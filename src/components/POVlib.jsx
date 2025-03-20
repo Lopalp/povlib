@@ -1,21 +1,52 @@
-"use client"
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ChevronDown, Play, X, Filter, Tag, ExternalLink, Map, Users, Calendar, Trophy, Check, Eye, User, Star, Heart, Menu, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Search, ChevronDown, Play, X, Filter, Tag, Map, Users, Calendar, Trophy, Check, Eye, User, Heart, Menu, ArrowRight, ArrowLeft } from 'lucide-react';
+import {
+  getAllDemos,
+  getFilteredDemos,
+  getTrendingDemos,
+  getLatestDemos,
+  getDemosByMap,
+  getDemosByPosition,
+  getFilterOptions,
+  updateDemoStats,
+  updateDemoTags,
+  updateDemoPositions
+} from '../lib/supabase';
 
 const POVlib = () => {
-  // State for navigation and UI
+  // State für Navigation und UI
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeVideoId, setActiveVideoId] = useState('rye2aZKjo_M');
-  const [demoType, setDemoType] = useState('pro'); // Toggle between 'pro' and 'community'
+  const [activeVideoId, setActiveVideoId] = useState('');
+  const [demoType, setDemoType] = useState('pro'); // Toggle zwischen 'pro' und 'community'
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [autoplayVideo, setAutoplayVideo] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // Daten-States
+  const [filteredDemos, setFilteredDemos] = useState([]);
+  const [trendingDemos, setTrendingDemos] = useState([]);
+  const [latestDemos, setLatestDemos] = useState([]);
+  const [mapDemos, setMapDemos] = useState({});
+  const [positionDemos, setPositionDemos] = useState({});
+  const [filterOptions, setFilterOptions] = useState({
+    maps: [],
+    positions: {},
+    teams: [],
+    years: [],
+    events: [],
+    results: [],
+    players: []
+  });
+  
   const [filtersApplied, setFiltersApplied] = useState({
     map: '',
     position: '',
@@ -23,284 +54,500 @@ const POVlib = () => {
     team: '',
     year: '',
     event: '',
-    result: ''
+    result: '',
+    search: ''
   });
   
-  // Refs for custom scrolling
+  // Refs für Custom Scrolling
   const scrollContainerRef = useRef(null);
   const featuredVideoRef = useRef(null);
   
-  // Maps and Positions
-  const maps = ["Mirage", "Inferno", "Dust2", "Nuke", "Overpass", "Vertigo", "Ancient", "Anubis"];
-  
-  const positions = {
-    "Mirage": ["A-Site", "B-Site", "Mid", "Connector", "Palace", "Apartments", "Window", "Underpass", "Ramp", "B Short", "B Anchor", "A Connect", "A Anchor", "Door", "AWPer"],
-    "Inferno": ["A-Site", "B-Site", "Banana", "Mid", "Apartments", "Pit", "Library", "A Rifle", "B Short", "B Support", "B Aggress", "B Anchor", "Door", "AWPer"],
-    "Dust2": ["A-Site", "B-Site", "Mid", "Long", "Catwalk", "Tunnels", "Middle", "CT", "B Aggress", "A Rifle", "B Support", "B Anchor", "Pit", "AWPer"],
-    "Nuke": ["A-Site", "B-Site", "Outside", "Ramp", "Heaven", "Secret", "Door", "Floor", "A Main", "AWPer"],
-    "Overpass": ["A-Site", "B-Site", "Connector", "Long", "Bank", "Monster", "AWPer"],
-    "Ancient": ["A Anchor", "Middle", "B Cave", "B Anchor", "AWPer"],
-    "Anubis": ["A Anchor", "B Connect", "Long", "Middle", "B Anchor", "AWPer", "CT"],
-  };
-  
-  const teams = ["NAVI", "FaZe", "Vitality", "G2", "Liquid", "MOUZ", "Astralis", "Complexity", "Spirit", "Eternal Fire", "TheMongolz"];
-  const years = ["2025", "2024", "2023", "2022", "2021"];
-  const events = ["Major", "BLAST Premier", "ESL Pro League", "IEM", "ESL One"];
-  const results = ["Win", "Loss"];
-
-  // Pro Demo Database
-  const proDemosDatabase = [
-    {
-      id: 1,
-      title: "sh1ro AWP Setup on Ancient",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Ancient",
-      positions: ["AWPer"],
-      tags: ["AWP", "Setup"],
-      players: ["sh1ro"],
-      team: "Spirit",
-      year: "2024",
-      event: "BLAST Premier",
-      result: "Win",
-      views: 12541,
-      likes: 340,
-      isPro: true
-    },
-    {
-      id: 2,
-      title: "ZywOo's Perfect AWP Rotation on Inferno",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Inferno",
-      positions: ["AWPer", "A-Site"],
-      tags: ["AWP", "Rotation"],
-      players: ["ZywOo"],
-      team: "Vitality",
-      year: "2024",
-      event: "ESL Pro League",
-      result: "Win",
-      views: 23156,
-      likes: 567,
-      isPro: true
-    },
-    {
-      id: 3,
-      title: "b1t A Anchor Defense on Mirage",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Mirage",
-      positions: ["A Anchor"],
-      tags: ["Rifle", "Defense"],
-      players: ["b1t"],
-      team: "Natus Vincere",
-      year: "2024",
-      event: "Major",
-      result: "Win",
-      views: 9823,
-      likes: 287,
-      isPro: true
-    },
-    {
-      id: 4,
-      title: "m0NESY AWP Connector Control on Overpass",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Overpass",
-      positions: ["Connector", "AWPer"],
-      tags: ["AWP", "Control"],
-      players: ["m0NESY"],
-      team: "G2",
-      year: "2024",
-      event: "IEM",
-      result: "Win",
-      views: 18450,
-      likes: 452,
-      isPro: true
-    },
-    {
-      id: 5,
-      title: "broky Outside AWP Angles on Nuke",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Nuke",
-      positions: ["Outside", "AWPer"],
-      tags: ["AWP", "Defense"],
-      players: ["broky"],
-      team: "FaZe",
-      year: "2023",
-      event: "Major",
-      result: "Win",
-      views: 15670,
-      likes: 398,
-      isPro: true
-    },
-    {
-      id: 6,
-      title: "donk's Middle Control on Ancient",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Ancient",
-      positions: ["Middle"],
-      tags: ["Rifle", "Control"],
-      players: ["donk"],
-      team: "Spirit",
-      year: "2023",
-      event: "ESL Pro League",
-      result: "Win",
-      views: 7836,
-      likes: 213,
-      isPro: true
-    },
-    {
-      id: 7,
-      title: "torzsi AWP Holds on Inferno",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Inferno",
-      positions: ["AWPer"],
-      tags: ["AWP", "Defense"],
-      players: ["torzsi"],
-      team: "MOUZ",
-      year: "2023",
-      event: "BLAST Premier",
-      result: "Loss",
-      views: 11234,
-      likes: 289,
-      isPro: true
-    },
-    {
-      id: 8,
-      title: "zont1x A Anchor Setups on Anubis",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Anubis",
-      positions: ["A Anchor"],
-      tags: ["Rifle", "Setup"],
-      players: ["zont1x"],
-      team: "Spirit",
-      year: "2023",
-      event: "IEM",
-      result: "Loss",
-      views: 6543,
-      likes: 178,
-      isPro: true
-    }
-  ];
-  
-  // Community Demo Database
-  const communityDemosDatabase = [
-    {
-      id: 101,
-      title: "Supreme Matchmaking - 30 Bomb on Mirage",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Mirage",
-      positions: ["A Anchor", "AWPer"],
-      tags: ["Matchmaking", "30 Bomb", "AWP"],
-      players: ["User123"],
-      year: "2025",
-      views: 532,
-      likes: 48,
-      isPro: false
-    },
-    {
-      id: 102,
-      title: "FaceIT Level 10 - Inferno B Hold",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Inferno",
-      positions: ["B-Site", "B Anchor"],
-      tags: ["FaceIT", "Rifle", "Defense"],
-      players: ["ProGamer44"],
-      year: "2025",
-      views: 1205,
-      likes: 87,
-      isPro: false
-    },
-    {
-      id: 103,
-      title: "ESEA Advanced - Dust2 AWP Mid Control",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Dust2",
-      positions: ["Mid", "AWPer"],
-      tags: ["ESEA", "AWP", "Control"],
-      players: ["AWPMaster"],
-      year: "2024",
-      views: 3487,
-      likes: 125,
-      isPro: false
-    },
-    {
-      id: 104,
-      title: "FaceIT Level 8 - Nuke Ramp Control",
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
-      videoId: "rye2aZKjo_M",
-      map: "Nuke",
-      positions: ["Ramp"],
-      tags: ["FaceIT", "Rifle", "Entry"],
-      players: ["RampGod"],
-      year: "2024",
-      views: 876,
-      likes: 54,
-      isPro: false
-    }
-  ];
-  
-  // Get current demo database based on selected type
-  const demoDatabase = demoType === 'pro' ? proDemosDatabase : communityDemosDatabase;
-  
-  // Filter demos based on current filters
-  const filteredDemos = demoDatabase.filter(demo => {
-    if (filtersApplied.map && demo.map !== filtersApplied.map) return false;
-    if (filtersApplied.position && !demo.positions.includes(filtersApplied.position)) return false;
-    if (filtersApplied.player && !demo.players.includes(filtersApplied.player)) return false;
-    if (filtersApplied.team && demo.team !== filtersApplied.team) return false;
-    if (filtersApplied.year && demo.year !== filtersApplied.year) return false;
-    if (filtersApplied.event && demo.event !== filtersApplied.event) return false;
-    if (filtersApplied.result && demo.result !== filtersApplied.result) return false;
+  // Daten laden, wenn die Komponente montiert wird
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Filter-Optionen laden
+        const options = await getFilterOptions();
+        setFilterOptions(options);
+        
+        // Initial gefilterte Demos laden
+        const demos = await getFilteredDemos(filtersApplied, demoType);
+        
+        // Datenfeld-Mapping (Supabase -> Frontend)
+        const mappedDemos = demos.map(demo => ({
+          id: demo.id,
+          title: demo.title,
+          thumbnail: demo.thumbnail,
+          videoId: demo.video_id,  // Umbenannt von video_id zu videoId
+          map: demo.map,
+          positions: demo.positions || [],
+          tags: demo.tags || [],
+          players: demo.players || [],
+          team: demo.team,
+          year: demo.year,
+          event: demo.event,
+          result: demo.result,
+          views: demo.views || 0,
+          likes: demo.likes || 0,
+          isPro: demo.is_pro // Umbenannt von is_pro zu isPro
+        }));
+        
+        setFilteredDemos(mappedDemos);
+        
+        // Trending und neueste Demos laden
+        const trendingData = await getTrendingDemos(5, demoType);
+        setTrendingDemos(trendingData.map(demo => ({
+          id: demo.id,
+          title: demo.title,
+          thumbnail: demo.thumbnail,
+          videoId: demo.video_id,
+          map: demo.map,
+          positions: demo.positions || [],
+          tags: demo.tags || [],
+          players: demo.players || [],
+          team: demo.team,
+          year: demo.year,
+          event: demo.event,
+          result: demo.result,
+          views: demo.views || 0,
+          likes: demo.likes || 0,
+          isPro: demo.is_pro
+        })));
+        
+        const latestData = await getLatestDemos(5, demoType);
+        setLatestDemos(latestData.map(demo => ({
+          id: demo.id,
+          title: demo.title,
+          thumbnail: demo.thumbnail,
+          videoId: demo.video_id,
+          map: demo.map,
+          positions: demo.positions || [],
+          tags: demo.tags || [],
+          players: demo.players || [],
+          team: demo.team,
+          year: demo.year,
+          event: demo.event,
+          result: demo.result,
+          views: demo.views || 0,
+          likes: demo.likes || 0,
+          isPro: demo.is_pro
+        })));
+        
+        // Video ID für das erste Demo setzen (falls vorhanden)
+        if (mappedDemos.length > 0) {
+          setActiveVideoId(mappedDemos[0].videoId);
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error loading initial data:', err);
+        setError('Failed to load data. Please try again later.');
+        setIsLoading(false);
+      }
+    };
     
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const inTitle = demo.title.toLowerCase().includes(query);
-      const inTags = demo.tags.some(tag => tag.toLowerCase().includes(query));
-      const inPlayer = demo.players.some(player => player.toLowerCase().includes(query));
-      const inMap = demo.map.toLowerCase().includes(query);
+    loadInitialData();
+  }, [demoType]);
+  
+  // Demos aktualisieren, wenn sich Filter ändern
+  useEffect(() => {
+    const updateFilteredDemos = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Gefilterte Demos laden
+        const demos = await getFilteredDemos({
+          ...filtersApplied,
+          search: searchQuery
+        }, demoType);
+        
+        // Datenfeld-Mapping (Supabase -> Frontend)
+        const mappedDemos = demos.map(demo => ({
+          id: demo.id,
+          title: demo.title,
+          thumbnail: demo.thumbnail,
+          videoId: demo.video_id,
+          map: demo.map,
+          positions: demo.positions || [],
+          tags: demo.tags || [],
+          players: demo.players || [],
+          team: demo.team,
+          year: demo.year,
+          event: demo.event,
+          result: demo.result,
+          views: demo.views || 0,
+          likes: demo.likes || 0,
+          isPro: demo.is_pro
+        }));
+        
+        setFilteredDemos(mappedDemos);
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error updating filtered demos:', err);
+        setError('Failed to update data. Please try again later.');
+        setIsLoading(false);
+      }
+    };
+    
+    updateFilteredDemos();
+  }, [filtersApplied, searchQuery, demoType]);
+  
+  // Map-spezifische Demos laden, wenn benötigt
+  useEffect(() => {
+    const loadMapDemos = async (map) => {
+      if (!mapDemos[map]) {
+        try {
+          const demos = await getDemosByMap(map);
+          
+          // Datenfeld-Mapping (Supabase -> Frontend)
+          const mappedDemos = demos.map(demo => ({
+            id: demo.id,
+            title: demo.title,
+            thumbnail: demo.thumbnail,
+            videoId: demo.video_id,
+            map: demo.map,
+            positions: demo.positions || [],
+            tags: demo.tags || [],
+            players: demo.players || [],
+            team: demo.team,
+            year: demo.year,
+            event: demo.event,
+            result: demo.result,
+            views: demo.views || 0,
+            likes: demo.likes || 0,
+            isPro: demo.is_pro
+          }));
+          
+          setMapDemos(prev => ({
+            ...prev,
+            [map]: mappedDemos
+          }));
+        } catch (err) {
+          console.error(`Error loading demos for map ${map}:`, err);
+        }
+      }
+    };
+    
+    // Für einige Standard-Maps vorladen
+    if (!filtersApplied.map) {
+      loadMapDemos('Mirage');
+      loadMapDemos('Inferno');
+    }
+  }, [mapDemos, filtersApplied.map]);
+  
+  // Position-spezifische Demos laden, wenn benötigt
+  useEffect(() => {
+    const loadPositionDemos = async (position) => {
+      if (!positionDemos[position]) {
+        try {
+          const demos = await getDemosByPosition(position);
+          
+          // Datenfeld-Mapping (Supabase -> Frontend)
+          const mappedDemos = demos.map(demo => ({
+            id: demo.id,
+            title: demo.title,
+            thumbnail: demo.thumbnail,
+            videoId: demo.video_id,
+            map: demo.map,
+            positions: demo.positions || [],
+            tags: demo.tags || [],
+            players: demo.players || [],
+            team: demo.team,
+            year: demo.year,
+            event: demo.event,
+            result: demo.result,
+            views: demo.views || 0,
+            likes: demo.likes || 0,
+            isPro: demo.is_pro
+          }));
+          
+          setPositionDemos(prev => ({
+            ...prev,
+            [position]: mappedDemos
+          }));
+        } catch (err) {
+          console.error(`Error loading demos for position ${position}:`, err);
+        }
+      }
+    };
+    
+    // AWP Demos vorladen
+    if (!filtersApplied.position) {
+      loadPositionDemos('AWPer');
+    }
+  }, [positionDemos, filtersApplied.position]);
+  
+  // Views aktualisieren, wenn ein Demo ausgewählt wird
+  useEffect(() => {
+    const updateViews = async () => {
+      if (selectedDemo) {
+        try {
+          const result = await updateDemoStats(selectedDemo.id, 'views', 1);
+          
+          if (result.success) {
+            // Lokalen State aktualisieren (damit wir nicht neu laden müssen)
+            setFilteredDemos(prev => 
+              prev.map(demo => 
+                demo.id === selectedDemo.id 
+                  ? { ...demo, views: demo.views + 1 } 
+                  : demo
+              )
+            );
+            
+            // Wenn das Demo in anderen Listen ist, dort auch aktualisieren
+            if (trendingDemos.some(demo => demo.id === selectedDemo.id)) {
+              setTrendingDemos(prev => 
+                prev.map(demo => 
+                  demo.id === selectedDemo.id 
+                    ? { ...demo, views: demo.views + 1 } 
+                    : demo
+                )
+              );
+            }
+            
+            if (latestDemos.some(demo => demo.id === selectedDemo.id)) {
+              setLatestDemos(prev => 
+                prev.map(demo => 
+                  demo.id === selectedDemo.id 
+                    ? { ...demo, views: demo.views + 1 } 
+                    : demo
+                )
+              );
+            }
+            
+            // Auch in mapDemos und positionDemos aktualisieren, falls vorhanden
+            Object.keys(mapDemos).forEach(map => {
+              if (mapDemos[map].some(demo => demo.id === selectedDemo.id)) {
+                setMapDemos(prev => ({
+                  ...prev,
+                  [map]: prev[map].map(demo => 
+                    demo.id === selectedDemo.id 
+                      ? { ...demo, views: demo.views + 1 } 
+                      : demo
+                  )
+                }));
+              }
+            });
+            
+            Object.keys(positionDemos).forEach(position => {
+              if (positionDemos[position].some(demo => demo.id === selectedDemo.id)) {
+                setPositionDemos(prev => ({
+                  ...prev,
+                  [position]: prev[position].map(demo => 
+                    demo.id === selectedDemo.id 
+                      ? { ...demo, views: demo.views + 1 } 
+                      : demo
+                  )
+                }));
+              }
+            });
+          }
+        } catch (err) {
+          console.error('Error updating views:', err);
+        }
+      }
+    };
+    
+    updateViews();
+  }, [selectedDemo]);
+  
+  // Demo-Like-Handler
+  const handleLikeDemo = async (demoId) => {
+    try {
+      const result = await updateDemoStats(demoId, 'likes', 1);
       
-      return inTitle || inTags || inPlayer || inMap;
+      if (result.success) {
+        // Remap Supabase-Felder auf Frontend-Felder
+        const updatedDemo = {
+          id: result.demo.id,
+          title: result.demo.title,
+          thumbnail: result.demo.thumbnail,
+          videoId: result.demo.video_id,
+          map: result.demo.map,
+          positions: result.demo.positions || [],
+          tags: result.demo.tags || [],
+          players: result.demo.players || [],
+          team: result.demo.team,
+          year: result.demo.year,
+          event: result.demo.event,
+          result: result.demo.result,
+          views: result.demo.views || 0,
+          likes: result.demo.likes || 0,
+          isPro: result.demo.is_pro
+        };
+        
+        // Lokalen State aktualisieren
+        setFilteredDemos(prev => 
+          prev.map(demo => 
+            demo.id === demoId 
+              ? { ...demo, likes: updatedDemo.likes } 
+              : demo
+          )
+        );
+        
+        if (selectedDemo && selectedDemo.id === demoId) {
+          setSelectedDemo({
+            ...selectedDemo,
+            likes: updatedDemo.likes
+          });
+        }
+        
+        // Auch in anderen Listen aktualisieren
+        if (trendingDemos.some(demo => demo.id === demoId)) {
+          setTrendingDemos(prev => 
+            prev.map(demo => 
+              demo.id === demoId 
+                ? { ...demo, likes: updatedDemo.likes } 
+                : demo
+            )
+          );
+        }
+        
+        if (latestDemos.some(demo => demo.id === demoId)) {
+          setLatestDemos(prev => 
+            prev.map(demo => 
+              demo.id === demoId 
+                ? { ...demo, likes: updatedDemo.likes } 
+                : demo
+            )
+          );
+        }
+        
+        // Auch in mapDemos und positionDemos aktualisieren
+        Object.keys(mapDemos).forEach(map => {
+          if (mapDemos[map].some(demo => demo.id === demoId)) {
+            setMapDemos(prev => ({
+              ...prev,
+              [map]: prev[map].map(demo => 
+                demo.id === demoId 
+                  ? { ...demo, likes: updatedDemo.likes } 
+                  : demo
+              )
+            }));
+          }
+        });
+        
+        Object.keys(positionDemos).forEach(position => {
+          if (positionDemos[position].some(demo => demo.id === demoId)) {
+            setPositionDemos(prev => ({
+              ...prev,
+              [position]: prev[position].map(demo => 
+                demo.id === demoId 
+                  ? { ...demo, likes: updatedDemo.likes } 
+                  : demo
+              )
+            }));
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error liking demo:', err);
     }
-    
-    return true;
-  });
-
-  // Get demos by category
-  const getFilteredDemosByMap = (map) => {
-    return filteredDemos.filter(demo => demo.map === map);
   };
   
-  const getFilteredDemosByPosition = (position) => {
-    return filteredDemos.filter(demo => demo.positions.includes(position));
+  // Tags aktualisieren
+  const handleUpdateTags = async (demoId, tags) => {
+    try {
+      const result = await updateDemoTags(demoId, tags);
+      
+      if (result.success) {
+        // Remap Supabase-Felder auf Frontend-Felder
+        const updatedDemo = {
+          id: result.demo.id,
+          title: result.demo.title,
+          thumbnail: result.demo.thumbnail,
+          videoId: result.demo.video_id,
+          map: result.demo.map,
+          positions: result.demo.positions || [],
+          tags: result.demo.tags || [],
+          players: result.demo.players || [],
+          team: result.demo.team,
+          year: result.demo.year,
+          event: result.demo.event,
+          result: result.demo.result,
+          views: result.demo.views || 0,
+          likes: result.demo.likes || 0,
+          isPro: result.demo.is_pro
+        };
+        
+        // Lokalen State aktualisieren
+        setFilteredDemos(prev => 
+          prev.map(demo => 
+            demo.id === demoId 
+              ? { ...demo, tags: updatedDemo.tags } 
+              : demo
+          )
+        );
+        
+        if (selectedDemo && selectedDemo.id === demoId) {
+          setSelectedDemo({
+            ...selectedDemo,
+            tags: updatedDemo.tags
+          });
+        }
+        
+        // Modal schließen
+        setIsTaggingModalOpen(false);
+      }
+    } catch (err) {
+      console.error('Error updating tags:', err);
+    }
   };
   
-  const getTrendingDemos = () => {
-    // Sort by views and take top 5
-    return [...filteredDemos].sort((a, b) => b.views - a.views).slice(0, 5);
+  // Positionen aktualisieren
+  const handleUpdatePositions = async (demoId, positions) => {
+    try {
+      const result = await updateDemoPositions(demoId, positions);
+      
+      if (result.success) {
+        // Remap Supabase-Felder auf Frontend-Felder
+        const updatedDemo = {
+          id: result.demo.id,
+          title: result.demo.title,
+          thumbnail: result.demo.thumbnail,
+          videoId: result.demo.video_id,
+          map: result.demo.map,
+          positions: result.demo.positions || [],
+          tags: result.demo.tags || [],
+          players: result.demo.players || [],
+          team: result.demo.team,
+          year: result.demo.year,
+          event: result.demo.event,
+          result: result.demo.result,
+          views: result.demo.views || 0,
+          likes: result.demo.likes || 0,
+          isPro: result.demo.is_pro
+        };
+        
+        // Lokalen State aktualisieren
+        setFilteredDemos(prev => 
+          prev.map(demo => 
+            demo.id === demoId 
+              ? { ...demo, positions: updatedDemo.positions } 
+              : demo
+          )
+        );
+        
+        if (selectedDemo && selectedDemo.id === demoId) {
+          setSelectedDemo({
+            ...selectedDemo,
+            positions: updatedDemo.positions
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error updating positions:', err);
+    }
   };
   
-  const getLatestDemos = () => {
-    // Sort by year (newer first) and take top 5
-    return [...filteredDemos].sort((a, b) => {
-      if (a.year !== b.year) return b.year - a.year;
-      return b.id - a.id; // Secondary sort by id if same year
-    }).slice(0, 5);
-  };
-  
-  // Custom scroll handling with enhanced smooth behavior
+  // Custom scroll handling mit enhanced smooth behavior
   const handleScroll = (direction, speed = 400) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const cardWidth = 300; // Approximate width of a card including margins
+      const cardWidth = 300; // Ungefähre Breite einer Karte inkl. Margins
       const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
       
       container.scrollBy({
@@ -310,12 +557,21 @@ const POVlib = () => {
     }
   };
   
-  // YouTube embed component with enhanced options
-  const YouTubeEmbed = ({ videoId, title, autoplay = false, className = "", controls = true, fullscreen = false }) => {
+  // Helferfunktionen für gefilterte Demos
+  const getFilteredDemosByMap = (map) => {
+    return mapDemos[map] || [];
+  };
+  
+  const getFilteredDemosByPosition = (position) => {
+    return positionDemos[position] || [];
+  };
+  
+  // YouTube embed component mit erweiterten Optionen
+  const YouTubeEmbed = ({ videoId, title, autoplay = false, className = "", controls = true }) => {
     if (!videoId) return null;
     
     return (
-      <div className={`relative ${fullscreen ? 'w-full h-full' : 'w-full pb-56.25 h-0'} rounded-lg overflow-hidden ${className}`}>
+      <div className={`relative w-full pb-56.25 h-0 rounded-lg overflow-hidden ${className}`}>
         <iframe
           className="absolute top-0 left-0 w-full h-full rounded-lg"
           src={`https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? 1 : 0}&rel=0&controls=${controls ? 1 : 0}&showinfo=0&mute=${autoplay ? 1 : 0}`}
@@ -328,7 +584,7 @@ const POVlib = () => {
     );
   };
   
-  // Redesigned Demo Card Component with professional layout
+  // Redesigned Demo Card Component mit professional layout
   const DemoCard = ({ demo, featured = false, className = "" }) => (
     <div 
       className={`relative flex-shrink-0 ${featured ? 'w-full' : 'w-72'} overflow-hidden rounded-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group ${className}`}
@@ -408,27 +664,23 @@ const POVlib = () => {
     </div>
   );
   
-  // Enhanced Featured Demo Hero Component with immersive video background
+  // Enhanced Featured Demo Hero Component with better spacing
   const FeaturedHero = ({ demo }) => {
     if (!demo) return null;
     
     return (
-      <div className="relative h-[80vh] min-h-[600px] w-full overflow-hidden">
-        {/* Immersive background video */}
-        <div className="absolute inset-0 w-full h-full" ref={featuredVideoRef}>
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent z-10"></div>
-          
-          {/* Ken Burns effect with scale and subtle animation */}
-          <div className="absolute inset-0 w-full h-full transform scale-105 animate-kenburns">
-            <YouTubeEmbed 
-              videoId={demo.videoId} 
-              title={demo.title} 
-              autoplay={autoplayVideo} 
-              controls={false}
-              fullscreen={true}
-            />
-          </div>
+      <div className="relative h-[60vh] min-h-[500px] w-full overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+        {/* Background video with improved gradient overlay */}
+        <div className="absolute inset-0 overflow-hidden" ref={featuredVideoRef}>
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
+          <YouTubeEmbed 
+            videoId={demo.videoId} 
+            title={demo.title} 
+            autoplay={autoplayVideo} 
+            controls={false} 
+            className="scale-110 opacity-60" 
+          />
         </div>
         
         {/* Content overlay with improved spacing */}
@@ -446,11 +698,11 @@ const POVlib = () => {
               </span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white leading-tight drop-shadow-lg">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white leading-tight">
               {demo.title}
             </h1>
             
-            <p className="text-gray-300 text-lg max-w-xl mb-6 line-clamp-2 drop-shadow-md">
+            <p className="text-gray-300 text-lg max-w-xl mb-6 line-clamp-2">
               Watch this high-level POV demo featuring {demo.players.join(', ')} playing on {demo.map}. 
               Learn professional techniques and strategies used by top players.
             </p>
@@ -479,11 +731,11 @@ const POVlib = () => {
             <div className="flex items-center mt-8 space-x-6">
               <div className="flex items-center">
                 <Eye className="h-5 w-5 mr-2 text-yellow-400" />
-                <span className="text-white drop-shadow-md">{demo.views.toLocaleString()} views</span>
+                <span className="text-white">{demo.views.toLocaleString()} views</span>
               </div>
               <div className="flex items-center">
                 <Heart className="h-5 w-5 mr-2 text-yellow-400" />
-                <span className="text-white drop-shadow-md">{demo.likes} likes</span>
+                <span className="text-white">{demo.likes} likes</span>
               </div>
             </div>
           </div>
@@ -494,7 +746,7 @@ const POVlib = () => {
   
   // Demo carousel with improved spacing and professional design
   const DemoCarousel = ({ title, demos, description }) => {
-    if (demos.length === 0) return null;
+    if (!demos || demos.length === 0) return null;
     
     return (
       <div className="mb-16 relative">
@@ -628,6 +880,7 @@ const POVlib = () => {
                   Tag Demo
                 </button>
                 <button 
+                  onClick={() => handleLikeDemo(selectedDemo.id)}
                   className="px-4 py-2 bg-yellow-400 text-gray-900 text-sm rounded-md hover:bg-yellow-300 transition flex items-center font-bold"
                 >
                   <Heart className="h-4 w-4 mr-2" />
@@ -668,6 +921,11 @@ const POVlib = () => {
     
     const removePosition = (positionToRemove) => {
       setDemoPositions(demoPositions.filter(position => position !== positionToRemove));
+    };
+    
+    const handleSave = () => {
+      handleUpdateTags(selectedDemo.id, demoTags);
+      handleUpdatePositions(selectedDemo.id, demoPositions);
     };
     
     return (
@@ -724,7 +982,7 @@ const POVlib = () => {
                       }}
                     >
                       <option value="">+ Add Position</option>
-                      {positions[selectedDemo.map]?.map((pos, idx) => (
+                      {filterOptions.positions[selectedDemo.map]?.map((pos, idx) => (
                         <option key={idx} value={pos}>{pos}</option>
                       ))}
                     </select>
@@ -773,7 +1031,10 @@ const POVlib = () => {
               
               {/* Submit Button */}
               <div className="flex justify-end mt-6">
-                <button className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)]">
+                <button 
+                  onClick={handleSave}
+                  className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)]"
+                >
                   Save Tags
                 </button>
               </div>
@@ -836,7 +1097,7 @@ const POVlib = () => {
                     }}
                   >
                     <option value="">All Maps</option>
-                    {maps.map(map => (
+                    {filterOptions.maps.map(map => (
                       <option key={map} value={map}>{map}</option>
                     ))}
                   </select>
@@ -860,10 +1121,10 @@ const POVlib = () => {
                   >
                     <option value="">All Positions</option>
                     {filtersApplied.map 
-                      ? positions[filtersApplied.map]?.map(pos => (
+                      ? filterOptions.positions[filtersApplied.map]?.map(pos => (
                           <option key={pos} value={pos}>{pos}</option>
                         ))
-                      : Object.values(positions).flat().filter((pos, i, arr) => arr.indexOf(pos) === i).map(pos => (
+                      : Object.values(filterOptions.positions).flat().filter((pos, i, arr) => arr.indexOf(pos) === i).map(pos => (
                           <option key={pos} value={pos}>{pos}</option>
                         ))
                     }
@@ -889,7 +1150,7 @@ const POVlib = () => {
                     }}
                   >
                     <option value="">All Players</option>
-                    {[...new Set(demoDatabase.flatMap(demo => demo.players))].map(player => (
+                    {filterOptions.players.map(player => (
                       <option key={player} value={player}>{player}</option>
                     ))}
                   </select>
@@ -912,7 +1173,7 @@ const POVlib = () => {
                       }}
                     >
                       <option value="">All Teams</option>
-                      {teams.map(team => (
+                      {filterOptions.teams.map(team => (
                         <option key={team} value={team}>{team}</option>
                       ))}
                     </select>
@@ -938,7 +1199,7 @@ const POVlib = () => {
                     }}
                   >
                     <option value="">All Years</option>
-                    {years.map(year => (
+                    {filterOptions.years.map(year => (
                       <option key={year} value={year}>{year}</option>
                     ))}
                   </select>
@@ -963,7 +1224,7 @@ const POVlib = () => {
                         }}
                       >
                         <option value="">All Events</option>
-                        {events.map(event => (
+                        {filterOptions.events.map(event => (
                           <option key={event} value={event}>{event}</option>
                         ))}
                       </select>
@@ -986,7 +1247,7 @@ const POVlib = () => {
                         }}
                       >
                         <option value="">All Results</option>
-                        {results.map(result => (
+                        {filterOptions.results.map(result => (
                           <option key={result} value={result}>{result}</option>
                         ))}
                       </select>
@@ -1006,7 +1267,8 @@ const POVlib = () => {
                       team: '',
                       year: '',
                       event: '',
-                      result: ''
+                      result: '',
+                      search: ''
                     });
                   }}
                   className="text-gray-400 hover:text-yellow-400 text-sm font-bold transition-colors"
@@ -1037,7 +1299,7 @@ const POVlib = () => {
     return (
       <div className="flex flex-wrap gap-2 mb-8 p-4 bg-gray-800 rounded-xl border border-gray-700">
         {Object.entries(filtersApplied).map(([key, value]) => {
-          if (!value) return null;
+          if (!value || key === 'search') return null;
           
           return (
             <div key={key} className="flex items-center bg-gray-700 text-xs rounded-full px-3 py-2 group hover:bg-gray-600 transition-colors">
@@ -1067,7 +1329,8 @@ const POVlib = () => {
               team: '',
               year: '',
               event: '',
-              result: ''
+              result: '',
+              search: searchQuery
             });
           }}
           className="text-xs text-gray-400 hover:text-yellow-400 ml-2 font-bold transition-colors"
@@ -1118,14 +1381,39 @@ const POVlib = () => {
     );
   };
 
-  // Create references for scrolling
-  const topRef = useRef(null);
-    
+  // Loading-Anzeige
+  if (isLoading && !filteredDemos.length) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg font-medium">Loading POVlib data...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Fehler-Anzeige
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6 bg-gray-800 rounded-xl shadow-lg">
+          <div className="text-red-500 text-5xl mb-4">!</div>
+          <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      {/* Ref for scrolling to top */}
-      <div ref={topRef} />
-      
       {/* Custom CSS for scrollbars and effects */}
       <style jsx>{`
         /* Hide scrollbar for Chrome, Safari and Opera */
@@ -1149,23 +1437,6 @@ const POVlib = () => {
         .bg-pattern {
           background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
           background-size: 20px 20px;
-        }
-        
-        /* Ken Burns effect for hero background */
-        @keyframes kenburns {
-          0% {
-            transform: scale(1.05);
-          }
-          50% {
-            transform: scale(1.12);
-          }
-          100% {
-            transform: scale(1.05);
-          }
-        }
-        
-        .animate-kenburns {
-          animation: kenburns 20s ease-in-out infinite;
         }
       `}</style>
       
@@ -1240,6 +1511,7 @@ const POVlib = () => {
                     onClick={() => {
                       setSearchActive(false);
                       setSearchQuery('');
+                      setFiltersApplied(prev => ({...prev, search: ''}));
                     }}
                   />
                 </div>
@@ -1311,8 +1583,23 @@ const POVlib = () => {
         {/* Content category tabs */}
         <ContentTabs />
         
-        {/* Content based on selected tab */}
-        {activeTab === 'all' && (
+        {/* Wenn Daten geladen werden, Skeleton anzeigen */}
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-gray-800 rounded-xl overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-700"></div>
+                <div className="p-4">
+                  <div className="h-5 bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Inhalt basierend auf ausgewähltem Tab */}
+        {!isLoading && activeTab === 'all' && (
           <>
             <DemoCarousel 
               title="Recently Added"
@@ -1343,23 +1630,23 @@ const POVlib = () => {
           </>
         )}
         
-        {activeTab === 'trending' && (
+        {!isLoading && activeTab === 'trending' && (
           <DemoCarousel 
             title="Trending POVs"
-            demos={getTrendingDemos()} 
+            demos={trendingDemos} 
             description="Most viewed demos right now"
           />
         )}
         
-        {activeTab === 'latest' && (
+        {!isLoading && activeTab === 'latest' && (
           <DemoCarousel 
             title="Latest Uploads"
-            demos={getLatestDemos()} 
+            demos={latestDemos} 
             description="Fresh POV content from this year"
           />
         )}
         
-        {activeTab === 'awp' && (
+        {!isLoading && activeTab === 'awp' && (
           <DemoCarousel 
             title="AWP Highlights"
             demos={getFilteredDemosByPosition("AWPer")} 
@@ -1367,7 +1654,7 @@ const POVlib = () => {
           />
         )}
         
-        {activeTab === 'rifle' && (
+        {!isLoading && activeTab === 'rifle' && (
           <DemoCarousel 
             title="Rifle Plays"
             demos={filteredDemos.filter(demo => 
@@ -1379,44 +1666,46 @@ const POVlib = () => {
         )}
         
         {/* Maps grid with proper spacing */}
-        <div className="mt-16 mb-12">
-          <h2 className="text-2xl font-bold text-white mb-8">
-            <span className="border-l-4 border-yellow-400 pl-3 py-1">Browse Maps</span>
-          </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {maps.slice(0, 8).map(map => (
-              <div 
-                key={map}
-                className="relative overflow-hidden h-36 rounded-xl cursor-pointer group"
-                onClick={() => {
-                  setFiltersApplied(prev => ({
-                    ...prev,
-                    map: map
-                  }));
-                }}
-              >
-                <img 
-                  src="https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true" 
-                  alt={map} 
-                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-yellow-400 z-0"></div>
-                
-                <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-                  <h3 className="text-white font-bold text-lg mb-2">{map}</h3>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-yellow-400 font-medium">
-                      {getFilteredDemosByMap(map).length} POVs
-                    </span>
-                    <span className="text-xs text-gray-300 group-hover:text-white transition-colors">View &rarr;</span>
+        {!isLoading && (
+          <div className="mt-16 mb-12">
+            <h2 className="text-2xl font-bold text-white mb-8">
+              <span className="border-l-4 border-yellow-400 pl-3 py-1">Browse Maps</span>
+            </h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filterOptions.maps.slice(0, 8).map(map => (
+                <div 
+                  key={map}
+                  className="relative overflow-hidden h-36 rounded-xl cursor-pointer group"
+                  onClick={() => {
+                    setFiltersApplied(prev => ({
+                      ...prev,
+                      map: map
+                    }));
+                  }}
+                >
+                  <img 
+                    src="https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true" 
+                    alt={map} 
+                    className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-yellow-400 z-0"></div>
+                  
+                  <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                    <h3 className="text-white font-bold text-lg mb-2">{map}</h3>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-yellow-400 font-medium">
+                        {getFilteredDemosByMap(map).length} POVs
+                      </span>
+                      <span className="text-xs text-gray-300 group-hover:text-white transition-colors">View &rarr;</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </main>
       
       {/* Footer with cleaner design */}
