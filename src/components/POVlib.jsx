@@ -13,7 +13,7 @@ import {
   updateDemoStats,
   updateDemoTags,
   updateDemoPositions
-} from '../lib/supabase';
+} from './lib/supabase';
 
 const POVlib = () => {
   // State für Navigation und UI
