@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Eye, Heart, Tag, Share2, Flag, Bookmark, 
-  ThumbsUp, ChevronDown, ChevronRight, MapPin, Shield 
+  ThumbsUp, ChevronDown, ChevronRight, MapPin, Shield, Play
 } from 'lucide-react';
 import YouTubeEmbed from './YouTubeEmbed';
 import DemoCard from './DemoCard';
@@ -113,7 +113,14 @@ const VideoPlayerPage = ({
                 <div className="flex flex-wrap items-center justify-between gap-2 py-4 border-t border-b border-gray-800">
                   <div className="flex flex-wrap gap-4">
                     <button 
-                      onClick={() => onLike(selectedDemo.id)}
+                      onClick={() => {
+                        try {
+                          onLike(selectedDemo.id);
+                        } catch (error) {
+                          console.log("Error liking demo:", error);
+                          // Don't break the UI, just log the error
+                        }
+                      }}
                       className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors"
                     >
                       <ThumbsUp className="h-5 w-5" />
