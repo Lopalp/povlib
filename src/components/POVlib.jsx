@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { Search, Filter, X, Menu } from 'lucide-react';
 import {
   getFilteredDemos,
@@ -11,7 +12,8 @@ import {
   getFilterOptions,
   updateDemoStats,
   updateDemoTags,
-  updateDemoPositions
+  updateDemoPositions,
+  getPlayerInfo
 } from '@/lib/supabase';
 
 import YouTubeEmbed from './POVlib/YouTubeEmbed';
@@ -26,6 +28,7 @@ import Footer from './POVlib/Footer';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
 import ContentTabs from './POVlib/ContentTabs';
+import PlayerCard from './POVlib/PlayerCard';
 
 const POVlib = () => {
   // UI States
@@ -50,6 +53,7 @@ const POVlib = () => {
   const [mapDemos, setMapDemos] = useState({});
   const [positionDemos, setPositionDemos] = useState({});
   const [relatedDemos, setRelatedDemos] = useState([]);
+  const [topPlayers, setTopPlayers] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     maps: [],
     positions: {},
@@ -143,6 +147,21 @@ const POVlib = () => {
           likes: demo.likes || 0,
           isPro: demo.is_pro
         })));
+        
+        // Load top players
+        if (options.players && options.players.length > 0) {
+          const playerPromises = options.players.slice(0, 5).map(async (playerName) => {
+            try {
+              return await getPlayerInfo(playerName);
+            } catch (err) {
+              console.error(`Error loading player info for ${playerName}:`, err);
+              return null;
+            }
+          });
+          
+          const playerResults = await Promise.all(playerPromises);
+          setTopPlayers(playerResults.filter(Boolean));
+        }
         
         if (mappedDemos.length > 0) {
           setActiveVideoId(mappedDemos[0].videoId);
@@ -654,6 +673,39 @@ const POVlib = () => {
             onSelectDemo={onSelectDemo}
             handleScroll={handleScroll}
           />
+        )}
+        
+        {/* Featured Players Section */}
+        {topPlayers.length > 0 && (
+          <div className="mt-16 mb-12">
+            <h2 className="text-2xl font-bold text-white mb-8">
+              <span className="border-l-4 border-yellow-400 pl-3 py-1">Top Players</span>
+            </h2>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {topPlayers.map(player => (
+                <PlayerCard 
+                  key={player.name}
+                  player={player}
+                  demoCount={player.stats?.totalDemos}
+                  viewCount={player.stats?.totalViews}
+                />
+              ))}
+              
+              <Link
+                href="/players"
+                className="flex items-center justify-center rounded-xl border border-gray-700 hover:border-yellow-400/30 bg-gradient-to-br from-gray-800 to-gray-900 p-6 transition-all duration-300 hover:scale-105"
+              >
+                <div className="text-center">
+                  <div className="w-24 h-24 rounded-full bg-gray-800 hover:bg-yellow-400/20 border-2 border-yellow-400/30 mb-4 flex items-center justify-center">
+                    <span className="text-yellow-400 text-3xl font-bold">+</span>
+                  </div>
+                  <h3 className="text-white font-bold mb-1">View All Players</h3>
+                  <p className="text-gray-400 text-sm">Browse the complete list</p>
+                </div>
+              </Link>
+            </div>
+          </div>
         )}
         
         {/* Map Grid */}

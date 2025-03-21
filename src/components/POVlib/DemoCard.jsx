@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Play, Eye, Heart } from 'lucide-react';
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => (
@@ -47,7 +48,20 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => (
     
     <div className="p-4 relative overflow-hidden">
       <div className="flex justify-between items-center">
-        <span className="text-yellow-400 text-xs font-medium">{demo.players.join(', ')}</span>
+        <span className="text-yellow-400 text-xs font-medium">
+          {demo.players.map((player, idx) => (
+            <React.Fragment key={idx}>
+              {idx > 0 && ", "}
+              <Link 
+                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                className="hover:underline hover:text-yellow-300"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {player}
+              </Link>
+            </React.Fragment>
+          ))}
+        </span>
         <span className="text-gray-400 text-xs">{demo.year}</span>
       </div>
       <div className="flex flex-wrap gap-1 mt-2">
