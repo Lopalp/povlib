@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Filter, Eye, Heart, ChevronDown, Star } from 'lucide-react';
+import { Play, Filter, ChevronDown, Star } from 'lucide-react';
 import YouTubeEmbed from './YouTubeEmbed';
 
 const FeaturedHero = ({ 
@@ -53,12 +53,13 @@ const FeaturedHero = ({
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/50 z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay z-5"></div>
-        <div className={`absolute inset-0 scale-105 transition-all duration-1000 ${isVisible ? 'opacity-60' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 transition-all duration-1000 ${isVisible ? 'opacity-60' : 'opacity-0'}`}>
           <YouTubeEmbed 
             videoId={demo.videoId} 
             title={demo.title} 
             autoplay={autoplayVideo} 
             controls={false}
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
@@ -73,10 +74,6 @@ const FeaturedHero = ({
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-yellow-400 text-gray-900 font-bold rounded-full px-3 py-1 text-sm flex items-center gap-1">
                 <Star className="w-3 h-3" /> FEATURED
-              </span>
-              <span className="h-4 w-px bg-gray-600"></span>
-              <span className="text-gray-400 text-sm">
-                {demo.views.toLocaleString()} views
               </span>
             </div>
             
@@ -152,28 +149,14 @@ const FeaturedHero = ({
             ))}
           </div>
           
-          {/* Social stats */}
-          <div className="flex items-center mt-6 space-x-6">
-            <div className="flex items-center">
-              <Eye className="h-5 w-5 mr-2 text-yellow-400" />
-              <span className="text-white">{demo.views.toLocaleString()} views</span>
-            </div>
-            <div className="flex items-center">
-              <Heart className="h-5 w-5 mr-2 text-yellow-400" />
-              <span className="text-white">{demo.likes} likes</span>
-            </div>
-          </div>
+
         </div>
       </div>
       
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
       
-      {/* Scroll indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center animate-bounce">
-        <div className="text-gray-400 text-xs mb-1">Scroll for more</div>
-        <ChevronDown className="h-5 w-5 text-yellow-400" />
-      </div>
+
     </div>
   );
 };
