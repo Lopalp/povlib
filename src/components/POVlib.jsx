@@ -1,8 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Filter } from 'lucide-react';
-import { getAllDemos, getFilteredDemos, getTrendingDemos, getLatestDemos, getDemosByMap, getDemosByPosition, getFilterOptions, updateDemoStats, updateDemoTags, updateDemoPositions } from '@/lib/supabase';
+import { Search, Filter, X, Menu } from 'lucide-react';
+import {
+  getFilteredDemos,
+  getTrendingDemos,
+  getLatestDemos,
+  getDemosByMap,
+  getDemosByPosition,
+  getFilterOptions,
+  updateDemoStats,
+  updateDemoTags,
+  updateDemoPositions
+} from '@/lib/supabase';
+
 import YouTubeEmbed from './POVlib/YouTubeEmbed';
 import DemoCard from './POVlib/DemoCard';
 import VideoPlayerModal from './POVlib/VideoPlayerModal';
@@ -12,9 +23,12 @@ import Navbar from './POVlib/Navbar';
 import DemoCarousel from './POVlib/DemoCarousel';
 import MapGrid from './POVlib/MapGrid';
 import Footer from './POVlib/Footer';
+import FeaturedHero from './POVlib/FeaturedHero';
+import SelectedFilters from './POVlib/SelectedFilters';
+import ContentTabs from './POVlib/ContentTabs';
 
 const POVlib = () => {
-  const [activeFilter, setActiveFilter] = useState('all');
+  // UI States
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
@@ -27,7 +41,8 @@ const POVlib = () => {
   const [autoplayVideo, setAutoplayVideo] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
+  // Data States
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
   const [latestDemos, setLatestDemos] = useState([]);
@@ -57,16 +72,15 @@ const POVlib = () => {
   const scrollContainerRef = useRef(null);
   const featuredVideoRef = useRef(null);
   
-  // Helper: Liefert Demos nach Map
-  const getFilteredDemosByMap = (map) => {
-    return mapDemos[map] || [];
-  };
+  // Helper-Funktionen
+  const getFilteredDemosByMap = (map) => mapDemos[map] || [];
+  const getFilteredDemosByPosition = (position) => positionDemos[position] || [];
   
+  // Daten laden
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
-        
         const options = await getFilterOptions();
         setFilterOptions(options);
         
@@ -143,14 +157,12 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
   
+  // Aktualisiere gefilterte Demos bei Änderung der Filter
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
         setIsLoading(true);
-        const demos = await getFilteredDemos({
-          ...filtersApplied,
-          search: searchQuery
-        }, demoType);
+        const demos = await getFilteredDemos({ ...filtersApplied, search: searchQuery }, demoType);
         const mappedDemos = demos.map(demo => ({
           id: demo.id,
           title: demo.title,
@@ -180,6 +192,7 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
   
+  // Map- und Positions-Demos laden
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -202,16 +215,12 @@ const POVlib = () => {
             likes: demo.likes || 0,
             isPro: demo.is_pro
           }));
-          setMapDemos(prev => ({
-            ...prev,
-            [map]: mappedDemos
-          }));
+          setMapDemos(prev => ({ ...prev, [map]: mappedDemos }));
         } catch (err) {
           console.error(`Error loading demos for map ${map}:`, err);
         }
       }
     };
-    
     if (!filtersApplied.map) {
       loadMapDemos('Mirage');
       loadMapDemos('Inferno');
@@ -240,21 +249,18 @@ const POVlib = () => {
             likes: demo.likes || 0,
             isPro: demo.is_pro
           }));
-          setPositionDemos(prev => ({
-            ...prev,
-            [position]: mappedDemos
-          }));
+          setPositionDemos(prev => ({ ...prev, [position]: mappedDemos }));
         } catch (err) {
           console.error(`Error loading demos for position ${position}:`, err);
         }
       }
     };
-    
     if (!filtersApplied.position) {
       loadPositionDemos('AWPer');
     }
   }, [positionDemos, filtersApplied.position]);
   
+  // Views aktualisieren
   useEffect(() => {
     const updateViews = async () => {
       if (selectedDemo) {
@@ -262,55 +268,31 @@ const POVlib = () => {
           const result = await updateDemoStats(selectedDemo.id, 'views', 1);
           if (result.success) {
             setFilteredDemos(prev => 
-              prev.map(demo => 
-                demo.id === selectedDemo.id 
-                  ? { ...demo, views: demo.views + 1 } 
-                  : demo
-              )
+              prev.map(demo => demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo)
             );
-            
             if (trendingDemos.some(demo => demo.id === selectedDemo.id)) {
               setTrendingDemos(prev => 
-                prev.map(demo => 
-                  demo.id === selectedDemo.id 
-                    ? { ...demo, views: demo.views + 1 } 
-                    : demo
-                )
+                prev.map(demo => demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo)
               );
             }
-            
             if (latestDemos.some(demo => demo.id === selectedDemo.id)) {
               setLatestDemos(prev => 
-                prev.map(demo => 
-                  demo.id === selectedDemo.id 
-                    ? { ...demo, views: demo.views + 1 } 
-                    : demo
-                )
+                prev.map(demo => demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo)
               );
             }
-            
             Object.keys(mapDemos).forEach(map => {
               if (mapDemos[map].some(demo => demo.id === selectedDemo.id)) {
                 setMapDemos(prev => ({
                   ...prev,
-                  [map]: prev[map].map(demo => 
-                    demo.id === selectedDemo.id 
-                      ? { ...demo, views: demo.views + 1 } 
-                      : demo
-                  )
+                  [map]: prev[map].map(demo => demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo)
                 }));
               }
             });
-            
             Object.keys(positionDemos).forEach(position => {
               if (positionDemos[position].some(demo => demo.id === selectedDemo.id)) {
                 setPositionDemos(prev => ({
                   ...prev,
-                  [position]: prev[position].map(demo => 
-                    demo.id === selectedDemo.id 
-                      ? { ...demo, views: demo.views + 1 } 
-                      : demo
-                  )
+                  [position]: prev[position].map(demo => demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo)
                 }));
               }
             });
@@ -320,10 +302,10 @@ const POVlib = () => {
         }
       }
     };
-    
     updateViews();
   }, [selectedDemo]);
   
+  // Handler-Funktionen (Like, Update Tags/Positions)
   const handleLikeDemo = async (demoId) => {
     try {
       const result = await updateDemoStats(demoId, 'likes', 1);
@@ -346,65 +328,11 @@ const POVlib = () => {
           isPro: result.demo.is_pro
         };
         setFilteredDemos(prev => 
-          prev.map(demo => 
-            demo.id === demoId 
-              ? { ...demo, likes: updatedDemo.likes } 
-              : demo
-          )
+          prev.map(demo => demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo)
         );
-        
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({
-            ...selectedDemo,
-            likes: updatedDemo.likes
-          });
+          setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
-        
-        if (trendingDemos.some(demo => demo.id === demoId)) {
-          setTrendingDemos(prev => 
-            prev.map(demo => 
-              demo.id === demoId 
-                ? { ...demo, likes: updatedDemo.likes } 
-                : demo
-            )
-          );
-        }
-        
-        if (latestDemos.some(demo => demo.id === demoId)) {
-          setLatestDemos(prev => 
-            prev.map(demo => 
-              demo.id === demoId 
-                ? { ...demo, likes: updatedDemo.likes } 
-                : demo
-            )
-          );
-        }
-        
-        Object.keys(mapDemos).forEach(map => {
-          if (mapDemos[map].some(demo => demo.id === demoId)) {
-            setMapDemos(prev => ({
-              ...prev,
-              [map]: prev[map].map(demo => 
-                demo.id === demoId 
-                  ? { ...demo, likes: updatedDemo.likes } 
-                  : demo
-              )
-            }));
-          }
-        });
-        
-        Object.keys(positionDemos).forEach(position => {
-          if (positionDemos[position].some(demo => demo.id === demoId)) {
-            setPositionDemos(prev => ({
-              ...prev,
-              [position]: prev[position].map(demo => 
-                demo.id === demoId 
-                  ? { ...demo, likes: updatedDemo.likes } 
-                  : demo
-              )
-            }));
-          }
-        });
       }
     } catch (err) {
       console.error('Error liking demo:', err);
@@ -433,20 +361,11 @@ const POVlib = () => {
           isPro: result.demo.is_pro
         };
         setFilteredDemos(prev => 
-          prev.map(demo => 
-            demo.id === demoId 
-              ? { ...demo, tags: updatedDemo.tags } 
-              : demo
-          )
+          prev.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo)
         );
-        
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({
-            ...selectedDemo,
-            tags: updatedDemo.tags
-          });
+          setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
         }
-        
         setIsTaggingModalOpen(false);
       }
     } catch (err) {
@@ -476,18 +395,10 @@ const POVlib = () => {
           isPro: result.demo.is_pro
         };
         setFilteredDemos(prev => 
-          prev.map(demo => 
-            demo.id === demoId 
-              ? { ...demo, positions: updatedDemo.positions } 
-              : demo
-          )
+          prev.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo)
         );
-        
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({
-            ...selectedDemo,
-            positions: updatedDemo.positions
-          });
+          setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
         }
       }
     } catch (err) {
@@ -495,43 +406,34 @@ const POVlib = () => {
     }
   };
   
+  // Custom Scroll Handling
   const handleScroll = (direction) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const cardWidth = 300;
       const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
-      container.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
   
+  // Auswahl eines Demos
   const onSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
   };
   
-  const onSwitchDemoType = (type) => {
-    setDemoType(type);
-  };
-  
-  const onResetFilters = () => {
-    setFiltersApplied({
-      map: '',
-      position: '',
-      player: '',
-      team: '',
-      year: '',
-      event: '',
-      result: '',
-      search: searchQuery
-    });
-  };
-  
-  const onApplyFilters = () => {
-    setIsFilterModalOpen(false);
-  };
+  const onSwitchDemoType = (type) => setDemoType(type);
+  const onResetFilters = () => setFiltersApplied({
+    map: '',
+    position: '',
+    player: '',
+    team: '',
+    year: '',
+    event: '',
+    result: '',
+    search: searchQuery
+  });
+  const onApplyFilters = () => setIsFilterModalOpen(false);
   
   if (isLoading && !filteredDemos.length) {
     return (
@@ -565,21 +467,9 @@ const POVlib = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 0;
-          width: 0;
-          display: none;
-        }
-        
-        .custom-scrollbar {
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        
-        .bg-pattern {
-          background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-          background-size: 20px 20px;
-        }
+        .custom-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .bg-pattern { background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 20px 20px; }
       `}</style>
       
       <Navbar 
@@ -592,14 +482,34 @@ const POVlib = () => {
       />
       
       {filteredDemos.length > 0 && !selectedDemo && (
-        <div className="mb-12">
-          <YouTubeEmbed videoId={filteredDemos[0].videoId} title={filteredDemos[0].title} autoplay={autoplayVideo} controls={false} className="scale-110 opacity-60" />
-        </div>
+        <FeaturedHero 
+          demo={filteredDemos[0]}
+          autoplayVideo={autoplayVideo}
+          setSelectedDemo={setSelectedDemo}
+          setActiveVideoId={setActiveVideoId}
+          setIsFilterModalOpen={setIsFilterModalOpen}
+        />
       )}
       
       <main className="container mx-auto px-6 py-12 bg-pattern">
-        {/* Hier können weitere UI-Elemente wie Tabs etc. eingefügt werden */}
-        {activeTab === 'all' && (
+        <SelectedFilters filtersApplied={filtersApplied} setFiltersApplied={setFiltersApplied} searchQuery={searchQuery} />
+        <ContentTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-gray-800 rounded-xl overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-700"></div>
+                <div className="p-4">
+                  <div className="h-5 bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {!isLoading && activeTab === 'all' && (
           <>
             <DemoCarousel 
               title="Recently Added"
@@ -608,28 +518,26 @@ const POVlib = () => {
               onSelectDemo={onSelectDemo}
               handleScroll={handleScroll}
             />
-            
             {!filtersApplied.map && (
               <>
                 <DemoCarousel 
                   title="Mirage POVs" 
-                  demos={mapDemos['Mirage'] || []} 
+                  demos={getFilteredDemosByMap("Mirage")} 
                   onSelectDemo={onSelectDemo}
                   handleScroll={handleScroll}
                 />
                 <DemoCarousel 
                   title="Inferno POVs" 
-                  demos={mapDemos['Inferno'] || []} 
+                  demos={getFilteredDemosByMap("Inferno")} 
                   onSelectDemo={onSelectDemo}
                   handleScroll={handleScroll}
                 />
               </>
             )}
-            
             {!filtersApplied.position && (
               <DemoCarousel 
                 title="AWP Plays" 
-                demos={positionDemos['AWPer'] || []} 
+                demos={getFilteredDemosByPosition("AWPer")} 
                 onSelectDemo={onSelectDemo}
                 handleScroll={handleScroll}
               />
@@ -637,7 +545,7 @@ const POVlib = () => {
           </>
         )}
         
-        {activeTab === 'trending' && (
+        {!isLoading && activeTab === 'trending' && (
           <DemoCarousel 
             title="Trending POVs"
             demos={trendingDemos}
@@ -647,11 +555,34 @@ const POVlib = () => {
           />
         )}
         
-        {activeTab === 'latest' && (
+        {!isLoading && activeTab === 'latest' && (
           <DemoCarousel 
             title="Latest Uploads"
             demos={latestDemos}
             description="Fresh POV content from this year"
+            onSelectDemo={onSelectDemo}
+            handleScroll={handleScroll}
+          />
+        )}
+        
+        {!isLoading && activeTab === 'awp' && (
+          <DemoCarousel 
+            title="AWP Highlights"
+            demos={getFilteredDemosByPosition("AWPer")}
+            description="Best AWP plays from top players"
+            onSelectDemo={onSelectDemo}
+            handleScroll={handleScroll}
+          />
+        )}
+        
+        {!isLoading && activeTab === 'rifle' && (
+          <DemoCarousel 
+            title="Rifle Plays"
+            demos={filteredDemos.filter(demo => 
+              demo.tags.some(tag => tag.includes('Rifle')) || 
+              demo.positions.some(pos => !pos.includes('AWP'))
+            )}
+            description="Top rifle gameplay and positioning"
             onSelectDemo={onSelectDemo}
             handleScroll={handleScroll}
           />
