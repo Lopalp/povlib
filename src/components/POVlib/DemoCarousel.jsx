@@ -44,11 +44,16 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
     setScrollWidth(maxScrollLeft <= 0 ? 0 : (clientWidth / scrollWidth) * 100);
   };
 
-  // Register scroll event
+  // Register scroll and wheel events
   useEffect(() => {
     const carousel = carouselRef.current;
     if (carousel) {
+      // For scroll progress
       carousel.addEventListener('scroll', updateScrollInfo);
+      
+      // For horizontal wheel scrolling
+      carousel.addEventListener('wheel', handleWheel, { passive: false });
+      
       // Initial check
       updateScrollInfo();
       
@@ -57,6 +62,7 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
       
       return () => {
         carousel.removeEventListener('scroll', updateScrollInfo);
+        carousel.removeEventListener('wheel', handleWheel);
         window.removeEventListener('resize', updateScrollInfo);
       };
     }
@@ -111,11 +117,23 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
   // Touch and mouse drag handlers
   const handleMouseDown = (e) => {
     if (e.button !== 0) return; // Only handle left mouse button
-    setIsDragging(true);
+    
+    // Track drag start position
     setStartX(e.pageX);
     setScrollLeft(carouselRef.current.scrollLeft);
-    carouselRef.current.style.cursor = 'grabbing';
-    e.preventDefault(); // Prevent text selection during drag
+    
+    // Set dragging state after a small delay or movement to avoid preventing clicks
+    const dragTimeout = setTimeout(() => {
+      if (Math.abs(e.pageX - startX) > 5) {
+        setIsDragging(true);
+        carouselRef.current.style.cursor = 'grabbing';
+      }
+    }, 100);
+    
+    // Clean up timeout when mouse is released
+    document.addEventListener('mouseup', () => {
+      clearTimeout(dragTimeout);
+    }, { once: true });
   };
 
   const handleMouseUp = () => {
@@ -142,19 +160,25 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
     }
   };
 
-  // Handle mouse wheel for horizontal scrolling
+  // Handle mouse wheel for horizontal scrolling only
   const handleWheel = (e) => {
     if (!carouselRef.current) return;
     
-    if (e.deltaY !== 0) {
-      e.preventDefault(); // Prevent vertical scrolling
-      carouselRef.current.scrollLeft += e.deltaY;
+    // Check if wheel event happened inside the carousel
+    if (carouselRef.current.contains(e.target)) {
+      // Ensure we only handle horizontal scrolling
+      if (e.deltaY !== 0) {
+        e.preventDefault(); // Prevent vertical scrolling
+        carouselRef.current.scrollLeft += e.deltaY;
+      }
     }
   };
 
-  // Handle card selection only if not dragging
+  // Better card selection handling to ensure clicks work properly
   const handleCardSelect = (demo) => {
-    if (!isDragging) {
+    // Only select the demo if we haven't been dragging
+    // Using a small threshold (5px) to distinguish between a click and a drag
+    if (!isDragging && Math.abs(startX - scrollLeft) < 5) {
       onSelectDemo(demo);
     }
   };
@@ -203,7 +227,6 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          onWheel={handleWheel}
         >
           {/* Hide scrollbar */}
           <style jsx>{`
@@ -223,16 +246,8 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
               }}
               className="card-container"
             >
-              <div 
-                className={`${isDragging ? 'pointer-events-none' : ''}`}
-                onClick={(e) => {
-                  // Only call onSelectDemo if we're not dragging
-                  if (!isDragging) {
-                    handleCardSelect(demo);
-                  }
-                }}
-              >
-                <DemoCard demo={demo} onSelect={() => {}} />
+              <div onClick={() => handleCardSelect(demo)}>
+                <DemoCard demo={demo} onSelect={onSelectDemo} />
               </div>
             </div>
           ))}
