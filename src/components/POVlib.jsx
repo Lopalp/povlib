@@ -714,6 +714,13 @@ const POVlib = () => {
           getFilteredDemosByMap={getFilteredDemosByMap} 
           setFiltersApplied={setFiltersApplied} 
         />
+
+        {/* Browse All Demos Button */}
+        <div className="text-center py-8">
+          <Link href="/demos" className="inline-block px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all duration-300 shadow-[0_0_15px_rgba(250,204,21,0.3)]">
+            Browse All Demos
+          </Link>
+        </div>
       </main>
       
       {isFilterModalOpen && (
@@ -725,6 +732,16 @@ const POVlib = () => {
           onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
           onResetFilters={onResetFilters}
           onApplyFilters={onApplyFilters}
+        />
+      )}
+      
+      {isTaggingModalOpen && selectedDemo && (
+        <TaggingModal 
+          selectedDemo={selectedDemo}
+          filterOptions={filterOptions}
+          onClose={() => setIsTaggingModalOpen(false)}
+          onUpdateTags={handleUpdateTags}
+          onUpdatePositions={handleUpdatePositions}
         />
       )}
       

@@ -16,6 +16,7 @@ const Navbar = ({ demoType, onSwitchDemoType, searchActive, setSearchActive, set
           </Link>
           <div className="hidden md:flex space-x-8 ml-10">
             <Link href="/" className="text-sm text-white font-bold relative group">Home</Link>
+            <Link href="/demos" className="text-sm text-gray-400 hover:text-white font-medium relative group">Demos</Link>
             <Link href="/players" className="text-sm text-gray-400 hover:text-white font-medium relative group">Players</Link>
             <Link href="#" className="text-sm text-gray-400 hover:text-white font-medium relative group">Maps</Link>
           </div>
@@ -55,6 +56,7 @@ const Navbar = ({ demoType, onSwitchDemoType, searchActive, setSearchActive, set
           <div className="container mx-auto p-4">
             <div className="flex flex-col space-y-4">
               <Link href="/" className="text-white font-bold py-2">Home</Link>
+              <Link href="/demos" className="text-gray-400 hover:text-white py-2">Demos</Link>
               <Link href="/players" className="text-gray-400 hover:text-white py-2">Players</Link>
               <Link href="#" className="text-gray-400 hover:text-white py-2">Maps</Link>
               <div className="border-t border-gray-700 pt-4 mt-2">
