@@ -1,27 +1,17 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  getAllDemos,
-  getFilteredDemos,
-  getTrendingDemos,
-  getLatestDemos,
-  getDemosByMap,
-  getDemosByPosition,
-  getFilterOptions,
-  updateDemoStats,
-  updateDemoTags,
-  updateDemoPositions
-} from '@/lib/supabase';
-
-// Importiere Komponenten aus den aufgeteilten Dateien
-import { DemoCard, FeaturedHero, DemoCarousel, YouTubeEmbed } from './DemoComponents';
-import { VideoPlayerModal, TaggingModal, FilterModal } from './ModalComponents';
-import { Navbar, SelectedFilters, ContentTabs } from './Navigation';
-import { MainContent, Footer } from './Layout';
+import { Search, Filter } from 'lucide-react';
+import { getAllDemos, getFilteredDemos, getTrendingDemos, getLatestDemos, getDemosByMap, getDemosByPosition, getFilterOptions, updateDemoStats, updateDemoTags, updateDemoPositions } from '@/lib/supabase';
+import YouTubeEmbed from './components/YouTubeEmbed';
+import DemoCard from './components/DemoCard';
+import VideoPlayerModal from './components/VideoPlayerModal';
+import TaggingModal from './components/TaggingModal';
+import FilterModal from './components/FilterModal';
+import Navbar from './components/Navbar';
+import DemoCarousel from './components/DemoCarousel';
 
 const POVlib = () => {
-  // State für Navigation und UI
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -29,14 +19,13 @@ const POVlib = () => {
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideoId, setActiveVideoId] = useState('');
-  const [demoType, setDemoType] = useState('pro'); // Toggle zwischen 'pro' und 'community'
+  const [demoType, setDemoType] = useState('pro');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [autoplayVideo, setAutoplayVideo] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Daten-States
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
   const [latestDemos, setLatestDemos] = useState([]);
@@ -63,24 +52,18 @@ const POVlib = () => {
     search: ''
   });
   
-  // Refs für Custom Scrolling
   const scrollContainerRef = useRef(null);
   const featuredVideoRef = useRef(null);
   
-  // Daten laden, wenn die Komponente montiert wird
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
         
-        // Filter-Optionen laden
         const options = await getFilterOptions();
         setFilterOptions(options);
         
-        // Initial gefilterte Demos laden
         const demos = await getFilteredDemos(filtersApplied, demoType);
-        
-        // Datenfeld-Mapping (Supabase -> Frontend)
         const mappedDemos = demos.map(demo => ({
           id: demo.id,
           title: demo.title,
@@ -98,10 +81,8 @@ const POVlib = () => {
           likes: demo.likes || 0,
           isPro: demo.is_pro
         }));
-        
         setFilteredDemos(mappedDemos);
         
-        // Trending und neueste Demos laden
         const trendingData = await getTrendingDemos(5, demoType);
         setTrendingDemos(trendingData.map(demo => ({
           id: demo.id,
@@ -140,7 +121,6 @@ const POVlib = () => {
           isPro: demo.is_pro
         })));
         
-        // Video ID für das erste Demo setzen (falls vorhanden)
         if (mappedDemos.length > 0) {
           setActiveVideoId(mappedDemos[0].videoId);
         }
@@ -156,19 +136,14 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
   
-  // Demos aktualisieren, wenn sich Filter ändern
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
         setIsLoading(true);
-        
-        // Gefilterte Demos laden
         const demos = await getFilteredDemos({
           ...filtersApplied,
           search: searchQuery
         }, demoType);
-        
-        // Datenfeld-Mapping (Supabase -> Frontend)
         const mappedDemos = demos.map(demo => ({
           id: demo.id,
           title: demo.title,
@@ -186,9 +161,7 @@ const POVlib = () => {
           likes: demo.likes || 0,
           isPro: demo.is_pro
         }));
-        
         setFilteredDemos(mappedDemos);
-        
         setIsLoading(false);
       } catch (err) {
         console.error('Error updating filtered demos:', err);
@@ -200,14 +173,11 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
   
-  // Map-spezifische Demos laden, wenn benötigt
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
         try {
           const demos = await getDemosByMap(map);
-          
-          // Datenfeld-Mapping (Supabase -> Frontend)
           const mappedDemos = demos.map(demo => ({
             id: demo.id,
             title: demo.title,
@@ -225,7 +195,6 @@ const POVlib = () => {
             likes: demo.likes || 0,
             isPro: demo.is_pro
           }));
-          
           setMapDemos(prev => ({
             ...prev,
             [map]: mappedDemos
@@ -236,21 +205,17 @@ const POVlib = () => {
       }
     };
     
-    // Für einige Standard-Maps vorladen
     if (!filtersApplied.map) {
       loadMapDemos('Mirage');
       loadMapDemos('Inferno');
     }
   }, [mapDemos, filtersApplied.map]);
   
-  // Position-spezifische Demos laden, wenn benötigt
   useEffect(() => {
     const loadPositionDemos = async (position) => {
       if (!positionDemos[position]) {
         try {
           const demos = await getDemosByPosition(position);
-          
-          // Datenfeld-Mapping (Supabase -> Frontend)
           const mappedDemos = demos.map(demo => ({
             id: demo.id,
             title: demo.title,
@@ -268,7 +233,6 @@ const POVlib = () => {
             likes: demo.likes || 0,
             isPro: demo.is_pro
           }));
-          
           setPositionDemos(prev => ({
             ...prev,
             [position]: mappedDemos
@@ -279,21 +243,17 @@ const POVlib = () => {
       }
     };
     
-    // AWP Demos vorladen
     if (!filtersApplied.position) {
       loadPositionDemos('AWPer');
     }
   }, [positionDemos, filtersApplied.position]);
   
-  // Views aktualisieren, wenn ein Demo ausgewählt wird
   useEffect(() => {
     const updateViews = async () => {
       if (selectedDemo) {
         try {
           const result = await updateDemoStats(selectedDemo.id, 'views', 1);
-          
           if (result.success) {
-            // Lokalen State aktualisieren (damit wir nicht neu laden müssen)
             setFilteredDemos(prev => 
               prev.map(demo => 
                 demo.id === selectedDemo.id 
@@ -302,7 +262,6 @@ const POVlib = () => {
               )
             );
             
-            // Wenn das Demo in anderen Listen ist, dort auch aktualisieren
             if (trendingDemos.some(demo => demo.id === selectedDemo.id)) {
               setTrendingDemos(prev => 
                 prev.map(demo => 
@@ -323,7 +282,6 @@ const POVlib = () => {
               );
             }
             
-            // Auch in mapDemos und positionDemos aktualisieren, falls vorhanden
             Object.keys(mapDemos).forEach(map => {
               if (mapDemos[map].some(demo => demo.id === selectedDemo.id)) {
                 setMapDemos(prev => ({
@@ -359,13 +317,10 @@ const POVlib = () => {
     updateViews();
   }, [selectedDemo]);
   
-  // Demo-Like-Handler
   const handleLikeDemo = async (demoId) => {
     try {
       const result = await updateDemoStats(demoId, 'likes', 1);
-      
       if (result.success) {
-        // Remap Supabase-Felder auf Frontend-Felder
         const updatedDemo = {
           id: result.demo.id,
           title: result.demo.title,
@@ -383,8 +338,6 @@ const POVlib = () => {
           likes: result.demo.likes || 0,
           isPro: result.demo.is_pro
         };
-        
-        // Lokalen State aktualisieren
         setFilteredDemos(prev => 
           prev.map(demo => 
             demo.id === demoId 
@@ -400,7 +353,6 @@ const POVlib = () => {
           });
         }
         
-        // Auch in anderen Listen aktualisieren
         if (trendingDemos.some(demo => demo.id === demoId)) {
           setTrendingDemos(prev => 
             prev.map(demo => 
@@ -421,7 +373,6 @@ const POVlib = () => {
           );
         }
         
-        // Auch in mapDemos und positionDemos aktualisieren
         Object.keys(mapDemos).forEach(map => {
           if (mapDemos[map].some(demo => demo.id === demoId)) {
             setMapDemos(prev => ({
@@ -453,13 +404,10 @@ const POVlib = () => {
     }
   };
   
-  // Tags aktualisieren
   const handleUpdateTags = async (demoId, tags) => {
     try {
       const result = await updateDemoTags(demoId, tags);
-      
       if (result.success) {
-        // Remap Supabase-Felder auf Frontend-Felder
         const updatedDemo = {
           id: result.demo.id,
           title: result.demo.title,
@@ -477,8 +425,6 @@ const POVlib = () => {
           likes: result.demo.likes || 0,
           isPro: result.demo.is_pro
         };
-        
-        // Lokalen State aktualisieren
         setFilteredDemos(prev => 
           prev.map(demo => 
             demo.id === demoId 
@@ -494,7 +440,6 @@ const POVlib = () => {
           });
         }
         
-        // Modal schließen
         setIsTaggingModalOpen(false);
       }
     } catch (err) {
@@ -502,13 +447,10 @@ const POVlib = () => {
     }
   };
   
-  // Positionen aktualisieren
   const handleUpdatePositions = async (demoId, positions) => {
     try {
       const result = await updateDemoPositions(demoId, positions);
-      
       if (result.success) {
-        // Remap Supabase-Felder auf Frontend-Felder
         const updatedDemo = {
           id: result.demo.id,
           title: result.demo.title,
@@ -526,8 +468,6 @@ const POVlib = () => {
           likes: result.demo.likes || 0,
           isPro: result.demo.is_pro
         };
-        
-        // Lokalen State aktualisieren
         setFilteredDemos(prev => 
           prev.map(demo => 
             demo.id === demoId 
@@ -548,13 +488,11 @@ const POVlib = () => {
     }
   };
   
-  // Custom scroll handling mit enhanced smooth behavior
-  const handleScroll = (direction, speed = 400) => {
+  const handleScroll = (direction) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const cardWidth = 300; // Ungefähre Breite einer Karte inkl. Margins
+      const cardWidth = 300;
       const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
-      
       container.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
@@ -562,16 +500,32 @@ const POVlib = () => {
     }
   };
   
-  // Helferfunktionen für gefilterte Demos
-  const getFilteredDemosByMap = (map) => {
-    return mapDemos[map] || [];
+  const onSelectDemo = (demo) => {
+    setSelectedDemo(demo);
+    setActiveVideoId(demo.videoId);
   };
   
-  const getFilteredDemosByPosition = (position) => {
-    return positionDemos[position] || [];
+  const onSwitchDemoType = (type) => {
+    setDemoType(type);
   };
-
-  // Loading-Anzeige
+  
+  const onResetFilters = () => {
+    setFiltersApplied({
+      map: '',
+      position: '',
+      player: '',
+      team: '',
+      year: '',
+      event: '',
+      result: '',
+      search: searchQuery
+    });
+  };
+  
+  const onApplyFilters = () => {
+    setIsFilterModalOpen(false);
+  };
+  
   if (isLoading && !filteredDemos.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -583,7 +537,6 @@ const POVlib = () => {
     );
   }
   
-  // Fehler-Anzeige
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -601,118 +554,135 @@ const POVlib = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      {/* Custom CSS für Scrollbars und Effekte */}
       <style jsx>{`
-        /* Hide scrollbar for Chrome, Safari and Opera */
         .custom-scrollbar::-webkit-scrollbar {
           height: 0;
           width: 0;
           display: none;
         }
         
-        /* Hide scrollbar for Firefox */
         .custom-scrollbar {
           scrollbar-width: none;
-        }
-        
-        /* Hide scrollbar for IE and Edge */
-        .custom-scrollbar {
           -ms-overflow-style: none;
         }
         
-        /* Background pattern overlay */
         .bg-pattern {
           background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
           background-size: 20px 20px;
         }
       `}</style>
       
-      {/* Navbar Komponente */}
       <Navbar 
+        demoType={demoType}
+        onSwitchDemoType={onSwitchDemoType}
         searchActive={searchActive}
         setSearchActive={setSearchActive}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        demoType={demoType}
-        setDemoType={setDemoType}
-        isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
-        setIsFilterModalOpen={setIsFilterModalOpen}
-        filtersApplied={filtersApplied}
-        setFiltersApplied={setFiltersApplied}
+        isMenuOpen={isMenuOpen}
       />
       
-      {/* Featured Hero Banner für ausgewähltes Demo */}
       {filteredDemos.length > 0 && !selectedDemo && (
-        <FeaturedHero 
-          demo={filteredDemos[0]} 
-          setSelectedDemo={setSelectedDemo}
-          setActiveVideoId={setActiveVideoId}
-          autoplayVideo={autoplayVideo}
-          setIsFilterModalOpen={setIsFilterModalOpen}
-          featuredVideoRef={featuredVideoRef}
-        />
+        <div className="mb-12">
+          <YouTubeEmbed videoId={filteredDemos[0].videoId} title={filteredDemos[0].title} autoplay={autoplayVideo} controls={false} className="scale-110 opacity-60" />
+        </div>
       )}
       
-      {/* Main Content */}
-      <MainContent
-        activeTab={activeTab}
-        isLoading={isLoading}
-        filtersApplied={filtersApplied}
-        setFiltersApplied={setFiltersApplied}
-        filteredDemos={filteredDemos}
-        trendingDemos={trendingDemos}
-        latestDemos={latestDemos}
-        mapDemos={mapDemos}
-        getFilteredDemosByMap={getFilteredDemosByMap}
-        getFilteredDemosByPosition={getFilteredDemosByPosition}
-        filterOptions={filterOptions}
-        searchQuery={searchQuery}
-        selectedDemo={selectedDemo}
-        setSelectedDemo={setSelectedDemo}
-        activeVideoId={activeVideoId}
-        setActiveVideoId={setActiveVideoId}
-        handleScroll={handleScroll}
-        scrollContainerRef={scrollContainerRef}
-        setActiveTab={setActiveTab}
-      />
+      <main className="container mx-auto px-6 py-12 bg-pattern">
+        {/* Hier können weitere UI-Elemente wie Tabs etc. eingefügt werden */}
+        {activeTab === 'all' && (
+          <>
+            <DemoCarousel 
+              title="Recently Added"
+              demos={filteredDemos}
+              description="Latest POV demos based on your filter criteria"
+              onSelectDemo={onSelectDemo}
+              handleScroll={handleScroll}
+            />
+            
+            {!filtersApplied.map && (
+              <>
+                <DemoCarousel 
+                  title="Mirage POVs" 
+                  demos={mapDemos['Mirage'] || []} 
+                  onSelectDemo={onSelectDemo}
+                  handleScroll={handleScroll}
+                />
+                <DemoCarousel 
+                  title="Inferno POVs" 
+                  demos={mapDemos['Inferno'] || []} 
+                  onSelectDemo={onSelectDemo}
+                  handleScroll={handleScroll}
+                />
+              </>
+            )}
+            
+            {!filtersApplied.position && (
+              <DemoCarousel 
+                title="AWP Plays" 
+                demos={positionDemos['AWPer'] || []} 
+                onSelectDemo={onSelectDemo}
+                handleScroll={handleScroll}
+              />
+            )}
+          </>
+        )}
+        
+        {activeTab === 'trending' && (
+          <DemoCarousel 
+            title="Trending POVs"
+            demos={trendingDemos}
+            description="Most viewed demos right now"
+            onSelectDemo={onSelectDemo}
+            handleScroll={handleScroll}
+          />
+        )}
+        
+        {activeTab === 'latest' && (
+          <DemoCarousel 
+            title="Latest Uploads"
+            demos={latestDemos}
+            description="Fresh POV content from this year"
+            onSelectDemo={onSelectDemo}
+            handleScroll={handleScroll}
+          />
+        )}
+      </main>
       
-      {/* Footer */}
-      <Footer />
-      
-      {/* Modals */}
       {isFilterModalOpen && (
         <FilterModal 
-          setIsFilterModalOpen={setIsFilterModalOpen}
+          demoType={demoType}
           filterOptions={filterOptions}
           filtersApplied={filtersApplied}
-          setFiltersApplied={setFiltersApplied}
-          demoType={demoType}
-          setDemoType={setDemoType}
+          onClose={() => setIsFilterModalOpen(false)}
+          onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
+          onResetFilters={onResetFilters}
+          onApplyFilters={onApplyFilters}
         />
       )}
       
       {selectedDemo && (
         <VideoPlayerModal 
           selectedDemo={selectedDemo}
-          setSelectedDemo={setSelectedDemo}
           activeVideoId={activeVideoId}
-          setActiveVideoId={setActiveVideoId}
-          handleLikeDemo={handleLikeDemo}
-          setIsTaggingModalOpen={setIsTaggingModalOpen}
+          onClose={() => {
+            setSelectedDemo(null);
+            setActiveVideoId('');
+          }}
+          onLike={handleLikeDemo}
+          onOpenTagModal={() => setIsTaggingModalOpen(true)}
         />
       )}
       
       {isTaggingModalOpen && selectedDemo && (
         <TaggingModal 
           selectedDemo={selectedDemo}
-          setIsTaggingModalOpen={setIsTaggingModalOpen}
-          handleUpdateTags={handleUpdateTags}
-          handleUpdatePositions={handleUpdatePositions}
           filterOptions={filterOptions}
+          onClose={() => setIsTaggingModalOpen(false)}
+          onUpdateTags={handleUpdateTags}
+          onUpdatePositions={handleUpdatePositions}
         />
       )}
     </div>
