@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { getAllDemos, getFilteredDemos, getTrendingDemos, getLatestDemos, getDemosByMap, getDemosByPosition, getFilterOptions, updateDemoStats, updateDemoTags, updateDemoPositions } from '@/lib/supabase';
-import YouTubeEmbed from './components/YouTubeEmbed';
-import DemoCard from './components/DemoCard';
-import VideoPlayerModal from './components/VideoPlayerModal';
-import TaggingModal from './components/TaggingModal';
-import FilterModal from './components/FilterModal';
-import Navbar from './components/Navbar';
-import DemoCarousel from './components/DemoCarousel';
+import YouTubeEmbed from './POVlib/YouTubeEmbed';
+import DemoCard from './POVlib/DemoCard';
+import VideoPlayerModal from './POVlib/VideoPlayerModal';
+import TaggingModal from './POVlib/TaggingModal';
+import FilterModal from './POVlib/FilterModal';
+import Navbar from './POVlib/Navbar';
+import DemoCarousel from './POVlib/DemoCarousel';
 
 const POVlib = () => {
   const [activeFilter, setActiveFilter] = useState('all');
