@@ -59,6 +59,7 @@ const FeaturedHero = ({
             title={demo.title} 
             autoplay={autoplayVideo} 
             controls={false}
+            showInfo={false}
             className="w-full h-full object-cover"
           />
         </div>
@@ -148,15 +149,11 @@ const FeaturedHero = ({
               </span>
             ))}
           </div>
-          
-
         </div>
       </div>
       
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900 to-transparent z-10"></div>
-      
-
     </div>
   );
 };

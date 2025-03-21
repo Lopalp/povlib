@@ -16,7 +16,7 @@ import {
 
 import YouTubeEmbed from './POVlib/YouTubeEmbed';
 import DemoCard from './POVlib/DemoCard';
-import VideoPlayerModal from './POVlib/VideoPlayerModal';
+import VideoPlayerPage from './POVlib/VideoPlayerPage';
 import TaggingModal from './POVlib/TaggingModal';
 import FilterModal from './POVlib/FilterModal';
 import Navbar from './POVlib/Navbar';
@@ -41,6 +41,7 @@ const POVlib = () => {
   const [autoplayVideo, setAutoplayVideo] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isVideoPlayerPage, setIsVideoPlayerPage] = useState(false);
 
   // Data States
   const [filteredDemos, setFilteredDemos] = useState([]);
@@ -48,6 +49,7 @@ const POVlib = () => {
   const [latestDemos, setLatestDemos] = useState([]);
   const [mapDemos, setMapDemos] = useState({});
   const [positionDemos, setPositionDemos] = useState({});
+  const [relatedDemos, setRelatedDemos] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     maps: [],
     positions: {},
@@ -76,7 +78,7 @@ const POVlib = () => {
   const getFilteredDemosByMap = (map) => mapDemos[map] || [];
   const getFilteredDemosByPosition = (position) => positionDemos[position] || [];
   
-  // Daten laden
+  // Load initial data
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -157,7 +159,7 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
   
-  // Aktualisiere gefilterte Demos bei Änderung der Filter
+  // Update filtered demos when filters change
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
@@ -192,7 +194,7 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
   
-  // Map- und Positions-Demos laden
+  // Load map demos
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -227,6 +229,7 @@ const POVlib = () => {
     }
   }, [mapDemos, filtersApplied.map]);
   
+  // Load position demos
   useEffect(() => {
     const loadPositionDemos = async (position) => {
       if (!positionDemos[position]) {
@@ -260,7 +263,32 @@ const POVlib = () => {
     }
   }, [positionDemos, filtersApplied.position]);
   
-  // Views aktualisieren
+  // Find related demos when a demo is selected
+  useEffect(() => {
+    if (selectedDemo) {
+      // Find demos with same map or same players or same positions
+      const related = filteredDemos.filter(demo => 
+        demo.id !== selectedDemo.id && (
+          demo.map === selectedDemo.map || 
+          demo.players.some(p => selectedDemo.players.includes(p)) ||
+          demo.positions.some(p => selectedDemo.positions.includes(p))
+        )
+      );
+      
+      // If we don't have enough related demos, add some from trending
+      if (related.length < 5) {
+        const additionalDemos = trendingDemos.filter(
+          demo => demo.id !== selectedDemo.id && !related.some(r => r.id === demo.id)
+        ).slice(0, 5 - related.length);
+        
+        setRelatedDemos([...related, ...additionalDemos]);
+      } else {
+        setRelatedDemos(related.slice(0, 10)); // Limit to 10 related demos
+      }
+    }
+  }, [selectedDemo, filteredDemos, trendingDemos]);
+  
+  // Update views when a demo is selected
   useEffect(() => {
     const updateViews = async () => {
       if (selectedDemo) {
@@ -416,10 +444,24 @@ const POVlib = () => {
     }
   };
   
-  // Auswahl eines Demos
+  // Video selection and navigation
   const onSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
+    setIsVideoPlayerPage(true);
+    window.scrollTo(0, 0);
+  };
+  
+  const onCloseVideoPlayer = () => {
+    setSelectedDemo(null);
+    setActiveVideoId('');
+    setIsVideoPlayerPage(false);
+  };
+  
+  const onSelectRelatedDemo = (demo) => {
+    setSelectedDemo(demo);
+    setActiveVideoId(demo.videoId);
+    window.scrollTo(0, 0);
   };
   
   const onSwitchDemoType = (type) => setDemoType(type);
@@ -464,6 +506,32 @@ const POVlib = () => {
     );
   }
   
+  // If we're in video player mode, render the video player page
+  if (isVideoPlayerPage && selectedDemo) {
+    return (
+      <>
+        <VideoPlayerPage 
+          selectedDemo={selectedDemo}
+          relatedDemos={relatedDemos}
+          onClose={onCloseVideoPlayer}
+          onLike={handleLikeDemo}
+          onOpenTagModal={() => setIsTaggingModalOpen(true)}
+          onSelectRelatedDemo={onSelectRelatedDemo}
+        />
+        
+        {isTaggingModalOpen && selectedDemo && (
+          <TaggingModal 
+            selectedDemo={selectedDemo}
+            filterOptions={filterOptions}
+            onClose={() => setIsTaggingModalOpen(false)}
+            onUpdateTags={handleUpdateTags}
+            onUpdatePositions={handleUpdatePositions}
+          />
+        )}
+      </>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <style jsx>{`
@@ -485,7 +553,7 @@ const POVlib = () => {
         <FeaturedHero 
           demo={filteredDemos[0]}
           autoplayVideo={autoplayVideo}
-          setSelectedDemo={setSelectedDemo}
+          setSelectedDemo={onSelectDemo}
           setActiveVideoId={setActiveVideoId}
           setIsFilterModalOpen={setIsFilterModalOpen}
         />
@@ -605,29 +673,6 @@ const POVlib = () => {
           onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
           onResetFilters={onResetFilters}
           onApplyFilters={onApplyFilters}
-        />
-      )}
-      
-      {selectedDemo && (
-        <VideoPlayerModal 
-          selectedDemo={selectedDemo}
-          activeVideoId={activeVideoId}
-          onClose={() => {
-            setSelectedDemo(null);
-            setActiveVideoId('');
-          }}
-          onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
-        />
-      )}
-      
-      {isTaggingModalOpen && selectedDemo && (
-        <TaggingModal 
-          selectedDemo={selectedDemo}
-          filterOptions={filterOptions}
-          onClose={() => setIsTaggingModalOpen(false)}
-          onUpdateTags={handleUpdateTags}
-          onUpdatePositions={handleUpdatePositions}
         />
       )}
       
