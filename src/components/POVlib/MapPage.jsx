@@ -67,12 +67,12 @@ const MapPage = ({ mapName }) => {
     mirage: {
       description: "Mirage is a classic Counter-Strike map set in Morocco that features a balanced layout with two bombsites. The map has an open mid area that connects to both sites, offering multiple rotation options and strategic depth. A-site is more open with several entry points, while B-site is more confined, accessible primarily through apartments or a narrow passage from mid.",
       callouts: ["A Site", "B Site", "Mid", "Palace", "Apartments", "CT Spawn", "T Spawn", "Connector", "Jungle", "Window", "Underpass", "B Halls", "Market", "Catwalk", "Ticket Booth", "Firebox", "Ninja", "Dark", "Van", "Bench", "Chair", "Stairs", "Ramp", "Triple Box"],
-      strategy: "Mirage requires careful mid control and effective rotations. T-side usually focuses on securing mid control to split defenses, while CT-side often relies on crossfires and smart utility usage. AWPers commonly hold mid from window or connector, or watch palace/A ramp from ticket booth."
+      strategy: "Mirage requires careful mid control and effective rotations. T-side usually focuses on securing mid control to split defenses, while CT-side often relies on crossfires and smart utility usage."
     },
     inferno: {
       description: "Inferno is set in a Mediterranean town with narrow corridors and chokepoints. The map features two bombsites, with B site accessible via the infamous 'Banana' corridor, and A site approached through apartments or a mid split. The confined spaces make utility usage crucial for both attackers and defenders.",
       callouts: ["A Site", "B Site", "Banana", "Mid", "Apartments", "Pit", "Graveyard", "Library", "Arch", "CT Spawn", "T Spawn", "Second Mid", "Boiler", "Dark", "New Box", "Orange", "Construction", "Ruins", "Coffins", "Logs", "Car", "Sandbags"],
-      strategy: "Control of Banana is crucial for both teams. T-side often uses flashbangs and molotovs to clear tight angles, while CT-side focuses on crossfires and fall-back positions. Utility management is especially important on Inferno due to its narrow pathways."
+      strategy: "Control of Banana is crucial for both teams. T-side often uses flashbangs and molotovs to clear tight angles, while CT-side focuses on crossfires and fallback positions. Utility management is especially important on Inferno due to its narrow pathways."
     },
     ancient: {
       description: "Ancient is a newer addition to CS2, featuring a temple theme with two bombsites. It has a compact layout with multiple pathways between areas. The mid area offers crucial control points, while both bombsites have unique defensive setups. The map features several elevation changes and tight corridors.",
@@ -90,7 +90,7 @@ const MapPage = ({ mapName }) => {
       strategy: "Overpass is CT-sided at higher levels of play. T-side strategies often involve gaining control of connector or water for mid-round rotations. Fast B executes through monster and unique boosts are common tactics on this map."
     },
     anubis: {
-      description: "Anubis is one of the newer maps in the competitive pool, featuring an Egyptian theme. It has two bombsites with multiple approaches to each. The layout includes a mixed of open areas and tight corridors, with a complex mid section that offers various tactical options.",
+      description: "Anubis is one of the newer maps in the competitive pool, featuring an Egyptian theme. It has two bombsites with multiple approaches to each. The layout includes a mix of open areas and tight corridors, with a complex mid section that offers various tactical options.",
       callouts: ["A Site", "B Site", "Mid", "Palace", "Canal", "Connector", "Street", "Bridge", "Alley", "CT Spawn", "T Spawn", "Garden", "Heaven", "Tunnels", "Fountain"],
       strategy: "As a newer map, Anubis strategies are still evolving. The mid area offers crucial control for both teams. T-side often uses mid to split defenses, while CT-side must balance resources between multiple entry points to both sites."
     },
@@ -624,4 +624,93 @@ const MapPage = ({ mapName }) => {
                     <Info className="h-4 w-4 mr-2 text-yellow-400" />
                     Map Strategy
                   </h3>
-                  <p className="text-gray-300 mb-6
+                  <p className="text-gray-300 mb-6">{map.strategy}</p>
+                </div>
+              </div>
+              <div>
+                {/* Additional content or media can be added here */}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Callouts Tab */}
+        {activeTab === 'callouts' && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-6">
+              <span className="border-l-4 border-yellow-400 pl-3 py-1">Callouts</span>
+            </h2>
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
+              <ul className="list-disc pl-5">
+                {map.callouts && map.callouts.map((callout, index) => (
+                  <li key={index} className="text-gray-300 mb-2">{callout}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* Positions Tab */}
+        {activeTab === 'positions' && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-6">
+              <span className="border-l-4 border-yellow-400 pl-3 py-1">Positions</span>
+            </h2>
+            {Object.keys(demosByPosition).length > 0 ? (
+              Object.keys(demosByPosition).map((position, idx) => (
+                <div key={idx} className="mb-8">
+                  <h3 className="text-xl font-semibold mb-4">{position}</h3>
+                  <DemoCarousel demos={demosByPosition[position]} onSelectDemo={handleSelectDemo} />
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-300">No demos available for this map's positions.</p>
+            )}
+          </div>
+        )}
+        
+        {/* All POVs Tab */}
+        {activeTab === 'all-demos' && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-6">
+              <span className="border-l-4 border-yellow-400 pl-3 py-1">All POV Demos</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {allDemos.map(demo => (
+                <DemoCard key={demo.id} demo={demo} onSelectDemo={handleSelectDemo} onLike={handleLikeDemo} />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Strategies Tab */}
+        {activeTab === 'strategies' && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-6">
+              <span className="border-l-4 border-yellow-400 pl-3 py-1">Strategies</span>
+            </h2>
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
+              <p className="text-gray-300 mb-4">{map.strategy}</p>
+              {/* Additional strategy insights can be added here */}
+            </div>
+          </div>
+        )}
+      </main>
+      
+      {isFilterModalOpen && (
+        <FilterModal 
+          filtersApplied={filtersApplied}
+          setFiltersApplied={setFiltersApplied}
+          filterOptions={filterOptions}
+          onClose={() => setIsFilterModalOpen(false)}
+          onApply={handleApplyFilters}
+          onReset={handleResetFilters}
+        />
+      )}
+      
+      <Footer />
+    </div>
+  );
+};
+
+export default MapPage;
