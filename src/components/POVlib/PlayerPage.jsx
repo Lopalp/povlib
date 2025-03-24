@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import DemoCard from './DemoCard';
-import VideoPlayerModal from './VideoPlayerModal';
+import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
 
@@ -59,6 +59,8 @@ const PlayerPage = ({ playerName }) => {
     event: '',
     result: '',
   });
+  const [relatedDemos, setRelatedDemos] = useState([]);
+  const [isFullScreenPlayer, setIsFullScreenPlayer] = useState(false);
 
   const infiniteScrollRef = useRef(null);
   
@@ -208,14 +210,33 @@ const PlayerPage = ({ playerName }) => {
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
+    setIsFullScreenPlayer(true);
+    // Find related demos
+    findRelatedDemos(demo);
     updateDemoStats(demo.id, 'views', 1).catch(err => 
       console.error('Error updating views:', err)
     );
+    window.scrollTo(0, 0);
+  };
+
+  const findRelatedDemos = (demo) => {
+    // Find demos with same map or same players or same positions
+    const related = allDemos.filter(d => 
+      d.id !== demo.id && (
+        d.map === demo.map || 
+        d.players.some(p => demo.players.includes(p)) ||
+        d.positions.some(p => demo.positions.includes(p))
+      )
+    );
+    
+    setRelatedDemos(related.slice(0, 10)); // Limit to 10 related demos
   };
   
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
     setActiveVideoId('');
+    setIsFullScreenPlayer(false);
+    setRelatedDemos([]);
   };
   
   const handleLikeDemo = async (demoId) => {
@@ -295,6 +316,16 @@ const PlayerPage = ({ playerName }) => {
   });
   
   const handleApplyFilters = () => setIsFilterModalOpen(false);
+
+  const handleSelectRelatedDemo = (demo) => {
+    setSelectedDemo(demo);
+    setActiveVideoId(demo.videoId);
+    findRelatedDemos(demo);
+    updateDemoStats(demo.id, 'views', 1).catch(err => 
+      console.error('Error updating views:', err)
+    );
+    window.scrollTo(0, 0);
+  };
   
   // Render loading state
   if (isLoading && !allDemos.length) {
@@ -324,6 +355,38 @@ const PlayerPage = ({ playerName }) => {
           </button>
         </div>
       </div>
+    );
+  }
+
+  // If we're showing the full-screen player
+  if (isFullScreenPlayer && selectedDemo) {
+    return (
+      <>
+        <VideoPlayerPage 
+          selectedDemo={selectedDemo}
+          relatedDemos={relatedDemos}
+          onClose={handleCloseVideoPlayer}
+          onLike={handleLikeDemo}
+          onOpenTagModal={() => setIsTaggingModalOpen(true)}
+          onSelectRelatedDemo={handleSelectRelatedDemo}
+          demoType={demoType}
+          setDemoType={handleSwitchDemoType}
+          searchActive={searchActive}
+          setSearchActive={setSearchActive}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+        />
+        
+        {isTaggingModalOpen && selectedDemo && (
+          <TaggingModal 
+            selectedDemo={selectedDemo}
+            filterOptions={filterOptions}
+            onClose={() => setIsTaggingModalOpen(false)}
+            onUpdateTags={handleUpdateTags}
+            onUpdatePositions={handleUpdatePositions}
+          />
+        )}
+      </>
     );
   }
   
@@ -627,44 +690,22 @@ const PlayerPage = ({ playerName }) => {
         </div>
       </main>
       
-      {/* Video Player Modal */}
-      {selectedDemo && (
-        <VideoPlayerModal 
-          selectedDemo={selectedDemo}
-          activeVideoId={activeVideoId}
-          onClose={handleCloseVideoPlayer}
-          onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
-        />
-      )}
-      
-      {/* Tagging Modal */}
-      {isTaggingModalOpen && selectedDemo && (
-        <TaggingModal 
-          selectedDemo={selectedDemo}
-          filterOptions={filterOptions}
-          onClose={() => setIsTaggingModalOpen(false)}
-          onUpdateTags={handleUpdateTags}
-          onUpdatePositions={handleUpdatePositions}
-        />
-      )}
-      
       {/* Filter Modal */}
       {isFilterModalOpen && (
-        <FilterModal 
-          demoType={demoType}
-          filterOptions={filterOptions}
-          filtersApplied={filtersApplied}
-          onClose={() => setIsFilterModalOpen(false)}
-          onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
-          onResetFilters={handleResetFilters}
-          onApplyFilters={handleApplyFilters}
-        />
-      )}
-      
-      <Footer />
-    </div>
-  );
-};
+              <FilterModal 
+                demoType={demoType}
+                filterOptions={filterOptions}
+                filtersApplied={filtersApplied}
+                onClose={() => setIsFilterModalOpen(false)}
+                onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
+                onResetFilters={handleResetFilters}
+                onApplyFilters={handleApplyFilters}
+              />
+            )}
+            
+            <Footer />
+          </div>
+        );
+      };
 
 export default PlayerPage;
