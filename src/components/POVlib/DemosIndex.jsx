@@ -5,7 +5,7 @@ import { Search, Filter, FileVideo, MapPin } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import DemoCard from './DemoCard';
-import VideoPlayerModal from './VideoPlayerModal';
+import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
 
@@ -24,7 +24,7 @@ const DemosIndex = () => {
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDemo, setSelectedDemo] = useState(null);
-  const [activeVideoId, setActiveVideoId] = useState('');
+  const [relatedDemos, setRelatedDemos] = useState([]);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   
@@ -209,15 +209,29 @@ const DemosIndex = () => {
   
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
-    setActiveVideoId(demo.videoId);
+    // Find related demos
+    findRelatedDemos(demo);
     updateDemoStats(demo.id, 'views', 1).catch(err => 
       console.error('Error updating views:', err)
     );
   };
   
+  const findRelatedDemos = (demo) => {
+    // Find demos with same map or same players or same positions
+    const related = demos.filter(d => 
+      d.id !== demo.id && (
+        d.map === demo.map || 
+        d.players.some(p => demo.players.includes(p)) ||
+        d.positions.some(p => demo.positions.includes(p))
+      )
+    );
+    
+    setRelatedDemos(related.slice(0, 10)); // Limit to 10 related demos
+  };
+  
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
-    setActiveVideoId('');
+    setRelatedDemos([]);
   };
   
   const handleLikeDemo = async (demoId) => {
@@ -314,6 +328,38 @@ const DemosIndex = () => {
   });
   
   const handleApplyFilters = () => setIsFilterModalOpen(false);
+  
+  // If we have a selected demo, show the full screen player
+  if (selectedDemo) {
+    return (
+      <>
+        <VideoPlayerPage 
+          selectedDemo={selectedDemo}
+          relatedDemos={relatedDemos}
+          onClose={handleCloseVideoPlayer}
+          onLike={handleLikeDemo}
+          onOpenTagModal={() => setIsTaggingModalOpen(true)}
+          onSelectRelatedDemo={handleSelectDemo}
+          demoType={demoType}
+          setDemoType={handleSwitchDemoType}
+          searchActive={searchActive}
+          setSearchActive={setSearchActive}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+        />
+        
+        {isTaggingModalOpen && (
+          <TaggingModal 
+            selectedDemo={selectedDemo}
+            filterOptions={filterOptions}
+            onClose={() => setIsTaggingModalOpen(false)}
+            onUpdateTags={handleUpdateTags}
+            onUpdatePositions={handleUpdatePositions}
+          />
+        )}
+      </>
+    );
+  }
   
   // Render loading state
   if (isLoading && !demos.length) {
@@ -519,28 +565,6 @@ const DemosIndex = () => {
           onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
           onResetFilters={handleResetFilters}
           onApplyFilters={handleApplyFilters}
-        />
-      )}
-      
-      {/* Video Player Modal */}
-      {selectedDemo && (
-        <VideoPlayerModal
-          selectedDemo={selectedDemo}
-          activeVideoId={activeVideoId}
-          onClose={handleCloseVideoPlayer}
-          onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
-        />
-      )}
-      
-      {/* Tagging Modal */}
-      {isTaggingModalOpen && selectedDemo && (
-        <TaggingModal 
-          selectedDemo={selectedDemo}
-          filterOptions={filterOptions}
-          onClose={() => setIsTaggingModalOpen(false)}
-          onUpdateTags={handleUpdateTags}
-          onUpdatePositions={handleUpdatePositions}
         />
       )}
       
