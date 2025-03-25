@@ -16,7 +16,6 @@ import {
   getPlayerInfo
 } from '@/lib/supabase';
 
-import YouTubeEmbed from './POVlib/YouTubeEmbed';
 import DemoCard from './POVlib/DemoCard';
 import VideoPlayerPage from './POVlib/VideoPlayerPage';
 import TaggingModal from './POVlib/TaggingModal';
@@ -25,8 +24,6 @@ import Navbar from './POVlib/Navbar';
 import Footer from './POVlib/Footer';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
-// (ContentTabs und DemoCarousel wurden entfernt)
-
 
 // Helper-Funktion zum Mapping eines Demo-Objekts
 const mapDemo = (demo) => ({
@@ -46,6 +43,72 @@ const mapDemo = (demo) => ({
   likes: demo.likes || 0,
   isPro: demo.is_pro
 });
+
+// ────────────────
+// CategorySection
+// ────────────────
+// Diese Komponente rendert eine Kategorie (z. B. "Recently Added" oder "Mirage POVs")
+// und zeigt standardmäßig nur eine Zeile (basierend auf dem Container-Bereich).
+// Mit "View More" kann der Bereich um eine weitere Zeile erweitert werden.
+// Dabei werden immer maximal so viele Videos pro Zeile gezeigt, wie der Container (aber höchstens 5).
+const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxColumns = 5 }) => {
+  const containerRef = useRef(null);
+  const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
+  const [visibleRows, setVisibleRows] = useState(1);
+
+  // Berechne die Anzahl der Videos pro Zeile anhand der Container-Breite
+  useEffect(() => {
+    const updateItemsPerRow = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const calculated = Math.floor(containerWidth / minCardWidth) || 1;
+        setItemsPerRow(Math.min(calculated, maxColumns));
+      }
+    };
+
+    updateItemsPerRow();
+    window.addEventListener("resize", updateItemsPerRow);
+    return () => window.removeEventListener("resize", updateItemsPerRow);
+  }, [minCardWidth, maxColumns]);
+
+  const visibleCount = itemsPerRow * visibleRows;
+  const visibleDemos = demos.slice(0, visibleCount);
+
+  // Chunking der sichtbaren Demos in Zeilen
+  const rows = [];
+  for (let i = 0; i < visibleDemos.length; i += itemsPerRow) {
+    rows.push(visibleDemos.slice(i, i + itemsPerRow));
+  }
+
+  const canViewMore = demos.length > visibleCount;
+
+  return (
+    <section className="mt-8">
+      <h2 className="text-2xl font-bold text-white mb-4">{title}</h2>
+      <div ref={containerRef} className="overflow-hidden">
+        {rows.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex gap-2 flex-nowrap mb-2">
+            {row.map(demo => (
+              <div key={demo.id} style={{ minWidth: minCardWidth }} className="flex-shrink-0">
+                <DemoCard demo={demo} onSelectDemo={onSelectDemo} />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      {canViewMore && (
+        <div className="mt-2">
+          <button
+            onClick={() => setVisibleRows(visibleRows + 1)}
+            className="text-yellow-400 text-sm underline"
+          >
+            View More
+          </button>
+        </div>
+      )}
+    </section>
+  );
+};
 
 const POVlib = () => {
   // UI States
@@ -68,7 +131,6 @@ const POVlib = () => {
   const [latestDemos, setLatestDemos] = useState([]);
   const [mapDemos, setMapDemos] = useState({});
   const [positionDemos, setPositionDemos] = useState({});
-  // (topPlayers wird nicht mehr benötigt, da wir eigene Cards für Players verwenden)
   const [filterOptions, setFilterOptions] = useState({
     maps: [],
     positions: {},
@@ -89,16 +151,12 @@ const POVlib = () => {
     search: searchQuery
   });
 
-  const scrollContainerRef = useRef(null);
-  const featuredVideoRef = useRef(null);
-
-  // Dynamische Tags generieren (basierend auf den Demo-Tags und einigen Beispielen)
+  // Dynamische Tags (wie zuvor)
   const dynamicTags = useMemo(() => {
     const tagsSet = new Set();
     filteredDemos.forEach(demo => {
       demo.tags.forEach(tag => tagsSet.add(tag));
     });
-    // Zusätzliche Beispiel-Tags:
     tagsSet.add("Karten");
     tagsSet.add("Spieler");
     tagsSet.add("Teams");
@@ -106,9 +164,7 @@ const POVlib = () => {
     return Array.from(tagsSet);
   }, [filteredDemos]);
 
-  // Handler für Klick auf einen Tag (setzt den Suchbegriff oder Filter)
   const handleTagClick = (tag) => {
-    // Hier könntest Du differenzierter filtern – beispielhaft setzen wir den Suchbegriff:
     setSearchQuery(tag);
     setFiltersApplied(prev => ({ ...prev, search: tag }));
   };
@@ -131,7 +187,6 @@ const POVlib = () => {
         const options = await getFilterOptions();
         setFilterOptions(options);
 
-        // Parallel geladen: gefilterte, trending und neueste Demos
         const [demos, trending, latest] = await Promise.all([
           getFilteredDemos(filtersApplied, demoType),
           getTrendingDemos(5, demoType),
@@ -154,7 +209,7 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
 
-  // Aktualisierung der gefilterten Demos bei Änderung von Filtern oder Suchbegriff
+  // Aktualisierung gefilterter Demos bei Änderung von Filtern oder Suchbegriff
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
@@ -171,7 +226,7 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
 
-  // Laden von Map-Demos, falls nicht bereits vorhanden
+  // Laden von Map- und Positions-Demos (wie zuvor)
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -189,7 +244,6 @@ const POVlib = () => {
     }
   }, [mapDemos, filtersApplied.map]);
 
-  // Laden von Positions-Demos, falls nicht bereits vorhanden
   useEffect(() => {
     const loadPositionDemos = async (position) => {
       if (!positionDemos[position]) {
@@ -205,20 +259,6 @@ const POVlib = () => {
       loadPositionDemos('AWPer');
     }
   }, [positionDemos, filtersApplied.position]);
-
-  // Ermittlung verwandter Demos basierend auf ausgewählter Demo
-  useEffect(() => {
-    if (selectedDemo) {
-      const related = filteredDemos.filter(demo =>
-        demo.id !== selectedDemo.id &&
-        (demo.map === selectedDemo.map ||
-          demo.players.some(p => selectedDemo.players.includes(p)) ||
-          demo.positions.some(p => selectedDemo.positions.includes(p)))
-      );
-      // Bei Bedarf können hier weitere Demos aus trending ergänzt werden
-      // (vereinfachte Logik)
-    }
-  }, [selectedDemo, filteredDemos, trendingDemos]);
 
   // Update der Views bei Demo-Auswahl
   useEffect(() => {
@@ -241,7 +281,6 @@ const POVlib = () => {
     }
   }, [selectedDemo]);
 
-  // Gemeinsame Handler-Funktion für Updates (Likes, Tags, Positions)
   const handleDemoUpdate = async (demoId, updateFn, updater) => {
     try {
       const result = await updateFn(demoId, updater);
@@ -346,7 +385,6 @@ const POVlib = () => {
       <>
         <VideoPlayerPage 
           selectedDemo={selectedDemo}
-          // relatedDemos können hier nach Bedarf ergänzt werden
           onClose={onCloseVideoPlayer}
           onLike={handleLikeDemo}
           onOpenTagModal={() => setIsTaggingModalOpen(true)}
@@ -367,9 +405,10 @@ const POVlib = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar { display: none; }
-        .custom-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
-        .bg-pattern { background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 20px 20px; }
+        .bg-pattern {
+          background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+          background-size: 20px 20px;
+        }
       `}</style>
       
       <Navbar 
@@ -414,66 +453,35 @@ const POVlib = () => {
           </Link>
         </div>
         
-        {/* Demo-Abschnitte als feste Karten */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-800 rounded-xl overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-700"></div>
-                <div className="p-4">
-                  <div className="h-5 bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
+        {/* Kategorieabschnitte als feste Karten mit "View More"-Funktion */}
+        <CategorySection 
+          title="Recently Added" 
+          demos={filteredDemos} 
+          onSelectDemo={onSelectDemo} 
+        />
+        {!filtersApplied.map && (
           <>
-            <section className="mt-8">
-              <h2 className="text-2xl font-bold text-white mb-4">Recently Added</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {filteredDemos.map(demo => (
-                  <DemoCard key={demo.id} demo={demo} onSelectDemo={onSelectDemo} />
-                ))}
-              </div>
-            </section>
-            
-            {!filtersApplied.map && (
-              <>
-                <section className="mt-8">
-                  <h2 className="text-2xl font-bold text-white mb-4">Mirage POVs</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {getFilteredDemosByMap("Mirage").map(demo => (
-                      <DemoCard key={demo.id} demo={demo} onSelectDemo={onSelectDemo} />
-                    ))}
-                  </div>
-                </section>
-                <section className="mt-8">
-                  <h2 className="text-2xl font-bold text-white mb-4">Inferno POVs</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {getFilteredDemosByMap("Inferno").map(demo => (
-                      <DemoCard key={demo.id} demo={demo} onSelectDemo={onSelectDemo} />
-                    ))}
-                  </div>
-                </section>
-              </>
-            )}
-            
-            {!filtersApplied.position && (
-              <section className="mt-8">
-                <h2 className="text-2xl font-bold text-white mb-4">AWP Plays</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {getFilteredDemosByPosition("AWPer").map(demo => (
-                    <DemoCard key={demo.id} demo={demo} onSelectDemo={onSelectDemo} />
-                  ))}
-                </div>
-              </section>
-            )}
+            <CategorySection 
+              title="Mirage POVs" 
+              demos={getFilteredDemosByMap("Mirage")} 
+              onSelectDemo={onSelectDemo} 
+            />
+            <CategorySection 
+              title="Inferno POVs" 
+              demos={getFilteredDemosByMap("Inferno")} 
+              onSelectDemo={onSelectDemo} 
+            />
           </>
         )}
+        {!filtersApplied.position && (
+          <CategorySection 
+            title="AWP Plays" 
+            demos={getFilteredDemosByPosition("AWPer")} 
+            onSelectDemo={onSelectDemo} 
+          />
+        )}
         
-        {/* Statt des bisherigen Browse-Buttons und der unteren Bereiche:
-            Zwei Karten, eine für Players und eine für Maps */}
+        {/* Untere Navigationskarten */}
         <section className="mt-16 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link
