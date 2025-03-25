@@ -51,12 +51,17 @@ const mapDemo = (demo) => ({
 // Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
 // sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
 // Mit "View More" wird eine weitere Zeile freigeschaltet.
-const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxColumns = 5 }) => {
+// ────────────────
+// CategorySection
+// ────────────────
+// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
+// Mit verbesserten Abständen zwischen den Karten für ein besseres visuelles Layout.
+// Mit "View More" wird eine weitere Zeile freigeschaltet.
+const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
   const [visibleRows, setVisibleRows] = useState(1);
   const [cardWidth, setCardWidth] = useState(minCardWidth);
-  const fixedGap = 16; // Fester Abstand in Pixeln zwischen den Cards
 
   useEffect(() => {
     const updateItemsPerRow = () => {
@@ -64,20 +69,20 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
         // Sicherstellen, dass der Container box-sizing: border-box hat und kein Padding/Margin
         const containerWidth = containerRef.current.offsetWidth;
         // Berechne, wie viele Cards (inkl. fester Lücke) in die Container-Breite passen
-        const calculated = Math.floor((containerWidth + fixedGap) / (minCardWidth + fixedGap)) || 1;
+        const calculated = Math.floor((containerWidth + gap) / (minCardWidth + gap)) || 1;
         const finalItems = Math.min(calculated, maxColumns);
         setItemsPerRow(finalItems);
         // Berechne die exakte Breite so, dass:
-        // (finalItems * cardWidth) + ((finalItems - 1) * fixedGap) = containerWidth
-        const newCardWidth = (containerWidth - (finalItems - 1) * fixedGap) / finalItems;
-        setCardWidth(newCardWidth);
+        // (finalItems * cardWidth) + ((finalItems - 1) * gap) = containerWidth
+        const newCardWidth = (containerWidth - (finalItems - 1) * gap) / finalItems;
+        setCardWidth(Math.floor(newCardWidth));
       }
     };
 
     updateItemsPerRow();
     window.addEventListener("resize", updateItemsPerRow);
     return () => window.removeEventListener("resize", updateItemsPerRow);
-  }, [minCardWidth, maxColumns, fixedGap]);
+  }, [minCardWidth, maxColumns, gap]);
 
   const visibleCount = itemsPerRow * visibleRows;
   const visibleDemos = demos.slice(0, visibleCount);
@@ -91,8 +96,10 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
   const canViewMore = demos.length > visibleCount;
 
   return (
-    <section className="mt-4">
-      <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
+    <section className="mt-8 mb-6">
+      <h2 className="text-2xl font-bold text-white mb-4">
+        <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
+      </h2>
       <div
         ref={containerRef}
         className="overflow-hidden"
@@ -101,22 +108,26 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
         {rows.map((row, rowIndex) => (
           <div
             key={rowIndex}
-            className="flex mb-2"
-            style={{ gap: `${fixedGap}px` }} // Fester Abstand
+            className="flex mb-6"
+            style={{ gap: `${gap}px` }}
           >
             {row.map(demo => (
               <div key={demo.id} style={{ width: cardWidth }} className="flex-shrink-0">
-                <DemoCard demo={demo} onSelectDemo={onSelectDemo} />
+                <DemoCard demo={demo} onSelect={onSelectDemo} />
               </div>
+            ))}
+            {/* Fülle leere Slots für gleichmäßiges Layout */}
+            {row.length < itemsPerRow && Array(itemsPerRow - row.length).fill().map((_, i) => (
+              <div key={`empty-${i}`} style={{ width: cardWidth }} className="flex-shrink-0"></div>
             ))}
           </div>
         ))}
       </div>
       {canViewMore && (
-        <div className="mt-1">
+        <div className="mt-2 text-center">
           <button
             onClick={() => setVisibleRows(visibleRows + 1)}
-            className="text-yellow-400 text-sm underline"
+            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-yellow-400 text-sm rounded-lg border border-gray-700 transition-colors"
           >
             View More
           </button>
