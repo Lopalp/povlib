@@ -47,25 +47,22 @@ const mapDemo = (demo) => ({
 // ────────────────
 // CategorySection
 // ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Die Kartenbreite wird dynamisch errechnet, sodass links und rechts bündig abgeschlossen wird
-// und keine teilweise abgeschnittenen Cards erscheinen. Mit "View More" wird eine weitere Zeile angezeigt.
+// Diese Komponente rendert eine Kategorie (z. B. "Recently Added" oder "Mirage POVs")
+// und zeigt standardmäßig nur eine Zeile (basierend auf dem Container-Bereich).
+// Mit "View More" kann der Bereich um eine weitere Zeile erweitert werden.
+// Dabei werden immer maximal so viele Videos pro Zeile gezeigt, wie der Container (aber höchstens 5).
 const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxColumns = 5 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
   const [visibleRows, setVisibleRows] = useState(1);
-  const [cardWidth, setCardWidth] = useState(minCardWidth);
 
+  // Berechne die Anzahl der Videos pro Zeile anhand der Container-Breite
   useEffect(() => {
     const updateItemsPerRow = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        const gap = 8; // entspricht gap-2 (8px)
-        const calculated = Math.floor((containerWidth + gap) / (minCardWidth + gap)) || 1;
-        const finalItems = Math.min(calculated, maxColumns);
-        setItemsPerRow(finalItems);
-        const newCardWidth = (containerWidth - (finalItems - 1) * gap) / finalItems;
-        setCardWidth(newCardWidth);
+        const calculated = Math.floor(containerWidth / minCardWidth) || 1;
+        setItemsPerRow(Math.min(calculated, maxColumns));
       }
     };
 
@@ -77,7 +74,7 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
   const visibleCount = itemsPerRow * visibleRows;
   const visibleDemos = demos.slice(0, visibleCount);
 
-  // Aufteilen in Zeilen
+  // Chunking der sichtbaren Demos in Zeilen
   const rows = [];
   for (let i = 0; i < visibleDemos.length; i += itemsPerRow) {
     rows.push(visibleDemos.slice(i, i + itemsPerRow));
@@ -86,13 +83,13 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
   const canViewMore = demos.length > visibleCount;
 
   return (
-    <section className="mt-4"> {/* Verringerter vertikaler Abstand */}
-      <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-      <div ref={containerRef} className="overflow-hidden px-0"> {/* Kein horizontaler Padding */}
+    <section className="mt-8">
+      <h2 className="text-2xl font-bold text-white mb-4">{title}</h2>
+      <div ref={containerRef} className="overflow-hidden">
         {rows.map((row, rowIndex) => (
           <div key={rowIndex} className="flex gap-2 flex-nowrap mb-2">
             {row.map(demo => (
-              <div key={demo.id} style={{ width: cardWidth }} className="flex-shrink-0">
+              <div key={demo.id} style={{ minWidth: minCardWidth }} className="flex-shrink-0">
                 <DemoCard demo={demo} onSelectDemo={onSelectDemo} />
               </div>
             ))}
@@ -100,7 +97,7 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
         ))}
       </div>
       {canViewMore && (
-        <div className="mt-1">
+        <div className="mt-2">
           <button
             onClick={() => setVisibleRows(visibleRows + 1)}
             className="text-yellow-400 text-sm underline"
@@ -154,7 +151,7 @@ const POVlib = () => {
     search: searchQuery
   });
 
-  // Dynamische Tags
+  // Dynamische Tags (wie zuvor)
   const dynamicTags = useMemo(() => {
     const tagsSet = new Set();
     filteredDemos.forEach(demo => {
@@ -182,7 +179,7 @@ const POVlib = () => {
     [positionDemos]
   );
 
-  // Initialdaten laden
+  // Laden der Initialdaten
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -212,7 +209,7 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
 
-  // Gefilterte Demos aktualisieren
+  // Aktualisierung gefilterter Demos bei Änderung von Filtern oder Suchbegriff
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
@@ -229,7 +226,7 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
 
-  // Map- und Positions-Demos laden
+  // Laden von Map- und Positions-Demos (wie zuvor)
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -433,36 +430,30 @@ const POVlib = () => {
         />
       )}
       
-      <main className="container mx-auto px-6 py-6 bg-pattern"> {/* Etwas weniger vertikaler Padding */}
+      <main className="container mx-auto px-6 py-12 bg-pattern">
         <SelectedFilters 
           filtersApplied={filtersApplied} 
           setFiltersApplied={setFiltersApplied} 
           searchQuery={searchQuery} 
         />
         
-        {/* Filter-Icon + Tag-Leiste */}
-        <div className="flex items-center gap-2 mb-2">
-          <Filter 
-            onClick={() => setIsFilterModalOpen(true)}
-            className="text-yellow-400 cursor-pointer"
-          />
-          <div className="flex flex-wrap items-center gap-2">
-            {dynamicTags.map(tag => (
-              <button 
-                key={tag} 
-                onClick={() => handleTagClick(tag)}
-                className="px-3 py-1 bg-gray-800 rounded-full text-sm hover:bg-yellow-400/20 transition-colors"
-              >
-                {tag}
-              </button>
-            ))}
-            <Link href="/demos" className="text-yellow-400 text-sm underline">
-              Alle Demos
-            </Link>
-          </div>
+        {/* Dynamische Tag-Leiste */}
+        <div className="my-4 flex flex-wrap items-center gap-2">
+          {dynamicTags.map(tag => (
+            <button 
+              key={tag} 
+              onClick={() => handleTagClick(tag)}
+              className="px-3 py-1 bg-gray-800 rounded-full text-sm hover:bg-yellow-400/20 transition-colors"
+            >
+              {tag}
+            </button>
+          ))}
+          <Link href="/demos" className="text-yellow-400 text-sm underline ml-2">
+            Alle Demos
+          </Link>
         </div>
         
-        {/* Kategorieabschnitte */}
+        {/* Kategorieabschnitte als feste Karten mit "View More"-Funktion */}
         <CategorySection 
           title="Recently Added" 
           demos={filteredDemos} 
@@ -490,29 +481,31 @@ const POVlib = () => {
           />
         )}
         
-        {/* Überarbeitete Link-Cards unten */}
-        <section className="mt-8 mb-12">
+        {/* Untere Navigationskarten */}
+        <section className="mt-16 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Link href="/players" className="relative block rounded-xl overflow-hidden">
-              <img 
-                src="/images/players-example.png" 
-                alt="Players" 
-                className="w-full h-48 object-cover" 
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Players</h3>
-                <p className="text-gray-300">View all players</p>
+            <Link
+              href="/players"
+              className="flex items-center justify-center rounded-xl border border-gray-700 hover:border-yellow-400/30 bg-gradient-to-br from-gray-800 to-gray-900 p-6 transition-all duration-300 hover:scale-105"
+            >
+              <div className="text-center">
+                <div className="w-24 h-24 rounded-full bg-gray-800 hover:bg-yellow-400/20 border-2 border-yellow-400/30 mb-4 flex items-center justify-center">
+                  <span className="text-yellow-400 text-3xl font-bold">P</span>
+                </div>
+                <h3 className="text-white font-bold mb-1">Players</h3>
+                <p className="text-gray-400 text-sm">View all players</p>
               </div>
             </Link>
-            <Link href="/maps" className="relative block rounded-xl overflow-hidden">
-              <img 
-                src="/images/maps-example.png" 
-                alt="Maps" 
-                className="w-full h-48 object-cover" 
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Maps</h3>
-                <p className="text-gray-300">View all maps</p>
+            <Link
+              href="/maps"
+              className="flex items-center justify-center rounded-xl border border-gray-700 hover:border-yellow-400/30 bg-gradient-to-br from-gray-800 to-gray-900 p-6 transition-all duration-300 hover:scale-105"
+            >
+              <div className="text-center">
+                <div className="w-24 h-24 rounded-full bg-gray-800 hover:bg-yellow-400/20 border-2 border-yellow-400/30 mb-4 flex items-center justify-center">
+                  <span className="text-yellow-400 text-3xl font-bold">M</span>
+                </div>
+                <h3 className="text-white font-bold mb-1">Maps</h3>
+                <p className="text-gray-400 text-sm">View all maps</p>
               </div>
             </Link>
           </div>
