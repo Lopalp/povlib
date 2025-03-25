@@ -48,24 +48,25 @@ const mapDemo = (demo) => ({
 // CategorySection
 // ────────────────
 // Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Dabei wird ein fixer Abstand (gap) berücksichtigt, sodass die Cards immer links und rechts bündig abschließen
-// und keine Cards abgeschnitten oder überlappend dargestellt werden. Mit "View More" wird eine weitere Zeile freigeschaltet.
+// Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
+// sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
+// Mit "View More" wird eine weitere Zeile freigeschaltet.
 const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxColumns = 5 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
   const [visibleRows, setVisibleRows] = useState(1);
   const [cardWidth, setCardWidth] = useState(minCardWidth);
-  const fixedGap = 16; // Fixer Abstand in Pixeln zwischen den Cards
+  const fixedGap = 16; // Fester Abstand in Pixeln zwischen den Cards
 
   useEffect(() => {
     const updateItemsPerRow = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        // Berechnung: Verfügbare Breite + Gap, geteilt durch (minCardWidth + Gap)
+        // Berechne, wie viele Cards (inklusive fester Lücke) in die Container-Breite passen
         const calculated = Math.floor((containerWidth + fixedGap) / (minCardWidth + fixedGap)) || 1;
         const finalItems = Math.min(calculated, maxColumns);
         setItemsPerRow(finalItems);
-        // Berechne die Card-Breite so, dass sie exakt in den Container passen:
+        // Berechne die exakte Kartenbreite so, dass: (Anzahl * cardWidth) + (Anzahl-1 * fixedGap) = containerWidth
         const newCardWidth = (containerWidth - (finalItems - 1) * fixedGap) / finalItems;
         setCardWidth(newCardWidth);
       }
@@ -90,9 +91,13 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
   return (
     <section className="mt-4">
       <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-      <div ref={containerRef} className="overflow-hidden px-0">
+      <div ref={containerRef} className="overflow-hidden">
         {rows.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex mb-2" style={{ gap: fixedGap }}>
+          <div
+            key={rowIndex}
+            className="flex mb-2"
+            style={{ gap: `${fixedGap}px` }}  // expliziter Abstand
+          >
             {row.map(demo => (
               <div key={demo.id} style={{ width: cardWidth }} className="flex-shrink-0">
                 <DemoCard demo={demo} onSelectDemo={onSelectDemo} />
@@ -492,7 +497,7 @@ const POVlib = () => {
           />
         )}
         
-        {/* Überarbeitete Navigation-Karten unten – Vorlage (z. B. für Maps) */}
+        {/* Überarbeitete Navigation-Karten unten – Verwende hier das Template-Bild, das Du für Maps hattest */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link href="/players" className="relative block rounded-xl overflow-hidden">
@@ -507,7 +512,6 @@ const POVlib = () => {
               </div>
             </Link>
             <Link href="/maps" className="relative block rounded-xl overflow-hidden">
-              {/* Verwende hier das Template-Bild, das Du anfangs für Maps genutzt hast */}
               <img 
                 src="/images/maps-example.png" 
                 alt="Maps" 
