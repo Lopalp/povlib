@@ -14,7 +14,7 @@ const mapNamesDesktop = [
   { label: 'Vertigo', slug: 'vertigo' }
 ];
 
-const mapNamesMobile = [
+const mostPlayedMapsMobile = [
   { label: 'Mirage', slug: 'mirage' },
   { label: 'Inferno', slug: 'inferno' },
   { label: 'Nuke', slug: 'nuke' },
@@ -188,7 +188,7 @@ const Navbar = ({
             {/* Sign In Button */}
             <Link 
               href="/login" 
-              className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 hover:border-yellow-400 transition-all"
+              className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 transition-all"
             >
               <LogIn className="h-4 w-4 mr-2" />
               <span className="text-sm font-medium">Sign In</span>
@@ -240,27 +240,27 @@ const Navbar = ({
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
         <div className="md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800">
-          <div className="container mx-auto px-4 py-4">
-            <nav className="space-y-4">
+          <div className="container mx-auto px-4 py-6">
+            <nav className="flex flex-col space-y-6">
               <Link 
                 href="/" 
-                className="block py-2 text-white font-medium hover:text-yellow-400 transition-colors"
+                className="block text-white font-medium hover:text-yellow-400 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Home
               </Link>
               
-              <div className="border-t border-gray-800 pt-2">
-                <div className="flex items-center mb-2">
-                  <MapPin className="h-4 w-4 text-yellow-400 mr-2" />
-                  <span className="text-white font-medium">Maps</span>
+              <div className="border-t border-gray-800 pt-4">
+                <div className="flex items-center mb-3">
+                  <MapPin className="h-5 w-5 text-yellow-400 mr-2" />
+                  <span className="text-white font-medium text-lg">Maps</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2 pl-6">
-                  {mapNamesMobile.map(({ label, slug }) => (
+                <div className="grid grid-cols-2 gap-4">
+                  {mostPlayedMapsMobile.map(({ label, slug }) => (
                     <Link 
                       key={slug}
                       href={`/maps/${slug}`}
-                      className="text-gray-300 py-1 hover:text-yellow-400"
+                      className="block py-2 text-gray-300 hover:text-yellow-400 text-center border border-gray-700 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {label}
@@ -269,58 +269,54 @@ const Navbar = ({
                 </div>
                 <Link 
                   href="/maps" 
-                  className="block text-sm text-yellow-400 mt-1 pl-6 hover:underline"
+                  className="block text-sm text-yellow-400 mt-3 text-center hover:underline"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  View all maps →
+                  Alle Maps →
                 </Link>
               </div>
               
-              <div className="border-t border-gray-800 pt-2">
-                <Link 
-                  href="/demos" 
-                  className="flex items-center py-2 text-gray-300 hover:text-yellow-400 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <FileVideo className="h-4 w-4 mr-2 text-yellow-400" />
+              <Link 
+                href="/demos" 
+                className="block text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="flex items-center gap-2">
+                  <FileVideo className="h-5 w-5 text-yellow-400" />
                   <span className="font-medium">Demos</span>
-                </Link>
-              </div>
+                </div>
+              </Link>
               
-              <div className="border-t border-gray-800 pt-2">
-                <Link 
-                  href="/players" 
-                  className="flex items-center py-2 text-gray-300 hover:text-yellow-400 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <User className="h-4 w-4 mr-2 text-yellow-400" />
+              <Link 
+                href="/players" 
+                className="block text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-yellow-400" />
                   <span className="font-medium">Players</span>
-                </Link>
-              </div>
+                </div>
+              </Link>
               
-              <div className="border-t border-gray-800 pt-2">
-                <Link 
-                  href="/teams" 
-                  className="block py-2 text-gray-300 hover:text-yellow-400 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Teams
-                </Link>
-              </div>
+              <Link 
+                href="/teams" 
+                className="block text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Teams
+              </Link>
               
-              <div className="border-t border-gray-800 pt-2">
-                <Link 
-                  href="/events" 
-                  className="block py-2 text-gray-300 hover:text-yellow-400 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Events
-                </Link>
-              </div>
+              <Link 
+                href="/events" 
+                className="block text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Events
+              </Link>
               
               {/* Mobile PRO/COMMUNITY Toggle */}
-              <div className="border-t border-gray-800 pt-4">
-                <div className="bg-gray-800 p-1 rounded-full flex">
+              <div className="border-t border-gray-800 pt-6">
+                <div className="flex bg-gray-800 rounded-full p-1">
                   <button
                     onClick={() => { onSwitchDemoType('pro'); setIsMenuOpen(false); }}
                     className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
@@ -337,7 +333,7 @@ const Navbar = ({
               </div>
               
               {/* Sign In Button */}
-              <div className="border-t border-gray-800 pt-4">
+              <div className="border-t border-gray-800 pt-6">
                 <Link 
                   href="/login"
                   className="block w-full py-3 bg-yellow-400 text-gray-900 rounded-lg text-center font-bold hover:bg-yellow-300 transition-colors"
