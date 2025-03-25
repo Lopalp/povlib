@@ -1,78 +1,205 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
-import { Search, Filter, X, Menu } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Search, Filter, FileVideo, MapPin } from 'lucide-react';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import DemoCard from './DemoCard';
+import VideoPlayerPage from './VideoPlayerPage';
+import TaggingModal from './TaggingModal';
+import FilterModal from './FilterModal';
+
 import {
+  getAllDemos,
   getFilteredDemos,
-  getTrendingDemos,
-  getLatestDemos,
-  getDemosByMap,
-  getDemosByPosition,
   getFilterOptions,
   updateDemoStats,
   updateDemoTags,
-  updateDemoPositions,
-  getPlayerInfo
+  updateDemoPositions
 } from '@/lib/supabase';
 
-import YouTubeEmbed from './POVlib/YouTubeEmbed';
-import DemoCard from './POVlib/DemoCard';
-import VideoPlayerPage from './POVlib/VideoPlayerPage';
-import TaggingModal from './POVlib/TaggingModal';
-import FilterModal from './POVlib/FilterModal';
-import Navbar from './POVlib/Navbar';
-import DemoCarousel from './POVlib/DemoCarousel';
-import MapGrid from './POVlib/MapGrid';
-import Footer from './POVlib/Footer';
-import FeaturedHero from './POVlib/FeaturedHero';
-import SelectedFilters from './POVlib/SelectedFilters';
-import ContentTabs from './POVlib/ContentTabs';
-import PlayerCard from './POVlib/PlayerCard';
+// Subkomponente: Header mit Suchleiste und kleinem Link zu allen Demos
+const HeroHeader = ({ searchQuery, handleSearchChange, handleSearchSubmit, setIsFilterModalOpen }) => (
+  <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
+    <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
+    <div className="container mx-auto px-6 text-center">
+      <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">CS2 Pro POVs Library</h1>
+      <p className="text-gray-300 max-w-2xl mx-auto mb-4">
+        Browse all professional CS2 demos. Watch and learn from the best players and teams to improve your gameplay.
+      </p>
+      <p className="text-sm text-yellow-400 mb-8">
+        <a href="/demos">Alle Demos ansehen</a>
+      </p>
+      <div className="max-w-xl mx-auto">
+        <form onSubmit={handleSearchSubmit} className="relative">
+          <input
+            type="text"
+            placeholder="Search demos, maps, players, or teams..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full p-4 pl-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-400"
+          />
+          <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
+          <button 
+            type="button"
+            onClick={() => setIsFilterModalOpen(true)}
+            className="absolute right-3 top-3 p-1 bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 rounded-lg transition-colors"
+          >
+            <Filter className="h-5 w-5" />
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+);
 
-// Helper-Funktion zum Mapping eines Demo-Objekts
-const mapDemo = (demo) => ({
-  id: demo.id,
-  title: demo.title,
-  thumbnail: demo.thumbnail,
-  videoId: demo.video_id,
-  map: demo.map,
-  positions: demo.positions || [],
-  tags: demo.tags || [],
-  players: demo.players || [],
-  team: demo.team,
-  year: demo.year,
-  event: demo.event,
-  result: demo.result,
-  views: demo.views || 0,
-  likes: demo.likes || 0,
-  isPro: demo.is_pro
-});
+// Subkomponente: Anzeige aktiver Filter als Tags
+const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) => {
+  const hasFilters = Object.values(filtersApplied).some(value => value !== '');
+  if (!hasFilters) return null;
 
-const POVlib = () => {
-  // UI States
-  const [searchActive, setSearchActive] = useState(false);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
-  const [selectedDemo, setSelectedDemo] = useState(null);
+  return (
+    <div className="mb-8 flex flex-wrap items-center gap-3 p-4 bg-gray-800 rounded-xl border border-gray-700">
+      {Object.entries(filtersApplied).map(([key, value]) => {
+        if (!value || key === 'search') return null;
+        return (
+          <div key={key} className="flex items-center bg-gray-700 text-xs rounded-full px-3 py-2 group hover:bg-gray-600 transition-colors">
+            <span className="capitalize mr-1 text-gray-400">{key}:</span>
+            <span className="font-bold text-yellow-400">{value}</span>
+            <button 
+              onClick={() => {
+                setFiltersApplied(prev => ({
+                  ...prev,
+                  [key]: ''
+                }));
+              }}
+              className="ml-2 text-gray-500 group-hover:text-yellow-400 transition-colors"
+            >
+              &times;
+            </button>
+          </div>
+        );
+      })}
+      <button 
+        onClick={handleResetFilters}
+        className="text-xs text-gray-400 hover:text-yellow-400 ml-2 font-bold transition-colors"
+      >
+        Reset All Filters
+      </button>
+    </div>
+  );
+};
+
+// Neue Subkomponente: Dynamische Tags basierend auf den Demos
+const DynamicTags = ({ demos, setFiltersApplied }) => {
+  const uniqueTags = useMemo(() => {
+    const tagsSet = new Set();
+    demos.forEach(demo => {
+      if (demo.tags && demo.tags.length > 0) {
+        demo.tags.forEach(tag => tagsSet.add(tag));
+      }
+    });
+    return Array.from(tagsSet);
+  }, [demos]);
+
+  if (uniqueTags.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2 mb-6">
+      {uniqueTags.map(tag => (
+         <button 
+           key={tag} 
+           onClick={() => setFiltersApplied(prev => ({ ...prev, tag }))}
+           className="px-3 py-1 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+         >
+           {tag}
+         </button>
+      ))}
+    </div>
+  );
+};
+
+// Subkomponente: Grid zur Anzeige der Demos (statische Karten wie bei YouTube)
+const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    {demos.map((demo, index) => {
+      if (index === demos.length - 1) {
+        return (
+          <div ref={lastDemoElementRef} key={demo.id}>
+            <DemoCard 
+              demo={demo}
+              onSelect={handleSelectDemo}
+              className="w-full"
+            />
+          </div>
+        );
+      }
+      return (
+        <DemoCard 
+          key={demo.id}
+          demo={demo}
+          onSelect={handleSelectDemo}
+          className="w-full"
+        />
+      );
+    })}
+  </div>
+);
+
+// Neue Subkomponente: Extra Cards für Players und Maps (optisch an Maps-Cards angelehnt)
+const ExtraCards = () => (
+  <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <a 
+      href="/players" 
+      className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all"
+    >
+      <div className="flex items-center justify-between">
+         <span className="text-white font-medium">Players</span>
+         {/* Hier kann optional ein Icon eingefügt werden */}
+      </div>
+    </a>
+    <a 
+      href="/maps" 
+      className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all"
+    >
+      <div className="flex items-center justify-between">
+         <span className="text-white font-medium">Maps</span>
+         {/* Hier kann optional ein Icon eingefügt werden */}
+      </div>
+    </a>
+  </div>
+);
+
+const DemosIndex = () => {
+  // States für Demos, Filterung und UI
+  const [demos, setDemos] = useState([]);
+  const [filteredDemos, setFilteredDemos] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeVideoId, setActiveVideoId] = useState('');
-  const [demoType, setDemoType] = useState('pro');
+  const [selectedDemo, setSelectedDemo] = useState(null);
+  const [relatedDemos, setRelatedDemos] = useState([]);
+  const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  
+  const [searchActive, setSearchActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
-  const [autoplayVideo, setAutoplayVideo] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isVideoPlayerPage, setIsVideoPlayerPage] = useState(false);
-
-  // Data States
-  const [filteredDemos, setFilteredDemos] = useState([]);
-  const [trendingDemos, setTrendingDemos] = useState([]);
-  const [latestDemos, setLatestDemos] = useState([]);
-  const [mapDemos, setMapDemos] = useState({});
-  const [positionDemos, setPositionDemos] = useState({});
-  const [relatedDemos, setRelatedDemos] = useState([]);
-  const [topPlayers, setTopPlayers] = useState([]);
+  
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  
+  const [demoType, setDemoType] = useState('pro');
+  const [filtersApplied, setFiltersApplied] = useState({
+    map: '',
+    position: '',
+    player: '',
+    team: '',
+    year: '',
+    event: '',
+    result: '',
+    tag: '',
+    search: ''
+  });
   const [filterOptions, setFilterOptions] = useState({
     maps: [],
     positions: {},
@@ -82,213 +209,182 @@ const POVlib = () => {
     results: [],
     players: []
   });
-  const [filtersApplied, setFiltersApplied] = useState({
-    map: '',
-    position: '',
-    player: '',
-    team: '',
-    year: '',
-    event: '',
-    result: '',
-    search: ''
-  });
-
-  const scrollContainerRef = useRef(null);
-  const featuredVideoRef = useRef(null);
-
-  // Helper-Funktionen für Map/Positions-Filter
-  const getFilteredDemosByMap = useCallback(
-    (map) => mapDemos[map] || [],
-    [mapDemos]
-  );
-  const getFilteredDemosByPosition = useCallback(
-    (position) => positionDemos[position] || [],
-    [positionDemos]
-  );
-
-  // Laden der Initialdaten
+  
+  // Ref für Infinite Scroll
+  const observer = useRef();
+  const lastDemoElementRef = useCallback(node => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMoreDemos();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
+  
+  // Initiales Laden der Daten
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
         const options = await getFilterOptions();
         setFilterOptions(options);
-
-        // Parallel geladen: gefilterte, trending und neueste Demos
-        const [demos, trending, latest] = await Promise.all([
-          getFilteredDemos(filtersApplied, demoType),
-          getTrendingDemos(5, demoType),
-          getLatestDemos(5, demoType)
-        ]);
-
-        const mappedDemos = demos.map(mapDemo);
-        setFilteredDemos(mappedDemos);
-        if (mappedDemos.length > 0) setActiveVideoId(mappedDemos[0].videoId);
-        setTrendingDemos(trending.map(mapDemo));
-        setLatestDemos(latest.map(mapDemo));
-
-        // Top Players laden
-        if (options.players?.length > 0) {
-          const playerPromises = options.players.slice(0, 5).map(async (playerName) => {
-            try {
-              return await getPlayerInfo(playerName);
-            } catch (err) {
-              console.error(`Error loading player info for ${playerName}:`, err);
-              return null;
-            }
-          });
-          const playerResults = await Promise.all(playerPromises);
-          setTopPlayers(playerResults.filter(Boolean));
+        const demosData = await getFilteredDemos({ ...filtersApplied, search: searchQuery }, demoType);
+        if (!demosData || demosData.length === 0) {
+          setDemos([]);
+          setFilteredDemos([]);
+          setHasMore(false);
+          setIsLoading(false);
+          return;
         }
+        const mappedDemos = demosData.map(mapDemoData);
+        setDemos(mappedDemos);
+        setFilteredDemos(mappedDemos);
+        setHasMore(mappedDemos.length >= 20);
         setIsLoading(false);
       } catch (err) {
-        console.error('Error loading initial data:', err);
-        setError('Failed to load data. Please try again later.');
+        console.error('Error loading demos:', err);
+        setError('Failed to load demos. Please try again later.');
         setIsLoading(false);
       }
     };
     loadInitialData();
-  }, [demoType]);
-
-  // Aktualisierung der gefilterten Demos bei Änderung von Filtern oder Suchbegriff
+  }, [demoType, filtersApplied]);
+  
+  // Hilfsfunktion zum Mappen der Demo-Daten
+  const mapDemoData = (demo) => ({
+    id: demo.id,
+    title: demo.title,
+    thumbnail: demo.thumbnail,
+    videoId: demo.video_id,
+    map: demo.map,
+    positions: demo.positions || [],
+    tags: demo.tags || [],
+    players: demo.players || [],
+    team: demo.team,
+    year: demo.year,
+    event: demo.event,
+    result: demo.result,
+    views: demo.views || 0,
+    likes: demo.likes || 0,
+    isPro: demo.is_pro
+  });
+  
+  // Filterung der Demos anhand der Suchanfrage
   useEffect(() => {
-    const updateFilteredDemos = async () => {
-      try {
-        setIsLoading(true);
-        const demos = await getFilteredDemos({ ...filtersApplied, search: searchQuery }, demoType);
-        setFilteredDemos(demos.map(mapDemo));
-        setIsLoading(false);
-      } catch (err) {
-        console.error('Error updating filtered demos:', err);
-        setError('Failed to update data. Please try again later.');
-        setIsLoading(false);
-      }
-    };
-    updateFilteredDemos();
-  }, [filtersApplied, searchQuery, demoType]);
-
-  // Laden von Map-Demos, falls nicht bereits vorhanden
-  useEffect(() => {
-    const loadMapDemos = async (map) => {
-      if (!mapDemos[map]) {
-        try {
-          const demos = await getDemosByMap(map);
-          setMapDemos(prev => ({ ...prev, [map]: demos.map(mapDemo) }));
-        } catch (err) {
-          console.error(`Error loading demos for map ${map}:`, err);
-        }
-      }
-    };
-    if (!filtersApplied.map) {
-      loadMapDemos('Mirage');
-      loadMapDemos('Inferno');
+    if (!searchQuery.trim()) {
+      setFilteredDemos(demos);
+      return;
     }
-  }, [mapDemos, filtersApplied.map]);
-
-  // Laden von Positions-Demos, falls nicht bereits vorhanden
-  useEffect(() => {
-    const loadPositionDemos = async (position) => {
-      if (!positionDemos[position]) {
-        try {
-          const demos = await getDemosByPosition(position);
-          setPositionDemos(prev => ({ ...prev, [position]: demos.map(mapDemo) }));
-        } catch (err) {
-          console.error(`Error loading demos for position ${position}:`, err);
-        }
-      }
-    };
-    if (!filtersApplied.position) {
-      loadPositionDemos('AWPer');
-    }
-  }, [positionDemos, filtersApplied.position]);
-
-  // Ermittlung verwandter Demos basierend auf ausgewählter Demo
-  useEffect(() => {
-    if (selectedDemo) {
-      const related = filteredDemos.filter(demo =>
-        demo.id !== selectedDemo.id &&
-        (demo.map === selectedDemo.map ||
-          demo.players.some(p => selectedDemo.players.includes(p)) ||
-          demo.positions.some(p => selectedDemo.positions.includes(p)))
-      );
-      if (related.length < 5) {
-        const additional = trendingDemos.filter(
-          demo => demo.id !== selectedDemo.id && !related.some(r => r.id === demo.id)
-        ).slice(0, 5 - related.length);
-        setRelatedDemos([...related, ...additional]);
-      } else {
-        setRelatedDemos(related.slice(0, 10));
-      }
-    }
-  }, [selectedDemo, filteredDemos, trendingDemos]);
-
-  // Update der Views in allen relevanten Listen bei Demo-Auswahl
-  useEffect(() => {
-    if (selectedDemo) {
-      const updateViews = async () => {
-        try {
-          const result = await updateDemoStats(selectedDemo.id, 'views', 1);
-          if (result.success) {
-            const updateList = (list) =>
-              list.map(demo =>
-                demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo
-              );
-            setFilteredDemos(prev => updateList(prev));
-            setTrendingDemos(prev => updateList(prev));
-            setLatestDemos(prev => updateList(prev));
-            setMapDemos(prev => {
-              const updated = {};
-              for (const map in prev) {
-                updated[map] = updateList(prev[map]);
-              }
-              return updated;
-            });
-            setPositionDemos(prev => {
-              const updated = {};
-              for (const pos in prev) {
-                updated[pos] = updateList(prev[pos]);
-              }
-              return updated;
-            });
-          }
-        } catch (err) {
-          console.error('Error updating views:', err);
-        }
-      };
-      updateViews();
-    }
-  }, [selectedDemo]);
-
-  // Gemeinsame Handler-Funktion für Updates (Likes, Tags, Positions)
-  const handleDemoUpdate = async (demoId, updateFn, updater) => {
+    const query = searchQuery.toLowerCase();
+    const filtered = demos.filter(demo => 
+      demo.title.toLowerCase().includes(query) || 
+      demo.map.toLowerCase().includes(query) ||
+      demo.players.some(player => player.toLowerCase().includes(query)) ||
+      (demo.team && demo.team.toLowerCase().includes(query)) ||
+      demo.positions.some(pos => pos.toLowerCase().includes(query)) ||
+      demo.tags.some(tag => tag.toLowerCase().includes(query))
+    );
+    setFilteredDemos(filtered);
+  }, [searchQuery, demos]);
+  
+  // Laden weiterer Demos beim Scrollen
+  const loadMoreDemos = async () => {
+    if (!hasMore || isLoading) return;
     try {
-      const result = await updateFn(demoId, updater);
+      setIsLoading(true);
+      const nextPage = page + 1;
+      const demosData = await getFilteredDemos({ ...filtersApplied, search: searchQuery }, demoType);
+      const existingIds = demos.map(d => d.id);
+      const newDemos = demosData
+        .filter(d => !existingIds.includes(d.id))
+        .map(mapDemoData);
+      if (newDemos.length === 0) {
+        setHasMore(false);
+        setIsLoading(false);
+        return;
+      }
+      setDemos(prev => [...prev, ...newDemos]);
+      if (searchQuery.trim() === '') {
+        setFilteredDemos(prev => [...prev, ...newDemos]);
+      } else {
+        const query = searchQuery.toLowerCase();
+        const filteredNewDemos = newDemos.filter(demo => 
+          demo.title.toLowerCase().includes(query) || 
+          demo.map.toLowerCase().includes(query) ||
+          demo.players.some(player => player.toLowerCase().includes(query)) ||
+          (demo.team && demo.team.toLowerCase().includes(query)) ||
+          demo.positions.some(pos => pos.toLowerCase().includes(query)) ||
+          demo.tags.some(tag => tag.toLowerCase().includes(query))
+        );
+        setFilteredDemos(prev => [...prev, ...filteredNewDemos]);
+      }
+      setPage(nextPage);
+      setHasMore(newDemos.length >= 10);
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Error loading more demos:', err);
+      setIsLoading(false);
+    }
+  };
+  
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  const handleSearchSubmit = (e) => { e.preventDefault(); };
+  
+  const handleSelectDemo = (demo) => {
+    setSelectedDemo(demo);
+    findRelatedDemos(demo);
+    updateDemoStats(demo.id, 'views', 1).catch(err => console.error('Error updating views:', err));
+  };
+  
+  const findRelatedDemos = (demo) => {
+    const related = demos.filter(d => 
+      d.id !== demo.id && (
+        d.map === demo.map || 
+        d.players.some(p => demo.players.includes(p)) ||
+        d.positions.some(p => demo.positions.includes(p))
+      )
+    );
+    setRelatedDemos(related.slice(0, 10));
+  };
+  
+  const handleCloseVideoPlayer = () => {
+    setSelectedDemo(null);
+    setRelatedDemos([]);
+  };
+  
+  const handleLikeDemo = async (demoId) => {
+    try {
+      const result = await updateDemoStats(demoId, 'likes', 1);
       if (result.success) {
-        const updatedDemo = mapDemo(result.demo);
-        const updateList = (list) =>
-          list.map(demo => demo.id === demoId ? { ...demo, ...updatedDemo } : demo);
-        setFilteredDemos(prev => updateList(prev));
+        const updatedDemo = mapDemoData(result.demo);
+        setDemos(prev => 
+          prev.map(demo => demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo)
+        );
+        setFilteredDemos(prev => 
+          prev.map(demo => demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo)
+        );
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({ ...selectedDemo, ...updatedDemo });
+          setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
       }
     } catch (err) {
-      console.error(`Error updating demo ${demoId}:`, err);
+      console.error('Error liking demo:', err);
     }
   };
-
-  const handleLikeDemo = async (demoId) => {
-    await handleDemoUpdate(demoId, updateDemoStats, { field: 'likes', increment: 1 });
-  };
-
+  
   const handleUpdateTags = async (demoId, tags) => {
     try {
       const result = await updateDemoTags(demoId, tags);
       if (result.success) {
-        const updatedDemo = mapDemo(result.demo);
-        const updateList = (list) =>
-          list.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo);
-        setFilteredDemos(prev => updateList(prev));
+        const updatedDemo = mapDemoData(result.demo);
+        setDemos(prev => 
+          prev.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo)
+        );
+        setFilteredDemos(prev => 
+          prev.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo)
+        );
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
         }
@@ -298,15 +394,18 @@ const POVlib = () => {
       console.error('Error updating tags:', err);
     }
   };
-
+  
   const handleUpdatePositions = async (demoId, positions) => {
     try {
       const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
-        const updatedDemo = mapDemo(result.demo);
-        const updateList = (list) =>
-          list.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo);
-        setFilteredDemos(prev => updateList(prev));
+        const updatedDemo = mapDemoData(result.demo);
+        setDemos(prev => 
+          prev.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo)
+        );
+        setFilteredDemos(prev => 
+          prev.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo)
+        );
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
         }
@@ -315,62 +414,64 @@ const POVlib = () => {
       console.error('Error updating positions:', err);
     }
   };
-
-  // Custom Scroll-Handling (z. B. für Carousels)
-  const handleScroll = (direction) => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const cardWidth = 300;
-      const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
-      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
-
-  // Video-Auswahl und Navigation
-  const onSelectDemo = (demo) => {
-    setSelectedDemo(demo);
-    setActiveVideoId(demo.videoId);
-    setIsVideoPlayerPage(true);
-    window.scrollTo(0, 0);
-  };
-
-  const onCloseVideoPlayer = () => {
-    setSelectedDemo(null);
-    setActiveVideoId('');
-    setIsVideoPlayerPage(false);
-  };
-
-  const onSelectRelatedDemo = (demo) => {
-    setSelectedDemo(demo);
-    setActiveVideoId(demo.videoId);
-    window.scrollTo(0, 0);
-  };
-
-  const onSwitchDemoType = (type) => setDemoType(type);
-  const onResetFilters = () =>
-    setFiltersApplied({
-      map: '',
-      position: '',
-      player: '',
-      team: '',
-      year: '',
-      event: '',
-      result: '',
-      search: searchQuery
-    });
-  const onApplyFilters = () => setIsFilterModalOpen(false);
-
-  if (isLoading && !filteredDemos.length) {
+  
+  const handleSwitchDemoType = (type) => setDemoType(type);
+  
+  const handleResetFilters = () => setFiltersApplied({
+    map: '',
+    position: '',
+    player: '',
+    team: '',
+    year: '',
+    event: '',
+    result: '',
+    tag: '',
+    search: searchQuery
+  });
+  
+  const handleApplyFilters = () => setIsFilterModalOpen(false);
+  
+  if (selectedDemo) {
+    return (
+      <>
+        <VideoPlayerPage 
+          selectedDemo={selectedDemo}
+          relatedDemos={relatedDemos}
+          onClose={handleCloseVideoPlayer}
+          onLike={handleLikeDemo}
+          onOpenTagModal={() => setIsTaggingModalOpen(true)}
+          onSelectRelatedDemo={handleSelectDemo}
+          demoType={demoType}
+          setDemoType={handleSwitchDemoType}
+          searchActive={searchActive}
+          setSearchActive={setSearchActive}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+        />
+        {isTaggingModalOpen && (
+          <TaggingModal 
+            selectedDemo={selectedDemo}
+            filterOptions={filterOptions}
+            onClose={() => setIsTaggingModalOpen(false)}
+            onUpdateTags={handleUpdateTags}
+            onUpdatePositions={handleUpdatePositions}
+          />
+        )}
+      </>
+    );
+  }
+  
+  if (isLoading && !demos.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg font-medium">Loading POVlib data...</p>
+          <p className="text-white text-lg font-medium">Loading demos...</p>
         </div>
       </div>
     );
   }
-
+  
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -388,203 +489,69 @@ const POVlib = () => {
       </div>
     );
   }
-
-  if (isVideoPlayerPage && selectedDemo) {
-    return (
-      <>
-        <VideoPlayerPage 
-          selectedDemo={selectedDemo}
-          relatedDemos={relatedDemos}
-          onClose={onCloseVideoPlayer}
-          onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
-          onSelectRelatedDemo={onSelectRelatedDemo}
-        />
-        {isTaggingModalOpen && selectedDemo && (
-          <TaggingModal 
-            selectedDemo={selectedDemo}
-            filterOptions={filterOptions}
-            onClose={() => setIsTaggingModalOpen(false)}
-            onUpdateTags={handleUpdateTags}
-            onUpdatePositions={handleUpdatePositions}
-          />
-        )}
-      </>
-    );
-  }
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar { display: none; }
-        .custom-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
-        .bg-pattern { background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 20px 20px; }
-      `}</style>
-      
       <Navbar 
         demoType={demoType}
-        onSwitchDemoType={onSwitchDemoType}
+        onSwitchDemoType={handleSwitchDemoType}
         searchActive={searchActive}
         setSearchActive={setSearchActive}
         setIsMenuOpen={setIsMenuOpen}
         isMenuOpen={isMenuOpen}
       />
-      
-      {filteredDemos.length > 0 && !selectedDemo && (
-        <FeaturedHero 
-          demo={filteredDemos[0]}
-          autoplayVideo={autoplayVideo}
-          setSelectedDemo={onSelectDemo}
-          setActiveVideoId={setActiveVideoId}
-          setIsFilterModalOpen={setIsFilterModalOpen}
+      <HeroHeader 
+        searchQuery={searchQuery}
+        handleSearchChange={handleSearchChange}
+        handleSearchSubmit={handleSearchSubmit}
+        setIsFilterModalOpen={setIsFilterModalOpen}
+      />
+      <main className="container mx-auto px-6 py-12">
+        <FilterTags 
+          filtersApplied={filtersApplied}
+          setFiltersApplied={setFiltersApplied}
+          handleResetFilters={handleResetFilters}
         />
-      )}
-      
-      <main className="container mx-auto px-6 py-12 bg-pattern">
-        <SelectedFilters 
-          filtersApplied={filtersApplied} 
-          setFiltersApplied={setFiltersApplied} 
-          searchQuery={searchQuery} 
-        />
-        <ContentTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        {/* Dynamische Tags basierend auf den Demo-Daten */}
+        <DynamicTags demos={demos} setFiltersApplied={setFiltersApplied} />
+        {filteredDemos.length > 0 ? (
+          <DemoGrid 
+            demos={filteredDemos} 
+            lastDemoElementRef={lastDemoElementRef}
+            handleSelectDemo={handleSelectDemo}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-64 bg-gray-800/50 rounded-xl border border-gray-700">
+            <div className="text-yellow-400 text-6xl mb-4">
+              <FileVideo />
+            </div>
+            <h3 className="text-white text-xl font-bold mb-2">No demos found</h3>
+            <p className="text-gray-400">Try changing your search or filters</p>
+            {(searchQuery || Object.values(filtersApplied).some(v => v)) && (
+              <button 
+                onClick={handleResetFilters}
+                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+        )}
         
         {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-800 rounded-xl overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-700"></div>
-                <div className="p-4">
-                  <div className="h-5 bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-center mt-8">
+            <div className="w-10 h-10 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin"></div>
           </div>
         )}
         
-        {!isLoading && activeTab === 'all' && (
-          <>
-            <DemoCarousel 
-              title="Recently Added"
-              demos={filteredDemos}
-              description="Latest POV demos based on your filter criteria"
-              onSelectDemo={onSelectDemo}
-              handleScroll={handleScroll}
-            />
-            {!filtersApplied.map && (
-              <>
-                <DemoCarousel 
-                  title="Mirage POVs" 
-                  demos={getFilteredDemosByMap("Mirage")} 
-                  onSelectDemo={onSelectDemo}
-                  handleScroll={handleScroll}
-                />
-                <DemoCarousel 
-                  title="Inferno POVs" 
-                  demos={getFilteredDemosByMap("Inferno")} 
-                  onSelectDemo={onSelectDemo}
-                  handleScroll={handleScroll}
-                />
-              </>
-            )}
-            {!filtersApplied.position && (
-              <DemoCarousel 
-                title="AWP Plays" 
-                demos={getFilteredDemosByPosition("AWPer")} 
-                onSelectDemo={onSelectDemo}
-                handleScroll={handleScroll}
-              />
-            )}
-          </>
-        )}
-        
-        {!isLoading && activeTab === 'trending' && (
-          <DemoCarousel 
-            title="Trending POVs"
-            demos={trendingDemos}
-            description="Most viewed demos right now"
-            onSelectDemo={onSelectDemo}
-            handleScroll={handleScroll}
-          />
-        )}
-        
-        {!isLoading && activeTab === 'latest' && (
-          <DemoCarousel 
-            title="Latest Uploads"
-            demos={latestDemos}
-            description="Fresh POV content from this year"
-            onSelectDemo={onSelectDemo}
-            handleScroll={handleScroll}
-          />
-        )}
-        
-        {!isLoading && activeTab === 'awp' && (
-          <DemoCarousel 
-            title="AWP Highlights"
-            demos={getFilteredDemosByPosition("AWPer")}
-            description="Best AWP plays from top players"
-            onSelectDemo={onSelectDemo}
-            handleScroll={handleScroll}
-          />
-        )}
-        
-        {!isLoading && activeTab === 'rifle' && (
-          <DemoCarousel 
-            title="Rifle Plays"
-            demos={filteredDemos.filter(demo => 
-              demo.tags.some(tag => tag.includes('Rifle')) || 
-              demo.positions.some(pos => !pos.includes('AWP'))
-            )}
-            description="Top rifle gameplay and positioning"
-            onSelectDemo={onSelectDemo}
-            handleScroll={handleScroll}
-          />
-        )}
-        
-        {topPlayers.length > 0 && (
-          <div className="mt-16 mb-12">
-            <h2 className="text-2xl font-bold text-white mb-8">
-              <span className="border-l-4 border-yellow-400 pl-3 py-1">Top Players</span>
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {topPlayers.map(player => (
-                <PlayerCard 
-                  key={player.name}
-                  player={player}
-                  demoCount={player.stats?.totalDemos}
-                  viewCount={player.stats?.totalViews}
-                />
-              ))}
-              <Link
-                href="/players"
-                className="flex items-center justify-center rounded-xl border border-gray-700 hover:border-yellow-400/30 bg-gradient-to-br from-gray-800 to-gray-900 p-6 transition-all duration-300 hover:scale-105"
-              >
-                <div className="text-center">
-                  <div className="w-24 h-24 rounded-full bg-gray-800 hover:bg-yellow-400/20 border-2 border-yellow-400/30 mb-4 flex items-center justify-center">
-                    <span className="text-yellow-400 text-3xl font-bold">+</span>
-                  </div>
-                  <h3 className="text-white font-bold mb-1">View All Players</h3>
-                  <p className="text-gray-400 text-sm">Browse the complete list</p>
-                </div>
-              </Link>
-            </div>
+        {!hasMore && demos.length > 0 && (
+          <div className="text-center my-12 py-6 border-t border-gray-800">
+            <p className="text-gray-400">You've reached the end of the demos list</p>
           </div>
         )}
         
-        <MapGrid 
-          filterOptions={filterOptions} 
-          getFilteredDemosByMap={getFilteredDemosByMap} 
-          setFiltersApplied={setFiltersApplied} 
-        />
-
-        <div className="text-center py-8">
-          <Link 
-            href="/demos" 
-            className="inline-block px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all duration-300 shadow-[0_0_15px_rgba(250,204,21,0.3)]"
-          >
-            Browse All Demos
-          </Link>
-        </div>
+        {/* Statt der bisherigen Top Players/Maps fügen wir zwei Extra Cards hinzu */}
+        <ExtraCards />
       </main>
       
       {isFilterModalOpen && (
@@ -594,18 +561,8 @@ const POVlib = () => {
           filtersApplied={filtersApplied}
           onClose={() => setIsFilterModalOpen(false)}
           onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
-          onResetFilters={onResetFilters}
-          onApplyFilters={onApplyFilters}
-        />
-      )}
-      
-      {isTaggingModalOpen && selectedDemo && (
-        <TaggingModal 
-          selectedDemo={selectedDemo}
-          filterOptions={filterOptions}
-          onClose={() => setIsTaggingModalOpen(false)}
-          onUpdateTags={handleUpdateTags}
-          onUpdatePositions={handleUpdatePositions}
+          onResetFilters={handleResetFilters}
+          onApplyFilters={handleApplyFilters}
         />
       )}
       
@@ -614,4 +571,4 @@ const POVlib = () => {
   );
 };
 
-export default POVlib;
+export default DemosIndex;
