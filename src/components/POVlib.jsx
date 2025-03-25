@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Search, Filter, FileVideo, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Filter, FileVideo } from 'lucide-react';
+import Link from 'next/link';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import DemoCard from './DemoCard';
@@ -18,18 +19,20 @@ import {
   updateDemoPositions
 } from '@/lib/supabase';
 
-// Subkomponente: Header mit Suchleiste und kleinem Link zu allen Demos
+// Subkomponente: Header mit Suchleiste und kleinem Link zur Demos Page
 const HeroHeader = ({ searchQuery, handleSearchChange, handleSearchSubmit, setIsFilterModalOpen }) => (
   <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
     <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
     <div className="container mx-auto px-6 text-center">
       <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">CS2 Pro POVs Library</h1>
-      <p className="text-gray-300 max-w-2xl mx-auto mb-4">
+      <p className="text-gray-300 max-w-2xl mx-auto mb-2">
         Browse all professional CS2 demos. Watch and learn from the best players and teams to improve your gameplay.
       </p>
-      <p className="text-sm text-yellow-400 mb-8">
-        <a href="/demos">Alle Demos ansehen</a>
-      </p>
+      <div className="mb-6">
+        <Link href="/demos">
+          <a className="text-yellow-400 underline text-sm">Alle Demos ansehen</a>
+        </Link>
+      </div>
       <div className="max-w-xl mx-auto">
         <form onSubmit={handleSearchSubmit} className="relative">
           <input
@@ -90,36 +93,32 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
   );
 };
 
-// Neue Subkomponente: Dynamische Tags basierend auf den Demos
-const DynamicTags = ({ demos, setFiltersApplied }) => {
-  const uniqueTags = useMemo(() => {
-    const tagsSet = new Set();
-    demos.forEach(demo => {
-      if (demo.tags && demo.tags.length > 0) {
-        demo.tags.forEach(tag => tagsSet.add(tag));
-      }
-    });
-    return Array.from(tagsSet);
-  }, [demos]);
-
-  if (uniqueTags.length === 0) return null;
-
+// Neue Subkomponente: Dynamische Tag-Buttons
+const DynamicTagFilters = ({ demos, setSearchQuery }) => {
+  const uniqueTags = new Set();
+  demos.forEach(demo => {
+    if (demo.tags && Array.isArray(demo.tags)) {
+      demo.tags.forEach(tag => uniqueTags.add(tag));
+    }
+  });
+  const tagsArray = Array.from(uniqueTags);
+  if (tagsArray.length === 0) return null;
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
-      {uniqueTags.map(tag => (
-         <button 
-           key={tag} 
-           onClick={() => setFiltersApplied(prev => ({ ...prev, tag }))}
-           className="px-3 py-1 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-         >
-           {tag}
-         </button>
+    <div className="my-6 flex flex-wrap gap-2">
+      {tagsArray.map(tag => (
+        <button
+          key={tag}
+          onClick={() => setSearchQuery(tag)}
+          className="px-3 py-1 bg-gray-800 text-gray-200 rounded-full border border-gray-700 hover:bg-gray-700 transition-colors text-sm"
+        >
+          {tag}
+        </button>
       ))}
     </div>
   );
 };
 
-// Subkomponente: Grid zur Anzeige der Demos (statische Karten wie bei YouTube)
+// Subkomponente: Grid zur Anzeige der Demos (feste Karten, responsive)
 const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
     {demos.map((demo, index) => {
@@ -146,27 +145,24 @@ const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
   </div>
 );
 
-// Neue Subkomponente: Extra Cards für Players und Maps (optisch an Maps-Cards angelehnt)
-const ExtraCards = () => (
-  <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <a 
-      href="/players" 
-      className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all"
-    >
-      <div className="flex items-center justify-between">
-         <span className="text-white font-medium">Players</span>
-         {/* Hier kann optional ein Icon eingefügt werden */}
-      </div>
-    </a>
-    <a 
-      href="/maps" 
-      className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all"
-    >
-      <div className="flex items-center justify-between">
-         <span className="text-white font-medium">Maps</span>
-         {/* Hier kann optional ein Icon eingefügt werden */}
-      </div>
-    </a>
+// Neue Subkomponente: Quick Links Cards für Players und Maps
+const QuickLinks = () => (
+  <div className="mt-12">
+    <h2 className="text-gray-100 text-2xl font-bold mb-6">
+      <span className="border-l-4 border-yellow-400 pl-3 py-1">Quick Links</span>
+    </h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Link href="/players">
+        <a className="flex items-center justify-center p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all">
+          <span className="text-white font-medium">Players</span>
+        </a>
+      </Link>
+      <Link href="/maps">
+        <a className="flex items-center justify-center p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all">
+          <span className="text-white font-medium">Maps</span>
+        </a>
+      </Link>
+    </div>
   </div>
 );
 
@@ -197,7 +193,6 @@ const DemosIndex = () => {
     year: '',
     event: '',
     result: '',
-    tag: '',
     search: ''
   });
   const [filterOptions, setFilterOptions] = useState({
@@ -425,7 +420,6 @@ const DemosIndex = () => {
     year: '',
     event: '',
     result: '',
-    tag: '',
     search: searchQuery
   });
   
@@ -512,8 +506,7 @@ const DemosIndex = () => {
           setFiltersApplied={setFiltersApplied}
           handleResetFilters={handleResetFilters}
         />
-        {/* Dynamische Tags basierend auf den Demo-Daten */}
-        <DynamicTags demos={demos} setFiltersApplied={setFiltersApplied} />
+        <DynamicTagFilters demos={demos} setSearchQuery={setSearchQuery} />
         {filteredDemos.length > 0 ? (
           <DemoGrid 
             demos={filteredDemos} 
@@ -549,9 +542,8 @@ const DemosIndex = () => {
             <p className="text-gray-400">You've reached the end of the demos list</p>
           </div>
         )}
-        
-        {/* Statt der bisherigen Top Players/Maps fügen wir zwei Extra Cards hinzu */}
-        <ExtraCards />
+
+        <QuickLinks />
       </main>
       
       {isFilterModalOpen && (
