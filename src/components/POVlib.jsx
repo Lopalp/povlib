@@ -61,12 +61,14 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
   useEffect(() => {
     const updateItemsPerRow = () => {
       if (containerRef.current) {
+        // Sicherstellen, dass der Container box-sizing: border-box hat und kein Padding/Margin
         const containerWidth = containerRef.current.offsetWidth;
-        // Berechne, wie viele Cards (inklusive fester Lücke) in die Container-Breite passen
+        // Berechne, wie viele Cards (inkl. fester Lücke) in die Container-Breite passen
         const calculated = Math.floor((containerWidth + fixedGap) / (minCardWidth + fixedGap)) || 1;
         const finalItems = Math.min(calculated, maxColumns);
         setItemsPerRow(finalItems);
-        // Berechne die exakte Kartenbreite so, dass: (Anzahl * cardWidth) + (Anzahl-1 * fixedGap) = containerWidth
+        // Berechne die exakte Breite so, dass:
+        // (finalItems * cardWidth) + ((finalItems - 1) * fixedGap) = containerWidth
         const newCardWidth = (containerWidth - (finalItems - 1) * fixedGap) / finalItems;
         setCardWidth(newCardWidth);
       }
@@ -91,12 +93,16 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 200, maxCo
   return (
     <section className="mt-4">
       <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
-      <div ref={containerRef} className="overflow-hidden">
+      <div
+        ref={containerRef}
+        className="overflow-hidden"
+        style={{ boxSizing: 'border-box', padding: 0, margin: 0 }}
+      >
         {rows.map((row, rowIndex) => (
           <div
             key={rowIndex}
             className="flex mb-2"
-            style={{ gap: `${fixedGap}px` }}  // expliziter Abstand
+            style={{ gap: `${fixedGap}px` }} // Fester Abstand
           >
             {row.map(demo => (
               <div key={demo.id} style={{ width: cardWidth }} className="flex-shrink-0">
