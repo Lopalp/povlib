@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn } from 'lucide-react';
+import { 
+  Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn 
+} from 'lucide-react';
+
+const mapNamesDesktop = [
+  { label: 'Mirage', slug: 'mirage' },
+  { label: 'Inferno', slug: 'inferno' },
+  { label: 'Nuke', slug: 'nuke' },
+  { label: 'Ancient', slug: 'ancient' },
+  { label: 'Overpass', slug: 'overpass' },
+  { label: 'Anubis', slug: 'anubis' },
+  { label: 'Vertigo', slug: 'vertigo' }
+];
+
+const mapNamesMobile = [
+  { label: 'Mirage', slug: 'mirage' },
+  { label: 'Inferno', slug: 'inferno' },
+  { label: 'Nuke', slug: 'nuke' },
+  { label: 'Ancient', slug: 'ancient' }
+];
 
 const Navbar = ({ 
   demoType = 'pro', 
@@ -15,31 +34,21 @@ const Navbar = ({
   const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Handle scroll effect for navbar
+  // Scroll-Effekt für den Navbar-Hintergrund
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 10);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle search submit
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // In a real implementation, this would navigate to search results
     console.log('Search query:', searchQuery);
     setSearchActive(false);
   };
 
   return (
-    <header 
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-gray-900/95 backdrop-blur-lg shadow-lg' : 'bg-gradient-to-b from-gray-900/80 to-transparent'
-      }`}
-    >
+    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-gray-900/95 backdrop-blur-lg shadow-lg' : 'bg-gradient-to-b from-gray-900/80 to-transparent'}`}>
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
@@ -57,21 +66,18 @@ const Navbar = ({
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/" 
-              className="text-sm font-medium text-white hover:text-yellow-400 transition-colors"
-            >
+            <Link href="/" className="text-sm font-medium text-white hover:text-yellow-400 transition-colors">
               Home
             </Link>
             
-            <div className="relative group">
+            {/* Maps Dropdown */}
+            <div className="relative">
               <button 
-                onClick={() => setMapDropdownOpen(!mapDropdownOpen)}
+                onClick={() => setMapDropdownOpen(prev => !prev)}
                 className="flex items-center text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
               >
                 Maps <ChevronDown className="h-4 w-4 ml-1" />
               </button>
-              
               {mapDropdownOpen && (
                 <div 
                   className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
@@ -85,95 +91,50 @@ const Navbar = ({
                       All Maps
                     </Link>
                     <div className="border-t border-gray-700 my-1"></div>
-                    <Link 
-                      href="/maps/mirage" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Mirage
-                    </Link>
-                    <Link 
-                      href="/maps/inferno" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Inferno
-                    </Link>
-                    <Link 
-                      href="/maps/nuke" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Nuke
-                    </Link>
-                    <Link 
-                      href="/maps/ancient" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Ancient
-                    </Link>
-                    <Link 
-                      href="/maps/overpass" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Overpass
-                    </Link>
-                    <Link 
-                      href="/maps/anubis" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Anubis
-                    </Link>
-                    <Link 
-                      href="/maps/vertigo" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
-                    >
-                      Vertigo
-                    </Link>
+                    {mapNamesDesktop.map(({ label, slug }) => (
+                      <Link 
+                        key={slug}
+                        href={`/maps/${slug}`}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
+                      >
+                        {label}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
             
-            <Link 
-              href="/demos" 
-              className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
-            >
+            <Link href="/demos" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Demos
             </Link>
             
-            <Link 
-              href="/players" 
-              className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
-            >
+            <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Players
             </Link>
             
-            <Link 
-              href="/teams" 
-              className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
-            >
+            <Link href="/teams" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Teams
             </Link>
             
-            <Link 
-              href="/events" 
-              className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
-            >
+            <Link href="/events" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Events
             </Link>
           </nav>
 
-          {/* Right Side Navigation */}
+          {/* Rechte Navigation */}
           <div className="flex items-center space-x-4">
             {/* PRO/COMMUNITY Toggle */}
             <div className="hidden md:flex items-center p-1 bg-gray-800 rounded-full">
               <button
-                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
                 onClick={() => onSwitchDemoType('pro')}
+                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
               >
                 PRO POVs
               </button>
               <button
-                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'community' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
                 onClick={() => onSwitchDemoType('community')}
+                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'community' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
               >
                 COMMUNITY
               </button>
@@ -181,14 +142,14 @@ const Navbar = ({
 
             {/* Search Button */}
             <button 
-              onClick={() => setSearchActive(!searchActive)}
+              onClick={() => setSearchActive(prev => !prev)}
               className="p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200"
               aria-label="Search"
             >
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Notifications Bell - Hidden until implemented */}
+            {/* Notifications (Platzhalter) */}
             <button 
               className="hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200 relative"
               aria-label="Notifications"
@@ -197,10 +158,10 @@ const Navbar = ({
               <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
             </button>
 
-            {/* User Menu - Hidden for now, could be used for logged-in users */}
+            {/* User Menu (Platzhalter) */}
             <div className="hidden relative">
               <button 
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                onClick={() => setUserDropdownOpen(prev => !prev)}
                 className="flex items-center p-1 text-gray-400 hover:text-yellow-400 transition-colors"
                 aria-label="User menu"
               >
@@ -208,44 +169,23 @@ const Navbar = ({
                   <User className="h-4 w-4" />
                 </div>
               </button>
-              
               {userDropdownOpen && (
                 <div 
                   className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
                   onMouseLeave={() => setUserDropdownOpen(false)}
                 >
                   <div className="py-1">
-                    <Link 
-                      href="/profile" 
-                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
-                    >
-                      Your Profile
-                    </Link>
-                    <Link 
-                      href="/favorites" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
-                    >
-                      Favorites
-                    </Link>
-                    <Link 
-                      href="/settings" 
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
-                    >
-                      Settings
-                    </Link>
+                    <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">Your Profile</Link>
+                    <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Favorites</Link>
+                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Settings</Link>
                     <div className="border-t border-gray-700 my-1"></div>
-                    <Link 
-                      href="/logout" 
-                      className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
-                    >
-                      Sign out
-                    </Link>
+                    <Link href="/logout" className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700">Sign out</Link>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Sign In Button - Hidden until auth is implemented */}
+            {/* Sign In Button */}
             <Link 
               href="/login" 
               className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 hover:border-yellow-400 transition-all"
@@ -256,20 +196,16 @@ const Navbar = ({
 
             {/* Mobile Menu Button */}
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => setIsMenuOpen(prev => !prev)}
               className="md:hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors"
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
-        {/* Expanded Search Bar */}
+        {/* Erweiterte Suchleiste */}
         {searchActive && (
           <div className="pb-4 px-4">
             <form onSubmit={handleSearchSubmit} className="relative">
@@ -290,7 +226,7 @@ const Navbar = ({
                 <X className="h-5 w-5" />
               </button>
             </form>
-            {searchQuery.length > 0 && (
+            {searchQuery && (
               <div className="mt-2 bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
                 <div className="p-4">
                   <p className="text-gray-400 text-sm">Press Enter to search for "{searchQuery}"</p>
@@ -320,34 +256,16 @@ const Navbar = ({
                   <span className="text-white font-medium">Maps</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 pl-6">
-                  <Link 
-                    href="/maps/mirage" 
-                    className="text-gray-300 py-1 hover:text-yellow-400"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Mirage
-                  </Link>
-                  <Link 
-                    href="/maps/inferno" 
-                    className="text-gray-300 py-1 hover:text-yellow-400"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Inferno
-                  </Link>
-                  <Link 
-                    href="/maps/nuke" 
-                    className="text-gray-300 py-1 hover:text-yellow-400"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Nuke
-                  </Link>
-                  <Link 
-                    href="/maps/ancient" 
-                    className="text-gray-300 py-1 hover:text-yellow-400"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Ancient
-                  </Link>
+                  {mapNamesMobile.map(({ label, slug }) => (
+                    <Link 
+                      key={slug}
+                      href={`/maps/${slug}`}
+                      className="text-gray-300 py-1 hover:text-yellow-400"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {label}
+                    </Link>
+                  ))}
                 </div>
                 <Link 
                   href="/maps" 
@@ -404,20 +322,14 @@ const Navbar = ({
               <div className="border-t border-gray-800 pt-4">
                 <div className="bg-gray-800 p-1 rounded-full flex">
                   <button
+                    onClick={() => { onSwitchDemoType('pro'); setIsMenuOpen(false); }}
                     className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
-                    onClick={() => {
-                      onSwitchDemoType('pro');
-                      setIsMenuOpen(false);
-                    }}
                   >
                     PRO POVs
                   </button>
                   <button
+                    onClick={() => { onSwitchDemoType('community'); setIsMenuOpen(false); }}
                     className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'community' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
-                    onClick={() => {
-                      onSwitchDemoType('community');
-                      setIsMenuOpen(false);
-                    }}
                   >
                     COMMUNITY
                   </button>
