@@ -3,12 +3,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Filter, FileVideo } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from './Navbar';
-import Footer from './Footer';
-import DemoCard from './DemoCard';
-import VideoPlayerPage from './VideoPlayerPage';
-import TaggingModal from './TaggingModal';
-import FilterModal from './FilterModal';
+import Navbar from './POVlib/Navbar';
+import Footer from './POVlib/Footer';
+import DemoCard from './POVlib/DemoCard';
+import VideoPlayerPage from './POVlib/VideoPlayerPage';
+import TaggingModal from './POVlib/TaggingModal';
+import FilterModal from './POVlib/FilterModal';
 
 import {
   getAllDemos,
