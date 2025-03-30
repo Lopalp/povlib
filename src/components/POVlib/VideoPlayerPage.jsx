@@ -25,7 +25,7 @@ const VideoPlayerPage = ({
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [playerInfo, setPlayerInfo] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   if (!selectedDemo) return null;
 
@@ -68,27 +68,31 @@ const VideoPlayerPage = ({
       />
       
       <div className="bg-gray-900">
+      <div style={{height: "3rem"}}></div>
         <div className="container mx-auto px-4 pt-6 pb-12">
           <button 
             onClick={onClose}
             className="flex items-center text-gray-400 hover:text-yellow-400 mb-4 transition-colors"
+            style={{cursor: "pointer"}}
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Browse
           </button>
           
+          
+          <div style={{height: "1rem"}}></div>
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Video Player Section (Left) */}
             <div className="lg:w-8/12">
               {/* Video Player */}
               <div className="rounded-lg overflow-hidden bg-black shadow-[0_0_30px_rgba(0,0,0,0.3)]">
-                <YouTubeEmbed 
-                  videoId={selectedDemo.videoId} 
-                  title={selectedDemo.title} 
-                  autoplay={true} 
-                  controls={true}
-                  showInfo={false}
-                />
+                    <YouTubeEmbed 
+                      videoId={selectedDemo.video_id} 
+                      title={selectedDemo.title} 
+                      autoplay={true} 
+                      controls={true}
+                      showInfo={false}
+                    />
               </div>
               
               {/* Video Info */}
@@ -98,7 +102,7 @@ const VideoPlayerPage = ({
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                   <div className="flex items-center text-gray-400">
                     <Eye className="h-4 w-4 mr-1" />
-                    <span>{selectedDemo.views.toLocaleString()} views</span>
+                    <span>{selectedDemo.views?.toLocaleString()} views</span>
                   </div>
                   <span className="text-gray-400">•</span>
                   <span className="text-gray-400">{selectedDemo.year}</span>

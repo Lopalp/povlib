@@ -214,6 +214,22 @@ export async function getFilteredDemos(filters = {}, type = 'all') {
   return data;
 }
 
+// Demos nach ID abrufen
+export async function getDemoById(id) {
+  const { data, error } = await supabase
+    .from('demos')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching demo with id ${id}:`, error);
+    throw error;
+  }
+
+  return data;
+}
+
 // Demos nach Map abrufen
 export async function getDemosByMap(map) {
   const { data, error } = await supabase
