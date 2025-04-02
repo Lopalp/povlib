@@ -38,10 +38,10 @@ export async function getFilteredDemos(filters = {}, type = 'all') {
   if (type === 'pro') query = query.eq('is_pro', true);
   if (type === 'community') query = query.eq('is_pro', false);
 
-  if (filters.map_id) query = query.eq('map_id', filters.map_id);
-  if (filters.player_id) query = query.eq('player_id', filters.player_id);
-  if (filters.team_id) query = query.eq('team_id', filters.team_id);
-  if (filters.event_id) query = query.eq('event_id', filters.event_id);
+  if (filters.map) query = query.eq('map_id', filters.map);
+  if (filters.player) query = query.eq('player_id', filters.player);
+  if (filters.team) query = query.eq('team_id', filters.team);
+  if (filters.event) query = query.eq('event_id', filters.event);
 
   const { data, error } = await query;
   if (error) throw error;
@@ -146,7 +146,6 @@ export async function getFilterOptions() {
     supabase.from('tags').select('id, name')
   ]);
 
-  // Struktur: map_id → [ { id, name } ]
   const positionsByMap = {};
   (positionsRes.data || []).forEach(pos => {
     if (!positionsByMap[pos.map_id]) {
@@ -163,7 +162,6 @@ export async function getFilterOptions() {
     tags: tagsRes.data || []
   };
 }
-
 
 export async function getAllPlayers(limit = 100) {
   const { data, error } = await supabase
