@@ -31,18 +31,19 @@ const mapDemo = (demo) => ({
   title: demo.title,
   thumbnail: demo.thumbnail,
   videoId: demo.video_id,
-  map: demo.map?.name || "",            // Greift nun auf das relationale Objekt zu
-  positions: demo.demo_positions || [],  // Je nachdem, wie Du die Positionen einbindest (siehe Supabase)
-  tags: demo.demo_tags || [],            // Analog für Tags
-  players: demo.players || [],           // Erwartet ein Array von Spieler-Objekten
-  team: demo.team?.name || "",           // Team als Objekt
+  map: demo.map?.name || "",
+  positions: demo.demo_positions || [],
+  tags: demo.demo_tags || [],
+  players: Array.isArray(demo.players) ? demo.players : demo.players ? [demo.players] : [],
+  team: demo.team?.name || "",
   year: demo.year,
-  event: demo.event?.name || "",         // Event als Objekt
+  event: demo.event?.name || "",
   result: demo.result,
   views: demo.views || 0,
   likes: demo.likes || 0,
   isPro: demo.is_pro
 });
+
 
 // ────────────────
 // CategorySection
