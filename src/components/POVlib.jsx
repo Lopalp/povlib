@@ -207,6 +207,8 @@ const POVlib = () => {
   
   const getFilteredDemosByPosition = useCallback(
     (positionName) => {
+      if (!filterOptions?.positions || Object.keys(filterOptions.positions).length === 0) return [];
+  
       const posEntry = Object.entries(filterOptions.positions)
         .flatMap(([_, posList]) => posList)
         .find(p => p.name === positionName);
@@ -216,6 +218,7 @@ const POVlib = () => {
     },
     [positionDemos, filterOptions.positions]
   );
+  
   
 
   // Initialdaten laden
@@ -286,9 +289,12 @@ const POVlib = () => {
 
   useEffect(() => {
     const loadPositionDemos = async (positionName) => {
+      if (!filterOptions?.positions || Object.keys(filterOptions.positions).length === 0) return;
+    
       const posEntry = Object.entries(filterOptions.positions)
         .flatMap(([_, posList]) => posList)
         .find(p => p.name === positionName);
+    
       const positionId = posEntry?.id;
     
       if (positionId && !positionDemos[positionId]) {
@@ -299,7 +305,8 @@ const POVlib = () => {
           console.error(`Error loading demos for position ${positionName}:`, err);
         }
       }
-    };    
+    };
+    
     if (!filtersApplied.position) {
       loadPositionDemos('AWPer');
     }
