@@ -138,20 +138,32 @@ export async function updateDemoPositions(demoId, positionIds) {
 }
 
 export async function getFilterOptions() {
-  const [maps, teams, events, tags] = await Promise.all([
+  const [mapsRes, positionsRes, teamsRes, eventsRes, tagsRes] = await Promise.all([
     supabase.from('maps').select('id, name'),
+    supabase.from('positions').select('id, name, map_id'),
     supabase.from('teams').select('id, name'),
     supabase.from('events').select('id, name'),
     supabase.from('tags').select('id, name')
   ]);
 
+  // Struktur: map_id → [ { id, name } ]
+  const positionsByMap = {};
+  (positionsRes.data || []).forEach(pos => {
+    if (!positionsByMap[pos.map_id]) {
+      positionsByMap[pos.map_id] = [];
+    }
+    positionsByMap[pos.map_id].push({ id: pos.id, name: pos.name });
+  });
+
   return {
-    maps: maps.data || [],
-    teams: teams.data || [],
-    events: events.data || [],
-    tags: tags.data || []
+    maps: mapsRes.data || [],
+    positions: positionsByMap,
+    teams: teamsRes.data || [],
+    events: eventsRes.data || [],
+    tags: tagsRes.data || []
   };
 }
+
 
 export async function getAllPlayers(limit = 100) {
   const { data, error } = await supabase
