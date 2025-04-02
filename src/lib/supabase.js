@@ -200,14 +200,30 @@ export async function getFilteredDemos(filters = {}, type = 'all') {
 
   // Suche implementieren
   if (filters.search) {
-    const searchTerm = %${filters.search}%;
-    query = query.or(title.ilike.${searchTerm},tags.cs.{${searchTerm}},players.cs.{${searchTerm}},map.ilike.${searchTerm});
+    const searchTerm = `%${filters.search}%`;
+    query = query.or(`title.ilike.${searchTerm},tags.cs.{${searchTerm}},players.cs.{${searchTerm}},map.ilike.${searchTerm}`);
   }
 
   const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching filtered demos:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+// Demos nach ID abrufen
+export async function getDemoById(id) {
+  const { data, error } = await supabase
+    .from('demos')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching demo with id ${id}:`, error);
     throw error;
   }
 
@@ -222,7 +238,7 @@ export async function getDemosByMap(map) {
     .eq('map', map);
 
   if (error) {
-    console.error(Error fetching demos for map ${map}:, error);
+    console.error(`Error fetching demos for map ${map}:`, error);
     throw error;
   }
 
@@ -237,7 +253,7 @@ export async function getDemosByPosition(position) {
     .contains('positions', [position]);
 
   if (error) {
-    console.error(Error fetching demos for position ${position}:, error);
+    console.error(`Error fetching demos for position ${position}:`, error);
     throw error;
   }
 
@@ -554,7 +570,7 @@ export async function getDemosByPlayer(playerName, type = 'all', page = 1, pageS
     
     return data;
   } catch (error) {
-    console.error(Error fetching demos for player ${playerName}:, error);
+    console.error(`Error fetching demos for player ${playerName}:`, error);
     throw error;
   }
 }
@@ -606,7 +622,7 @@ export async function getRelatedPlayers(playerName, limit = 5) {
     
     return Array.from(relatedPlayers).slice(0, limit);
   } catch (error) {
-    console.error(Error fetching related players for ${playerName}:, error);
+    console.error(`Error fetching related players for ${playerName}:`, error);
     throw error;
   }
 }
