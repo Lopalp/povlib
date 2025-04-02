@@ -25,19 +25,19 @@ import Footer from './POVlib/Footer';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
 
-// Helper-Funktion zum Mapping eines Demo-Objekts
+// Helper-Funktion zum Mapping eines Demo-Objekts – angepasst für relationale Daten
 const mapDemo = (demo) => ({
   id: demo.id,
   title: demo.title,
   thumbnail: demo.thumbnail,
   videoId: demo.video_id,
-  map: demo.map,
-  positions: demo.positions || [],
-  tags: demo.tags || [],
-  players: demo.players || [],
-  team: demo.team,
+  map: demo.map?.name || "",            // Greift nun auf das relationale Objekt zu
+  positions: demo.demo_positions || [],  // Je nachdem, wie Du die Positionen einbindest (siehe Supabase)
+  tags: demo.demo_tags || [],            // Analog für Tags
+  players: demo.players || [],           // Erwartet ein Array von Spieler-Objekten
+  team: demo.team?.name || "",           // Team als Objekt
   year: demo.year,
-  event: demo.event,
+  event: demo.event?.name || "",         // Event als Objekt
   result: demo.result,
   views: demo.views || 0,
   likes: demo.likes || 0,
@@ -47,16 +47,6 @@ const mapDemo = (demo) => ({
 // ────────────────
 // CategorySection
 // ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
-// sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
-// Mit "View More" wird eine weitere Zeile freigeschaltet.
-// ────────────────
-// CategorySection
-// ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Mit verbesserten Abständen zwischen den Karten für ein besseres visuelles Layout.
-// Mit "View More" wird eine weitere Zeile freigeschaltet.
 const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
@@ -66,14 +56,10 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxCo
   useEffect(() => {
     const updateItemsPerRow = () => {
       if (containerRef.current) {
-        // Sicherstellen, dass der Container box-sizing: border-box hat und kein Padding/Margin
         const containerWidth = containerRef.current.offsetWidth;
-        // Berechne, wie viele Cards (inkl. fester Lücke) in die Container-Breite passen
         const calculated = Math.floor((containerWidth + gap) / (minCardWidth + gap)) || 1;
         const finalItems = Math.min(calculated, maxColumns);
         setItemsPerRow(finalItems);
-        // Berechne die exakte Breite so, dass:
-        // (finalItems * cardWidth) + ((finalItems - 1) * gap) = containerWidth
         const newCardWidth = (containerWidth - (finalItems - 1) * gap) / finalItems;
         setCardWidth(Math.floor(newCardWidth));
       }
@@ -86,13 +72,10 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxCo
 
   const visibleCount = itemsPerRow * visibleRows;
   const visibleDemos = demos.slice(0, visibleCount);
-
-  // Aufteilen in Zeilen
   const rows = [];
   for (let i = 0; i < visibleDemos.length; i += itemsPerRow) {
     rows.push(visibleDemos.slice(i, i + itemsPerRow));
   }
-
   const canViewMore = demos.length > visibleCount;
 
   return (
@@ -100,26 +83,19 @@ const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxCo
       <h2 className="text-2xl font-bold text-white mb-4">
         <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
       </h2>
-      <div
-        ref={containerRef}
-        className="overflow-hidden"
-        style={{ boxSizing: 'border-box', padding: 0, margin: 0 }}
-      >
+      <div ref={containerRef} className="overflow-hidden" style={{ boxSizing: 'border-box', padding: 0, margin: 0 }}>
         {rows.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            className="flex mb-6"
-            style={{ gap: `${gap}px` }}
-          >
+          <div key={rowIndex} className="flex mb-6" style={{ gap: `${gap}px` }}>
             {row.map(demo => (
               <div key={demo.id} style={{ width: cardWidth }} className="flex-shrink-0">
                 <DemoCard demo={demo} onSelect={onSelectDemo} />
               </div>
             ))}
-            {/* Fülle leere Slots für gleichmäßiges Layout */}
-            {row.length < itemsPerRow && Array(itemsPerRow - row.length).fill().map((_, i) => (
-              <div key={`empty-${i}`} style={{ width: cardWidth }} className="flex-shrink-0"></div>
-            ))}
+            {row.length < itemsPerRow &&
+              Array(itemsPerRow - row.length).fill().map((_, i) => (
+                <div key={`empty-${i}`} style={{ width: cardWidth }} className="flex-shrink-0"></div>
+              ))
+            }
           </div>
         ))}
       </div>
@@ -208,19 +184,15 @@ const POVlib = () => {
   const getFilteredDemosByPosition = useCallback(
     (positionName) => {
       if (!filterOptions?.positions || Object.keys(filterOptions.positions).length === 0) return [];
-  
       const posEntry = Object.entries(filterOptions.positions)
         .flatMap(([_, posList]) => posList)
         .find(p => p.name === positionName);
-  
       const posId = posEntry?.id;
       return positionDemos[posId] || [];
     },
     [positionDemos, filterOptions.positions]
   );
   
-  
-
   // Initialdaten laden
   useEffect(() => {
     const loadInitialData = async () => {
@@ -293,13 +265,10 @@ const POVlib = () => {
   useEffect(() => {
     const loadPositionDemos = async (positionName) => {
       if (!filterOptions?.positions || Object.keys(filterOptions.positions).length === 0) return;
-    
       const posEntry = Object.entries(filterOptions.positions)
         .flatMap(([_, posList]) => posList)
         .find(p => p.name === positionName);
-    
       const positionId = posEntry?.id;
-    
       if (positionId && !positionDemos[positionId]) {
         try {
           const demos = await getDemosByPosition(positionId);
@@ -309,7 +278,6 @@ const POVlib = () => {
         }
       }
     };
-    
     if (!filtersApplied.position) {
       loadPositionDemos('AWPer');
     }
@@ -542,7 +510,7 @@ const POVlib = () => {
           />
         )}
         
-        {/* Überarbeitete Navigation-Karten unten – Verwende hier das Template-Bild, das Du für Maps hattest */}
+        {/* Navigation-Karten */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link href="/players" className="relative block rounded-xl overflow-hidden">

@@ -1,6 +1,3 @@
-// Angepasste Version basierend auf neuer relationaler Datenbankstruktur
-// Supabase verwendet jetzt echte Relationen für maps, players, teams, events usw.
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,16 +6,16 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --------------------------
-// DEMO-FUNKTIONEN
+// DEMO-FUNKTIONEN – angepasst an die neue relationale Struktur
 // --------------------------
 
 export async function getAllDemos(type = 'all') {
   let query = supabase.from('demos').select(`
     *,
-    players:nickname,
-    teams(name),
-    maps(name),
-    events(name)
+    players:players(*),
+    team:teams(*),
+    map:maps(*),
+    event:events(*)
   `);
 
   if (type === 'pro') {
@@ -33,7 +30,13 @@ export async function getAllDemos(type = 'all') {
 }
 
 export async function getFilteredDemos(filters = {}, type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = supabase.from('demos').select(`
+    *,
+    players:players(*),
+    team:teams(*),
+    map:maps(*),
+    event:events(*)
+  `);
 
   if (type === 'pro') query = query.eq('is_pro', true);
   if (type === 'community') query = query.eq('is_pro', false);
@@ -43,13 +46,20 @@ export async function getFilteredDemos(filters = {}, type = 'all') {
   if (filters.team) query = query.eq('team_id', filters.team);
   if (filters.event) query = query.eq('event_id', filters.event);
 
+  // Optional: Erweiterung um Suchfilter etc.
   const { data, error } = await query;
   if (error) throw error;
   return data;
 }
 
 export async function getTrendingDemos(limit = 5, type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = supabase.from('demos').select(`
+    *,
+    players:players(*),
+    team:teams(*),
+    map:maps(*),
+    event:events(*)
+  `);
   if (type === 'pro') query = query.eq('is_pro', true);
   if (type === 'community') query = query.eq('is_pro', false);
 
@@ -59,7 +69,13 @@ export async function getTrendingDemos(limit = 5, type = 'all') {
 }
 
 export async function getLatestDemos(limit = 5, type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = supabase.from('demos').select(`
+    *,
+    players:players(*),
+    team:teams(*),
+    map:maps(*),
+    event:events(*)
+  `);
   if (type === 'pro') query = query.eq('is_pro', true);
   if (type === 'community') query = query.eq('is_pro', false);
 
@@ -104,7 +120,13 @@ export async function getDemoRounds(demoId) {
 export async function getDemosByMap(mapId) {
   const { data, error } = await supabase
     .from('demos')
-    .select('*')
+    .select(`
+      *,
+      players:players(*),
+      team:teams(*),
+      map:maps(*),
+      event:events(*)
+    `)
     .eq('map_id', mapId);
 
   if (error) throw error;
@@ -112,13 +134,23 @@ export async function getDemosByMap(mapId) {
 }
 
 export async function getDemosByPosition(positionId) {
+  // Nutze einen relationalen Join über die Zwischentabelle
   const { data, error } = await supabase
     .from('demo_positions')
-    .select('demo_id')
+    .select(`
+      demo:demos(
+        *,
+        players:players(*),
+        team:teams(*),
+        map:maps(*),
+        event:events(*)
+      )
+    `)
     .eq('position_id', positionId);
 
   if (error) throw error;
-  return data;
+  // Extrahiere die Demo-Datensätze aus den Ergebnissen
+  return data.map(item => item.demo);
 }
 
 export async function updateDemoTags(demoId, tagIds) {
@@ -126,7 +158,7 @@ export async function updateDemoTags(demoId, tagIds) {
   const insertData = tagIds.map(tagId => ({ demo_id: demoId, tag_id: tagId }));
   const { error } = await supabase.from('demo_tags').insert(insertData);
   if (error) throw error;
-  return true;
+  return { success: true, demo: { id: demoId, tags: tagIds } };
 }
 
 export async function updateDemoPositions(demoId, positionIds) {
@@ -134,7 +166,7 @@ export async function updateDemoPositions(demoId, positionIds) {
   const insertData = positionIds.map(pid => ({ demo_id: demoId, position_id: pid }));
   const { error } = await supabase.from('demo_positions').insert(insertData);
   if (error) throw error;
-  return true;
+  return { success: true, demo: { id: demoId, positions: positionIds } };
 }
 
 export async function getFilterOptions() {
@@ -166,7 +198,10 @@ export async function getFilterOptions() {
 export async function getAllPlayers(limit = 100) {
   const { data, error } = await supabase
     .from('players')
-    .select('*, teams(name, logo_url)')
+    .select(`
+      *,
+      team:teams(*)
+    `)
     .limit(limit);
 
   if (error) throw error;
@@ -176,7 +211,11 @@ export async function getAllPlayers(limit = 100) {
 export async function getPlayerInfo(playerId) {
   const { data, error } = await supabase
     .from('players')
-    .select('*, team:teams(name, logo_url), demos:demos(id, title, map_id, rating, views)')
+    .select(`
+      *,
+      team:teams(*),
+      demos:demos(id, title, map_id, rating, views)
+    `)
     .eq('id', playerId)
     .single();
 
@@ -207,7 +246,13 @@ export async function getRelatedPlayers(playerId, limit = 5) {
 export async function getDemosByPlayer(playerId) {
   const { data, error } = await supabase
     .from('demos')
-    .select('*')
+    .select(`
+      *,
+      players:players(*),
+      team:teams(*),
+      map:maps(*),
+      event:events(*)
+    `)
     .eq('player_id', playerId)
     .order('created_at', { ascending: false });
 
