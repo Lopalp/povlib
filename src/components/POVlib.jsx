@@ -51,6 +51,12 @@ const mapDemo = (demo) => ({
 // Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
 // sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
 // Mit "View More" wird eine weitere Zeile freigeschaltet.
+// ────────────────
+// CategorySection
+// ────────────────
+// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
+// Mit verbesserten Abständen zwischen den Karten für ein besseres visuelles Layout.
+// Mit "View More" wird eine weitere Zeile freigeschaltet.
 const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
@@ -192,35 +198,21 @@ const POVlib = () => {
 
   // Helper-Funktionen für Map/Positions-Filter
   const getFilteredDemosByMap = useCallback(
-    (mapName) => {
-      const mapId = filterOptions.maps.find(m => m.name === mapName)?.id;
-      return mapDemos[mapId] || [];
-    },
-    [mapDemos, filterOptions.maps]
+    (map) => mapDemos[map] || [],
+    [mapDemos]
   );
-  
   const getFilteredDemosByPosition = useCallback(
-    (positionName) => {
-      if (!filterOptions?.positions || Object.keys(filterOptions.positions).length === 0) return [];
-  
-      const posEntry = Object.entries(filterOptions.positions)
-        .flatMap(([_, posList]) => posList)
-        .find(p => p.name === positionName);
-  
-      const posId = posEntry?.id;
-      return positionDemos[posId] || [];
-    },
-    [positionDemos, filterOptions.positions]
+    (position) => positionDemos[position] || [],
+    [positionDemos]
   );
-  
+
   // Initialdaten laden
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
         const options = await getFilterOptions();
-        setFilterOptions(options); 
-        console.log('[FilterOptions] maps:', options.maps);
+        setFilterOptions(options);
 
         const [demos, trending, latest] = await Promise.all([
           getFilteredDemos(filtersApplied, demoType),
@@ -263,19 +255,16 @@ const POVlib = () => {
 
   // Map- und Positions-Demos laden
   useEffect(() => {
-    const loadMapDemos = async (mapName) => {
-      const mapId = filterOptions.maps.find(m => m.name === mapName)?.id;
-      console.log(`[loadMapDemos] mapName: ${mapName} → mapId: ${mapId}`);
-      if (mapId && !mapDemos[mapId]) {
+    const loadMapDemos = async (map) => {
+      if (!mapDemos[map]) {
         try {
-          const demos = await getDemosByMap(mapId);
-          console.log(`[loadMapDemos] fetched demos for ${mapName}:`, demos);
-          setMapDemos(prev => ({ ...prev, [mapId]: demos.map(mapDemo) }));
+          const demos = await getDemosByMap(map);
+          setMapDemos(prev => ({ ...prev, [map]: demos.map(mapDemo) }));
         } catch (err) {
-          console.error(`Error loading demos for map ${mapName}:`, err);
+          console.error(`Error loading demos for map ${map}:`, err);
         }
       }
-    };      
+    };
     if (!filtersApplied.map) {
       loadMapDemos('Mirage');
       loadMapDemos('Inferno');
@@ -283,25 +272,16 @@ const POVlib = () => {
   }, [mapDemos, filtersApplied.map]);
 
   useEffect(() => {
-    const loadPositionDemos = async (positionName) => {
-      if (!filterOptions?.positions || Object.keys(filterOptions.positions).length === 0) return;
-    
-      const posEntry = Object.entries(filterOptions.positions)
-        .flatMap(([_, posList]) => posList)
-        .find(p => p.name === positionName);
-    
-      const positionId = posEntry?.id;
-    
-      if (positionId && !positionDemos[positionId]) {
+    const loadPositionDemos = async (position) => {
+      if (!positionDemos[position]) {
         try {
-          const demos = await getDemosByPosition(positionId);
-          setPositionDemos(prev => ({ ...prev, [positionId]: demos.map(mapDemo) }));
+          const demos = await getDemosByPosition(position);
+          setPositionDemos(prev => ({ ...prev, [position]: demos.map(mapDemo) }));
         } catch (err) {
-          console.error(`Error loading demos for position ${positionName}:`, err);
+          console.error(`Error loading demos for position ${position}:`, err);
         }
       }
     };
-    
     if (!filtersApplied.position) {
       loadPositionDemos('AWPer');
     }
@@ -451,12 +431,12 @@ const POVlib = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <style jsx>{
+      <style jsx>{`
         .bg-pattern {
           background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
           background-size: 20px 20px;
         }
-      }</style>
+      `}</style>
       
       <Navbar 
         demoType={demoType}
