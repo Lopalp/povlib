@@ -227,7 +227,8 @@ const POVlib = () => {
       try {
         setIsLoading(true);
         const options = await getFilterOptions();
-        setFilterOptions(options);
+        setFilterOptions(options); 
+        console.log('[FilterOptions] maps:', options.maps);
 
         const [demos, trending, latest] = await Promise.all([
           getFilteredDemos(filtersApplied, demoType),
