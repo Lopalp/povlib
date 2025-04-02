@@ -198,13 +198,25 @@ const POVlib = () => {
 
   // Helper-Funktionen für Map/Positions-Filter
   const getFilteredDemosByMap = useCallback(
-    (map) => mapDemos[map] || [],
-    [mapDemos]
+    (mapName) => {
+      const mapId = filterOptions.maps.find(m => m.name === mapName)?.id;
+      return mapDemos[mapId] || [];
+    },
+    [mapDemos, filterOptions.maps]
   );
+  
   const getFilteredDemosByPosition = useCallback(
-    (position) => positionDemos[position] || [],
-    [positionDemos]
+    (positionName) => {
+      const posEntry = Object.entries(filterOptions.positions)
+        .flatMap(([_, posList]) => posList)
+        .find(p => p.name === positionName);
+  
+      const posId = posEntry?.id;
+      return positionDemos[posId] || [];
+    },
+    [positionDemos, filterOptions.positions]
   );
+  
 
   // Initialdaten laden
   useEffect(() => {
@@ -255,16 +267,17 @@ const POVlib = () => {
 
   // Map- und Positions-Demos laden
   useEffect(() => {
-    const loadMapDemos = async (map) => {
-      if (!mapDemos[map]) {
+    const loadMapDemos = async (mapName) => {
+      const mapId = filterOptions.maps.find(m => m.name === mapName)?.id;
+      if (mapId && !mapDemos[mapId]) {
         try {
-          const demos = await getDemosByMap(map);
-          setMapDemos(prev => ({ ...prev, [map]: demos.map(mapDemo) }));
+          const demos = await getDemosByMap(mapId);
+          setMapDemos(prev => ({ ...prev, [mapId]: demos.map(mapDemo) }));
         } catch (err) {
-          console.error(`Error loading demos for map ${map}:`, err);
+          console.error(`Error loading demos for map ${mapName}:`, err);
         }
       }
-    };
+    };    
     if (!filtersApplied.map) {
       loadMapDemos('Mirage');
       loadMapDemos('Inferno');
@@ -272,16 +285,21 @@ const POVlib = () => {
   }, [mapDemos, filtersApplied.map]);
 
   useEffect(() => {
-    const loadPositionDemos = async (position) => {
-      if (!positionDemos[position]) {
+    const loadPositionDemos = async (positionName) => {
+      const posEntry = Object.entries(filterOptions.positions)
+        .flatMap(([_, posList]) => posList)
+        .find(p => p.name === positionName);
+      const positionId = posEntry?.id;
+    
+      if (positionId && !positionDemos[positionId]) {
         try {
-          const demos = await getDemosByPosition(position);
-          setPositionDemos(prev => ({ ...prev, [position]: demos.map(mapDemo) }));
+          const demos = await getDemosByPosition(positionId);
+          setPositionDemos(prev => ({ ...prev, [positionId]: demos.map(mapDemo) }));
         } catch (err) {
-          console.error(`Error loading demos for position ${position}:`, err);
+          console.error(`Error loading demos for position ${positionName}:`, err);
         }
       }
-    };
+    };    
     if (!filtersApplied.position) {
       loadPositionDemos('AWPer');
     }
