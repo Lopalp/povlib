@@ -272,15 +272,17 @@ const POVlib = () => {
   useEffect(() => {
     const loadMapDemos = async (mapName) => {
       const mapId = filterOptions.maps.find(m => m.name === mapName)?.id;
+      console.log(`[loadMapDemos] mapName: ${mapName} → mapId: ${mapId}`);
       if (mapId && !mapDemos[mapId]) {
         try {
           const demos = await getDemosByMap(mapId);
+          console.log(`[loadMapDemos] fetched demos for ${mapName}:`, demos);
           setMapDemos(prev => ({ ...prev, [mapId]: demos.map(mapDemo) }));
         } catch (err) {
           console.error(`Error loading demos for map ${mapName}:`, err);
         }
       }
-    };    
+    };      
     if (!filtersApplied.map) {
       loadMapDemos('Mirage');
       loadMapDemos('Inferno');
