@@ -187,7 +187,7 @@ const Navbar = ({
 
             {/* Sign In Button */}
             <Link 
-              href="/login" 
+              href="/signin" 
               className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 transition-all"
             >
               <LogIn className="h-4 w-4 mr-2" />

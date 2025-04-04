@@ -4,7 +4,7 @@ import POVlib from '../components/POVlib.jsx';
 export default function Home() {
   return (
     <main>
-      {/* <Script src="https://accounts.google.com/gsi/client" async /> */}
+      <Script src="https://accounts.google.com/gsi/client" async></Script>
       <POVlib />
     </main>
   )
