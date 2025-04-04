@@ -396,7 +396,7 @@ const POVlib = () => {
           <div className="text-red-500 text-5xl mb-4">!</div>
           <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
           <p className="text-gray-300 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
           >
@@ -410,14 +410,14 @@ const POVlib = () => {
   if (isVideoPlayerPage && selectedDemo) {
     return (
       <>
-        <VideoPlayerPage 
+        <VideoPlayerPage
           selectedDemo={selectedDemo}
           onClose={onCloseVideoPlayer}
           onLike={handleLikeDemo}
           onOpenTagModal={() => setIsTaggingModalOpen(true)}
         />
         {isTaggingModalOpen && selectedDemo && (
-          <TaggingModal 
+          <TaggingModal
             selectedDemo={selectedDemo}
             filterOptions={filterOptions}
             onClose={() => setIsTaggingModalOpen(false)}
@@ -437,8 +437,8 @@ const POVlib = () => {
           background-size: 20px 20px;
         }
       `}</style>
-      
-      <Navbar 
+
+      <Navbar
         demoType={demoType}
         onSwitchDemoType={setDemoType}
         searchActive={searchActive}
@@ -446,9 +446,9 @@ const POVlib = () => {
         setIsMenuOpen={setIsMenuOpen}
         isMenuOpen={isMenuOpen}
       />
-      
+
       {filteredDemos.length > 0 && !selectedDemo && (
-        <FeaturedHero 
+        <FeaturedHero
           demo={filteredDemos[0]}
           autoplayVideo={autoplayVideo}
           setSelectedDemo={onSelectDemo}
@@ -456,24 +456,24 @@ const POVlib = () => {
           setIsFilterModalOpen={setIsFilterModalOpen}
         />
       )}
-      
+
       <main className="container mx-auto px-6 py-6 bg-pattern">
-        <SelectedFilters 
-          filtersApplied={filtersApplied} 
-          setFiltersApplied={setFiltersApplied} 
-          searchQuery={searchQuery} 
+        <SelectedFilters
+          filtersApplied={filtersApplied}
+          setFiltersApplied={setFiltersApplied}
+          searchQuery={searchQuery}
         />
-        
+
         {/* Filter-Icon + Tag-Leiste */}
         <div className="flex items-center gap-2 mb-2">
-          <Filter 
+          <Filter
             onClick={() => setIsFilterModalOpen(true)}
             className="text-yellow-400 cursor-pointer"
           />
           <div className="flex flex-wrap items-center gap-2">
             {dynamicTags.map(tag => (
-              <button 
-                key={tag} 
+              <button
+                key={tag}
                 onClick={() => handleTagClick(tag)}
                 className="px-3 py-1 bg-gray-800 rounded-full text-sm hover:bg-yellow-400/20 transition-colors"
               >
@@ -485,43 +485,43 @@ const POVlib = () => {
             </Link>
           </div>
         </div>
-        
+
         {/* Kategorieabschnitte */}
-        <CategorySection 
-          title="Recently Added" 
-          demos={filteredDemos} 
-          onSelectDemo={onSelectDemo} 
+        <CategorySection
+          title="Recently Added"
+          demos={filteredDemos}
+          onSelectDemo={onSelectDemo}
         />
         {!filtersApplied.map && (
           <>
-            <CategorySection 
-              title="Mirage POVs" 
-              demos={getFilteredDemosByMap("Mirage")} 
-              onSelectDemo={onSelectDemo} 
+            <CategorySection
+              title="Mirage POVs"
+              demos={getFilteredDemosByMap("Mirage")}
+              onSelectDemo={onSelectDemo}
             />
-            <CategorySection 
-              title="Inferno POVs" 
-              demos={getFilteredDemosByMap("Inferno")} 
-              onSelectDemo={onSelectDemo} 
+            <CategorySection
+              title="Inferno POVs"
+              demos={getFilteredDemosByMap("Inferno")}
+              onSelectDemo={onSelectDemo}
             />
           </>
         )}
         {!filtersApplied.position && (
-          <CategorySection 
-            title="AWP Plays" 
-            demos={getFilteredDemosByPosition("AWPer")} 
-            onSelectDemo={onSelectDemo} 
+          <CategorySection
+            title="AWP Plays"
+            demos={getFilteredDemosByPosition("AWPer")}
+            onSelectDemo={onSelectDemo}
           />
         )}
-        
+
         {/* Überarbeitete Navigation-Karten unten – Verwende hier das Template-Bild, das Du für Maps hattest */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link href="/players" className="relative block rounded-xl overflow-hidden">
-              <img 
-                src="/images/players-example.png" 
-                alt="Players" 
-                className="w-full h-48 object-cover" 
+              <img
+                src="/images/players-example.png"
+                alt="Players"
+                className="w-full h-48 object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Players</h3>
@@ -529,10 +529,10 @@ const POVlib = () => {
               </div>
             </Link>
             <Link href="/maps" className="relative block rounded-xl overflow-hidden">
-              <img 
-                src="/images/maps-example.png" 
-                alt="Maps" 
-                className="w-full h-48 object-cover" 
+              <img
+                src="/images/maps-example.png"
+                alt="Maps"
+                className="w-full h-48 object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Maps</h3>
@@ -542,9 +542,9 @@ const POVlib = () => {
           </div>
         </section>
       </main>
-      
+
       {isFilterModalOpen && (
-        <FilterModal 
+        <FilterModal
           demoType={demoType}
           filterOptions={filterOptions}
           filtersApplied={filtersApplied}
@@ -563,9 +563,9 @@ const POVlib = () => {
           onApplyFilters={() => setIsFilterModalOpen(false)}
         />
       )}
-      
+
       {isTaggingModalOpen && selectedDemo && (
-        <TaggingModal 
+        <TaggingModal
           selectedDemo={selectedDemo}
           filterOptions={filterOptions}
           onClose={() => setIsTaggingModalOpen(false)}
@@ -573,7 +573,7 @@ const POVlib = () => {
           onUpdatePositions={handleUpdatePositions}
         />
       )}
-      
+
       <Footer />
     </div>
   );
