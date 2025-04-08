@@ -42,17 +42,11 @@ const Navbar = ({
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
-  // Scroll-Effekt für den Navbar-Hintergrund
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    console.debug(user.avatar_url)
-  }, [user]);
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     console.log('Search query:', searchQuery);
@@ -60,38 +54,16 @@ const Navbar = ({
   };
 
   const handleSignOut = async () => {
-    // 1. Get the Supabase client instance
-    //    Note: This assumes handleSignOut is defined within a component
-    //    where useSupabaseClient() and useRouter() can be called.
-    //    If calling from outside a component, you'll need to pass
-    //    the supabase client and router instance as arguments.
-  
     console.log('Attempting to sign out...');
-  
-    // 2. Call the Supabase signOut method
     const { error } = await supabase.auth.signOut();
   
     // 3. Handle potential errors
     if (error) {
       console.error('Error signing out:', error.message);
-      // Optional: Display an error message to the user
-      // alert(`Error signing out: ${error.message}`);
     } else {
       console.log('Sign out successful.');
-  
-      // 4. Perform post-sign-out actions (IMPORTANT!)
-      //    This usually involves redirecting the user or refreshing state.
-      setUser(null); // Clear user state
-  
-      // Option A: Redirect to login or home page
-      // Replace '/login' with your desired destination after logout
+      setUser(null);
       router.push('/');
-  
-      // Option B: Refresh the current page to clear state (might be less smooth)
-      // router.refresh(); // Available in both Pages and App Router (different behavior)
-  
-      // Option C: If using global state management (Context, Zustand, Redux),
-      // clear user-related state here.
     }
   };
 
@@ -206,7 +178,7 @@ const Navbar = ({
                         aria-label="User menu"
                       >
                         <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-                        <img src={user.avatar_url} className="w-full h-full object-cover" />
+                        {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : null}
                         </div>
                       </button>
                       {userDropdownOpen && (
@@ -227,7 +199,7 @@ const Navbar = ({
                       : <>
                       <Link 
                       href="/signin" 
-                      className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all w-full"
+                      className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
                       >
                       <LogIn className="h-4 w-4 mr-2" />
                       <span className="text-sm font-medium">Sign In</span>
