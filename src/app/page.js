@@ -30,11 +30,14 @@ export default function Home() {
     // Listen for auth state changes (login, logout)
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        console.log('Auth state changed:', _event, session);
-        setSession(session);
-        console.debug("Session:", session.user.user_metadata);
-        session?.user ?? setUser(session.user.user_metadata);
-        setLoading(false);
+        if (session) {
+          setSession(session);
+          setUser(session.user.user_metadata);
+        }
+        else {
+          setSession(null);
+          setUser(null);
+        }
       }
     );
 
@@ -52,10 +55,7 @@ export default function Home() {
   
   return (
     <main>
-      <UserContext.Provider value={user}>
-        <Script src="https://accounts.google.com/gsi/client" async></Script>
         <POVlib />
-      </UserContext.Provider>
     </main>
   )
 }
