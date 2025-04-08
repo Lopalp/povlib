@@ -1,9 +1,9 @@
 "use client"
-import VideoPlayerPage from "@/components/POVlib/VideoPlayerPage";
-import { getDemoById } from "@/lib/supabase";
+import VideoPlayerPage from "../../../components/POVlib/VideoPlayerPage";
+import { getDemoById } from "../../../lib/supabase";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LoadingFullscreen } from "@/components/loading/LoadingFullscreen";
+import { LoadingFullscreen } from "../../../components/loading/LoadingFullscreen";
 
 export default function Test({ params }) {
   const { demo_id } = React.use(params);

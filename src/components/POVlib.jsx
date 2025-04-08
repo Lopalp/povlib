@@ -13,10 +13,8 @@ import {
   updateDemoTags,
   updateDemoPositions,
   getPlayerInfo
-} from '@/lib/supabase';
+} from '../lib/supabase';
 import { useRouter } from 'next/navigation';
-
-import DemoCard from './POVlib/DemoCard';
 import VideoPlayerPage from './POVlib/VideoPlayerPage';
 import TaggingModal from './POVlib/TaggingModal';
 import FilterModal from './POVlib/FilterModal';

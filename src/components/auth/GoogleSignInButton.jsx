@@ -6,18 +6,21 @@ export default function LoginButton() {
   const supabase = createSupabaseBrowserClient()
 
   const handleGoogleLogin = async () => {
-    console.log("Attempting Google Sign In..."); // Add log
+    console.log("Attempting Google Sign In...");
     // Basic call without options first
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      // Temporarily remove options like redirectTo
+      options: {    
+        redirectTo: "https://pepxdktfatcqjfpeyrui.supabase.co/auth/v1/callback",
+      },
     });
 
     if (error) {
-      console.error("signInWithOAuth Error:", error); // Log the full error object
-      alert(`Error: ${error.message}`); // Show error to user
+      console.error("signInWithOAuth Error:", error);
+      alert(`Error: ${error.message}`);
     } else {
-      console.log("signInWithOAuth successful (redirect should happen):", data);
+      console.log("signInWithOAuth successful (redirect should happen):");
+      console.debug(data);
     }
   };
 

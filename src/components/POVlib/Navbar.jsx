@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+"use client"
+import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import { 
   Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn 
 } from 'lucide-react';
+import { UserContext } from '../../../context/UserContext';
 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
@@ -21,14 +23,15 @@ const mostPlayedMapsMobile = [
   { label: 'Ancient', slug: 'ancient' }
 ];
 
-const Navbar = ({ 
-  demoType = 'pro', 
-  onSwitchDemoType, 
-  searchActive, 
-  setSearchActive, 
-  setIsMenuOpen, 
-  isMenuOpen 
+const Navbar = ({
+  demoType = 'pro',
+  onSwitchDemoType,
+  searchActive,
+  setSearchActive,
+  setIsMenuOpen,
+  isMenuOpen
 }) => {
+  const userContext = useContext(UserContext);
   const [isScrolled, setIsScrolled] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
@@ -186,15 +189,23 @@ const Navbar = ({
             </div>
 
             {/* Sign In Button */}
-            <Link 
-              href="/signin" 
-              className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 transition-all"
-            >
-              <LogIn className="h-4 w-4 mr-2" />
-              <span className="text-sm font-medium">Sign In</span>
-            </Link>
+                  {userContext ? <>
+                    <img 
+                    src={userContext.avatar_url} 
+                    className="w-8 h-8 rounded-full" 
+                    alt="User Avatar"
+                    />
+                    </>
+                  : <>
+                  <Link 
+                  href="/signin" 
+                  className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 transition-all"
+                  >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  <span className="text-sm font-medium">Sign In</span>
+                  </Link></> }
 
-            {/* Mobile Menu Button */}
+                  {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(prev => !prev)}
               className="md:hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors"
