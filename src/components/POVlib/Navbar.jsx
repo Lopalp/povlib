@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+"use client"
+import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import { 
   Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn 
 } from 'lucide-react';
+import { UserContext } from '../../../context/UserContext';
+import LogoHeading from '@/components/typography/LogoHeading'
+import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation'
 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
@@ -21,30 +26,45 @@ const mostPlayedMapsMobile = [
   { label: 'Ancient', slug: 'ancient' }
 ];
 
-const Navbar = ({ 
-  demoType = 'pro', 
-  onSwitchDemoType, 
-  searchActive, 
-  setSearchActive, 
-  setIsMenuOpen, 
-  isMenuOpen 
+const Navbar = ({
+  demoType = 'pro',
+  onSwitchDemoType,
+  searchActive,
+  setSearchActive,
+  setIsMenuOpen,
+  isMenuOpen
 }) => {
+  const {user, setUser} = useContext(UserContext);
   const [isScrolled, setIsScrolled] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const supabase = createSupabaseBrowserClient();
+  const router = useRouter();
 
-  // Scroll-Effekt für den Navbar-Hintergrund
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     console.log('Search query:', searchQuery);
     setSearchActive(false);
+  };
+
+  const handleSignOut = async () => {
+    console.log('Attempting to sign out...');
+    const { error } = await supabase.auth.signOut();
+  
+    // 3. Handle potential errors
+    if (error) {
+      console.error('Error signing out:', error.message);
+    } else {
+      console.log('Sign out successful.');
+      setUser(null);
+      router.push('/');
+    }
   };
 
   return (
@@ -53,15 +73,7 @@ const Navbar = ({
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-9 h-9 bg-yellow-400 rounded-full flex items-center justify-center">
-              <div className="absolute inset-0 bg-yellow-400 rounded-full animate-pulse opacity-50"></div>
-              <span className="text-gray-900 font-black text-lg">P</span>
-            </div>
-            <h1 className="text-2xl font-black">
-              <span className="text-yellow-400">POV</span>
-              <span className="text-white">lib</span>
-              <span className="text-gray-400 text-xl">.gg</span>
-            </h1>
+            <LogoHeading size={4}/>
           </Link>
 
           {/* Desktop Navigation */}
@@ -150,51 +162,50 @@ const Navbar = ({
             </button>
 
             {/* Notifications (Platzhalter) */}
-            <button 
-              className="hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200 relative"
-              aria-label="Notifications"
-            >
-              <BellRing className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
-            </button>
+                      <button 
+                      className="hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200 relative rounded-full"
+                      aria-label="Notifications"
+                      >
+                      <BellRing className="h-5 w-5" />
+                      <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
+                      </button>
+                      
+                      {user ? 
+                      <div className="relative">
+                      <button 
+                        onClick={() => setUserDropdownOpen(prev => !prev)}
+                        className="flex items-center p-1 text-gray-400 hover:text-yellow-400 transition-colors border border-yellow-400 rounded-full cursor-pointer w-full"
+                        aria-label="User menu"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                        {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : null}
+                        </div>
+                      </button>
+                      {userDropdownOpen && (
+                        <div 
+                        className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
+                        onMouseLeave={() => setUserDropdownOpen(false)}
+                        >
+                        <div className="py-1 text-left">
+                          <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">Your Profile</Link>
+                          <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Favorites</Link>
+                          <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Settings</Link>
+                          <div className="border-t border-gray-700 my-1"></div>
+                          <button onClick={handleSignOut} className="cursor-pointer text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 w-full">Sign out</button>
+                        </div>
+                        </div>
+                      )}
+                      </div>
+                      : <>
+                      <Link 
+                      href="/signin" 
+                      className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
+                      >
+                      <LogIn className="h-4 w-4 mr-2" />
+                      <span className="text-sm font-medium">Sign In</span>
+                      </Link></> }
 
-            {/* User Menu (Platzhalter) */}
-            <div className="hidden relative">
-              <button 
-                onClick={() => setUserDropdownOpen(prev => !prev)}
-                className="flex items-center p-1 text-gray-400 hover:text-yellow-400 transition-colors"
-                aria-label="User menu"
-              >
-                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                  <User className="h-4 w-4" />
-                </div>
-              </button>
-              {userDropdownOpen && (
-                <div 
-                  className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
-                  onMouseLeave={() => setUserDropdownOpen(false)}
-                >
-                  <div className="py-1">
-                    <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">Your Profile</Link>
-                    <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Favorites</Link>
-                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Settings</Link>
-                    <div className="border-t border-gray-700 my-1"></div>
-                    <Link href="/logout" className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700">Sign out</Link>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Sign In Button */}
-            <Link 
-              href="/login" 
-              className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-md border border-yellow-400/30 transition-all"
-            >
-              <LogIn className="h-4 w-4 mr-2" />
-              <span className="text-sm font-medium">Sign In</span>
-            </Link>
-
-            {/* Mobile Menu Button */}
+                      {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(prev => !prev)}
               className="md:hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors"

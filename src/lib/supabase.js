@@ -1,11 +1,40 @@
 // lib/supabase.js - Supabase Client und Datenbank-Hilfsfunktionen
 import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from "@supabase/ssr";
 
 // Supabase-Client initialisieren
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(
+  supabaseUrl,
+  supabaseKey,
+  {
+    cookies: {
+      get(name) {
+        return cookieStore.get(name)?.value;
+      },
+      set(name, value, options) {
+        try {
+          cookieStore.set({ name, value, ...options });
+        } catch (error) {
+          // The `set` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
+      },
+      remove(name, options) {
+        try {
+          cookieStore.set({ name, value: "", ...options });
+        } catch (error) {
+          // The `delete` method was called from a Server Component.
+          // This can be ignored if you have middleware refreshing
+          // user sessions.
+        }
+      },
+    },
+  }
+);
 
 // Hilfsfunktionen für Demo-Daten
 
@@ -208,6 +237,22 @@ export async function getFilteredDemos(filters = {}, type = 'all') {
 
   if (error) {
     console.error('Error fetching filtered demos:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+// Demos nach ID abrufen
+export async function getDemoById(id) {
+  const { data, error } = await supabase
+    .from('demos')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error(`Error fetching demo with id ${id}:`, error);
     throw error;
   }
 
