@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { 
   Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn 
 } from 'lucide-react';
-import { UserContext } from '../../../context/UserContext';
 import LogoHeading from '@/components/typography/LogoHeading'
 import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation'
+import { useUser } from '../../../context/UserProvider';
+import { useNavbar } from '../../../context/NavbarProvider';
 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
@@ -26,21 +27,23 @@ const mostPlayedMapsMobile = [
   { label: 'Ancient', slug: 'ancient' }
 ];
 
-const Navbar = ({
-  demoType = 'pro',
-  onSwitchDemoType,
-  searchActive,
-  setSearchActive,
-  setIsMenuOpen,
-  isMenuOpen
-}) => {
-  const {user, setUser} = useContext(UserContext);
+const Navbar = () => {
+  const {user, setUser, session, loading} = useUser();
   const [isScrolled, setIsScrolled] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
+
+  const {
+    demoType,
+    setDemoType,
+    searchActive,
+    setSearchActive,
+    setIsMenuOpen,
+    isMenuOpen
+  } = useNavbar();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -139,13 +142,13 @@ const Navbar = ({
             {/* PRO/COMMUNITY Toggle */}
             <div className="hidden md:flex items-center p-1 bg-gray-800 rounded-full">
               <button
-                onClick={() => onSwitchDemoType('pro')}
+                onClick={() => setDemoType('pro')}
                 className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
               >
-                PRO POVs
+                PRO
               </button>
               <button
-                onClick={() => onSwitchDemoType('community')}
+                onClick={() => setDemoType('community')}
                 className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'community' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
               >
                 COMMUNITY
@@ -329,13 +332,13 @@ const Navbar = ({
               <div className="border-t border-gray-800 pt-6">
                 <div className="flex bg-gray-800 rounded-full p-1">
                   <button
-                    onClick={() => { onSwitchDemoType('pro'); setIsMenuOpen(false); }}
+                    onClick={() => { setDemoType('pro'); setIsMenuOpen(false); }}
                     className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
                   >
                     PRO POVs
                   </button>
                   <button
-                    onClick={() => { onSwitchDemoType('community'); setIsMenuOpen(false); }}
+                    onClick={() => { setDemoType('community'); setIsMenuOpen(false); }}
                     className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'community' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
                   >
                     COMMUNITY

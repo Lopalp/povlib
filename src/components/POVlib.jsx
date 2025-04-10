@@ -18,31 +18,12 @@ import { useRouter } from 'next/navigation';
 import VideoPlayerPage from './POVlib/VideoPlayerPage';
 import TaggingModal from './POVlib/TaggingModal';
 import FilterModal from './POVlib/FilterModal';
-import Navbar from './POVlib/Navbar';
 import Footer from './POVlib/Footer';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
-
-// Helper-Funktion zum Mapping eines Demo-Objekts
-const mapDemo = (demo) => ({
-  id: demo.id,
-  title: demo.title,
-  thumbnail: demo.thumbnail,
-  videoId: demo.video_id,
-  map: demo.map,
-  positions: demo.positions || [],
-  tags: demo.tags || [],
-  players: demo.players || [],
-  team: demo.team,
-  year: demo.year,
-  event: demo.event,
-  result: demo.result,
-  views: demo.views || 0,
-  likes: demo.likes || 0,
-  isPro: demo.is_pro
-});
+import ErrorWindow from './error/ErrorWindow';
 
 const POVlib = () => {
   
@@ -218,6 +199,24 @@ const POVlib = () => {
     }
   }, [selectedDemo]);
 
+  const mapDemo = (demo) => ({
+    id: demo.id,
+    title: demo.title,
+    thumbnail: demo.thumbnail,
+    videoId: demo.video_id,
+    map: demo.map,
+    positions: demo.positions || [],
+    tags: demo.tags || [],
+    players: demo.players || [],
+    team: demo.team,
+    year: demo.year,
+    event: demo.event,
+    result: demo.result,
+    views: demo.views || 0,
+    likes: demo.likes || 0,
+    isPro: demo.is_pro
+  });
+
   const handleDemoUpdate = async (demoId, updateFn, updater) => {
     try {
       const result = await updateFn(demoId, updater);
@@ -277,17 +276,6 @@ const POVlib = () => {
   // Video-Auswahl und Navigation
   const onSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
-    console.debug(demo)
-    /* setSelectedDemo(demo);
-    setActiveVideoId(demo.videoId);
-    setIsVideoPlayerPage(true);
-    window.scrollTo(0, 0); */
-  };
-
-  const onCloseVideoPlayer = () => {
-    setSelectedDemo(null);
-    setActiveVideoId('');
-    setIsVideoPlayerPage(false);
   };
 
   if (isLoading && !filteredDemos.length) {
@@ -298,41 +286,7 @@ const POVlib = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6 bg-gray-800 rounded-xl shadow-lg">
-          <div className="text-red-500 text-5xl mb-4">!</div>
-          <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
-          <p className="text-gray-300 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isVideoPlayerPage && selectedDemo) {
-    return (
-      <>
-        <VideoPlayerPage
-          selectedDemo={selectedDemo}
-          onClose={onCloseVideoPlayer}
-          onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
-        />
-        {isTaggingModalOpen && selectedDemo && (
-          <TaggingModal
-            selectedDemo={selectedDemo}
-            filterOptions={filterOptions}
-            onClose={() => setIsTaggingModalOpen(false)}
-            onUpdateTags={handleUpdateTags}
-            onUpdatePositions={handleUpdatePositions}
-          />
-        )}
-      </>
+      <ErrorWindow text={"Error Loading Data"} />
     );
   }
 
@@ -345,18 +299,9 @@ const POVlib = () => {
         }
       `}</style>
 
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={setDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       {filteredDemos.length > 0 && !selectedDemo && (
         <FeaturedHero
-          demo={filteredDemos[0]}
+          demo={filteredDemos[1]}
           autoplayVideo={autoplayVideo}
           setSelectedDemo={onSelectDemo}
           setActiveVideoId={setActiveVideoId}

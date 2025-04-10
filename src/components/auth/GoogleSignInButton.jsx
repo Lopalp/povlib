@@ -2,16 +2,16 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
 import Script from 'next/script';
-import { UserContext } from '../../../context/UserContext';
 import { useRouter } from 'next/navigation';
 import ErrorWindow from '@/components/error/ErrorWindow';
+import { useUser } from '../../../context/UserProvider';
 
 const GoogleSignInButton = () => {
 
   const supabase = createSupabaseBrowserClient();
   const googleButtonRef = useRef(null);
   const [isScriptReady, setIsScriptReady] = useState(false);
-  const {user, setUser} = useContext(UserContext);
+  const {user, setUser, session, loading} = useUser();
   const [error, setError] = useState(false);
   const router = useRouter();
 
