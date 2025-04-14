@@ -16,11 +16,11 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   
   return (
     <div 
-      className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : 'w-72 sm:w-80'} ${className}`}
+      className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className}`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section with padding */}
-      <div className="relative w-full aspect-video overflow-hidden">
+      <div className="relative aspect-video overflow-hidden w-full">
         {/* Thumbnail image */}
         <img 
           src={demo.thumbnail} 
@@ -55,13 +55,13 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
       
       {/* Content Section - YouTube-like info below thumbnail with padding */}
-      <div className="p-4">
+      <div>
         {/* Title */}
-        <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-2">
+        <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
           {demo.title}
         </h3>
         
-        {/* Team and Players */}
+         {/* Team and Players */}
         <div className="flex items-center mb-1">
           {demo.team && (
             <div className="text-xs text-gray-300 flex items-center mr-2">
@@ -71,60 +71,66 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           )}
           <div className="text-gray-400 text-xs">{demo.year}</div>
         </div>
-        
-        <div className="text-yellow-400 text-xs font-medium mb-2 line-clamp-1">
-          {demo.players.map((player, idx) => (
-            <React.Fragment key={idx}>
-              {idx > 0 && ", "}
-              <Link 
-                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="hover:underline hover:text-yellow-300"
-                onClick={(e) => handlePlayerClick(e, player)}
-              >
-                {player}
-              </Link>
-            </React.Fragment>
-          ))}
-        </div>
-        
-        {/* Tags and Positions Row */}
-        <div className="flex flex-wrap gap-1 mb-2">
-          {demo.positions.slice(0, 1).map((position, i) => (
-            <span key={i} className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer">
-              {position}
-            </span>
-          ))}
-          
-          {demo.tags.slice(0, 1).map((tag, i) => (
-            <span key={i} className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer flex items-center">
-              <TagIcon className="h-2 w-2 mr-1" />
-              {tag}
-            </span>
-          ))}
-          
-          {(demo.positions.length + demo.tags.length) > 2 && (
-            <span className="text-xs bg-gray-700 px-2 py-0.5 rounded">
-              +{(demo.positions.length + demo.tags.length - 2)}
-            </span>
-          )}
-        </div>
-        
-        {/* Subtle CT/T Rounds Bar */}
-        <div className="mt-1">
-          <div className="h-0.5 w-full rounded-full overflow-hidden flex bg-gray-700/30">
-            <div 
-              className="bg-blue-500/40 h-full"
-              style={{ width: `${ctPercentage}%` }}
-            ></div>
-            <div 
-              className="bg-yellow-500/40 h-full"
-              style={{ width: `${100 - ctPercentage}%` }}
-            ></div>
-          </div>
-          <div className="text-[10px] text-gray-500 mt-1 flex justify-between">
-            <span>CT: {ctRounds}</span>
-            <span>T: {tRounds}</span>
-          </div>
+         <div className="text-yellow-400 text-xs font-medium mb-2 line-clamp-1">
+           {demo.players.map((player, idx) => (
+             <React.Fragment key={idx}>
+               {idx > 0 && ", "}
+               <Link 
+                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                 className="hover:underline hover:text-yellow-300"
+                 onClick={(e) => handlePlayerClick(e, player)}
+               >
+                 {player}
+               </Link>
+             </React.Fragment>
+           ))}
+         </div>
+
+         {/* Tags and Positions Row */}
+         <div className="flex flex-wrap gap-1 mb-2">
+           {demo.positions.slice(0, 1).map((position, i) => (
+             <span key={i} className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer">
+               {position}
+             </span>
+           ))}
+
+           {demo.tags.slice(0, 1).map((tag, i) => (
+             <span key={i} className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer flex items-center">
+               <TagIcon className="h-2 w-2 mr-1" />
+               {tag}
+             </span>
+           ))}
+
+           {(demo.positions.length + demo.tags.length) > 2 && (
+             <span className="text-xs bg-gray-700 px-2 py-0.5 rounded">
+               +{(demo.positions.length + demo.tags.length - 2)}
+             </span>
+           )}
+         </div>
+
+         {/* Subtle CT/T Rounds Bar */}
+         <div className="mt-1">
+           <div className="h-0.5 w-full rounded-full overflow-hidden flex bg-gray-700/30">
+             <div 
+               className="bg-blue-500/40 h-full"
+               style={{ width: `${ctPercentage}%` }}
+             ></div>
+             <div 
+               className="bg-yellow-500/40 h-full"
+               style={{ width: `${100 - ctPercentage}%` }}
+             ></div>
+           </div>
+           <div className="text-[10px] text-gray-500 mt-1 flex justify-between">
+             <span>CT: {ctRounds}</span>
+             <span>T: {tRounds}</span>
+           </div>
+         </div>
+       </div>
+     </div>
+   );
+ };
+
+ export default DemoCard;
         </div>
       </div>
     </div>
