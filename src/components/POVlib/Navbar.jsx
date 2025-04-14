@@ -77,7 +77,7 @@ const Navbar = ({
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden lg:flex items-center space-x-8">
             <Link href="/" className="text-sm font-medium text-white hover:text-yellow-400 transition-colors">
               Home
             </Link>
@@ -123,14 +123,6 @@ const Navbar = ({
             
             <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Players
-            </Link>
-            
-            <Link href="/teams" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
-              Teams
-            </Link>
-            
-            <Link href="/events" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
-              Events
             </Link>
           </nav>
 
@@ -250,7 +242,7 @@ const Navbar = ({
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-0 left-0 w-full h-screen md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
+        <div className="fixed top-0 left-0 w-full h-screen lg:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
               <Link 
@@ -307,22 +299,6 @@ const Navbar = ({
                   <User className="h-5 w-5 text-yellow-400" />
                   <span className="font-medium">Players</span>
                 </div>
-              </Link>
-              
-              <Link 
-                href="/teams" 
-                className="block text-gray-300 hover:text-yellow-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Teams
-              </Link>
-              
-              <Link 
-                href="/events" 
-                className="block text-gray-300 hover:text-yellow-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Events
               </Link>
               
               {/* Mobile PRO/COMMUNITY Toggle */}
