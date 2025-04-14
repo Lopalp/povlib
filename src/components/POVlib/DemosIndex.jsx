@@ -93,13 +93,11 @@ const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
     {demos.map((demo, index) => {
       if (index === demos.length - 1) {
         return (
-          <div ref={lastDemoElementRef} key={demo.id} className="relative">
-            <div className="aspect-[16/9] max-w-full">
-              <DemoCard 
-                demo={demo}
-                onSelect={handleSelectDemo}
-              />
-            </div>
+          <div ref={lastDemoElementRef} key={demo.id}>
+            <DemoCard 
+              demo={demo}
+              onSelect={handleSelectDemo}
+            />
           </div>
         );
       }
