@@ -19,7 +19,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : 'w-72 sm:w-80'} ${className}`}
       onClick={() => onSelect(demo)}
     >
-      {/* Thumbnail Section */}
+      {/* Thumbnail Section with padding */}
       <div className="relative w-full aspect-video overflow-hidden">
         {/* Thumbnail image */}
         <img 
@@ -54,8 +54,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
       </div>
       
-      {/* Content Section - YouTube-like info below thumbnail */}
-      <div className="p-3">
+      {/* Content Section - YouTube-like info below thumbnail with padding */}
+      <div className="p-4">
         {/* Title */}
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-2">
           {demo.title}
