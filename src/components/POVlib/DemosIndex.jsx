@@ -89,7 +89,7 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
 
 // Subkomponente: Grid zur Anzeige der Demos
 const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
-  <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-8 p-6">
+  <div className="grid grid-cols-[repeat(auto-fit,minmax(275px,1fr))] gap-8 p-6">
     {demos.map((demo, index) => {
       if (index === demos.length - 1) {
         return (
