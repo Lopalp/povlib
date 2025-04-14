@@ -55,8 +55,10 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
       
       {/* Content Section - YouTube-like info below thumbnail */}
-      {/* Title */}
+      <div className="p-4">
+        {/* Title */}
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
+          {demo.title}
         </h3>
         
          {/* Team and Players */}
