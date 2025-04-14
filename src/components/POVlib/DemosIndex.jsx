@@ -89,27 +89,33 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
 
 // Subkomponente: Grid zur Anzeige der Demos
 const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6 youtube-like-grid">
     {demos.map((demo, index) => {
-      if (index === demos.length - 1) {
-        return (
-          <div ref={lastDemoElementRef} key={demo.id}>
-            <DemoCard 
-              demo={demo}
-              onSelect={handleSelectDemo}
-            />
-          </div>
-        );
-      }
-      return (<div key={demo.id}>
-        <div className="relative">
-          <DemoCard
-            demo={demo}
-            onSelect={handleSelectDemo}
-          />
-        </div>
+      const isLastElement = index === demos.length - 1;
 
-</div>
+      return (
+        <div key={demo.id} ref={isLastElement ? lastDemoElementRef : null} className="youtube-like-card">
+          <div className="aspect-w-16 aspect-h-9 bg-gray-800 rounded-t-lg overflow-hidden">
+            {demo.thumbnail ? (
+              <img 
+                src={demo.thumbnail} 
+                alt={demo.title} 
+                className="object-cover w-full h-full hover:scale-105 transition-transform cursor-pointer"
+                onClick={() => handleSelectDemo(demo)}
+              />
+            ) : (
+              <div className="flex items-center justify-center bg-gray-700 text-gray-400">
+                No Preview Available
+              </div>
+            )}
+          </div>
+          <div className="p-3 bg-gray-900 rounded-b-lg">
+            <h3 className="text-white font-semibold text-sm truncate cursor-pointer hover:text-yellow-400 transition-colors" onClick={() => handleSelectDemo(demo)}>{demo.title}</h3>
+            <p className="text-gray-400 text-xs mt-1">
+              {demo.views ? `${demo.views} views` : 'No views yet'}
+            </p>
+          </div>
+        </div>
       );
     })}
   </div>
