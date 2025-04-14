@@ -130,11 +130,4 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
    );
  };
 
- export default DemoCard;
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default DemoCard;
