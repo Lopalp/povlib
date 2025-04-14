@@ -68,8 +68,8 @@ const Navbar = ({
   };
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-gray-900/95 backdrop-blur-lg shadow-lg' : 'bg-gradient-to-b from-gray-900/80 to-transparent'}`}>
-      <div className="container mx-auto px-4 sm:px-6">
+    <header className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-gray-900/95 backdrop-blur-lg shadow-lg' : 'bg-gradient-to-b from-gray-900/80 to-transparent'}`}>
+      <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
@@ -250,7 +250,7 @@ const Navbar = ({
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800">
+        <div className="fixed top-0 left-0 w-full h-screen md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
               <Link 
