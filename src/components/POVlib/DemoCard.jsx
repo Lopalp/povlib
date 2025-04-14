@@ -1,30 +1,22 @@
 import React from 'react';
 import Link from 'next/link';
 import { Play, Shield, Tag as TagIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   // Handle clicking on player links without triggering card selection
   const handlePlayerClick = (e, player) => {
     e.stopPropagation();
   };
-
-  const [ctRounds, setCtRounds] = useState(0);
-  const [tRounds, setTRounds] = useState(0);
-  const [ctPercentage, setCtPercentage] = useState(0);
-
-  useEffect(() => {
-    if (demo.rounds) {
-      setCtRounds(demo.rounds.ct);
-      setTRounds(demo.rounds.t);
-      const totalRounds = demo.rounds.ct + demo.rounds.t;
-      setCtPercentage((demo.rounds.ct / totalRounds) * 100);
-    }
-  }, [demo]);
+  
+  // Mock data for CT/T rounds (in a real app, this would come from the demo data)
+  const ctRounds = demo.id % 7 + 6; // Just for demonstration
+  const tRounds = demo.id % 5 + 8; // Just for demonstration
+  const totalRounds = ctRounds + tRounds;
+  const ctPercentage = (ctRounds / totalRounds) * 100;
   
   return (
     <div 
-      className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-4`}
+      className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className}`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section with padding */}
@@ -62,8 +54,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
       </div>
       
-      {/* Content Section - YouTube-like info below thumbnail */}
-      <div className="p-4">
+      {/* Content Section - YouTube-like info below thumbnail with padding */}
+      <div>
         {/* Title */}
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
           {demo.title}
@@ -133,6 +125,9 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
              <span>T: {tRounds}</span>
            </div>
          </div>
+       </div>
      </div>
-  );
+   );
+ };
+
 export default DemoCard;
