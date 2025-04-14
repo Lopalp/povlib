@@ -94,28 +94,13 @@ const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
       const isLastElement = index === demos.length - 1;
 
       return (
-        <div key={demo.id} ref={isLastElement ? lastDemoElementRef : null} className="youtube-like-card">
-          <div className="aspect-w-16 aspect-h-9 bg-gray-800 rounded-t-lg overflow-hidden">
-            {demo.thumbnail ? (
-              <img 
-                src={demo.thumbnail} 
-                alt={demo.title} 
-                className="object-cover w-full h-full hover:scale-105 transition-transform cursor-pointer"
-                onClick={() => handleSelectDemo(demo)}
-              />
-            ) : (
-              <div className="flex items-center justify-center bg-gray-700 text-gray-400">
-                No Preview Available
-              </div>
-            )}
-          </div>
-          <div className="p-3 bg-gray-900 rounded-b-lg">
-            <h3 className="text-white font-semibold text-sm truncate cursor-pointer hover:text-yellow-400 transition-colors" onClick={() => handleSelectDemo(demo)}>{demo.title}</h3>
-            <p className="text-gray-400 text-xs mt-1">
-              {demo.views ? `${demo.views} views` : 'No views yet'}
-            </p>
-          </div>
-        </div>
+        <DemoCard
+          key={demo.id}
+          ref={isLastElement ? lastDemoElementRef : null}
+          demo={demo}
+          onSelect={handleSelectDemo}
+        />
+
       );
     })}
   </div>
