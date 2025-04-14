@@ -124,6 +124,26 @@ const Navbar = ({
             <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Players
             </Link>
+
+            {/* Community Link with Hover Modal */}
+            <div className="relative">
+              <div className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                >
+                Community
+              </div>
+              <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-40 bg-gray-800 rounded-lg shadow-lg border border-gray-700 text-center py-2 text-sm text-gray-300 opacity-0 pointer-events-none transition-opacity duration-200 hover:opacity-100 group-hover:opacity-100">
+                To be continued
+              </div>
+
+              <div className="absolute inset-0 group">
+                <Link 
+                  href="#"
+                  className="w-full h-full flex items-center justify-center"
+                >
+                </Link>
+              </div>
+            </div>
+
           </nav>
 
           {/* Rechte Navigation */}
