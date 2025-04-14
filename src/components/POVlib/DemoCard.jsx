@@ -55,7 +55,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
       
       {/* Content Section - YouTube-like info below thumbnail */}
-        {/* Title */}
+      {/* Title */}
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
         </h3>
         
@@ -123,9 +123,6 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
              <span>T: {tRounds}</span>
            </div>
          </div>
-       </div>
      </div>
-   );
- };
-
+  );
 export default DemoCard;
