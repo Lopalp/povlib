@@ -1,18 +1,26 @@
 import React from 'react';
 import Link from 'next/link';
 import { Play, Shield, Tag as TagIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   // Handle clicking on player links without triggering card selection
   const handlePlayerClick = (e, player) => {
     e.stopPropagation();
   };
-  
-  // Mock data for CT/T rounds (in a real app, this would come from the demo data)
-  const ctRounds = demo.id % 7 + 6; // Just for demonstration
-  const tRounds = demo.id % 5 + 8; // Just for demonstration
-  const totalRounds = ctRounds + tRounds;
-  const ctPercentage = (ctRounds / totalRounds) * 100;
+
+  const [ctRounds, setCtRounds] = useState(0);
+  const [tRounds, setTRounds] = useState(0);
+  const [ctPercentage, setCtPercentage] = useState(0);
+
+  useEffect(() => {
+    if (demo.rounds) {
+      setCtRounds(demo.rounds.ct);
+      setTRounds(demo.rounds.t);
+      const totalRounds = demo.rounds.ct + demo.rounds.t;
+      setCtPercentage((demo.rounds.ct / totalRounds) * 100);
+    }
+  }, [demo]);
   
   return (
     <div 
