@@ -89,21 +89,22 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
 
 // Subkomponente: Grid zur Anzeige der Demos
 const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
-  <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
+  <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 p-6">
     {demos.map((demo, index) => {
       if (index === demos.length - 1) {
         return (
-          <div ref={lastDemoElementRef} key={demo.id} className="overflow-hidden">
-            <DemoCard 
-              demo={demo}
-              onSelect={handleSelectDemo}
-              className="max-w-[400px]"
-            />
+          <div ref={lastDemoElementRef} key={demo.id} className="relative">
+            <div className="aspect-[16/9] max-w-full">
+              <DemoCard 
+                demo={demo}
+                onSelect={handleSelectDemo}
+              />
+            </div>
           </div>
         );
       }
       return (
-        <div className="overflow-hidden max-w-[400px]">
+        <div className="relative">
           <DemoCard
             demo={demo}
             onSelect={handleSelectDemo}
