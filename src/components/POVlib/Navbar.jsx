@@ -77,7 +77,7 @@ const Navbar = ({
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-sm font-medium text-white hover:text-yellow-400 transition-colors">
               Home
             </Link>
@@ -129,7 +129,7 @@ const Navbar = ({
           {/* Rechte Navigation */}
           <div className="flex items-center space-x-4">
             {/* PRO/COMMUNITY Toggle */}
-            <div className="hidden md:flex items-center p-1 bg-gray-800 rounded-full">
+            <div className="hidden lg:flex items-center p-1 bg-gray-800 rounded-full">
               <button
                 onClick={() => onSwitchDemoType('pro')}
                 className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
@@ -191,14 +191,14 @@ const Navbar = ({
                       : <>
                       <Link 
                       href="/signin" 
-                      className="hidden md:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
+                      className="hidden lg:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
                       >
                       <LogIn className="h-4 w-4 mr-2" />
                       <span className="text-sm font-medium">Sign In</span>
                       </Link></> }
 
                       {/* Mobile Menu Button */}
-            <button
+                      <button
               onClick={() => setIsMenuOpen(prev => !prev)}
               className="md:hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors"
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
@@ -242,7 +242,7 @@ const Navbar = ({
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-0 left-0 w-full h-screen lg:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
+        <div className="fixed top-0 left-0 w-full h-screen md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
               <Link 
