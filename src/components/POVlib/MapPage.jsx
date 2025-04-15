@@ -72,28 +72,51 @@ function MapPage({ mapName }) {
         { name: "B-Site", top: "20%", left: "60%", width: "30%", height: "30%" },
     ] : [];
 
-    return (
-        <div className="bg-gray-900 text-white min-h-screen">
-                <Navbar />
-            <main className="container mx-auto py-8">
-                <div ref={mapSectionRef} className="map-page">
-                    <h1 className="text-4xl font-bold mt-8 mb-4">{mapName}</h1>
-                    <div className="map-description mb-8">
-                        <p>{mapData.description}</p>
-                    </div>
+  return (
+    <div className="bg-gray-900 text-white min-h-screen">
+      <Navbar />
+      <main className="container mx-auto py-8 max-w-7xl">
+        <FeaturedHero title={mapName} subtitle={mapData.description} />
 
-                    <InteractiveMap
-                        mapName={mapName}
-                        handleAreaClick={handleAreaClick}
-                                        areas={mirageAreas}
-                    className="mb-8"                    />
+        <section ref={mapSectionRef} className="mt-8 mb-16">
+          <InteractiveMap
+            mapName={mapName}
+            handleAreaClick={handleAreaClick}
+            areas={mirageAreas}
+          />
+        </section>
 
-                    <div className="videos-section mt-8">
-                        <h2 className="text-2xl font-semibold mb-4">Videos related to {mapName}</h2>
-                        <div className="videos-list flex gap-4">
-                            <div className="video-thumbnail">Video 1</div>
-                            <div className="video-thumbnail">Video 2</div>
-                            <div className="video-thumbnail">Video 3</div>
+        <section className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Videos related to {mapName}</h2>
+          <div className="videos-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Placeholder Video Cards */}
+            {[1, 2, 3, 4, 5, 6].map((index) => (
+              <div key={index} className="bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img
+                  src="https://via.placeholder.com/400x225"
+                  alt={`Video Thumbnail ${index}`}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg mb-2">Dummy Video Title {index}</h3>
+                  <p className="text-gray-300 text-sm">Short description or uploader name...</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <button className="py-2 px-4 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors duration-300">
+              View More Videos
+            </button>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default MapPage;
                         </div>
                     </div>
                     <button className="mt-8 py-4 rounded-md bg-gray-800">Mehr anzeigen</button>
