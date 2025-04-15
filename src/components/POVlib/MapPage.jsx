@@ -60,7 +60,7 @@ function MapPage({ mapName }) {
     return <div>No data found for this map.</div>;
   }
 
-  const handleMapAreaClick = (area) => {
+  const handleAreaClick = (area) => {
     console.log(`Map area clicked: ${area}`);
     // Hier Demos für den geklickten Bereich anzeigen
   };
@@ -75,7 +75,7 @@ function MapPage({ mapName }) {
         {/* Interactive Map */}
         <InteractiveMap
           mapName={mapName}
-          onAreaClick={handleAreaClick}
+          handleAreaClick={handleAreaClick}
         />
 
         {/* Videos Section (placeholder) */}
