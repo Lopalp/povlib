@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import InteractiveMap from './InteractiveMap';
-
+import Navbar from './Navbar';
+import Footer from './Footer';
+import FeaturedHero from './FeaturedHero';
 function MapPage({ mapName }) {
   const [isLoading, setIsLoading] = useState(true);
   const [mapData, setMapData] = useState(null);
@@ -64,31 +66,35 @@ function MapPage({ mapName }) {
     console.log('Map area clicked:', area);
   };
 
-  const mirageAreas = mapName === 'mirage' ? [
-    { name: "A-Site", top: "20%", left: "10%", width: "30%", height: "30%" },
-    { name: "Mid", top: "40%", left: "40%", width: "20%", height: "20%" },
-    { name: "B-Site", top: "20%", left: "60%", width: "30%", height: "30%" },
-  ] : [];
+    const mirageAreas = mapName === 'mirage' ? [
+        { name: "A-Site", top: "20%", left: "10%", width: "30%", height: "30%" },
+        { name: "Mid", top: "40%", left: "40%", width: "20%", height: "20%" },
+        { name: "B-Site", top: "20%", left: "60%", width: "30%", height: "30%" },
+    ] : [];
 
-  return (
-    <div ref={mapSectionRef} className="map-page">
-      <h1>{mapName}</h1>
-      <div className="map-description">
-        <p>{mapData.description}</p>
-      </div>
+    return (
+        <div className="bg-gray-900 text-white min-h-screen">
+                <Navbar />
+            <main className="container mx-auto py-8">
+                <div ref={mapSectionRef} className="map-page">
+                    <h1 className="text-4xl font-bold mt-8 mb-4">{mapName}</h1>
+                    <div className="map-description mb-8">
+                        <p>{mapData.description}</p>
+                    </div>
 
-      <InteractiveMap
-        mapName={mapName}
-        handleAreaClick={handleAreaClick}
-        areas={mirageAreas}
-      />
+                    <InteractiveMap
+                        mapName={mapName}
+                        handleAreaClick={handleAreaClick}
+                                        areas={mirageAreas}
+                    className="mb-8"                    />
 
-      <div className="videos-section">
-        <h2>Videos related to {mapName}</h2>
-        <div className="videos-list">
-          <div className="video-thumbnail">Video 1</div>
-          <div className="video-thumbnail">Video 2</div>
-          <div className="video-thumbnail">Video 3</div>
+                    <div className="videos-section mt-8">
+                        <h2 className="text-2xl font-semibold mb-4">Videos related to {mapName}</h2>
+                        <div className="videos-list flex gap-4">
+                            <div className="video-thumbnail">Video 1</div>
+                            <div className="video-thumbnail">Video 2</div>
+                            <div className="video-thumbnail">Video 3</div>
+                        </div>
         </div>
         <button>Mehr anzeigen</button>
       </div>
