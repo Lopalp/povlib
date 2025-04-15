@@ -660,7 +660,11 @@ const MapPage = ({ mapName }) => {
               Object.keys(demosByPosition).map((position, idx) => (
                 <div key={idx} className="mb-8">
                   <h3 className="text-xl font-semibold mb-4">{position}</h3>
-                  <DemoCarousel demos={demosByPosition[position]} onSelectDemo={handleSelectDemo} />
+                  {demosByPosition[position] ? (
+                    <DemoCarousel demos={demosByPosition[position]} onSelectDemo={handleSelectDemo} /> 
+                  ) : (
+                    <p className="text-gray-300">No demos available for this position.</p>
+                  ) }
                 </div>
               ))
             ) : (
@@ -669,6 +673,20 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
         
+        {/* Recently Added POVs Section - Only visible if NOT on 'all-demos' tab */}
+        {activeTab !== 'all-demos' && (
+          allDemos.length > 0 ? (
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                <span className="border-l-4 border-yellow-400 pl-3 py-1">Recently Added POVs</span>
+              </h2>
+              <DemoCarousel demos={allDemos.slice(0, 10)} onSelectDemo={handleSelectDemo} />
+              {allDemos.length > 10 && <p className="text-gray-300 mt-4">Scroll down to the "All POVs" tab for more!</p>}
+            </div>
+          ) : (
+            <p className="text-gray-300">No recently added demos available for this map.</p>
+          )
+        )}
         {/* All POVs Tab */}
         {activeTab === 'all-demos' && (
           <div>
