@@ -58,17 +58,17 @@ function MapPage({ mapName }) {
     return <div>No data found for this map.</div>;
   }
 
+  const handleMapAreaClick = (area) => {
+    console.log(`Map area clicked: ${area}`);
+    // Hier Demos für den geklickten Bereich anzeigen
+  };
+
   return (
     <div ref={mapSectionRef} className="map-page">
         <h1>{mapName}</h1>
         <div className="map-description">
-        const handleMapAreaClick = (area) => {
-          console.log(`Map area clicked: ${area}`);
-          // Hier Demos für den geklickten Bereich anzeigen
-        };
-
           <p>{mapData.description}</p>
-        </div>
+        </div>        
 
         {/* Interactive Map */}
         <InteractiveMap
@@ -86,7 +86,7 @@ function MapPage({ mapName }) {
             <div className="video-thumbnail">Video 3</div>
             {/* ... more videos ... */}
           </div>
-          <button>Mehr anzeigen</button>
+          <button>Mehr anzeigen</button>          
         </div>        
       </div>
     );
