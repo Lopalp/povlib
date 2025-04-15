@@ -10,6 +10,7 @@ function MapPage({ mapName }) {
 
   // Map data
   const mapInformation = {
+    mirage: { description: "Mirage is a classic and well-balanced map in Counter-Strike. It features a three-lane design with a central mid area connecting two bombsite locations. The map encourages versatile strategies, combining elements of close-quarters combat and long-range engagements. Its iconic locations like A apartments, B apartments, and underpass are known for their tactical depth." },
     ancient: {
       description: "Ancient rewards methodical play and good utility usage. T-side often focuses on gaining mid control before committing to a site, while CT-side relies on crossfires and well-timed rotations. The tight corridors make flashbangs especially effective."
     },
@@ -73,6 +74,8 @@ function MapPage({ mapName }) {
       <InteractiveMap
         mapName={mapName}
         handleAreaClick={handleAreaClick}
+        mapImage={`/maps/${mapName}.webp`}
+        areas={{}}
       />
 
       <div className="videos-section">

@@ -8,6 +8,7 @@
 //     - width: The width of the area as a percentage.
 //     - height: The height of the area as a percentage.
 //   handleAreaClick: A function to be called when an area is clicked.  It will receive the area name as an argument.
+//   mapImage: The URL of the map image.
 
 import React from 'react';
 
@@ -17,6 +18,7 @@ function InteractiveMap({
     { name: 'Area 2', top: '40%', left: '50%', width: '15%', height: '25%' },
   ],
   handleAreaClick,
+  mapImage,
 }) {
   return (
     <div
@@ -27,6 +29,8 @@ function InteractiveMap({
         height: '0',
         paddingBottom: '56.25%',
         display: 'block',
+        backgroundImage: `url(${mapImage})`,
+        backgroundSize: 'cover',
       }}
     >
       {areas &&
