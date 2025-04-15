@@ -9,7 +9,7 @@ import DemoCard from './DemoCard';
 import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
-import { getDemosByMap, getFilterOptions, updateDemoStats, updateDemoTags, updateDemoPositions } from '../../lib/supabase'; // Import helper functions
+import { getDemosByMap, getFilterOptions, updateDemoStats, updateDemoTags, updateDemoPositions, getTrendingDemos } from '../../lib/supabase'; // Import helper functions
 import { CategorySection } from '../containers/CategorySection';
 import { LoadingFullscreen } from '../loading/LoadingFullscreen';
 import { Filter } from 'lucide-react';
@@ -58,7 +58,7 @@ function MapPage({ mapName }) {
   };
 
   const mapDemoData = (demo) => ({
-    id: demo.id,
+    id: demo?.id,
     title: demo.title,
     thumbnail: demo.thumbnail,
     videoId: demo.video_id,
@@ -68,12 +68,13 @@ function MapPage({ mapName }) {
     players: demo.players || [],
     team: demo.team,
     year: demo.year,
-    event: demo.event,
+    event: demo?.event,
     result: demo.result,
     views: demo.views || 0,
     likes: demo.likes || 0,
     isPro: demo.is_pro,
   });
+
 
   const handleSwitchDemoType = (type) => {
     setDemoType(type);
@@ -171,7 +172,7 @@ function MapPage({ mapName }) {
       setFilterOptions(options);
 
       const initialTrending = [...mappedDemos]
-        .sort((a, b) => (b.views || 0) - (a.views || 0))
+        .sort((a, b) => (b?.views || 0) - (a?.views || 0))
         .slice(0, 5);
       setTrendingDemos(initialTrending);
 
