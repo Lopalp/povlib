@@ -491,10 +491,7 @@ const MapPage = ({ mapName }) => {
         <div className="container mx-auto px-6 pt-32 pb-16 relative z-20">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">{formattedMapName}</h1>
-            
-            <p className="text-gray-300 text-lg mb-8">
-              {map.description}
-            </p>
+            <p className="text-gray-300 text-lg mb-8">{map.description}</p>
             
             <div className="flex flex-wrap gap-4">
               <button
@@ -502,7 +499,7 @@ const MapPage = ({ mapName }) => {
                   setActiveTab('overview');
                   scrollToMapSection();
                 }}
-                className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
+                className="hidden px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
               >
                 <MapPin className="h-5 w-5 mr-2" />
                 Map Overview
@@ -544,6 +541,12 @@ const MapPage = ({ mapName }) => {
                 </div>
               </div>
             </div>
+            {/* Display Map Strategy */}
+            <div className="mt-8">
+              <h3 className="text-white font-bold mb-3 flex items-center"><Info className="h-4 w-4 mr-2 text-yellow-400" />Map Strategy</h3>
+              <p className="text-gray-300 text-lg">{map.strategy}</p>
+            </div>
+            
           </div>
         </div>
       </div>
@@ -553,16 +556,7 @@ const MapPage = ({ mapName }) => {
         <div className="container mx-auto px-6">
           <div className="flex overflow-x-auto custom-scrollbar">
             <button
-              className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
-                activeTab === 'overview' 
-                  ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              onClick={() => setActiveTab('overview')}
-            >
-              Map Overview
-            </button>
-            <button
+              
               className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
                 activeTab === 'callouts' 
                   ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent' 
@@ -608,31 +602,6 @@ const MapPage = ({ mapName }) => {
       
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 bg-pattern" ref={mapSectionRef}>
-        {/* Map Overview Tab */}
-        {activeTab === 'overview' && (
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="md:col-span-2">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  <span className="border-l-4 border-yellow-400 pl-3 py-1">About {formattedMapName}</span>
-                </h2>
-                
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
-                  <p className="text-gray-300 mb-4">{map.description}</p>
-                  
-                  <h3 className="text-white font-bold mb-3 flex items-center">
-                    <Info className="h-4 w-4 mr-2 text-yellow-400" />
-                    Map Strategy
-                  </h3>
-                  <p className="text-gray-300 mb-6">{map.strategy}</p>
-                </div>
-              </div>
-              <div>
-                {/* Additional content or media can be added here */}
-              </div>
-            </div>
-          </div>
-        )}
         
         {/* Callouts Tab */}
         {activeTab === 'callouts' && (
