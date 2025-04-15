@@ -208,7 +208,13 @@ const MapPage = ({ mapName }) => {
     
     window.scrollTo(0, 0);
   };
-  
+
+  const playRandomDemo = () => {
+    if (allDemos.length > 0) {
+      const randomIndex = Math.floor(Math.random() * allDemos.length);
+      handleSelectDemo(allDemos[randomIndex]);
+    }
+  };
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
     setIsVideoPlayerOpen(false);
@@ -489,7 +495,7 @@ const MapPage = ({ mapName }) => {
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
         
         <div className="container mx-auto px-6 pt-32 pb-16 relative z-20">
-          <div className="max-w-3xl">
+          <div className="max-w-5xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">{formattedMapName}</h1>
             <p className="text-gray-300 text-lg mb-8">{map.description}</p>
             
@@ -499,7 +505,7 @@ const MapPage = ({ mapName }) => {
                   setActiveTab('overview');
                   scrollToMapSection();
                 }}
-                className="hidden px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
+                className=" px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
               >
                 <MapPin className="h-5 w-5 mr-2" />
                 Map Overview
@@ -512,7 +518,24 @@ const MapPage = ({ mapName }) => {
                 <Filter className="h-5 w-5 mr-2" />
                 Filter POVs
               </button>
+              {/* Play Random Demo Button */}
+              {allDemos.length > 0 && (
+                <button
+                  onClick={playRandomDemo}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all flex items-center"
+                >
+                  <ChevronRight className="h-5 w-5 mr-2" />
+                  Play Random Demo
+                </button>
+              )}
             </div>
+             {/* Video Player (Conditionally Rendered) */}
+             <div className="w-full max-w-4xl mx-auto mb-8">
+              {allDemos.length > 0 && (
+                <DemoCard demo={allDemos[0]} onSelectDemo={handleSelectDemo} onLike={handleLikeDemo} />
+              )}
+            </div>
+
             
             <div className="mt-8 flex flex-wrap gap-2">
               <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
@@ -551,57 +574,10 @@ const MapPage = ({ mapName }) => {
         </div>
       </div>
       
-      {/* Tab Navigation */}
-      <div className="bg-gray-900 border-b border-gray-800 sticky top-16 z-30">
-        <div className="container mx-auto px-6">
-          <div className="flex overflow-x-auto custom-scrollbar">
-            <button
-              
-              className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
-                activeTab === 'callouts' 
-                  ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              onClick={() => setActiveTab('callouts')}
-            >
-              Callouts
-            </button>
-            <button
-              className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
-                activeTab === 'positions' 
-                  ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              onClick={() => setActiveTab('positions')}
-            >
-              Positions
-            </button>
-            <button
-              className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
-                activeTab === 'all-demos' 
-                  ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              onClick={() => setActiveTab('all-demos')}
-            >
-              All POVs
-            </button>
-            <button
-              className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
-                activeTab === 'strategies' 
-                  ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              onClick={() => setActiveTab('strategies')}
-            >
-              Strategies
-            </button>
-          </div>
-        </div>
-      </div>
-      
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 bg-pattern" ref={mapSectionRef}>
+      
+
         
         {/* Callouts Tab */}
         {activeTab === 'callouts' && (
