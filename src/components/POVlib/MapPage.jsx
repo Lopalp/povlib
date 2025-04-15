@@ -95,11 +95,12 @@ function MapPage({ mapName }) {
                             <div className="video-thumbnail">Video 2</div>
                             <div className="video-thumbnail">Video 3</div>
                         </div>
+                    </div>
+                    <button className="mt-8 py-4 rounded-md bg-gray-800">Mehr anzeigen</button>
+                </div>
+            </main>
+            <Footer />
         </div>
-        <button>Mehr anzeigen</button>
-      </div>
-    </div>
-  );
+    );
 }
-
 export default MapPage;
