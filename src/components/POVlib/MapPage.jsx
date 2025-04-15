@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import InteractiveMap from './InteractiveMap';
 
 function MapPage({ mapName }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -57,42 +58,37 @@ function MapPage({ mapName }) {
     return <div>No data found for this map.</div>;
   }
 
-  const handleMapAreaClick = (area) => {
-    console.log(`Map area clicked: ${area}`);
-    // Hier Demos für den geklickten Bereich anzeigen
-  };
-
   return (
     <div ref={mapSectionRef} className="map-page">
         <h1>{mapName}</h1>
-      {/* Map Description */}
-      <div className="map-description">
-        <p>{mapData.description}</p>
-      </div>
+        <div className="map-description">
+        const handleMapAreaClick = (area) => {
+          console.log(`Map area clicked: ${area}`);
+          // Hier Demos für den geklickten Bereich anzeigen
+        };
 
-      {/* Interactive Map (placeholder) */}
-      <div className="interactive-map">
-        <h2>Interactive Map</h2>
-        <div className="map-placeholder" onClick={() => handleMapAreaClick('Clicked Area')}>
-          Click on map areas to view demos.
-          {/* Here would be an image or a SVG to display the map, with onclick events on parts of it */}
+          <p>{mapData.description}</p>
         </div>
-      </div>
 
-      {/* Videos Section (placeholder) */}
-      <div className="videos-section">
-        <h2>Videos related to {mapName}</h2>
-        <div className="videos-list">
-          {/* Placeholder for video thumbnails */}
-          <div className="video-thumbnail">Video 1</div>
-          <div className="video-thumbnail">Video 2</div>
-          <div className="video-thumbnail">Video 3</div>
-          {/* ... more videos ... */}
-        </div>
-        <button>Mehr anzeigen</button>
+        {/* Interactive Map */}
+        <InteractiveMap
+          mapName={mapName}
+          onAreaClick={handleAreaClick}
+        />
+
+        {/* Videos Section (placeholder) */}
+        <div className="videos-section">
+          <h2>Videos related to {mapName}</h2>
+          <div className="videos-list">
+            {/* Placeholder for video thumbnails */}
+            <div className="video-thumbnail">Video 1</div>
+            <div className="video-thumbnail">Video 2</div>
+            <div className="video-thumbnail">Video 3</div>
+            {/* ... more videos ... */}
+          </div>
+          <button>Mehr anzeigen</button>
+        </div>        
       </div>
-    </div>
-  );
+    );
 }
-
 export default MapPage;
