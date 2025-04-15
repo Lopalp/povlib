@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Play, Shield, Tag as TagIcon } from 'lucide-react';
 
+
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   // Handle clicking on player links without triggering card selection
   const handlePlayerClick = (e, player) => {
