@@ -107,23 +107,5 @@ function MapPage({ mapName }) {
           <div className="text-center mt-8">
             <button className="py-2 px-4 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors duration-300">
               View More Videos
-            </button>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
-}
-
-export default MapPage;
-                        </div>
-                    </div>
-                    <button className="mt-8 py-4 rounded-md bg-gray-800">Mehr anzeigen</button>
-                </div>
-            </main>
-            <Footer />
-        </div>
-    );
-}
-export default MapPage;
+            </button></div></section></main><Footer /></div>);
+}export default MapPage;
