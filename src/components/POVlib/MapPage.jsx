@@ -14,8 +14,20 @@ import { CategorySection } from '../containers/CategorySection';
 import { LoadingFullscreen } from '../loading/LoadingFullscreen';
 import { Filter } from 'lucide-react';
 
+const mapDescriptions = {
+  mirage: "Mirage is a classic and well-balanced map in Counter-Strike. It features a three-lane design with a central mid area connecting two bombsite locations. The map encourages versatile strategies, combining elements of close-quarters combat and long-range engagements. Its iconic locations like A apartments, B apartments, and underpass are known for their tactical depth.",
+  inferno: "Inferno is known for its narrow streets and tight corners, favoring tactical grenades and close-quarters combat. The map has two bombsites, A and B, each with multiple entry points, demanding coordinated attacks and strong defenses. Controlling key areas like Banana and Apartments is crucial for success.",
+  nuke: "Nuke is a unique two-level map set in a nuclear facility. Bombsite A is on the upper floor, while B is directly below. The vertical gameplay creates complex rotation dynamics and requires specific strategies. The outdoor area offers long sightlines for AWPers, while the tight corridors inside demand tactical utility usage.",
+  overpass: "Overpass is a CT-sided map at higher levels of play. T-side strategies often involve gaining control of connector or water for mid-round rotations. Fast B executes through monster and unique boosts are common tactics. The map features a mix of open areas and tight, vertical pathways.",
+  ancient: "Ancient rewards methodical play and good utility usage. T-side often focuses on gaining mid control before committing to a site, while CT-side relies on crossfires and well-timed rotations. The tight corridors make flashbangs especially effective, and controlling the chokepoints is key to success.",
+  vertigo: "Vertigo is set atop a skyscraper under construction, featuring tight corridors and exposed edges. It is known for its verticality, where a single misstep can result in a fatal fall. The two bomb sites are located at opposite ends of the structure, connected by narrow walkways and scaffolding.",
+  anubis: "Anubis is one of the newer maps in the competitive pool, featuring an Egyptian theme. It has two bombsites with multiple approaches to each. The layout includes a mix of open areas and tight corridors, with a complex mid section that offers various tactical options. Controlling the canals and mid is crucial for map control.",
+  dust2: "Dust2 is the most iconic Counter-Strike map, featuring a simple but balanced design. It has two bombsites, with A accessible via long doors and short, and B via the famous B tunnels. The mid area connects to both sites and offers crucial control options. The map favors both aggressive pushes and tactical holds."
+};
+
 function MapPage({ mapName }) {
   const [isLoading, setIsLoading] = useState(true);
+  const [mapDescription, setMapDescription] = useState('');
   const [allDemos, setAllDemos] = useState([]);
   const [demosByYear, setDemosByYear] = useState({});
   const [demosByEvent, setDemosByEvent] = useState({});
@@ -257,9 +269,20 @@ function MapPage({ mapName }) {
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <Navbar demoType={demoType} onSwitchDemoType={handleSwitchDemoType} />
       <main className="container mx-auto px-4 py-8 max-w-7xl custom-scrollbar">
-        <FeaturedHero title={mapName} subtitle={`Explore professional CS:GO demos on ${mapName}`} />
+        {/* Header */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
 
-        <section ref={mapSectionRef} className="mt-8 mb-16">
+          <div className="container mx-auto px-6 pt-12 pb-16 relative z-20">
+            <div className="text-center md:text-left">
+              <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white">{mapName}</h1>
+              <p className="text-gray-300 mb-6 max-w-2xl">{mapDescription}</p>
+            </div>
+          </div>
+        </div>
+
+        <section ref={mapSectionRef} className="mb-16 mt-12">
           <InteractiveMap mapName={mapName} handleAreaClick={handleAreaClick} areas={mirageAreas} />
         </section>
 
