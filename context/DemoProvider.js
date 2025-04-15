@@ -1,13 +1,24 @@
 "use client";
 import { createContext, useState, useContext, useMemo } from "react";
+import { useNavbar } from "./NavbarProvider";
 
 const DemoContext = createContext(null);
 
-export default function DemoProvider({ children }) {
+export default function DemoProvider({ children, initialDemos }) {
 
-    const [filteredDemos, setFilteredDemos] = useState([]);
-    const [trendingDemos, setTrendingDemos] = useState([]);
-    const [latestDemos, setLatestDemos] = useState([]);
+    const {
+      searchActive,
+      setSearchActive,
+      demoType,
+      setDemoType,
+      isMenuOpen,
+      setIsMenuOpen,
+    } = useNavbar();
+
+    const [filteredDemos, setFilteredDemos] = useState(initialDemos.filteredDemos || []);
+    const [trendingDemos, setTrendingDemos] = useState(initialDemos.trendingDemos || []);
+    const [latestDemos, setLatestDemos] = useState(initialDemos.latestDemos || []);
+    const [searchQuery, setSearchQuery] = useState(null);
     const [mapDemos, setMapDemos] = useState({});
     const [positionDemos, setPositionDemos] = useState({});
     const [filterOptions, setFilterOptions] = useState({
@@ -30,6 +41,24 @@ export default function DemoProvider({ children }) {
       search: searchQuery
     });
 
+  // Dynamische Tags
+  const dynamicTags = useMemo(() => {
+    const tagsSet = new Set();
+    filteredDemos.forEach(demo => {
+      demo.tags.forEach(tag => tagsSet.add(tag));
+    });
+    tagsSet.add("Karten");
+    tagsSet.add("Spieler");
+    tagsSet.add("Teams");
+    tagsSet.add("Karte + CT Position");
+    return Array.from(tagsSet);
+  }, [filteredDemos]);
+
+  const handleTagClick = (tag) => {
+    setSearchQuery(tag);
+    setFiltersApplied(prev => ({ ...prev, search: tag }));
+  };
+
   const value = useMemo(
     () => ({
       filteredDemos,
@@ -38,6 +67,12 @@ export default function DemoProvider({ children }) {
       setTrendingDemos,
       latestDemos,
       setIsMenuOpen,
+      searchQuery,
+      setSearchQuery,
+      filtersApplied,
+      setFiltersApplied,
+      dynamicTags,
+      handleTagClick
     }),
     [searchActive, demoType, isMenuOpen]
   );
@@ -48,9 +83,9 @@ export default function DemoProvider({ children }) {
 }
 
 export function useDemos() {
-  const context = useContext(NavbarContext);
+  const context = useContext(DemoContext);
   if (context === null) {
-    throw new Error("useNavbar must be used within a NavbarProvider");
+    throw new Error("useDemo must be used within a DemoProvider");
   }
   return context;
 }

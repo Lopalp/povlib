@@ -3,6 +3,7 @@
     "paths": {
       "@/lib/*": ["./src/lib/*"],
       "@/components/*": ["./src/components/*"],
+      "@/context/*": ["./context/*"]
     },
     "target": "ES2017",
     "lib": [

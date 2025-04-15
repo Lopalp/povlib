@@ -1,5 +1,4 @@
-// context/UserProvider.js (or wherever you have it)
-"use client"; // Provider must be a client component
+"use client";
 import {
   useEffect,
   useState,

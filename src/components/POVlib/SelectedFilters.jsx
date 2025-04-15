@@ -1,13 +1,23 @@
+"use client"
 import React from 'react';
 import { X } from 'lucide-react';
+import { useDemos } from '@/context/DemoProvider';
 
-const SelectedFilters = ({ filtersApplied, setFiltersApplied, searchQuery }) => {
+const SelectedFilters = () => {
+
+  const {
+    searchQuery,
+    filtersApplied,
+    setFiltersApplied
+  } = useDemos();
+
   const hasFilters = Object.values(filtersApplied).some(val => val !== '');
   if (!hasFilters) return null;
-  
+
   return (
     <div className="flex flex-wrap gap-2 mb-8 p-4 bg-gray-800 rounded-xl border border-gray-700">
       {Object.entries(filtersApplied).map(([key, value]) => {
+        console.debug(key, value, 'key, value');
         if (!value || key === 'search') return null;
         return (
           <div key={key} className="flex items-center bg-gray-700 text-xs rounded-full px-3 py-2 group hover:bg-gray-600 transition-colors">

@@ -19,9 +19,9 @@ import VideoPlayerPage from './POVlib/VideoPlayerPage';
 import TaggingModal from './POVlib/TaggingModal';
 import FilterModal from './POVlib/FilterModal';
 import Footer from './POVlib/Footer';
-import FeaturedHero from './POVlib/FeaturedHero';
+import FeaturedHero from './content/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
-import { CategorySection } from './containers/CategorySection';
+import { CategorySection } from './content/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
 import ErrorWindow from './error/ErrorWindow';
 

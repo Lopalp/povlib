@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, {useState} from 'react';
 import { Play, Filter, ChevronDown, Star } from 'lucide-react';
-import YouTubeEmbed from './YouTubeEmbed';
+import YouTubeEmbed from '../POVlib/YouTubeEmbed';
+import { useDemos } from '@/context/DemoProvider';
 
-const FeaturedHero = ({ 
-  demo, 
-  autoplayVideo, 
-  setSelectedDemo, 
-  setActiveVideoId, 
-  setIsFilterModalOpen 
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
+const FeaturedHero = () => {
+
+  const { 
+    demos,
+    filteredDemos,
+    setFilteredDemos,
+    setIsFilterModalOpen,
+    autoplayVideo,
+    setActiveVideoId 
+  } = useDemos();
+
+  const demo = filteredDemos[0];
   const [showFullDescription, setShowFullDescription] = useState(false);
-  
-  useEffect(() => {
-    setIsVisible(true);
-    return () => setIsVisible(false);
-  }, [demo]);
 
   if (!demo) return null;
 
@@ -53,7 +54,7 @@ const FeaturedHero = ({
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/50 z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay z-5"></div>
-        <div className={`absolute inset-0 transition-all duration-1000 ${isVisible ? 'opacity-60' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 transition-all duration-1000 ${demo ? 'opacity-60' : 'opacity-0'}`}>
           <YouTubeEmbed 
             videoId={demo.videoId} 
             title={demo.title} 
@@ -70,7 +71,7 @@ const FeaturedHero = ({
       
       {/* Content Overlay */}
       <div className="relative z-20 container mx-auto h-full flex items-center px-8">
-        <div className={`max-w-2xl transition-all duration-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`max-w-2xl transition-all duration-700 transform ${demo ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="mb-6 space-y-2">
             <div className="flex items-center gap-2 mb-4">
               <span className="bg-yellow-400 text-gray-900 font-bold rounded-full px-3 py-1 text-sm flex items-center gap-1">
@@ -103,17 +104,17 @@ const FeaturedHero = ({
           </h1>
           
           <div className="relative">
-            <p className={`text-gray-300 text-lg max-w-xl mb-6 ${showFullDescription ? '' : 'line-clamp-2'} transition-all duration-300`}>
-              {description}
-            </p>
-            {description.length > 120 && !showFullDescription && (
-              <button 
-                onClick={() => setShowFullDescription(true)}
-                className="text-yellow-400 hover:text-yellow-300 text-sm flex items-center gap-1 transition-colors"
-              >
-                Show more <ChevronDown className="w-4 h-4" />
-              </button>
-            )}
+              <p className={`text-gray-300 text-lg max-w-xl mb-6 ${showFullDescription ? '' : 'line-clamp-2'} transition-all duration-300`}>
+                  {description}
+              </p>
+              {description.length > 120 && !showFullDescription && (
+                  <button 
+                      onClick={() => setShowFullDescription(true)}
+                      className="text-yellow-400 hover:text-yellow-300 text-sm flex items-center gap-1 transition-colors"
+                  >
+                      Show more <ChevronDown className="w-4 h-4" />
+                  </button>
+              )}
           </div>
           
           <div className="flex flex-wrap items-center gap-4 mt-8">

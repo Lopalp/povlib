@@ -1,23 +1,25 @@
 import POVlib from '../components/POVlib.jsx';
-import FeaturedHero from '@/components/POVlib/FeaturedHero.jsx';
+import FeaturedHero from '@/components/content/FeaturedHero.jsx';
+import SelectedFilters from '@/components/POVlib/SelectedFilters.jsx';
+import DemoFilters from '@/components/menus/DemoFilters.jsx';
 
 export default function Home() {
 
 	return (
-		<main>
+		<>
 			<div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
 
-			{filteredDemos.length > 0 && !selectedDemo && (
-				<FeaturedHero
-				demo={filteredDemos[1]}
-				autoplayVideo={autoplayVideo}
-				setSelectedDemo={onSelectDemo}
-				setActiveVideoId={setActiveVideoId}
-				setIsFilterModalOpen={setIsFilterModalOpen}
-				/>
-			)}
+        	<FeaturedHero />
+
+			<main className="container mx-auto px-6 py-6 bg-pattern">
+
+				<SelectedFilters />
+
+				<DemoFilters />
+
+			</main>
 
 			</div>
-		</main>
+		</>
 	)
 }
