@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const ContentTabs = ({ activeTab, setActiveTab }) => {
   return (
     <div className="mb-8 border-b border-gray-700">
