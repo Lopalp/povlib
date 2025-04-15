@@ -64,6 +64,12 @@ function MapPage({ mapName }) {
     console.log('Map area clicked:', area);
   };
 
+  const mirageAreas = mapName === 'mirage' ? [
+    { name: "A-Site", top: "20%", left: "10%", width: "30%", height: "30%" },
+    { name: "Mid", top: "40%", left: "40%", width: "20%", height: "20%" },
+    { name: "B-Site", top: "20%", left: "60%", width: "30%", height: "30%" },
+  ] : [];
+
   return (
     <div ref={mapSectionRef} className="map-page">
       <h1>{mapName}</h1>
@@ -74,8 +80,7 @@ function MapPage({ mapName }) {
       <InteractiveMap
         mapName={mapName}
         handleAreaClick={handleAreaClick}
-        mapImage={`/maps/${mapName}.webp`}
-        areas={{}}
+        areas={mirageAreas}
       />
 
       <div className="videos-section">

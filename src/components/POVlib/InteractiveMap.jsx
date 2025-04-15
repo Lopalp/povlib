@@ -13,12 +13,7 @@
 import React from 'react';
 
 function InteractiveMap({
-  areas = [
-    { name: 'Area 1', top: '10%', left: '10%', width: '20%', height: '20%' },
-    { name: 'Area 2', top: '40%', left: '50%', width: '15%', height: '25%' },
-  ],
-  handleAreaClick,
-  mapImage,
+  areas = [], handleAreaClick, mapImage
 }) {
   return (
     <div
@@ -29,7 +24,7 @@ function InteractiveMap({
         height: '0',
         paddingBottom: '56.25%',
         display: 'block',
-        backgroundImage: `url(${mapImage})`,
+        backgroundImage: `url(${mapImage ? `/maps/${mapImage}.webp` : '/window.svg'})`,
         backgroundSize: 'cover',
       }}
     >
