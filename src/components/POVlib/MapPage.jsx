@@ -8,7 +8,7 @@ function MapPage({ mapName }) {
   const [mapData, setMapData] = useState(null);
   const mapSectionRef = useRef(null);
 
-  // Map data - adjusted to remove callouts and strategy
+  // Map data
   const mapInformation = {
     ancient: {
       description: "Ancient rewards methodical play and good utility usage. T-side often focuses on gaining mid control before committing to a site, while CT-side relies on crossfires and well-timed rotations. The tight corridors make flashbangs especially effective."
@@ -31,26 +31,25 @@ function MapPage({ mapName }) {
   };
 
   useEffect(() => {
-      const loadMapData = async () => {
-        try {
-          setIsLoading(true);
-          // Simulated API call or data loading
-          setTimeout(() => {
-              if (mapName && mapInformation[mapName]) {
-                  setMapData(mapInformation[mapName]);
-              } else {
-                setMapData({description : "no information for this map"});
-              }
-            setIsLoading(false);
-          }, 1000); // Simulate loading time
-        } catch (error) {
-          console.error('Error loading map data:', error);
+    const loadMapData = async () => {
+      try {
+        setIsLoading(true);
+        setTimeout(() => {
+          if (mapName && mapInformation[mapName]) {
+            setMapData(mapInformation[mapName]);
+          } else {
+            setMapData({ description: "no information for this map" });
+          }
           setIsLoading(false);
-        }
-      };
-  
-      loadMapData();
-    }, [mapName]);
+        }, 1000);
+      } catch (error) {
+        console.error('Error loading map data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadMapData();
+  }, [mapName]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -61,36 +60,32 @@ function MapPage({ mapName }) {
   }
 
   const handleAreaClick = (area) => {
-    console.log(`Map area clicked: ${area}`);
-    // Hier Demos für den geklickten Bereich anzeigen
+    console.log('Map area clicked:', area);
   };
 
   return (
     <div ref={mapSectionRef} className="map-page">
-        <h1>{mapName}</h1>
-        <div className="map-description">
-          <p>{mapData.description}</p>
-        </div>        
-
-        {/* Interactive Map */}
-        <InteractiveMap
-          mapName={mapName}
-          handleAreaClick={handleAreaClick}
-        />
-
-        {/* Videos Section (placeholder) */}
-        <div className="videos-section">
-          <h2>Videos related to {mapName}</h2>
-          <div className="videos-list">
-            {/* Placeholder for video thumbnails */}
-            <div className="video-thumbnail">Video 1</div>
-            <div className="video-thumbnail">Video 2</div>
-            <div className="video-thumbnail">Video 3</div>
-            {/* ... more videos ... */}
-          </div>
-          <button>Mehr anzeigen</button>          
-        </div>        
+      <h1>{mapName}</h1>
+      <div className="map-description">
+        <p>{mapData.description}</p>
       </div>
-    );
+
+      <InteractiveMap
+        mapName={mapName}
+        handleAreaClick={handleAreaClick}
+      />
+
+      <div className="videos-section">
+        <h2>Videos related to {mapName}</h2>
+        <div className="videos-list">
+          <div className="video-thumbnail">Video 1</div>
+          <div className="video-thumbnail">Video 2</div>
+          <div className="video-thumbnail">Video 3</div>
+        </div>
+        <button>Mehr anzeigen</button>
+      </div>
+    </div>
+  );
 }
+
 export default MapPage;
