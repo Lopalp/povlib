@@ -1,6 +1,6 @@
 import React from 'react';
 
-function InteractiveMap({ mapImage, areas, onAreaClick }) {
+function InteractiveMap({ mapImage, areas, handleAreaClick }) {
   return (
     <div className="interactive-map" style={{ position: 'relative', width: '100%', height: '0', paddingBottom: '56.25%', backgroundImage: `url(${mapImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
       {areas.map((area) => (
@@ -14,7 +14,7 @@ function InteractiveMap({ mapImage, areas, onAreaClick }) {
             height: area.height,
             cursor: 'pointer',
           }}
-          onClick={() => onAreaClick(area.name)}
+          onClick={() => handleAreaClick(area.name)}
         />
       ))}
     </div>
