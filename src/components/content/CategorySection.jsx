@@ -1,24 +1,25 @@
-// ────────────────
-// CategorySection
-// ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
-// sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
-// Mit "View More" wird eine weitere Zeile freigeschaltet.
-// ────────────────
-// CategorySection
-// ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Mit verbesserten Abständen zwischen den Karten für ein besseres visuelles Layout.
-// Mit "View More" wird eine weitere Zeile freigeschaltet.
+"use client";
 import { useRef, useState, useEffect } from "react";
 import DemoCard from "../POVlib/DemoCard";
+import { useDemos } from "@/context/DemoProvider";
 
-export const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
+export const CategorySection = ({ title, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
   const [visibleRows, setVisibleRows] = useState(1);
   const [cardWidth, setCardWidth] = useState(minCardWidth);
+  const [canViewMore, setCanViewMore] = useState(false);
+
+  const [rows, setRows] = useState([]);
+
+  const { 
+      demos,
+      filteredDemos,
+      setFilteredDemos,
+      setIsFilterModalOpen,
+      autoplayVideo,
+      setActiveVideoId 
+    } = useDemos();
 
   useEffect(() => {
     const updateItemsPerRow = () => {
@@ -34,23 +35,32 @@ export const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280
         const newCardWidth = (containerWidth - (finalItems - 1) * gap) / finalItems;
         setCardWidth(Math.floor(newCardWidth));
       }
+
+      if (demos) {
+        const visibleCount = itemsPerRow * visibleRows;
+        const visibleDemos = demos.slice(0, visibleCount);
+
+        // Aufteilen in Zeilen
+        for (let i = 0; i < visibleDemos.length; i += itemsPerRow) {
+          setRows(prevRows => [
+            ...prevRows,
+            visibleDemos.slice(i, i + itemsPerRow)
+          ]);
+        }
+
+        setCanViewMore(demos.length > visibleCount);
+
+      }
     };
 
     updateItemsPerRow();
     window.addEventListener("resize", updateItemsPerRow);
     return () => window.removeEventListener("resize", updateItemsPerRow);
-  }, [minCardWidth, maxColumns, gap]);
+  }, [minCardWidth, maxColumns, gap, demos]);
 
-  const visibleCount = itemsPerRow * visibleRows;
-  const visibleDemos = demos.slice(0, visibleCount);
-
-  // Aufteilen in Zeilen
-  const rows = [];
-  for (let i = 0; i < visibleDemos.length; i += itemsPerRow) {
-    rows.push(visibleDemos.slice(i, i + itemsPerRow));
-  }
-
-  const canViewMore = demos.length > visibleCount;
+  const onSelectDemo = (demo) => {
+    router.push(`/demos/${demo.id}`);
+  };
 
   return (
     <section className="mt-8 mb-6">
