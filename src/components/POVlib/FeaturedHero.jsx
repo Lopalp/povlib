@@ -122,7 +122,7 @@ const FeaturedHero = ({
                 setSelectedDemo(demo);
                 setActiveVideoId(demo.videoId);
               }}
-              className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-md hover:bg-yellow-300 transition-all duration-300 shadow-[0_0_15px_rgba(250,204,21,0.5)] flex items-center group"
+              className="px-6 py-3 bg-green-400 text-gray-900 font-bold rounded-md hover:bg-green-300 transition-all duration-300 shadow-[0_0_15px_rgba(0,255,0,0.5)] flex items-center group"
             >
               <Play className="h-5 w-5 mr-2 transition-transform duration-300 group-hover:scale-110" fill="currentColor" />
               Watch Full POV
