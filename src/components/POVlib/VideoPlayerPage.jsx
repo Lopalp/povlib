@@ -95,6 +95,27 @@ const VideoPlayerPage = ({
                     />
               </div>
               
+              {/* Placeholder for new features */}
+              {/* Add features like download .dem, utils list, and matchroom button here */}
+              <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
+                <h2 className="text-xl font-bold text-white mb-4">Additional Features</h2>
+
+                {/* Download .dem button placeholder */}
+                <button className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition-colors mb-4">
+                  Download .dem
+                </button>
+
+                {/* Utilities list placeholder */}
+                <div className="mb-4">
+                  <h3 className="text-gray-300 font-medium mb-2">Utilities Used:</h3>
+                  <p className="text-gray-400">Placeholder for clickable list of utilities (e.g., Smokes, Flashes, Molotovs) that jump to timestamp.</p>
+                </div>
+
+                {/* Matchroom button placeholder */}
+                <button className="bg-gray-700 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 transition-colors">
+                  Go to Matchroom
+                </button>
+              </div>
               {/* Video Info */}
               <div className="mt-6">
                 <h1 className="text-2xl font-bold text-white mb-2">{selectedDemo.title}</h1>
