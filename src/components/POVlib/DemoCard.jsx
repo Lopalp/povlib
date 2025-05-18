@@ -19,7 +19,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
  <div
       className={`relative flex flex-col overflow-hidden rounded-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-2`}
       onClick={() => onSelect(demo)}
-    >
+ >
       {/* Thumbnail Section with padding */}
       <div className="relative aspect-video overflow-hidden w-full rounded-md">
         <img 
@@ -37,57 +37,60 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
       </div>
       
-      {/* Content Section - YouTube-like info below thumbnail with padding */}
+      {/* Content Section - Structured Layout */}
       <div className="pt-2 flex-grow flex flex-col">
         {/* Title */}
-        <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-2">
+        <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-1">
           {demo.title}
         </h3>  
 
-        {/* Map, PRO/COMMUNITY, and Year */}
-        <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
- <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded">
+        {/* Map, Type, Year */}
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+          <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded">
             {demo.map}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${demo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
             {demo.isPro ? 'PRO' : 'COMMUNITY'}
           </span>
-          <div>{demo.year}</div>
+          <div className="text-gray-400">{demo.year}</div>
         </div>
 
         {/* Team and Players */}
-          {demo.team && (
+        <div className="mb-2">
+          {demo.team && ( /* Conditional rendering for team */
 
             <div className="text-xs text-gray-300 flex items-center mr-2">
               <Shield className="h-3 w-3 mr-1 text-yellow-400" />
               <span>{demo.team}</span>
             </div>
           )}
-         <div className="text-yellow-400 text-xs font-medium mb-2 line-clamp-1">
-           {demo.players.map((player, idx) => (
-             <React.Fragment key={idx}>
-               {idx > 0 && ", "}
-               <Link 
-                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                 className="hover:underline hover:text-yellow-300"
-                 onClick={(e) => handlePlayerClick(e, player)}
-               >
-                 {player}
-               </Link>
-             </React.Fragment>
-           ))}
-         </div>
+          <div className="text-yellow-400 text-xs font-medium line-clamp-1">
+            {demo.players.map((player, idx) => (
+              <React.Fragment key={idx}>
+                {idx > 0 && ", "}
+                <Link 
+                  href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                  className="hover:underline hover:text-yellow-300"
+                  onClick={(e) => handlePlayerClick(e, player)}
+                >
+                  {player}
+                </Link>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
 
          {/* Tags and Positions Row */}
-         <div className="flex flex-wrap gap-1 mb-2">
-           {demo.positions.slice(0, 1).map((position, i) => (
-             <span key={i} className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer">
+ <div className="flex flex-wrap gap-1 mb-3">
+           {/* Displaying first few positions */}
+           {demo.positions.slice(0, 2).map((position, i) => (
+             <span key={i} className="text-[10px] bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer">
                {position}
              </span>
            ))}
-
-           {demo.tags.slice(0, 1).map((tag, i) => (
-             <span key={i} className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer flex items-center">
+           {/* Displaying first few tags */}
+           {demo.tags.slice(0, 2).map((tag, i) => (
+             <span key={i} className="text-[10px] bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors cursor-pointer flex items-center">
                <TagIcon className="h-2 w-2 mr-1" />
                {tag}
              </span>
@@ -95,11 +98,11 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
            {(demo.positions.length + demo.tags.length) > 2 && (
              <span className="text-xs bg-gray-700 px-2 py-0.5 rounded">
-               +{(demo.positions.length + demo.tags.length - 2)}
+               +{(demo.positions.length + demo.tags.length - 4)} {/* Adjust count based on slice size */}
              </span>
            )}
          </div>
-
+        
          {/* Subtle CT/T Rounds Bar */}
          <div className="mt-1">
            <div className="h-0.5 w-full rounded-full overflow-hidden flex bg-gray-700/30">
