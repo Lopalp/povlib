@@ -16,7 +16,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const ctPercentage = (ctRounds / totalRounds) * 100;
   
   return (
-    <div
+ <div
       className={`relative flex flex-col overflow-hidden rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className}`}
       onClick={() => onSelect(demo)}
     >
@@ -27,26 +27,14 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           alt={demo.title} 
           className="w-full h-full object-cover"
           loading="lazy"
-        />
-        
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-        
+ />
+
         {/* Play button overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
           <button className="bg-yellow-400 rounded-full p-4 transition-transform duration-300 hover:scale-110 shadow-[0_0_15px_rgba(250,204,21,0.7)]">
             <Play className="h-6 w-6 text-gray-900" fill="currentColor" />
           </button>
         </div>
-        
-        {/* Map badge */}
-        <div className="absolute top-2 left-2 z-10">
-          <span className="px-2 py-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded">
-            {demo.map}
-          </span>
-        </div>
-        
-        {/* PRO/COMMUNITY badge */}
         <div className="absolute top-2 right-2 z-10">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${demo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
             {demo.isPro ? 'PRO' : 'COMMUNITY'}
@@ -60,7 +48,14 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
           {demo.title}
         </h3>  
-        
+
+        {/* Map and PRO/COMMUNITY tags */}
+        <div className="flex items-center mb-1">
+          <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded mr-2">
+            {demo.map}
+          </span>
+        </div>
+
          {/* Team and Players */}
         <div className="flex items-center mb-1">
           {demo.team && (
