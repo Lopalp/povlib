@@ -18,7 +18,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   return (
  <div
       className={`relative flex flex-col overflow-hidden rounded-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-2`}
-      onClick={() => onSelect(demo.id)} // Pass the ID to onSelect
+      onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section with padding */}
       <div className="relative aspect-video overflow-hidden w-full rounded-md">
@@ -44,18 +44,20 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           {demo.title}
         </h3>  
 
-        {/* Map, PRO/COMMUNITY tags and year */}
-        <div className="flex items-center flex-wrap gap-2 text-xs text-gray-400 mb-2">
-          <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded mr-2">
+        {/* Map, PRO/COMMUNITY, and Year */}
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+ <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded">
             {demo.map}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${demo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
             {demo.isPro ? 'PRO' : 'COMMUNITY'}
           </span>
- <div>{demo.year}</div>
+          <div>{demo.year}</div>
         </div>
 
+        {/* Team and Players */}
           {demo.team && (
+
             <div className="text-xs text-gray-300 flex items-center mr-2">
               <Shield className="h-3 w-3 mr-1 text-yellow-400" />
               <span>{demo.team}</span>
