@@ -17,7 +17,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   
   return (
  <div
-      className={`relative flex flex-col overflow-hidden rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className}`}
+      className={`relative flex flex-col overflow-hidden rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-2`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section with padding */}
@@ -35,25 +35,24 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
             <Play className="h-6 w-6 text-gray-900" fill="currentColor" />
           </button>
         </div>
-        <div className="absolute top-2 right-2 z-10">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${demo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
-            {demo.isPro ? 'PRO' : 'COMMUNITY'}
-          </span>
-        </div>
       </div>
       
       {/* Content Section - YouTube-like info below thumbnail with padding */}
-      <div className="p-3 flex-grow">
+      <div className="pt-2 flex-grow">
         {/* Title */}
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
           {demo.title}
         </h3>  
 
-        {/* Map and PRO/COMMUNITY tags */}
-        <div className="flex items-center mb-1">
+        {/* Map, PRO/COMMUNITY tags and year */}
+        <div className="flex items-center flex-wrap gap-1 mb-1">
           <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded mr-2">
             {demo.map}
           </span>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${demo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
+            {demo.isPro ? 'PRO' : 'COMMUNITY'}
+          </span>
+ <div className="text-gray-400 text-xs">{demo.year}</div>
         </div>
 
          {/* Team and Players */}
@@ -64,7 +63,6 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
               <span>{demo.team}</span>
             </div>
           )}
-          <div className="text-gray-400 text-xs">{demo.year}</div>
         </div>
          <div className="text-yellow-400 text-xs font-medium mb-2 line-clamp-1">
            {demo.players.map((player, idx) => (
