@@ -16,13 +16,12 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const ctPercentage = (ctRounds / totalRounds) * 100;
   
   return (
-    <div 
-      className={`relative flex-shrink-0 overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className}`}
+    <div
+      className={`relative flex flex-col overflow-hidden rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className}`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section with padding */}
       <div className="relative aspect-video overflow-hidden w-full">
-        {/* Thumbnail image */}
         <img 
           src={demo.thumbnail} 
           alt={demo.title} 
@@ -31,10 +30,10 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         />
         
         {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
         
         {/* Play button overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
           <button className="bg-yellow-400 rounded-full p-4 transition-transform duration-300 hover:scale-110 shadow-[0_0_15px_rgba(250,204,21,0.7)]">
             <Play className="h-6 w-6 text-gray-900" fill="currentColor" />
           </button>
@@ -56,11 +55,11 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
       
       {/* Content Section - YouTube-like info below thumbnail with padding */}
-      <div>
+      <div className="p-3 flex-grow">
         {/* Title */}
         <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
           {demo.title}
-        </h3>
+        </h3>  
         
          {/* Team and Players */}
         <div className="flex items-center mb-1">
