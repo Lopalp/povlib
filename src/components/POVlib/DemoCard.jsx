@@ -17,14 +17,14 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   
   return (
  <div
-      className={`relative flex flex-col overflow-hidden rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-2`}
+      className={`relative flex flex-col overflow-hidden rounded-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-2`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section with padding */}
-      <div className="relative aspect-video overflow-hidden w-full">
+      <div className="relative aspect-video overflow-hidden w-full rounded-md">
         <img 
           src={demo.thumbnail} 
-          alt={demo.title} 
+ alt={demo.title} 
           className="w-full h-full object-cover"
           loading="lazy"
  />
