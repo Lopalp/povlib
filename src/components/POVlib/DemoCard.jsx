@@ -63,7 +63,6 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
               <span>{demo.team}</span>
             </div>
           )}
-        </div>
          <div className="text-yellow-400 text-xs font-medium mb-2 line-clamp-1">
            {demo.players.map((player, idx) => (
              <React.Fragment key={idx}>
