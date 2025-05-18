@@ -18,7 +18,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   return (
  <div
       className={`relative flex flex-col overflow-hidden rounded-lg group cursor-pointer ${featured ? 'w-full' : ''} ${className} p-2`}
-      onClick={() => onSelect(demo)}
+      onClick={() => onSelect(demo.id)} // Pass the ID to onSelect
     >
       {/* Thumbnail Section with padding */}
       <div className="relative aspect-video overflow-hidden w-full rounded-md">
@@ -38,25 +38,23 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
       
       {/* Content Section - YouTube-like info below thumbnail with padding */}
-      <div className="pt-2 flex-grow">
+      <div className="pt-2 flex-grow flex flex-col">
         {/* Title */}
-        <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors">
+        <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-2">
           {demo.title}
         </h3>  
 
         {/* Map, PRO/COMMUNITY tags and year */}
-        <div className="flex items-center flex-wrap gap-1 mb-1">
+        <div className="flex items-center flex-wrap gap-2 text-xs text-gray-400 mb-2">
           <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-bold rounded mr-2">
             {demo.map}
           </span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${demo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
             {demo.isPro ? 'PRO' : 'COMMUNITY'}
           </span>
- <div className="text-gray-400 text-xs">{demo.year}</div>
+ <div>{demo.year}</div>
         </div>
 
-         {/* Team and Players */}
-        <div className="flex items-center mb-1">
           {demo.team && (
             <div className="text-xs text-gray-300 flex items-center mr-2">
               <Shield className="h-3 w-3 mr-1 text-yellow-400" />
