@@ -54,12 +54,11 @@ const MapPage = ({ mapName }) => {
     year: '',
     event: '',
     role: '',
-    demoType: 'all'
+ result: '',
   });
   const [filterOptions, setFilterOptions] = useState({
     positions: {},
     teams: [],
-    years: [],
     events: [],
     roles: ['Entry', 'Lurk', 'AWP', 'Rifle', 'Support Rifle', 'IGL'],
     players: []
@@ -137,7 +136,7 @@ const MapPage = ({ mapName }) => {
           positions: options.positions || {},
           teams: options.teams || [],
           years: options.years || [],
-          events: options.events || [],
+ events: options.events || [],
           players: options.players || []
         });
         
@@ -367,20 +366,6 @@ const MapPage = ({ mapName }) => {
       console.error('Error liking demo:', err);
     }
   };
-  
-  const handleSwitchDemoType = (type) => setDemoType(type);
-  
-  const handleResetFilters = () => setFiltersApplied({
-    position: '',
-    player: '',
-    team: '',
-    year: '',
-    event: '',
-    role: '',
-    demoType: 'all'
-  });
-  
-  const handleApplyFilters = () => setIsFilterModalOpen(false);
   
   // Effect to update the year filter in filtersApplied when yearRange changes
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Map as MapIcon, Users, Calendar, Trophy, Check } from 'lucide-react';
+import { X, Map as MapIcon, Users, Calendar, Trophy, Zap } from 'lucide-react';
 
 const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilterChange, onResetFilters, onApplyFilters }) => {
   return (
@@ -56,13 +56,14 @@ const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilte
                   Position
                 </label>
                 <select 
+ value={filtersApplied.position}
+ onChange={(e) => onFilterChange({ position: e.target.value })}
+ disabled={!filtersApplied.map} // Disable if no map is selected
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                  value={filtersApplied.position}
-                  onChange={(e) => onFilterChange({ position: e.target.value })}
                 >
                   <option value="">All Positions</option>
                   {filtersApplied.map 
-                    ? filterOptions.positions[filtersApplied.map]?.map(pos => (
+                    ? ["Entry", "Lurk", "AWP", "Rifle", "Support Rifle", "IGL"].map(pos => (
                         <option key={pos} value={pos}>{pos}</option>
                       ))
                     : Object.values(filterOptions.positions).flat().filter((pos, i, arr) => arr.indexOf(pos) === i).map(pos => (
@@ -79,16 +80,12 @@ const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilte
                   <Users className="h-4 w-4 mr-2 text-yellow-400" />
                   Player
                 </label>
-                <select 
+                <input 
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                   value={filtersApplied.player}
                   onChange={(e) => onFilterChange({ player: e.target.value })}
-                >
-                  <option value="">All Players</option>
-                  {filterOptions.players.map(player => (
-                    <option key={player} value={player}>{player}</option>
-                  ))}
-                </select>
+                  placeholder="Search Player"
+                />
               </div>
               
               {demoType === 'pro' && (
@@ -97,16 +94,13 @@ const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilte
                     <Users className="h-4 w-4 mr-2 text-yellow-400" />
                     Team
                   </label>
-                  <select 
+                  <input 
                     className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                     value={filtersApplied.team}
                     onChange={(e) => onFilterChange({ team: e.target.value })}
-                  >
-                    <option value="">All Teams</option>
-                    {filterOptions.teams.map(team => (
-                      <option key={team} value={team}>{team}</option>
-                    ))}
-                  </select>
+                    placeholder="Search Team"
+ />
+
                 </div>
               )}
             </div>
@@ -117,16 +111,13 @@ const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilte
                   <Calendar className="h-4 w-4 mr-2 text-yellow-400" />
                   Year
                 </label>
-                <select 
+                <input 
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                   value={filtersApplied.year}
                   onChange={(e) => onFilterChange({ year: e.target.value })}
-                >
-                  <option value="">All Years</option>
-                  {filterOptions.years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
+                  placeholder="Enter Year"
+ />
+
               </div>
               
               {demoType === 'pro' && (
@@ -136,32 +127,27 @@ const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilte
                       <Trophy className="h-4 w-4 mr-2 text-yellow-400" />
                       Event
                     </label>
-                    <select 
+                    <input 
                       className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                       value={filtersApplied.event}
                       onChange={(e) => onFilterChange({ event: e.target.value })}
-                    >
-                      <option value="">All Events</option>
-                      {filterOptions.events.map(event => (
-                        <option key={event} value={event}>{event}</option>
-                      ))}
-                    </select>
+                      placeholder="Search Event"
+                    />
                   </div>
                   
                   <div>
                     <label className="flex items-center text-sm font-medium text-gray-300 mb-2">
-                      <Check className="h-4 w-4 mr-2 text-yellow-400" />
-                      Result
+                      <Zap className="h-4 w-4 mr-2 text-yellow-400" />
+                      Platform
                     </label>
-                    <select 
+                    <select
                       className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                      value={filtersApplied.result}
-                      onChange={(e) => onFilterChange({ result: e.target.value })}
+ value={filtersApplied.platform}
+ onChange={(e) => onFilterChange({ platform: e.target.value })}
                     >
-                      <option value="">All Results</option>
-                      {filterOptions.results.map(result => (
-                        <option key={result} value={result}>{result}</option>
-                      ))}
+ <option value="">All Platforms</option>
+ <option value="Faceit">Faceit</option>
+ <option value="Pro Game">Pro Game</option>
                     </select>
                   </div>
                 </>
