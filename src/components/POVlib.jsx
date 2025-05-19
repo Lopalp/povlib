@@ -25,7 +25,7 @@ import SelectedFilters from './POVlib/SelectedFilters';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
 
-// Helper-Funktion zum Mapping eines Demo-Objekts
+// Helper function for mapping a demo object
 const mapDemo = (demo) => ({
   id: demo.id,
   title: demo.title,
@@ -94,10 +94,10 @@ const POVlib = () => {
     filteredDemos.forEach(demo => {
       demo.tags.forEach(tag => tagsSet.add(tag));
     });
-    tagsSet.add("Karten");
-    tagsSet.add("Spieler");
+    tagsSet.add("Maps");
+    tagsSet.add("Players");
     tagsSet.add("Teams");
-    tagsSet.add("Karte + CT Position");
+    tagsSet.add("Map + CT Position");
     return Array.from(tagsSet);
   }, [filteredDemos]);
 
@@ -106,7 +106,7 @@ const POVlib = () => {
     setFiltersApplied(prev => ({ ...prev, search: tag }));
   };
 
-  // Helper-Funktionen für Map/Positions-Filter
+  // Helper functions for Map/Positions filters
   const getFilteredDemosByMap = useCallback(
     (map) => mapDemos[map] || [],
     [mapDemos]
@@ -116,7 +116,7 @@ const POVlib = () => {
     [positionDemos]
   );
 
-  // Initialdaten laden
+  // Load initial data
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -146,7 +146,7 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
 
-  // Gefilterte Demos aktualisieren
+  // Update filtered demos
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
@@ -163,7 +163,7 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
 
-  // Map- und Positions-Demos laden
+  // Load Map and Position demos
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -197,7 +197,7 @@ const POVlib = () => {
     }
   }, [positionDemos, filtersApplied.position]);
 
-  // Update der Views bei Demo-Auswahl
+  // Update views on demo selection
   useEffect(() => {
     if (selectedDemo) {
       const updateViews = async () => {
@@ -274,7 +274,7 @@ const POVlib = () => {
     }
   };
 
-  // Video-Auswahl und Navigation
+  // Video selection and navigation
   const onSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
     console.debug(demo)
@@ -371,7 +371,7 @@ const POVlib = () => {
           searchQuery={searchQuery}
         />
 
-        {/* Filter-Icon + Tag-Leiste */}
+        {/* Filter Icon + Tag Bar */}
         <div className="flex items-center gap-2 mb-2">
           <Filter
             onClick={() => setIsFilterModalOpen(true)}
@@ -387,12 +387,12 @@ const POVlib = () => {
                 {tag}
               </button>
             ))}
-            <Link href="/demos" className="text-yellow-400 text-sm underline">
-              Alle Demos
+            <Link href="/demos" className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors">
+              View All Demos
             </Link>
           </div>
         </div>
-
+        
         {/* Kategorieabschnitte */}
         <CategorySection
           title="Recently Added"
@@ -421,17 +421,17 @@ const POVlib = () => {
           />
         )}
 
-        {/* Überarbeitete Navigation-Karten unten – Verwende hier das Template-Bild, das Du für Maps hattest */}
+        {/* Revised Navigation Cards Below - Use the template image you had for Maps here */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Link href="/players" className="relative block rounded-xl overflow-hidden">
+            <Link href="/players" className="relative block rounded-xl overflow-hidden group">
               <img
                 src="/images/players-example.png"
                 alt="Players"
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Players</h3>
+                <h3 className="text-white text-2xl font-bold group-hover:underline">Players</h3>
                 <p className="text-gray-300">View all players</p>
               </div>
             </Link>
@@ -439,11 +439,11 @@ const POVlib = () => {
               <img
                 src="/images/maps-example.png"
                 alt="Maps"
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Maps</h3>
-                <p className="text-gray-300">View all maps</p>
+                <h3 className="text-white text-2xl font-bold group-hover:underline">Maps</h3>
+                <p className="text-gray-300 text-center">View all maps</p>
               </div>
             </Link>
           </div>

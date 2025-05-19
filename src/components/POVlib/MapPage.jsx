@@ -43,6 +43,8 @@ const MapPage = ({ mapName }) => {
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
+  // State to manage the year filter input fields
+  const [yearRange, setYearRange] = useState({ from: '', to: '' });
   
   // Filter states
   const [filtersApplied, setFiltersApplied] = useState({
@@ -51,14 +53,15 @@ const MapPage = ({ mapName }) => {
     team: '',
     year: '',
     event: '',
-    result: '',
+    role: '',
+    demoType: 'all'
   });
   const [filterOptions, setFilterOptions] = useState({
     positions: {},
     teams: [],
     years: [],
     events: [],
-    results: [],
+    roles: ['Entry', 'Lurk', 'AWP', 'Rifle', 'Support Rifle', 'IGL'],
     players: []
   });
   
@@ -135,7 +138,6 @@ const MapPage = ({ mapName }) => {
           teams: options.teams || [],
           years: options.years || [],
           events: options.events || [],
-          results: options.results || [],
           players: options.players || []
         });
         
@@ -374,12 +376,34 @@ const MapPage = ({ mapName }) => {
     team: '',
     year: '',
     event: '',
-    result: '',
+    role: '',
+    demoType: 'all'
   });
   
   const handleApplyFilters = () => setIsFilterModalOpen(false);
   
-  const handleSelectRelatedDemo = (demo) => {
+  // Effect to update the year filter in filtersApplied when yearRange changes
+  useEffect(() => {
+    const yearString = (yearRange.from || yearRange.to) ? `${yearRange.from}-${yearRange.to}` : '';
+    setFiltersApplied(prev => ({ ...prev, year: yearString }));
+  }, [yearRange]);
+  
+  const handleResetFilters = () => setFiltersApplied({
+    position: '',
+    player: '',
+    team: '',
+    year: '',
+    event: '',
+    result: '',
+  });
+  
+  const handleApplyFilters = () => {
+    // Logic to apply filters based on filtersApplied state
+    console.log("Applying Filters:", filtersApplied); // Placeholder for actual filtering logic
+    setIsFilterModalOpen(false);
+  };
+  
+  const handleSelectRelatedDemo = (demo) => { // Renamed function to avoid confusion with handleSelectDemo
     setSelectedDemo(demo);
     // Find related demos
     const related = allDemos.filter(d => 
@@ -691,6 +715,8 @@ const MapPage = ({ mapName }) => {
           filterOptions={filterOptions}
           onClose={() => setIsFilterModalOpen(false)}
           onApply={handleApplyFilters}
+          yearRange={yearRange}
+          setYearRange={setYearRange}
           onReset={handleResetFilters}
         />
       )}
