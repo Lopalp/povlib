@@ -70,14 +70,24 @@ const VideoPlayerPage = ({
       <div className="bg-gray-900">
       <div style={{height: "3rem"}}></div>
         <div className="container mx-auto px-4 pt-6 pb-12">
-          <button 
-            onClick={onClose}
-            className="flex items-center text-gray-400 hover:text-yellow-400 mb-4 transition-colors"
-            style={{cursor: "pointer"}}
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            Back to Browse
-          </button>
+ <div className="flex items-center gap-4 mb-4">
+ <button 
+ onClick={onClose}
+ className="flex items-center text-gray-400 hover:text-yellow-400 transition-colors"
+ style={{cursor: "pointer"}}
+ >
+ <ArrowLeft className="h-5 w-5 mr-2" />
+ Back to Browse
+ </button>
+ <Link href="/videoplaypagecopy">
+ <button 
+ className="flex items-center text-gray-400 hover:text-yellow-400 transition-colors"
+ style={{cursor: "pointer"}}
+ >
+ Go to Copy Page
+ </button>
+ </Link>
+ </div>
           
           
           <div style={{height: "1rem"}}></div>
