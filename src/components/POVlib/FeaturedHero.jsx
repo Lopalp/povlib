@@ -49,8 +49,8 @@ const FeaturedHero = ({
   return (
     <div className="relative h-[70vh] min-h-[550px] w-full overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 group">
       {/* Background video with overlay */}
-      <div className="absolute inset-0 overflow-hidden transition-all duration-700">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/50 z-10"></div>
+      <div className="absolute inset-0 overflow-hidden transition-all duration-700 ">
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-gray-900/30 z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay z-5"></div>
         <div className={`absolute inset-0 transition-all duration-1000 ${isVisible ? 'opacity-60' : 'opacity-0'}`}>
@@ -72,11 +72,6 @@ const FeaturedHero = ({
       <div className="relative z-20 container mx-auto h-full flex items-center px-8">
         <div className={`max-w-2xl transition-all duration-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <div className="mb-6 space-y-2">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="bg-yellow-400 text-gray-900 font-bold rounded-full px-3 py-1 text-sm flex items-center gap-1">
-                <Star className="w-3 h-3" /> FEATURED
-              </span>
-            </div>
             
             <div className="flex flex-wrap items-center gap-3 mb-4 animate-fadeIn">
               <span className="px-3 py-1 bg-yellow-400 text-gray-900 text-sm font-bold rounded">
@@ -98,10 +93,10 @@ const FeaturedHero = ({
             </div>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 drop-shadow-sm">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 drop-shadow-sm">
             {demo.title}
           </h1>
-          
+
           <div className="relative">
             <p className={`text-gray-300 text-lg max-w-xl mb-6 ${showFullDescription ? '' : 'line-clamp-2'} transition-all duration-300`}>
               {description}
@@ -115,6 +110,23 @@ const FeaturedHero = ({
               </button>
             )}
           </div>
+
+          {/* Player and position tags */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {demo.players.map((player, index) => (
+              <span key={`player-${index}`} className="text-xs bg-gray-800/60 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-400/20 backdrop-blur-sm">
+                {player}
+              </span>
+            ))}
+            {demo.positions && demo.positions.slice(0, 2).map((position, index) => (
+              <span key={`pos-${index}`} className="text-xs bg-gray-800/60 text-white px-2 py-0.5 rounded-full backdrop-blur-sm">
+                {position}
+              </span>
+            ))}
+             {demo.team && (
+                 <span className="text-xs bg-gray-800/60 border border-yellow-400/50 text-yellow-400 px-2 py-0.5 rounded backdrop-blur-sm">
+                 {demo.team}
+               </span>)}
           
           <div className="flex flex-wrap items-center gap-4 mt-8">
             <button 
@@ -136,19 +148,6 @@ const FeaturedHero = ({
             </button>
           </div>
           
-          {/* Player and position tags */}
-          <div className="mt-8 flex flex-wrap gap-2">
-            {demo.players.map((player, index) => (
-              <span key={`player-${index}`} className="text-sm bg-gray-800/60 text-yellow-400 px-3 py-1 rounded-full border border-yellow-400/20 backdrop-blur-sm">
-                {player}
-              </span>
-            ))}
-            {demo.positions && demo.positions.slice(0, 2).map((position, index) => (
-              <span key={`pos-${index}`} className="text-sm bg-gray-800/60 text-white px-3 py-1 rounded-full backdrop-blur-sm">
-                {position}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
       
