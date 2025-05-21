@@ -14,11 +14,11 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
   return (
     <div
-      className={`relative flex flex-col overflow-hidden rounded-2xl shadow-sm group cursor-pointer bg-[#111213] ${featured ? 'w-full' : ''} ${className} p-3 transition-all duration-200 hover:bg-[#1a1b1d]`}
+      className={`relative flex flex-col overflow-hidden rounded-xl group cursor-pointer bg-transparent ${featured ? 'w-full' : ''} ${className} p-2`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section */}
-      <div className="relative aspect-video overflow-hidden w-full rounded-xl">
+      <div className="relative aspect-video overflow-hidden w-full rounded-lg">
         <img 
           src={demo.thumbnail} 
           alt={demo.title} 
@@ -40,15 +40,15 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           {demo.title}
         </h3>
 
-        {/* Map, Type, Year */}
-        <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mb-2">
-          <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 font-semibold rounded-md">
+        {/* Meta Info */}
+        <div className="flex items-center flex-wrap gap-2 text-xs text-gray-400 mb-2">
+          <span className="px-2 py-0.5 rounded bg-yellow-400 text-gray-900 font-semibold">
             {demo.map}
           </span>
-          <span className={`px-2 py-0.5 rounded-md font-medium ${demo.isPro ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-400/30' : 'bg-gray-700 text-white'}`}>
+          <span className={`px-2 py-0.5 rounded border text-xs ${demo.isPro ? 'bg-yellow-500/10 text-yellow-400 border-yellow-300' : 'bg-gray-800 text-white border-gray-600'}`}>
             {demo.isPro ? 'PRO' : 'COMMUNITY'}
           </span>
-          <span className="text-gray-500">{demo.year}</span>
+          <span className="text-gray-500 font-medium">{demo.year}</span>
         </div>
 
         {/* Team and Players */}
@@ -75,11 +75,11 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </div>
 
-        {/* Tags and Positions */}
-        <div className="flex flex-wrap gap-1 mb-4">
+        {/* Tags Section (Unified Style) */}
+        <div className="flex flex-wrap gap-1 mb-3">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-            <span key={i} className="text-[11px] bg-white/5 text-white px-2 py-0.5 rounded-full flex items-center gap-1 border border-white/10">
-              {typeof item === 'string' && demo.tags.includes(item) && <TagIcon className="h-3 w-3" />}
+            <span key={i} className="text-[11px] px-2 py-0.5 bg-gray-800 text-white rounded-full border border-white/10 flex items-center gap-1">
+              {demo.tags.includes(item) && <TagIcon className="h-3 w-3" />}
               {item}
             </span>
           ))}
