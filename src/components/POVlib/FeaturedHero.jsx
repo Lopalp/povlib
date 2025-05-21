@@ -1,144 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Filter, ChevronDown } from 'lucide-react';
-import YouTubeEmbed from './YouTubeEmbed';
+// Angepasste Variante von FeaturedHero
 
-const FeaturedHero = ({
-  demo,
-  autoplayVideo,
-  setSelectedDemo,
-  setActiveVideoId,
-  setIsFilterModalOpen,
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [showFullDescription, setShowFullDescription] = useState(false);
+<div className="relative w-full aspect-video max-h-[80vh] overflow-hidden bg-black group">
+  {/* Hintergrund-Video mit verbesserter Lesbarkeit */}
+  <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 bg-black/50 z-10" /> {/* Mehr Kontrast */}
+    <YouTubeEmbed
+      videoId={demo.videoId}
+      title={demo.title}
+      autoplay={autoplayVideo}
+      controls={false}
+      showInfo={false}
+      className="w-full h-full object-contain" // Wichtig: Kein Cropping
+    />
+  </div>
 
-  useEffect(() => {
-    setIsVisible(true);
-    return () => setIsVisible(false);
-  }, [demo]);
+  {/* Content Box - Responsive, unten links */}
+  <div className="relative z-20 container mx-auto h-full flex items-end justify-start px-6 pb-8">
+    <div className={`max-w-2xl transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+      
+      {/* Titel */}
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight line-clamp-2 md:line-clamp-none">
+        {demo.title}
+      </h1>
 
-  if (!demo) return null;
-
-  const generateDescription = () => {
-    let desc = `Experience top-tier CS2 gameplay featuring ${demo.players.join(
-      ', '
-    )} on ${demo.map}. `;
-    desc += demo.team
-      ? `Watch how ${demo.team} players demonstrate professional `
-      : 'Watch professional ';
-    desc += demo.positions?.length
-      ? `positioning for ${demo.positions.join(' and ')} roles. `
-      : 'positioning and game sense. ';
-    desc += demo.tags?.length
-      ? `This POV highlights ${demo.tags.join(
-          ', '
-        )} techniques that can elevate your gameplay.`
-      : 'Learn strategies and techniques directly from the pros.';
-    return desc;
-  };
-  const description = generateDescription();
-
-  return (
-    <div className="relative w-full aspect-video max-h-[80vh] overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 group">
-      {/* Hintergrund-Video mit reduzierter Verdunklung */}
-      <div className="absolute inset-0 overflow-hidden transition-all duration-700">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-gray-900/30 to-gray-900/10 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 to-transparent z-10" />
-        <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay z-5" />
-        <div
-          className={`absolute inset-0 transition-all duration-1000 ${
-            isVisible ? 'opacity-50' : 'opacity-0'
-          }`}
-        >
-          <YouTubeEmbed
-            videoId={demo.videoId}
-            title={demo.title}
-            autoplay={autoplayVideo}
-            controls={false}
-            showInfo={false}
-            className="w-full h-full object-contain"
-          />
-        </div>
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {[demo.map, demo.team, demo.event, demo.year, ...demo.players, ...(demo.positions || [])]
+          .filter(Boolean)
+          .map((tag, i) => (
+            <span
+              key={i}
+              className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20"
+            >
+              {tag}
+            </span>
+          ))}
       </div>
 
-      {/* Mesh-Gradient */}
-      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] z-5" />
-
-      {/* Content am unteren linken Rand */}
-      <div className="relative z-20 container mx-auto h-full flex items-end justify-start px-6 pb-12">
-        <div
-          className={`max-w-2xl transition-transform duration-700 transform ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-          }`}
+      {/* Buttons */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => {
+            setSelectedDemo(demo);
+            setActiveVideoId(demo.videoId);
+          }}
+          className="flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
         >
-          {/* Titel */}
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-4 line-clamp-1 sm:line-clamp-none">
-            {demo.title}
-          </h1>
+          <Play className="h-5 w-5" />
+          <span className="hidden sm:inline text-sm">Watch Full POV</span>
+        </button>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="text-xs px-3 py-1 rounded-full bg-yellow-400/70 text-gray-900 border border-yellow-400">
-              {demo.map}
-            </span>
-            {demo.team && (
-              <span className="text-xs px-3 py-1 rounded-full bg-gray-800/60 text-white border border-gray-700">
-                {demo.team}
-              </span>
-            )}
-            {demo.event && (
-              <span className="text-xs px-3 py-1 rounded-full bg-gray-800/60 text-white border border-gray-700">
-                {demo.event}
-              </span>
-            )}
-            <span className="text-xs px-3 py-1 rounded-full bg-gray-800/60 text-white border border-gray-700">
-              {demo.year}
-            </span>
-            {demo.players.map((p, i) => (
-              <span
-                key={i}
-                className="text-xs px-3 py-1 rounded-full bg-gray-800/60 text-white border border-gray-700"
-              >
-                {p}
-              </span>
-            ))}
-            {demo.positions?.map((pos, i) => (
-              <span
-                key={i}
-                className="text-xs px-3 py-1 rounded-full bg-gray-800/60 text-white border border-gray-700"
-              >
-                {pos}
-              </span>
-            ))}
-          </div>
-
-          {/* Buttons */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                setSelectedDemo(demo);
-                setActiveVideoId(demo.videoId);
-              }}
-              className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-6 py-2 bg-yellow-400 text-gray-900 font-bold rounded-md border-2 border-yellow-400 transition-transform transform hover:scale-105"
-            >
-              <Play className="h-5 w-5" fill="currentColor" />
-              <span className="hidden sm:inline text-sm">Watch Full POV</span>
-            </button>
-            <button
-              onClick={() => setIsFilterModalOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-800/40 backdrop-blur-sm text-white rounded-md border border-gray-700 hover:border-yellow-400 transition-colors"
-            >
-              <Filter className="h-5 w-5" />
-              <span className="text-sm">Filter POVs</span>
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => setIsFilterModalOpen(true)}
+          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
+        >
+          <Filter className="h-5 w-5" />
+          <span className="text-sm">Filter POVs</span>
+        </button>
       </div>
-
-      {/* Bottom-Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-900 to-transparent" />
     </div>
-  );
-};
+  </div>
 
-export default FeaturedHero;
+  {/* Leichtes Bottom-Fade */}
+  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-20" />
+</div>
