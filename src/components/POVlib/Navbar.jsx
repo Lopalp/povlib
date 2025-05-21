@@ -82,8 +82,8 @@ const Navbar = ({
               Home
             </Link>
             
-            {/* Maps Dropdown */}
-            <div className="relative">
+ {/* Maps Dropdown */}
+ <div className="relative">
               <button 
                 onClick={() => setMapDropdownOpen(prev => !prev)}
                 className="flex items-center text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
@@ -122,13 +122,13 @@ const Navbar = ({
             </Link>
             
             <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
-              Players
-            </Link>
+ Players
+ </Link>
 
             {/* Community Link with Hover Modal */}
             <div className="relative">
               <div className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                >
+ >
                 Community
               </div>
               <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-40 bg-gray-800 rounded-lg shadow-lg border border-gray-700 text-center py-2 text-sm text-gray-300 opacity-0 pointer-events-none transition-opacity duration-200 hover:opacity-100 group-hover:opacity-100">
@@ -149,16 +149,16 @@ const Navbar = ({
           {/* Rechte Navigation */}
           <div className="flex items-center space-x-4">
             {/* PRO/COMMUNITY Toggle */}
-            <div className="hidden lg:flex items-center p-1 bg-gray-800 rounded-full">
+ <div className="hidden lg:flex items-center p-1 bg-gray-800 rounded-full">
               <button
                 onClick={() => onSwitchDemoType('pro')}
-                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
+                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`} 
               >
                 PRO POVs
               </button>
               <button
                 onClick={() => onSwitchDemoType('community')}
-                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'community' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`}
+                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'community' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`} 
               >
                 COMMUNITY
               </button>
@@ -174,25 +174,25 @@ const Navbar = ({
             </button>
 
             {/* Notifications (Platzhalter) */}
-                      <button 
-                      className="hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200 relative rounded-full"
+ <button 
+ className="hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200 relative rounded-full"
                       aria-label="Notifications"
-                      >
-                      <BellRing className="h-5 w-5" />
-                      <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
-                      </button>
+ >
+ <BellRing className="h-5 w-5" />
+ <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
+ </button>
                       
-                      {user ? 
-                      <div className="relative">
+ {user ? 
+ <div className="relative">
                       <button 
                         onClick={() => setUserDropdownOpen(prev => !prev)}
                         className="flex items-center p-1 text-gray-400 hover:text-yellow-400 transition-colors border border-yellow-400 rounded-full cursor-pointer w-full"
                         aria-label="User menu"
                       >
                         <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
-                        {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : null}
+ {user.avatar_url ? <img src={user.avatar_url} className="w-full h-full object-cover" /> : null}
                         </div>
-                      </button>
+ </button>
                       {userDropdownOpen && (
                         <div 
                         className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
@@ -202,18 +202,18 @@ const Navbar = ({
                           <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">Your Profile</Link>
                           <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Favorites</Link>
                           <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Settings</Link>
-                          <div className="border-t border-gray-700 my-1"></div>
+ <div className="border-t border-gray-700 my-1"></div>
                           <button onClick={handleSignOut} className="cursor-pointer text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 w-full">Sign out</button>
                         </div>
                         </div>
                       )}
-                      </div>
+ </div>
                       : <>
                       <Link 
                       href="/signin" 
                       className="hidden lg:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
                       >
-                      <LogIn className="h-4 w-4 mr-2" />
+ <LogIn className="h-4 w-4 mr-2" />
                       <span className="text-sm font-medium">Sign In</span>
                       </Link></> }
 
