@@ -138,7 +138,7 @@ const FeaturedHero = ({
                 setSelectedDemo(demo);
                 setActiveVideoId(demo.videoId);
               }}
-              className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-6 py-2 bg-yellow-400 text-gray-900 font-bold rounded-md shadow-[0_0_15px_rgba(250,204,21,0.5)] transition-transform transform hover:scale-105"
+              className="flex items-center justify-center sm:justify-start gap-2 px-3 sm:px-6 py-2 bg-yellow-400 text-gray-900 font-bold rounded-md border-2 border-yellow-400 transition-transform transform hover:scale-105"
             >
               <Play className="h-5 w-5" fill="currentColor" />
               <span className="hidden sm:inline text-sm">Watch Full POV</span>
