@@ -148,22 +148,6 @@ const Navbar = ({
 
           {/* Rechte Navigation */}
           <div className="flex items-center space-x-4">
-            {/* PRO/COMMUNITY Toggle */}
- <div className="hidden lg:flex items-center p-1 bg-gray-800 rounded-full">
-              <button
-                onClick={() => onSwitchDemoType('pro')}
-                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`} 
-              >
-                PRO POVs
-              </button>
-              <button
-                onClick={() => onSwitchDemoType('community')}
-                className={`text-xs font-bold px-4 py-2 rounded-full transition-all duration-300 ${demoType === 'community' ? 'bg-yellow-400 text-gray-900 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'text-gray-400 hover:text-white'}`} 
-              >
-                COMMUNITY
-              </button>
-            </div>
-
             {/* Search Button */}
             <button 
               onClick={() => setSearchActive(prev => !prev)}
@@ -321,23 +305,6 @@ const Navbar = ({
                 </div>
               </Link>
               
-              {/* Mobile PRO/COMMUNITY Toggle */}
-              <div className="border-t border-gray-800 pt-6">
-                <div className="flex bg-gray-800 rounded-full p-1">
-                  <button
-                    onClick={() => { onSwitchDemoType('pro'); setIsMenuOpen(false); }}
-                    className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'pro' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
-                  >
-                    PRO POVs
-                  </button>
-                  <button
-                    onClick={() => { onSwitchDemoType('community'); setIsMenuOpen(false); }}
-                    className={`flex-1 text-xs font-bold py-2 rounded-full transition-all ${demoType === 'community' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'}`}
-                  >
-                    COMMUNITY
-                  </button>
-                </div>
-              </div>
               
               {/* Sign In Button */}
               <div className="border-t border-gray-800 pt-6">
