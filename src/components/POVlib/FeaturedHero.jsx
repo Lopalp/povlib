@@ -22,7 +22,7 @@ const FeaturedHero = ({
     <div className="relative w-full aspect-video max-h-[90vh] overflow-hidden bg-black group">
       {/* Hintergrund-Video und Overlays mit z-Index 0-10 */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-black/60 z-10" />
+        <div className="absolute inset-0 bg-black/15 z-10" />
         <YouTubeEmbed
           videoId={demo.videoId}
           title={demo.title}
