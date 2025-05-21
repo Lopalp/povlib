@@ -68,7 +68,7 @@ const Navbar = ({
   };
 
   return (
-    <header className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-opacity-50 backdrop-filter backdrop-blur-lg' : 'bg-transparent'}`}>
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-opacity-50 backdrop-filter backdrop-blur-lg' : ''}`}>
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
