@@ -36,49 +36,43 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
       {/* Content Section */}
       <div className="pt-3 flex-grow flex flex-col">
-        <h3 className="text-white font-semibold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-2">
+        <h3 className="text-white font-semibold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-3">
           {demo.title}
         </h3>
 
         {/* Meta Info */}
-        <div className="flex items-center flex-wrap gap-2 text-xs text-gray-400 mb-2">
-          <span className="px-2 py-0.5 rounded bg-yellow-400 text-gray-900 font-semibold">
+        <div className="flex items-center flex-wrap gap-2 text-xs mb-3">
+          <span className="px-2 py-0.5 bg-white/10 text-white rounded-full uppercase tracking-wide font-semibold">
             {demo.map}
           </span>
-          <span className={`px-2 py-0.5 rounded border text-xs ${demo.isPro ? 'bg-yellow-500/10 text-yellow-400 border-yellow-300' : 'bg-gray-800 text-white border-gray-600'}`}>
+          <span className={`${demo.isPro ? 'bg-yellow-300/20 text-yellow-300 border border-yellow-300/30' : 'bg-white/10 text-white border border-white/10'} px-2 py-0.5 rounded-full font-semibold`}> 
             {demo.isPro ? 'PRO' : 'COMMUNITY'}
           </span>
-          <span className="text-gray-500 font-medium">{demo.year}</span>
-        </div>
-
-        {/* Team and Players */}
-        <div className="mb-3 space-y-1">
+          <span className="px-2 py-0.5 bg-white/5 text-white/80 rounded-full font-medium">
+            {demo.year}
+          </span>
           {demo.team && (
-            <div className="text-xs text-gray-300 flex items-center">
-              <Shield className="h-3 w-3 mr-1 text-yellow-400" />
-              <span>{demo.team}</span>
-            </div>
+            <span className="px-2 py-0.5 bg-white/10 text-white rounded-full font-medium flex items-center">
+              <Shield className="h-3 w-3 mr-1 text-yellow-300" /> {demo.team}
+            </span>
           )}
-          <div className="text-xs text-yellow-400 font-medium line-clamp-1">
-            {demo.players.map((player, idx) => (
-              <React.Fragment key={idx}>
-                {idx > 0 && ", "}
-                <Link 
-                  href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                  className="hover:underline hover:text-yellow-300"
-                  onClick={(e) => handlePlayerClick(e, player)}
-                >
-                  {player}
-                </Link>
-              </React.Fragment>
-            ))}
-          </div>
+          {demo.players.slice(0, 1).map((player, idx) => (
+            <span key={idx} className="px-2 py-0.5 bg-white/10 text-yellow-400 rounded-full font-medium">
+              <Link 
+                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                className="hover:underline"
+                onClick={(e) => handlePlayerClick(e, player)}
+              >
+                {player}
+              </Link>
+            </span>
+          ))}
         </div>
 
-        {/* Tags Section (Unified Style) */}
-        <div className="flex flex-wrap gap-1 mb-3">
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1 mb-4">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-            <span key={i} className="text-[11px] px-2 py-0.5 bg-gray-800 text-white rounded-full border border-white/10 flex items-center gap-1">
+            <span key={i} className="text-[11px] px-2 py-0.5 bg-white/5 text-white rounded-full border border-white/10 flex items-center gap-1">
               {demo.tags.includes(item) && <TagIcon className="h-3 w-3" />}
               {item}
             </span>
