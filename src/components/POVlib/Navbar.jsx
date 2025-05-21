@@ -34,7 +34,6 @@ const Navbar = ({
   setIsMenuOpen,
   isMenuOpen
 }) => {
-  const {user, setUser} = useContext(UserContext);
   const [isScrolled, setIsScrolled] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
@@ -42,6 +41,7 @@ const Navbar = ({
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
+  const {user, setUser} = useContext(UserContext);
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
@@ -68,7 +68,7 @@ const Navbar = ({
   };
 
   return (
-    <header className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-gray-900/95 backdrop-blur-lg shadow-lg' : 'bg-transparent'}`}>
+    <header className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-gray-900/85 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
