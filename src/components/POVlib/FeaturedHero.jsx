@@ -76,25 +76,6 @@ const FeaturedHero = ({
             {demo.title}
           </h1>
 
-          {/* Beschreibung (ab sm) */}
-          <div className="relative mb-6 hidden sm:block">
-            <p
-              className={`text-base text-gray-300 max-w-xl transition-all duration-300 ${
-                showFullDescription ? '' : 'line-clamp-2'
-              }`}
-            >
-              {description}
-            </p>
-            {description.length > 120 && !showFullDescription && (
-              <button
-                onClick={() => setShowFullDescription(true)}
-                className="flex items-center gap-1 text-sm text-yellow-400 hover:text-yellow-300 mt-1"
-              >
-                Show more <ChevronDown className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="text-xs px-3 py-1 rounded-full bg-yellow-400/70 text-gray-900 border border-yellow-400">
