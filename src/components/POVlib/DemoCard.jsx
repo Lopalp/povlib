@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Play, Shield, Tag as TagIcon } from 'lucide-react';
+import { Play, Shield, Tag as TagIcon, User } from 'lucide-react';
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const handlePlayerClick = (e, player) => {
@@ -11,6 +11,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const tRounds = demo.id % 5 + 8;
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
+  const mockKDA = "23/5/2"; // Placeholder for K/D/A
 
   return (
     <div
@@ -40,33 +41,31 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           {demo.title}
         </h3>
 
-        {/* Meta Info */}
-        <div className="flex items-center flex-wrap gap-2 text-xs mb-3">
-          <span className="px-2 py-0.5 bg-white/10 text-white rounded-full uppercase tracking-wide font-semibold">
-            {demo.map}
-          </span>
-          <span className={`${demo.isPro ? 'bg-yellow-300/20 text-yellow-300 border border-yellow-300/30' : 'bg-white/10 text-white border border-white/10'} px-2 py-0.5 rounded-full font-semibold`}> 
-            {demo.isPro ? 'PRO' : 'COMMUNITY'}
-          </span>
-          <span className="px-2 py-0.5 bg-white/5 text-white/80 rounded-full font-medium">
-            {demo.year}
-          </span>
-          {demo.team && (
-            <span className="px-2 py-0.5 bg-white/10 text-white rounded-full font-medium flex items-center">
-              <Shield className="h-3 w-3 mr-1 text-yellow-300" /> {demo.team}
-            </span>
-          )}
+        {/* Meta Row: Map, Team, Year */}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-white mb-2">
+          <span className="px-2 py-0.5 bg-white/10 rounded-full">{demo.map}</span>
+          {demo.team && <span className="px-2 py-0.5 bg-white/10 rounded-full">{demo.team}</span>}
+          <span className="px-2 py-0.5 bg-white/10 rounded-full">{demo.year}</span>
+        </div>
+
+        {/* Player */}
+        <div className="flex items-center text-xs text-yellow-400 font-medium mb-3">
+          <User className="h-3 w-3 mr-1" />
           {demo.players.slice(0, 1).map((player, idx) => (
-            <span key={idx} className="px-2 py-0.5 bg-white/10 text-yellow-400 rounded-full font-medium">
-              <Link 
-                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="hover:underline"
-                onClick={(e) => handlePlayerClick(e, player)}
-              >
-                {player}
-              </Link>
-            </span>
+            <Link
+              key={idx}
+              href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+              className="hover:underline"
+              onClick={(e) => handlePlayerClick(e, player)}
+            >
+              {player}
+            </Link>
           ))}
+        </div>
+
+        {/* KDA Section */}
+        <div className="text-xs text-white/80 mb-3">
+          <span className="bg-white/5 px-2 py-0.5 rounded-full">K/D/A: {mockKDA}</span>
         </div>
 
         {/* Tags */}
