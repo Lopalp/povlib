@@ -20,8 +20,8 @@ const FeaturedHero = ({
 
   return (
     <div className="relative w-full aspect-video max-h-[80vh] overflow-hidden bg-black group">
-      {/* Hintergrund-Video mit Overlay */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* Hintergrund-Video und Overlays mit z-Index 0-10 */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-black/60 z-10" />
         <YouTubeEmbed
           videoId={demo.videoId}
@@ -33,8 +33,8 @@ const FeaturedHero = ({
         />
       </div>
 
-      {/* Inhalt (unten links) */}
-      <div className="relative z-20 container mx-auto h-full flex items-end justify-start px-6 pb-8">
+      {/* Inhalt: Titel, Tags, Buttons */}
+      <div className="relative z-30 container mx-auto h-full flex items-end justify-start px-6 pb-8">
         <div
           className={`max-w-2xl transition-all duration-700 ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
@@ -83,8 +83,8 @@ const FeaturedHero = ({
         </div>
       </div>
 
-      {/* Leichtes Bottom-Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-20" />
+      {/* Bottom-Fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
     </div>
   );
 };
