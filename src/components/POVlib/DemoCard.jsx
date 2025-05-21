@@ -48,24 +48,24 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           <span className="px-2 py-0.5 bg-white/10 rounded-full">{demo.year}</span>
         </div>
 
-        {/* Player */}
-        <div className="flex items-center text-xs text-yellow-400 font-medium mb-3">
-          <User className="h-3 w-3 mr-1" />
-          {demo.players.slice(0, 1).map((player, idx) => (
-            <Link
-              key={idx}
-              href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-              className="hover:underline"
-              onClick={(e) => handlePlayerClick(e, player)}
-            >
-              {player}
-            </Link>
-          ))}
-        </div>
-
-        {/* KDA Section */}
-        <div className="text-xs text-white/80 mb-3">
-          <span className="bg-white/5 px-2 py-0.5 rounded-full">K/D/A: {mockKDA}</span>
+        {/* Player + KDA */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center text-sm font-semibold text-yellow-400">
+            <User className="h-4 w-4 mr-1 text-yellow-300" />
+            {demo.players.slice(0, 1).map((player, idx) => (
+              <Link
+                key={idx}
+                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                className="hover:underline"
+                onClick={(e) => handlePlayerClick(e, player)}
+              >
+                {player}
+              </Link>
+            ))}
+          </div>
+          <div className="text-sm text-yellow-300 font-bold tracking-wider bg-yellow-300/10 px-3 py-0.5 rounded-md">
+            {mockKDA}
+          </div>
         </div>
 
         {/* Tags */}
