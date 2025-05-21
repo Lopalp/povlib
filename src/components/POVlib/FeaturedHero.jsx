@@ -42,12 +42,12 @@ const FeaturedHero = ({
     <div className="relative w-full aspect-video max-h-[80vh] overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 group">
       {/* Hintergrund-Video mit reduzierter Verdunklung */}
       <div className="absolute inset-0 overflow-hidden transition-all duration-700">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-gray-900/10 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 via-gray-900/30 to-gray-900/10 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 to-transparent z-10" />
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay z-5" />
         <div
           className={`absolute inset-0 transition-all duration-1000 ${
-            isVisible ? 'opacity-20' : 'opacity-0'
+            isVisible ? 'opacity-50' : 'opacity-0'
           }`}
         >
           <YouTubeEmbed
