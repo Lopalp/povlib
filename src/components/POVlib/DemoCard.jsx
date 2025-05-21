@@ -15,7 +15,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
   return (
     <div
-      className={`relative flex flex-col overflow-hidden rounded-xl group cursor-pointer bg-transparent ${featured ? 'w-full' : ''} ${className} p-2`}
+      className={`relative flex flex-col overflow-hidden rounded-lg group cursor-pointer bg-gray-900 border border-gray-800 hover:border-yellow-500 transition-colors duration-200 ${featured ? 'w-full' : ''} ${className} p-4`}
       onClick={() => onSelect(demo)}
     >
       {/* Thumbnail Section */}
@@ -37,7 +37,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
       {/* Content Section */}
       <div className="pt-3 flex-grow flex flex-col">
-        <h3 className="text-white font-semibold text-sm line-clamp-2 group-hover:text-yellow-400 transition-colors mb-3">
+        <h3 className="text-white font-semibold text-lg line-clamp-2 group-hover:text-yellow-500 transition-colors mb-3">
           {demo.title}
         </h3>
 
@@ -49,21 +49,21 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
 
         {/* Player + KDA */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center text-sm font-semibold text-yellow-400">
-            <User className="h-4 w-4 mr-1 text-yellow-300" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center text-sm font-semibold text-gray-300">
+            <User className="h-4 w-4 mr-1 text-gray-400" />
             {demo.players.slice(0, 1).map((player, idx) => (
               <Link
                 key={idx}
                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="hover:underline"
+                className="hover:text-yellow-500 transition-colors"
                 onClick={(e) => handlePlayerClick(e, player)}
               >
                 {player}
               </Link>
             ))}
           </div>
-          <div className="text-sm text-yellow-300 font-bold tracking-wider bg-yellow-300/10 px-3 py-0.5 rounded-md">
+          <div className="text-xs text-gray-400 font-semibold tracking-wider bg-gray-800 px-2 py-1 rounded-md">
             {mockKDA}
           </div>
         </div>
@@ -71,13 +71,13 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         {/* Tags */}
         <div className="flex flex-wrap gap-1 mb-4">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-            <span key={i} className="text-[11px] px-2 py-0.5 bg-white/5 text-white rounded-full border border-white/10 flex items-center gap-1">
+            <span key={i} className="text-xs px-2 py-0.5 bg-gray-800 text-gray-300 rounded-full flex items-center gap-1">
               {demo.tags.includes(item) && <TagIcon className="h-3 w-3" />}
               {item}
             </span>
           ))}
           {(demo.positions.length + demo.tags.length) > 4 && (
-            <span className="text-[11px] text-gray-400 px-2 py-0.5 rounded-full border border-white/10">
+            <span className="text-xs text-gray-500 px-2 py-0.5 bg-gray-800 rounded-full">
               +{(demo.positions.length + demo.tags.length - 4)} more
             </span>
           )}
