@@ -84,7 +84,7 @@ const FeaturedHero = ({
       </div>
 
       {/* Bottom-Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent z-40 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
     </div>
   );
 };
