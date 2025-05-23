@@ -1,14 +1,13 @@
 "use client"
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import {
-  Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn
+import { 
+  Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn 
 } from 'lucide-react';
 import { UserContext } from '../../../context/UserContext';
-import LogoHeading from '@/components/typography/LogoHeading';
+import LogoHeading from '@/components/typography/LogoHeading'
 import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
-import clsx from 'clsx';
+import { useRouter } from 'next/navigation'
 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
@@ -27,32 +26,31 @@ const mostPlayedMapsMobile = [
   { label: 'Ancient', slug: 'ancient' }
 ];
 
-export default function Navbar({
+const Navbar = ({
   demoType = 'pro',
   onSwitchDemoType,
   searchActive,
   setSearchActive,
   setIsMenuOpen,
   isMenuOpen
-}) {
-  const [isScrolled, setIsScrolled]         = useState(false);
+}) => {
+  const [isScrolled, setIsScrolled] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [mapDropdownOpen, setMapDropdownOpen]   = useState(false);
-  const [searchQuery, setSearchQuery]       = useState('');
-  const supabase                            = createSupabaseBrowserClient();
-  const router                             = useRouter();
-  const { user, setUser }                   = useContext(UserContext);
+  const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const supabase = createSupabaseBrowserClient();
+  const router = useRouter();
 
-  // Shadow when at top; glass when scrolled
+  const { user, setUser } = useContext(UserContext);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSearchSubmit = e => {
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // hier ggf. Navigation oder Suche ausführen
     setSearchActive(false);
   };
 
@@ -64,92 +62,112 @@ export default function Navbar({
     }
   };
 
-  const headerClasses = clsx(
-    'fixed top-0 w-full z-50 transition-all duration-300',
-    !isScrolled
-      ? 'shadow-xl bg-black/80'
-      : 'backdrop-filter backdrop-blur-lg bg-black/30 border-b border-gray-700'
-  );
-
   return (
-    <header className={headerClasses}>
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        !isScrolled
+          ? 'bg-gradient-to-b from-black/50 to-transparent'
+          : 'backdrop-filter backdrop-blur-lg bg-black/30 border-b border-gray-700'
+      }`}
+    >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <LogoHeading size={4}/>
+            <LogoHeading size={4} />
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="nav-link">Home</Link>
+            <Link href="/" className="text-sm font-medium text-white hover:text-yellow-400 transition-colors">
+              Home
+            </Link>
 
-            {/* Maps */}
+            {/* Maps Dropdown */}
             <div className="relative">
               <button
-                onClick={() => setMapDropdownOpen(open => !open)}
-                className="nav-link flex items-center"
+                onClick={() => setMapDropdownOpen(prev => !prev)}
+                className="flex items-center text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
               >
-                Maps <ChevronDown className="ml-1 h-4 w-4"/>
+                Maps <ChevronDown className="h-4 w-4 ml-1" />
               </button>
               {mapDropdownOpen && (
                 <div
                   className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
                   onMouseLeave={() => setMapDropdownOpen(false)}
                 >
-                  <Link href="/maps" className="dropdown-item">All Maps</Link>
-                  <div className="border-t border-gray-700 my-1"/>
-                  {mapNamesDesktop.map(m => (
+                  <div className="py-1 max-h-96 overflow-y-auto">
                     <Link
-                      key={m.slug}
-                      href={`/maps/${m.slug}`}
-                      className="dropdown-item text-gray-300"
+                      href="/maps"
+                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-yellow-400"
                     >
-                      {m.label}
+                      All Maps
                     </Link>
-                  ))}
+                    <div className="border-t border-gray-700 my-1"></div>
+                    {mapNamesDesktop.map(({ label, slug }) => (
+                      <Link
+                        key={slug}
+                        href={`/maps/${slug}`}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
+                      >
+                        {label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
 
-            <Link href="/demos" className="nav-link text-gray-300">Demos</Link>
-            <Link href="/players" className="nav-link text-gray-300">Players</Link>
+            <Link href="/demos" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
+              Demos
+            </Link>
 
-            {/* Community Placeholder */}
+            <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
+              Players
+            </Link>
+
+            {/* Community Link with Hover Modal */}
             <div className="relative group">
-              <div className="nav-link cursor-default">Community</div>
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-40 bg-gray-800 rounded-lg border border-gray-700 py-2 text-center text-sm text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="text-sm font-medium text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors">
+                Community
+              </div>
+              <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-40 bg-gray-800 rounded-lg shadow-lg border border-gray-700 text-center py-2 text-sm text-gray-300 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
                 To be continued
               </div>
             </div>
           </nav>
 
-          {/* Right Side */}
+          {/* Right Navigation */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
+            {/* Search Button */}
             <button
-              onClick={() => setSearchActive(active => !active)}
-              className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
+              onClick={() => setSearchActive(prev => !prev)}
+              className="p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200"
               aria-label="Search"
             >
-              <Search className="h-5 w-5"/>
+              <Search className="h-5 w-5" />
             </button>
 
-            {/* Notifications (Placeholder) */}
-            <button className="hidden p-2 relative text-gray-400 hover:text-yellow-400 md:block">
-              <BellRing className="h-5 w-5"/>
-              <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"/>
+            {/* Notifications Placeholder */}
+            <button
+              className="hidden p-2 text-gray-400 hover:text-yellow-400 md:block relative rounded-full transition-colors"
+              aria-label="Notifications"
+            >
+              <BellRing className="h-5 w-5" />
+              <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
             </button>
 
-            {/* User */}
             {user ? (
               <div className="relative">
                 <button
-                  onClick={() => setUserDropdownOpen(open => !open)}
+                  onClick={() => setUserDropdownOpen(prev => !prev)}
                   className="flex items-center p-1 border border-yellow-400 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
+                  aria-label="User menu"
                 >
                   <div className="w-8 h-8 rounded-full bg-gray-700 overflow-hidden">
-                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="object-cover w-full h-full"/>}
+                    {user.avatar_url && (
+                      <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                    )}
                   </div>
                 </button>
                 {userDropdownOpen && (
@@ -157,13 +175,19 @@ export default function Navbar({
                     className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
                     onMouseLeave={() => setUserDropdownOpen(false)}
                   >
-                    <Link href="/profile" className="dropdown-item">Your Profile</Link>
-                    <Link href="/favorites" className="dropdown-item text-gray-300">Favorites</Link>
-                    <Link href="/settings" className="dropdown-item text-gray-300">Settings</Link>
-                    <div className="border-t border-gray-700 my-1"/>
+                    <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
+                      Your Profile
+                    </Link>
+                    <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
+                      Favorites
+                    </Link>
+                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
+                      Settings
+                    </Link>
+                    <div className="border-t border-gray-700 my-1"></div>
                     <button
                       onClick={handleSignOut}
-                      className="dropdown-item text-red-400"
+                      className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
                     >
                       Sign out
                     </button>
@@ -173,19 +197,20 @@ export default function Navbar({
             ) : (
               <Link
                 href="/signin"
-                className="hidden lg:flex items-center px-4 py-2 border border-yellow-400/30 rounded-full text-white hover:bg-yellow-400 hover:text-gray-900 transition"
+                className="hidden lg:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
               >
-                <LogIn className="mr-2 h-4 w-4"/> Sign In
+                <LogIn className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Sign In</span>
               </Link>
             )}
 
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Button */}
             <button
-              onClick={() => setIsMenuOpen(open => !open)}
+              onClick={() => setIsMenuOpen(prev => !prev)}
               className="md:hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors"
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {isMenuOpen ? <X className="h-6 w-6"/> : <Menu className="h-6 w-6"/>}
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -198,24 +223,24 @@ export default function Navbar({
                 type="text"
                 placeholder="Search POVs, maps, players, or teams..."
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full p-3 pl-10 pr-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-yellow-400 transition"
+                className="w-full p-3 pl-10 pr-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-400 transition-all"
               />
-              <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400"/>
+              <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
               <button
                 type="button"
                 onClick={() => setSearchActive(false)}
                 className="absolute right-3 top-3 text-gray-400 hover:text-yellow-400"
               >
-                <X className="h-5 w-5"/>
+                <X className="h-5 w-5" />
               </button>
             </form>
             {searchQuery && (
-              <div className="mt-2 bg-gray-800 rounded-xl border border-gray-700 shadow-lg">
+              <div className="mt-2 bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
                 <div className="p-4">
                   <p className="text-gray-400 text-sm">
-                    Press Enter to search for “{searchQuery}”
+                    Press Enter to search for "{searchQuery}"
                   </p>
                 </div>
               </div>
@@ -224,52 +249,72 @@ export default function Navbar({
         )}
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 md:hidden overflow-y-auto">
+        <div className="fixed inset-0 md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
-              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white font-medium hover:text-yellow-400">
+              <Link
+                href="/"
+                className="block text-white font-medium hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Home
               </Link>
 
-              <div className="pt-4 border-t border-gray-800">
+              <div className="border-t border-gray-800 pt-4">
                 <div className="flex items-center mb-3">
-                  <MapPin className="mr-2 h-5 w-5 text-yellow-400"/> <span className="text-lg font-medium text-white">Maps</span>
+                  <MapPin className="h-5 w-5 text-yellow-400 mr-2" />
+                  <span className="text-white font-medium text-lg">Maps</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  {mostPlayedMapsMobile.map(m => (
+                  {mostPlayedMapsMobile.map(({ label, slug }) => (
                     <Link
-                      key={m.slug}
-                      href={`/maps/${m.slug}`}
+                      key={slug}
+                      href={`/maps/${slug}`}
+                      className="block py-2 text-gray-300 hover:text-yellow-400 text-center border border-gray-700 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
-                      className="border border-gray-700 rounded-md py-2 text-center text-gray-300 hover:text-yellow-400"
                     >
-                      {m.label}
+                      {label}
                     </Link>
                   ))}
                 </div>
                 <Link
                   href="/maps"
+                  className="block text-sm text-yellow-400 mt-3 text-center hover:underline"
                   onClick={() => setIsMenuOpen(false)}
-                  className="mt-3 block text-center text-sm text-yellow-400 hover:underline"
                 >
                   Alle Maps →
                 </Link>
               </div>
 
-              <Link href="/demos" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-300 hover:text-yellow-400">
-                <FileVideo className="h-5 w-5 text-yellow-400"/> Demos
-              </Link>
-              <Link href="/players" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-300 hover:text-yellow-400">
-                <User className="h-5 w-5 text-yellow-400"/> Players
+              <Link
+                href="/demos"
+                className="block text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="flex items-center gap-2">
+                  <FileVideo className="h-5 w-5 text-yellow-400" />
+                  <span className="font-medium">Demos</span>
+                </div>
               </Link>
 
-              <div className="pt-6 border-t border-gray-800">
+              <Link
+                href="/players"
+                className="block text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-yellow-400" />
+                  <span className="font-medium">Players</span>
+                </div>
+              </Link>
+
+              <div className="border-t border-gray-800 pt-6">
                 <Link
                   href="/login"
+                  className="block w-full py-3 bg-yellow-400 text-gray-900 rounded-lg text-center font-bold hover:bg-yellow-300 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block w-full rounded-lg bg-yellow-400 py-3 text-center font-bold text-gray-900 hover:bg-yellow-300 transition"
                 >
                   Sign In
                 </Link>
@@ -280,4 +325,6 @@ export default function Navbar({
       )}
     </header>
   );
-}
+};
+
+export default Navbar;
