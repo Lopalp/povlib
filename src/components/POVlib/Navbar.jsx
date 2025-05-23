@@ -1,13 +1,13 @@
 "use client"
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import { 
-  Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn 
+import {
+  Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn
 } from 'lucide-react';
 import { UserContext } from '../../../context/UserContext';
-import LogoHeading from '@/components/typography/LogoHeading'
+import LogoHeading from '@/components/typography/LogoHeading';
 import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
@@ -16,41 +16,39 @@ const mapNamesDesktop = [
   { label: 'Ancient', slug: 'ancient' },
   { label: 'Overpass', slug: 'overpass' },
   { label: 'Anubis', slug: 'anubis' },
-  { label: 'Vertigo', slug: 'vertigo' }
+  { label: 'Vertigo', slug: 'vertigo' },
 ];
 
 const mostPlayedMapsMobile = [
   { label: 'Mirage', slug: 'mirage' },
   { label: 'Inferno', slug: 'inferno' },
   { label: 'Nuke', slug: 'nuke' },
-  { label: 'Ancient', slug: 'ancient' }
+  { label: 'Ancient', slug: 'ancient' },
 ];
 
-const Navbar = ({
-  demoType = 'pro',
-  onSwitchDemoType,
+export default function Navbar({
   searchActive,
   setSearchActive,
   setIsMenuOpen,
-  isMenuOpen
-}) => {
+  isMenuOpen,
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [mapDropdownOpen, setMapDropdownOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mapMenuOpen, setMapMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, setUser } = useContext(UserContext);
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
-  const { user, setUser } = useContext(UserContext);
-
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 0);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 0);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleSearchSubmit = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
+    // perform actual search logic here
     setSearchActive(false);
   };
 
@@ -62,251 +60,232 @@ const Navbar = ({
     }
   };
 
+  const baseLink =
+    'text-sm font-medium transition-colors duration-200 hover:text-yellow-400';
+
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        !isScrolled
+      className={`fixed top-0 w-full z-50 transition-all duration-300
+        ${!isScrolled
           ? 'bg-gradient-to-b from-black/70 to-transparent'
-          : 'backdrop-filter backdrop-blur-lg bg-black/30 border-b border-gray-700'
-      }`}
+          : 'bg-gradient-to-b from-black/30 to-transparent backdrop-blur-lg'}
+      `}
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-4">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <LogoHeading size={4} />
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-sm font-medium text-white hover:text-yellow-400 transition-colors">
-              Home
-            </Link>
-
-            {/* Maps Dropdown */}
+            <Link href="/" className={`${baseLink} text-white`}>Home</Link>
             <div className="relative">
               <button
-                onClick={() => setMapDropdownOpen(prev => !prev)}
-                className="flex items-center text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={() => setMapMenuOpen(o => !o)}
+                className={`${baseLink} text-gray-300 flex items-center`}
               >
-                Maps <ChevronDown className="h-4 w-4 ml-1" />
+                Maps <ChevronDown className="ml-1 h-4 w-4" />
               </button>
-              {mapDropdownOpen && (
-                <div
-                  className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
-                  onMouseLeave={() => setMapDropdownOpen(false)}
+              {mapMenuOpen && (
+                <ul
+                  className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden"
+                  onMouseLeave={() => setMapMenuOpen(false)}
                 >
-                  <div className="py-1 max-h-96 overflow-y-auto">
-                    <Link href="/maps" className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-yellow-400">
+                  <li>
+                    <Link
+                      href="/maps"
+                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                    >
                       All Maps
                     </Link>
-                    <div className="border-t border-gray-700 my-1"></div>
-                    {mapNamesDesktop.map(({ label, slug }) => (
+                  </li>
+                  <li className="border-t border-gray-700" />
+                  {mapNamesDesktop.map(m => (
+                    <li key={m.slug}>
                       <Link
-                        key={slug}
-                        href={`/maps/${slug}`}
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-400"
+                        href={`/maps/${m.slug}`}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                       >
-                        {label}
+                        {m.label}
                       </Link>
-                    ))}
-                  </div>
-                </div>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
 
-            <Link href="/demos" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
-              Demos
-            </Link>
-            <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
-              Players
-            </Link>
-
-            {/* Community */}
+            <Link href="/demos" className={`${baseLink} text-gray-300`}>Demos</Link>
+            <Link href="/players" className={`${baseLink} text-gray-300`}>Players</Link>
             <div className="relative group">
-              <div className="text-sm font-medium text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors">
-                Community
-              </div>
-              <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-40 bg-gray-800 rounded-lg shadow-lg border border-gray-700 text-center py-2 text-sm text-gray-300 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
+              <span className={`${baseLink} text-gray-300 cursor-default`}>Community</span>
+              <div className="absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 bg-gray-800 rounded-xl py-2 text-center text-gray-300 text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                 To be continued
               </div>
             </div>
           </nav>
 
-          {/* Right Navigation */}
+          {/* Right Side */}
           <div className="flex items-center space-x-4">
-            {/* Search Button */}
+            {/* Search Toggle */}
             <button
-              onClick={() => setSearchActive(prev => !prev)}
-              className="p-2 text-gray-400 hover:text-yellow-400 transition-colors duration-200"
-              aria-label="Search"
+              onClick={() => setSearchActive(a => !a)}
+              className="p-2 text-gray-400 hover:text-yellow-400 transition-colors"
             >
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Notifications */}
-            <button className="hidden md:block p-2 text-gray-400 hover:text-yellow-400 transition-colors relative rounded-full" aria-label="Notifications">
+            {/* Notification */}
+            <button className="hidden md:block p-2 relative text-gray-400 hover:text-yellow-400 transition-colors">
               <BellRing className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
+              <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full" />
             </button>
 
+            {/* User */}
             {user ? (
               <div className="relative">
                 <button
-                  onClick={() => setUserDropdownOpen(prev => !prev)}
+                  onClick={() => setUserMenuOpen(o => !o)}
                   className="flex items-center p-1 border border-yellow-400 rounded-full text-gray-400 hover:text-yellow-400 transition-colors"
-                  aria-label="User menu"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gray-700 overflow-hidden">
-                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />}
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
+                    {user.avatar_url && (
+                      <img
+                        src={user.avatar_url}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                 </button>
-                {userDropdownOpen && (
-                  <div
-                    className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden z-50"
-                    onMouseLeave={() => setUserDropdownOpen(false)}
+                {userMenuOpen && (
+                  <ul
+                    className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden"
+                    onMouseLeave={() => setUserMenuOpen(false)}
                   >
-                    <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-700">
-                      Your Profile
-                    </Link>
-                    <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
-                      Favorites
-                    </Link>
-                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
-                      Settings
-                    </Link>
-                    <div className="border-t border-gray-700 my-1"></div>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
-                    >
-                      Sign out
-                    </button>
-                  </div>
+                    <li>
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700"
+                      >
+                        Your Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/favorites"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+                      >
+                        Favorites
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/settings"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+                      >
+                        Settings
+                      </Link>
+                    </li>
+                    <li className="border-t border-gray-700" />
+                    <li>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
+                      >
+                        Sign Out
+                      </button>
+                    </li>
+                  </ul>
                 )}
               </div>
             ) : (
               <Link
                 href="/signin"
-                className="hidden lg:flex items-center px-4 py-2 bg-transparent hover:bg-yellow-400 text-white hover:text-gray-900 rounded-full border border-yellow-400/30 transition-all"
+                className="hidden lg:flex items-center px-4 py-2 border border-yellow-400/30 rounded-full bg-transparent text-white hover:bg-yellow-400 hover:text-gray-900 transition-colors"
               >
-                <LogIn className="h-4 w-4 mr-2" />
-                <span className="text-sm font-medium">Sign In</span>
+                <LogIn className="h-4 w-4 mr-2" /> Sign In
               </Link>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu */}
             <button
-              onClick={() => setIsMenuOpen(prev => !prev)}
+              onClick={() => setIsMenuOpen(o => !o)}
               className="md:hidden p-2 text-gray-400 hover:text-yellow-400 transition-colors"
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Glassmorphic Search Bar */}
         {searchActive && (
-          <div className="pb-4 px-4">
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <input
-                type="text"
-                placeholder="Search POVs, maps, players, or teams..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus
-                className="w-full p-3 pl-10 pr-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-400 transition-all"
-              />
-              <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-              <button
-                type="button"
-                onClick={() => setSearchActive(false)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-yellow-400"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </form>
-            {searchQuery && (
-              <div className="mt-2 bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-                <div className="p-4">
-                  <p className="text-gray-400 text-sm">
-                    Press Enter to search for "{searchQuery}"
-                  </p>
-                </div>
+          <div className="mt-2 px-4">
+            <form
+              onSubmit={handleSearch}
+              className="relative mx-auto max-w-lg"
+            >
+              <div className="bg-white bg-opacity-10 backdrop-blur-md border border-white border-opacity-20 rounded-full flex items-center px-4 py-2 transition-shadow shadow-lg">
+                <Search className="h-5 w-5 text-gray-200" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search POVs, maps, players or teams..."
+                  className="flex-grow bg-transparent placeholder-gray-300 text-white ml-3 focus:outline-none"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                )}
               </div>
-            )}
+            </form>
           </div>
         )}
       </div>
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed inset-0 md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-gray-900/95 backdrop-blur-lg z-50 overflow-y-auto">
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
-              <Link
-                href="/"
-                className="block text-white font-medium hover:text-yellow-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white font-medium hover:text-yellow-400">
                 Home
               </Link>
-
               <div className="border-t border-gray-800 pt-4">
-                <div className="flex items-center mb-3">
-                  <MapPin className="h-5 w-5 text-yellow-400 mr-2" />
-                  <span className="text-white font-medium text-lg">Maps</span>
+                <div className="flex items-center mb-3 text-lg font-medium text-white">
+                  <MapPin className="h-5 w-5 text-yellow-400 mr-2" /> Maps
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  {mostPlayedMapsMobile.map(({ label, slug }) => (
+                  {mostPlayedMapsMobile.map(m => (
                     <Link
-                      key={slug}
-                      href={`/maps/${slug}`}
-                      className="block py-2 text-gray-300 hover:text-yellow-400 text-center border border-gray-700 rounded-md"
+                      key={m.slug}
+                      href={`/maps/${m.slug}`}
                       onClick={() => setIsMenuOpen(false)}
+                      className="py-2 text-center text-gray-300 border border-gray-700 rounded-md hover:text-yellow-400"
                     >
-                      {label}
+                      {m.label}
                     </Link>
                   ))}
                 </div>
-                <Link
-                  href="/maps"
-                  className="block text-sm text-yellow-400 mt-3 text-center hover:underline"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link href="/maps" onClick={() => setIsMenuOpen(false)} className="mt-3 block text-center text-sm text-yellow-400 hover:underline">
                   Alle Maps →
                 </Link>
               </div>
-
-              <Link
-                href="/demos"
-                className="block text-gray-300 hover:text-yellow-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <div className="flex items-center gap-2">
-                  <FileVideo className="h-5 w-5 text-yellow-400" />
-                  <span className="font-medium">Demos</span>
-                </div>
+              <Link href="/demos" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-300 hover:text-yellow-400">
+                <FileVideo className="h-5 w-5 text-yellow-400" /> Demos
               </Link>
-
-              <Link
-                href="/players"
-                className="block text-gray-300 hover:text-yellow-400 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-yellow-400" />
-                  <span className="font-medium">Players</span>
-                </div>
+              <Link href="/players" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-300 hover:text-yellow-400">
+                <User className="h-5 w-5 text-yellow-400" /> Players
               </Link>
-
               <div className="border-t border-gray-800 pt-6">
-                <Link
-                  href="/login"
-                  className="block w-full py-3 bg-yellow-400 text-gray-900 rounded-lg text-center font-bold hover:bg-yellow-300 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block w-full py-3 rounded-full bg-yellow-400 text-gray-900 font-bold text-center hover:bg-yellow-300">
                   Sign In
                 </Link>
               </div>
@@ -316,6 +295,4 @@ const Navbar = ({
       )}
     </header>
   );
-};
-
-export default Navbar;
+}
