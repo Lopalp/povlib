@@ -66,7 +66,7 @@ const Navbar = ({
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         !isScrolled
-          ? 'bg-gradient-to-b from-black/50 to-transparent'
+          ? 'bg-gradient-to-b from-black/70 to-transparent'
           : 'backdrop-filter backdrop-blur-lg bg-black/30 border-b border-gray-700'
       }`}
     >
@@ -97,10 +97,7 @@ const Navbar = ({
                   onMouseLeave={() => setMapDropdownOpen(false)}
                 >
                   <div className="py-1 max-h-96 overflow-y-auto">
-                    <Link
-                      href="/maps"
-                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-yellow-400"
-                    >
+                    <Link href="/maps" className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-yellow-400">
                       All Maps
                     </Link>
                     <div className="border-t border-gray-700 my-1"></div>
@@ -121,12 +118,11 @@ const Navbar = ({
             <Link href="/demos" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Demos
             </Link>
-
             <Link href="/players" className="text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors">
               Players
             </Link>
 
-            {/* Community Link with Hover Modal */}
+            {/* Community */}
             <div className="relative group">
               <div className="text-sm font-medium text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors">
                 Community
@@ -148,11 +144,8 @@ const Navbar = ({
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Notifications Placeholder */}
-            <button
-              className="hidden p-2 text-gray-400 hover:text-yellow-400 md:block relative rounded-full transition-colors"
-              aria-label="Notifications"
-            >
+            {/* Notifications */}
+            <button className="hidden md:block p-2 text-gray-400 hover:text-yellow-400 transition-colors relative rounded-full" aria-label="Notifications">
               <BellRing className="h-5 w-5" />
               <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full"></span>
             </button>
@@ -165,9 +158,7 @@ const Navbar = ({
                   aria-label="User menu"
                 >
                   <div className="w-8 h-8 rounded-full bg-gray-700 overflow-hidden">
-                    {user.avatar_url && (
-                      <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />
-                    )}
+                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />}
                   </div>
                 </button>
                 {userDropdownOpen && (
