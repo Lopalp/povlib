@@ -8,21 +8,15 @@ import LogoHeading from '@/components/typography/LogoHeading';
 import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
-const mapNamesDesktop = [
-  { label: 'Mirage', slug: 'mirage' },
-  { label: 'Inferno', slug: 'inferno' },
-  { label: 'Nuke', slug: 'nuke' },
-  { label: 'Ancient', slug: 'ancient' },
-  { label: 'Overpass', slug: 'overpass' },
-  { label: 'Anubis', slug: 'anubis' },
-  { label: 'Vertigo', slug: 'vertigo' }
-];
-const mostPlayedMapsMobile = [
-  { label: 'Mirage', slug: 'mirage' },
-  { label: 'Inferno', slug: 'inferno' },
-  { label: 'Nuke', slug: 'nuke' },
-  { label: 'Ancient', slug: 'ancient' }
-];
+// Glassmorphism background utility for navbar and modals
+const glassBg = 'bg-black/40 backdrop-blur-lg';
+
+// Reusable Modal with frosted glass effect
+export const GlassModal = ({ children, className = '', ...props }) => (
+  <div className={`fixed inset-0 flex items-center justify-center ${glassBg} ${className}`} {...props}>
+    {children}
+  </div>
+);
 
 export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, isMenuOpen }) {
   const [isScrolled, setIsScrolled] = useState(false);
