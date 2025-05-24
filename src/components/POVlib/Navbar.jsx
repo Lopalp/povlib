@@ -34,7 +34,8 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   const router = useRouter();
 
   // Glassmorphism background utility
-  const glassBg = 'bg-black/40 backdrop-blur-lg';
+  // Glas- (Milchglas-) Effekt
+  const glassBg = 'bg-white/20 backdrop-blur-lg';
 
   useEffect(() => {
     const onScroll = () => {
