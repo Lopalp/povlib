@@ -35,7 +35,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   const router = useRouter();
 
   // Glassmorphism background utility
-  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
+  const glassBg = 'bg-black/40 backdrop-blur-lg';
 
   useEffect(() => {
     const onScroll = () => {
@@ -172,7 +172,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
       </div>
 
       {isMenuOpen && (
-        <div className={`fixed inset-0 z-50 ${glassBg.replace('border border-gray-700','bg-black/90 border border-gray-800')} overflow-y-auto`}>          
+        <div className={`fixed inset-0 z-50 ${glassBg} overflow-y-auto`}>          
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
               <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white font-medium hover:text-yellow-400">Home</Link>
@@ -182,7 +182,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {mostPlayedMapsMobile.map(m => (
-                    <Link key={m.slug} href={`/maps/${m.slug}`} onClick={() => setIsMenuOpen(false)} className="py-2 text-center text-gray-200 border border-gray-700 rounded-md hover:text-yellow-400">{m.label}</Link>
+                    <Link key={m.slug} href={`/maps/${m.slug}`} onClick={() => setIsMenuOpen(false)} className="py-2 text-center text-gray-200 border border-gray-700 hover:border-yellow-400 rounded-md hover:text-yellow-400">{m.label}</Link>
                   ))}
                 </div>
                 <Link href="/maps" onClick={() => setIsMenuOpen(false)} className="mt-3 block text-sm text-yellow-400 hover:underline">All Maps →</Link>
