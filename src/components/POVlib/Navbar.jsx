@@ -34,11 +34,21 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
+  // Glassmorphism background utility
+  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
+
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 0);
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+      // Close any open menus/modals on scroll
+      setMapMenuOpen(false);
+      setUserMenuOpen(false);
+      setSearchActive(false);
+      setIsMenuOpen(false);
+    };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [setSearchActive, setIsMenuOpen]);
 
   const toggleSearch = () => {
     setMapMenuOpen(false);
@@ -60,15 +70,10 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   };
 
   const linkClasses = 'text-sm font-medium transition-colors duration-200 hover:text-yellow-400';
-  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300
-        ${!isScrolled
-          ? 'bg-black/60'
-          : 'bg-black/40 backdrop-blur-lg'}
-      `}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
