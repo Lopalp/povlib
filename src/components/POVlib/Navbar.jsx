@@ -1,4 +1,3 @@
-"use client"
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import {
@@ -40,7 +39,6 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > 0);
-      // Close any open menus/modals on scroll
       setMapMenuOpen(false);
       setUserMenuOpen(false);
       setSearchActive(false);
@@ -61,7 +59,6 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
   const handleSearchSubmit = e => {
     e.preventDefault();
-    // perform search
     setSearchActive(false);
   };
   const handleSignOut = async () => {
@@ -73,6 +70,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
   return (
     <header
+      // Removed border/gradient classes to eliminate the frame
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
     >
       <div className="container mx-auto px-4 md:px-8">
@@ -88,12 +86,12 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                 Maps <ChevronDown className="h-4 w-4" />
               </button>
               {mapMenuOpen && (
-                <ul className={`absolute left-0 mt-2 w-52 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>
+                <ul className={`absolute left-0 mt-2 w-52 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>  
                   <li><Link href="/maps" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">All Maps</Link></li>
                   <li className="border-t border-gray-600 my-1" />
                   {mapNamesDesktop.map(m => (
                     <li key={m.slug}>
-                      <Link href={`/maps/${m.slug}`} className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
+                      <Link href={`/maps/${m.slug}`} className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400">
                         {m.label}
                       </Link>
                     </li>
@@ -143,7 +141,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
             {user ? (
               <div className="relative">
-                <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400">
+                <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-transparent rounded-full text-gray-300 hover:text-yellow-400">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
                     {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />}
                   </div>
@@ -151,8 +149,8 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                 {userMenuOpen && (
                   <ul className={`absolute right-0 mt-2 w-48 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>
                     <li><Link href="/profile" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">Your Profile</Link></li>
-                    <li><Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Favorites</Link></li>
-                    <li><Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Settings</Link></li>
+                    <li><Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400">Favorites</Link></li>
+                    <li><Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400">Settings</Link></li>
                     <li className="border-t border-gray-600 my-1" />
                     <li><button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white">Sign Out</button></li>
                   </ul>
