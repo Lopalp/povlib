@@ -3,8 +3,9 @@ import { X, Map as MapIcon, Users, Calendar, Trophy, Zap } from 'lucide-react';
 
 const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilterChange, onResetFilters, onApplyFilters }) => {
   return (
-    <div className="fixed inset-0 bg-gray-900/95 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-yellow-400/30 shadow-[0_0_30px_rgba(250,204,21,0.15)]">
+    <div className="fixed inset-0 bg-gray-900/95 flex items-center justify-center z-50 p-4 backdrop-blur-sm"> 
+      {/* Use the same glassmorphism effect as the Navbar */}
+      <div className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-white">Filter POV Demos</h2>
