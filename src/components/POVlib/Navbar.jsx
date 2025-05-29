@@ -90,7 +90,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
               {mapMenuOpen && (
                 <ul className={`absolute left-0 mt-2 w-52 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>
                   <li><Link href="/maps" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">All Maps</Link></li>
-                  <li className="border-t border-gray-600 my-1" />
+                  <li className="border-t border-gray-600 my-1"></li>
                   {mapNamesDesktop.map(m => (
                     <li key={m.slug}>
                       <Link href={`/maps/${m.slug}`} className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
@@ -120,7 +120,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                     type="text"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search POVs, maps, players or teams..."
+                    placeholder="Search POVs, maps, players or teams..." // Removed focus:outline-none here
                     className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white focus:outline-none"
                     autoFocus
                   />
@@ -153,7 +153,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                     <li><Link href="/profile" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">Your Profile</Link></li>
                     <li><Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Favorites</Link></li>
                     <li><Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Settings</Link></li>
-                    <li className="border-t border-gray-600 my-1" />
+                    <li className="border-t border-gray-600 my-1"></li>
                     <li><button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white">Sign Out</button></li>
                   </ul>
                 )}
