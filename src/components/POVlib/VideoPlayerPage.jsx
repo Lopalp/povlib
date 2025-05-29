@@ -26,6 +26,7 @@ const VideoPlayerPage = ({
 
   if (!selectedDemo) return null;
 
+  // Generate dynamic description
   const generateDescription = () => {
     let desc = `Experience top-tier CS2 gameplay featuring ${selectedDemo.players.join(', ')} on ${selectedDemo.map}. `;
     if (selectedDemo.team) desc += `Watch how ${selectedDemo.team} players demonstrate professional `;
@@ -62,16 +63,17 @@ const VideoPlayerPage = ({
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Video + Info Column (Text 10/12) */}
+            {/* Video + Info Column (increased width by ~20%) */}
             <div className="lg:w-10/12">
               {/* Video embed */}
-              <div className="rounded-lg overflow-hidden bg-black shadow-[0_0_30px_rgba(0,0,0,0.3)] mb-6" style={{ height: 'calc(56.25vw * 1.2)' }}>
+              <div className="rounded-lg overflow-hidden bg-black shadow-[0_0_30px_rgba(0,0,0,0.3)] mb-6">
                 <YouTubeEmbed 
                   videoId={selectedDemo.video_id} 
                   title={selectedDemo.title}
                   autoplay
                   controls
                   showInfo={false}
+                  style={{ width: '100%', height: 'calc(100% + 20%)' }}
                 />
               </div>
 
@@ -147,7 +149,7 @@ const VideoPlayerPage = ({
                   </h3>
                   <div className="space-y-3 text-xs">
                     {selectedDemo.players.map((player, idx) => (
-                      <Link key={idx} href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}>
+                      <Link key={idx} href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}>  
                         <a className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-700/50 transition-colors">
                           <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-bold text-xs">
                             {player.charAt(0)}
@@ -163,6 +165,7 @@ const VideoPlayerPage = ({
                   </div>
                 </div>
               </div>
+
             </div>
 
             {/* Related Videos Column */}
