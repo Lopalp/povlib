@@ -8,7 +8,7 @@ import { UserContext } from '../../../context/UserContext';
 import LogoHeading from '@/components/typography/LogoHeading';
 import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
-
+ 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
   { label: 'Inferno', slug: 'inferno' },
