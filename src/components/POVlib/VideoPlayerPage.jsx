@@ -81,7 +81,7 @@ const VideoPlayerPage = ({
               <h1 className="text-3xl font-bold text-white mb-4">{selectedDemo.title}</h1>
 
               {/* Stats & Actions */}
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-4">
                 {/* Stats */}
                 <div className="flex items-center space-x-4 text-gray-400">
                   <div className="flex items-center">
@@ -110,6 +110,20 @@ const VideoPlayerPage = ({
                   </button>
                 </div>
               </div>
+
+              {/* Tags (styled like on Start Page) */}
+              {selectedDemo.tags?.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  {selectedDemo.tags.map(tag => (
+                    <button
+                      key={tag}
+                      className="px-3 py-1 bg-gray-800 rounded-full text-sm hover:bg-yellow-400/20 transition-colors"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Description Section */}
               <section className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-6 mb-8 border border-gray-700">
