@@ -209,6 +209,10 @@ const MapPage = ({ mapName }) => {
     
     window.scrollTo(0, 0);
   };
+
+  const handleSwitchDemoType = (type) => {
+ setDemoType(type);
+  };
   
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);

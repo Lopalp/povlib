@@ -1,40 +1,48 @@
 // lib/supabase.js - Supabase Client und Datenbank-Hilfsfunktionen
 import { createClient } from '@supabase/supabase-js';
-import { createBrowserClient } from "@supabase/ssr";
 
 // Supabase-Client initialisieren
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(
-  supabaseUrl,
-  supabaseKey,
-  {
-    cookies: {
-      get(name) {
-        return cookieStore.get(name)?.value;
-      },
-      set(name, value, options) {
-        try {
-          cookieStore.set({ name, value, ...options });
-        } catch (error) {
-          // The `set` method was called from a Server Component.
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
+let supabase;
+
+function getSupabaseClient() {
+  if (!supabase) {
+    supabase = createClient(
+      supabaseUrl,
+      supabaseKey,
+      {
+        cookies: {
+          get(name) {
+            return cookieStore.get(name)?.value;
+          },
+          set(name, value, options) {
+            try {
+              cookieStore.set({ name, value, ...options });
+            } catch (error) {
+              // The `set` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+          remove(name, options) {
+            try {
+              cookieStore.set({ name, value: "", ...options });
+            } catch (error) {
+              // The `delete` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
         }
       },
-      remove(name, options) {
-        try {
-          cookieStore.set({ name, value: "", ...options });
-        } catch (error) {
-          // The `delete` method was called from a Server Component.
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
-        }
-      },
-    },
+    );
   }
-);
+  return supabase;
+}
+
+export { getSupabaseClient as supabase };
 
 // Hilfsfunktionen für Demo-Daten
 
@@ -94,7 +102,7 @@ export async function seedDatabase() {
         views: 9823,
         likes: 287,
         is_pro: true
-      },
+      }
       // Weitere Pro-Demos hier hinzufügen...
     ];
 
@@ -113,7 +121,7 @@ export async function seedDatabase() {
         views: 532,
         likes: 48,
         is_pro: false
-      },
+      }
       // Weitere Community-Demos hier hinzufügen...
     ];
 
@@ -146,7 +154,7 @@ export async function seedDatabase() {
     // Maps speichern
     const { error: mapsError } = await supabase
       .from('maps')
-      .upsert(maps.map(map => ({ name: map })));
+      .upsert(maps.map(name => ({ name })));
 
     if (mapsError) throw mapsError;
 
@@ -169,7 +177,7 @@ export async function seedDatabase() {
 
 // Alle Demos abrufen
 export async function getAllDemos(type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = getSupabaseClient().from('demos').select('*');
 
   if (type === 'pro') {
     query = query.eq('is_pro', true);
@@ -189,7 +197,7 @@ export async function getAllDemos(type = 'all') {
 
 // Gefilterte Demos abrufen
 export async function getFilteredDemos(filters = {}, type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = getSupabaseClient().from('demos').select('*');
 
   // Pro vs Community Filter
   if (type === 'pro') {
@@ -246,7 +254,7 @@ export async function getFilteredDemos(filters = {}, type = 'all') {
 // Demos nach ID abrufen
 export async function getDemoById(id) {
   const { data, error } = await supabase
-    .from('demos')
+ .from('demos')
     .select('*')
     .eq('id', id)
     .single();
@@ -261,7 +269,7 @@ export async function getDemoById(id) {
 
 // Demos nach Map abrufen
 export async function getDemosByMap(map) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseClient()
     .from('demos')
     .select('*')
     .eq('map', map);
@@ -276,7 +284,7 @@ export async function getDemosByMap(map) {
 
 // Demos nach Position abrufen
 export async function getDemosByPosition(position) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseClient()
     .from('demos')
     .select('*')
     .contains('positions', [position]);
@@ -291,7 +299,7 @@ export async function getDemosByPosition(position) {
 
 // Trending Demos abrufen (nach Views sortiert)
 export async function getTrendingDemos(limit = 5, type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = getSupabaseClient().from('demos').select('*');
 
   if (type === 'pro') {
     query = query.eq('is_pro', true);
@@ -313,7 +321,7 @@ export async function getTrendingDemos(limit = 5, type = 'all') {
 
 // Neueste Demos abrufen
 export async function getLatestDemos(limit = 5, type = 'all') {
-  let query = supabase.from('demos').select('*');
+  let query = getSupabaseClient().from('demos').select('*');
 
   if (type === 'pro') {
     query = query.eq('is_pro', true);
@@ -338,7 +346,7 @@ export async function getLatestDemos(limit = 5, type = 'all') {
 // Demo Views/Likes aktualisieren
 export async function updateDemoStats(demoId, field, increment = 1) {
   const { data: demo, error: fetchError } = await supabase
-    .from('demos')
+ .from('demos')
     .select('*')
     .eq('id', demoId)
     .single();
@@ -358,7 +366,7 @@ export async function updateDemoStats(demoId, field, increment = 1) {
   }
 
   const { data, error: updateError } = await supabase
-    .from('demos')
+ .from('demos')
     .update({ [field]: updatedValue })
     .eq('id', demoId)
     .select()
@@ -374,7 +382,7 @@ export async function updateDemoStats(demoId, field, increment = 1) {
 
 // Tags aktualisieren
 export async function updateDemoTags(demoId, tags) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseClient()
     .from('demos')
     .update({ tags })
     .eq('id', demoId)
@@ -391,7 +399,7 @@ export async function updateDemoTags(demoId, tags) {
 
 // Positionen aktualisieren
 export async function updateDemoPositions(demoId, positions) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabaseClient()
     .from('demos')
     .update({ positions })
     .eq('id', demoId)
@@ -410,14 +418,14 @@ export async function updateDemoPositions(demoId, positions) {
 export async function getFilterOptions() {
   try {
     // Maps abrufen
-    const { data: maps, error: mapsError } = await supabase
+    const { data: maps, error: mapsError } = await getSupabaseClient()
       .from('maps')
       .select('name');
 
     if (mapsError) throw mapsError;
 
     // Positionen abrufen
-    const { data: positionsData, error: positionsError } = await supabase
+    const { data: positionsData, error: positionsError } = await getSupabaseClient()
       .from('map_positions')
       .select('map, positions');
 
@@ -433,7 +441,7 @@ export async function getFilterOptions() {
     // Hier könntest du weitere Abfragen für diese Daten implementieren
 
     // Alle vorhandenen Player aus den Demos extrahieren
-    const { data: demos, error: demosError } = await supabase
+    const { data: demos, error: demosError } = await getSupabaseClient()
       .from('demos')
       .select('players');
 
@@ -447,19 +455,19 @@ export async function getFilterOptions() {
     });
 
     // Weitere Filter-Optionen aus der Datenbank abrufen
-    const { data: teams, error: teamsError } = await supabase
+    const { data: teams, error: teamsError } = await getSupabaseClient()
       .from('teams')
       .select('name');
 
-    const { data: years, error: yearsError } = await supabase
+    const { data: years, error: yearsError } = await getSupabaseClient()
       .from('years')
       .select('value');
 
-    const { data: events, error: eventsError } = await supabase
+    const { data: events, error: eventsError } = await getSupabaseClient()
       .from('events')
       .select('name');
 
-    const { data: results, error: resultsError } = await supabase
+    const { data: results, error: resultsError } = await getSupabaseClient()
       .from('results')
       .select('value');
 
@@ -484,7 +492,7 @@ export async function getFilterOptions() {
 export async function getPlayerInfo(playerName) {
   try {
     // First check if we have a dedicated players table
-    let { data: playerData, error: playerError } = await supabase
+    let { data: playerData, error: playerError } = await getSupabaseClient()
       .from('players')
       .select('*')
       .eq('name', playerName)
@@ -495,7 +503,7 @@ export async function getPlayerInfo(playerName) {
       
       // If no dedicated player data, generate it from the demos
       const { data: demos, error: demosError } = await supabase
-        .from('demos')
+ .from('demos')
         .select('*')
         .contains('players', [playerName]);
       
@@ -547,7 +555,7 @@ export async function getPlayerInfo(playerName) {
 export async function getDemosByPlayer(playerName, type = 'all', page = 1, pageSize = 12, filters = {}) {
   try {
     let query = supabase
-      .from('demos')
+ .from('demos')
       .select('*')
       .contains('players', [playerName]);
     
@@ -612,7 +620,7 @@ export async function getRelatedPlayers(playerName, limit = 5) {
     if (!player || !player.team) {
       // Get players from the same demos if no team
       const { data: demos } = await supabase
-        .from('demos')
+ .from('demos')
         .select('players')
         .contains('players', [playerName])
         .limit(10);
@@ -632,7 +640,7 @@ export async function getRelatedPlayers(playerName, limit = 5) {
     
     // Get other players from the same team
     const { data: teamPlayers, error } = await supabase
-      .from('demos')
+ .from('demos')
       .select('players')
       .eq('team', player.team)
       .limit(20);
@@ -660,13 +668,13 @@ export async function getRelatedPlayers(playerName, limit = 5) {
 export async function getAllPlayers(type = 'pro', page = 1, pageSize = 20, filters = {}) {
   try {
     // First try to get from players table if it exists
-    let { data: playersData, error: playersError } = await supabase
+    let { data: playersData, error: playersError } = await getSupabaseClient()
       .from('players')
       .select('*');
     
     // If no players table or empty, generate players from demos
     if (playersError || !playersData || playersData.length === 0) {
-      console.log('Generating players from demos');
+      console.log('Generating players from demos, Supabase table not found or empty');
       
       // Get all demos
       let query = supabase.from('demos').select('*');
