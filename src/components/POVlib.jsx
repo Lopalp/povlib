@@ -416,14 +416,6 @@ const POVlib = () => {
             />
           </>
         )}
-        {!filtersApplied.position && (
-          <CategorySection
-            title="AWP Plays"
-            demos={getFilteredDemosByPosition("AWPer")}
-            onSelectDemo={onSelectDemo}
-          />
-        )}
-
         {/* Revised Navigation Cards Below - Use the template image you had for Maps here */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
