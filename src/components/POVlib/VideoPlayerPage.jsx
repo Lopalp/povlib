@@ -63,7 +63,7 @@ const VideoPlayerPage = ({
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Video + Info Column (increased width by ~20%) */}
+            {/* Video + Info Column */}
             <div className="lg:w-10/12">
               {/* Video embed */}
               <div className="rounded-lg overflow-hidden bg-black shadow-[0_0_30px_rgba(0,0,0,0.3)] mb-6">
@@ -136,47 +136,68 @@ const VideoPlayerPage = ({
                 )}
               </section>
 
-              {/* Additional Features & Featured Players */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Additional Features */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 border border-gray-700">
-                  <h3 className="text-white font-medium mb-3 flex items-center text-sm">
-                    <Tag className="h-4 w-4 mr-2 text-yellow-400" /> Additional Features
-                  </h3>
-                  <div className="space-y-2 text-xs">
-                    <button className="w-full flex items-center justify-between bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-600">
-                      <span>Download .dem</span>
-                      <ChevronRight className="h-3 w-3 text-gray-500" />
-                    </button>
-                    <button className="w-full flex items-center justify-between bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-600">
-                      <span>Go to Matchroom</span>
-                      <ChevronRight className="h-3 w-3 text-gray-500" />
-                    </button>
-                  </div>
-                  <p className="text-gray-400 text-xs mt-3">Utilities Used: Placeholder</p>
+              {/* Additional Features */}
+              <div className="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
+                <h3 className="text-white font-medium mb-4 flex items-center text-base">
+                  <Tag className="h-5 w-5 mr-2 text-yellow-400" /> Additional Features
+                </h3>
+                <div className="flex flex-col md:flex-row gap-4">
+                  <a
+                    href={selectedDemo.video_url}
+                    download
+                    className="flex-1 flex items-center justify-center bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg hover:bg-yellow-300 transition-colors text-sm"
+                  >
+                    Download Video
+                  </a>
+                  <a
+                    href={selectedDemo.dem_url}
+                    download
+                    className="flex-1 flex items-center justify-center bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg hover:bg-yellow-300 transition-colors text-sm"
+                  >
+                    Download Demo
+                  </a>
+                  <a
+                    href={selectedDemo.matchroom_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors rounded-lg py-2 text-sm"
+                  >
+                    <img src="/images/faceit-logo.png" alt="Faceit" className="h-5 w-5 mr-2" />
+                    Go to Matchroom
+                  </a>
                 </div>
+              </div>
 
-                {/* Featured Players */}
-                <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 border border-gray-700">
-                  <h3 className="text-white font-medium mb-3 flex items-center text-sm">
-                    <Shield className="h-4 w-4 mr-2 text-yellow-400" /> Featured Players
-                  </h3>
-                  <div className="space-y-3 text-xs">
-                    {selectedDemo.players.map((player, idx) => (
-                      <Link key={idx} href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}>  
-                        <a className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-700/50 transition-colors">
-                          <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-bold text-xs">
-                            {player.charAt(0)}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-white font-medium">{player}</p>
-                            {selectedDemo.team && <p className="text-gray-400 text-xs">{selectedDemo.team}</p>}
-                          </div>
-                          <ChevronRight className="ml-auto h-3 w-3 text-gray-500" />
-                        </a>
-                      </Link>
-                    ))}
-                  </div>
+              {/* Utilities Section */}
+              <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 mb-8 border border-gray-700">
+                <h3 className="text-white font-medium mb-3 text-base">Utilities</h3>
+                <ul className="list-disc list-inside text-xs text-gray-300 space-y-1">
+                  <li>Utility 1</li>
+                  <li>Utility 2</li>
+                  <li>Utility 3</li>
+                </ul>
+              </div>
+
+              {/* Featured Players */}
+              <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 border border-gray-700">
+                <h3 className="text-white font-medium mb-3 flex items-center text-sm">
+                  <Shield className="h-4 w-4 mr-2 text-yellow-400" /> Featured Players
+                </h3>
+                <div className="space-y-3 text-xs">
+                  {selectedDemo.players.map((player, idx) => (
+                    <Link key={idx} href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}>  
+                      <a className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-700/50 transition-colors">
+                        <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-bold text-xs">
+                          {player.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white font-medium">{player}</p>
+                          {selectedDemo.team && <p className="text-gray-400 text-xs">{selectedDemo.team}</p>}
+                        </div>
+                        <ChevronRight className="ml-auto h-3 w-3 text-gray-500" />
+                      </a>
+                    </Link>
+                  ))}
                 </div>
               </div>
 
