@@ -8,7 +8,7 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
   const isDraggingRef = useRef(false);
   const dragStartX = useRef(0);
   const dragStartScrollLeft = useRef(0);
-
+ 
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
