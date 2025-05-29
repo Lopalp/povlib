@@ -51,6 +51,7 @@ const POVlib = () => {
   // UI States
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [activeTag, setActiveTag] = useState(null);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -275,6 +276,10 @@ const POVlib = () => {
     } catch (err) {
       console.error('Error updating positions:', err);
     }
+  };
+  
+  const handleTagClick = (tag) => {
+    setActiveTag(tag);
   };
 
   // Video selection and navigation
