@@ -32,57 +32,57 @@ const MapsIndex = () => {
     {
       name: "Mirage",
       description: "A classic CS2 map set in Morocco with a mix of long sight lines and close-quarters combat.",
-      demoCount: 42,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_mirage.png",
       positions: ["A Site", "B Site", "Mid", "Palace", "Apartments", "CT", "A Ramp", "B Short", "Window", "Underpass", "Jungle", "Connector"]
     },
     {
       name: "Inferno",
       description: "A tight map set in Italy featuring narrow corridors and choke points, requiring strong teamwork.",
-      demoCount: 37,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_inferno.png",
       positions: ["A Site", "B Site", "Banana", "Mid", "Pit", "Apartments", "Library", "CT", "Car", "Construction", "Boiler"]
     },
     {
       name: "Nuke",
       description: "A unique vertical map with two bomb sites stacked on top of each other in a nuclear facility.",
-      demoCount: 28,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_nuke.png",
       positions: ["A Site", "B Site", "Outside", "Ramp", "Secret", "Heaven", "Hell", "Radio", "Lobby", "Squeaky", "Vents"]
     },
     {
       name: "Ancient",
       description: "A newer map set in a mystical temple with tight corridors and unique layout.",
-      demoCount: 23,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_ancient.png",
       positions: ["A Site", "B Site", "Mid", "Cave", "Temple", "Donut", "Jungle", "T Ramp", "CT Ramp"]
     },
     {
       name: "Overpass",
       description: "A large map with two distinct areas, featuring unique elevation changes and rotation paths.",
-      demoCount: 19,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_overpass.png",
       positions: ["A Site", "B Site", "Long", "Monster", "Connector", "Bathrooms", "Bank", "Playground", "Short", "Heaven"]
     },
     {
       name: "Anubis",
       description: "A newer Egyptian-themed map with open bombsites and multiple approaches.",
-      demoCount: 17,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_anubis.png",
       positions: ["A Site", "B Site", "Palace", "Canal", "Connector", "Mid", "Street", "Bridge", "Alley"]
     },
     {
       name: "Vertigo",
       description: "A high-rise construction site map with tight corners and vertical gameplay elements.",
-      demoCount: 15,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_vertigo.png",
       positions: ["A Site", "B Site", "Mid", "CT", "Ramp", "Ladder", "Scaffold", "Elevators", "Heaven"]
     },
     {
       name: "Dust2",
       description: "The iconic Counter-Strike map with its classic layout and mid-centric design.",
-      demoCount: 14,
-      thumbnail: "https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true",
+      demoCount: 0, // Placeholder
+      thumbnail: "https://raw.githubusercontent.com/ghostcap-gaming/cs2-map-images/main/cs2/de_dust2.png",
       positions: ["A Site", "B Site", "Long", "Short", "Mid", "Lower Tunnels", "Upper Tunnels", "CT", "Pit", "Car"]
     }
   ];
