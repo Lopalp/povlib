@@ -105,46 +105,7 @@ const VideoPlayerPage = ({
                     />
               </div>
               
-              {/* Placeholder for new features */}
-              {/* Add features like download .dem, utils list, and matchroom button here */}
-              <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700">
-                <h2 className="text-xl font-bold text-white mb-4">Additional Features</h2>
-
-                {/* Download .dem button placeholder */}
-                <button className="bg-yellow-400 text-gray-900 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition-colors mb-4">
-                  Download .dem
-                </button>
-
-                {/* Utilities list placeholder */}
-                <div className="mb-4">
-                  <h3 className="text-gray-300 font-medium mb-2">Utilities Used:</h3>
-                  <p className="text-gray-400">Placeholder for clickable list of utilities (e.g., Smokes, Flashes, Molotovs) that jump to timestamp.</p>
-                </div>
-
-                {/* Matchroom button placeholder */}
-                <button className="bg-gray-700 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 transition-colors">
-                  Go to Matchroom
-                </button>
-              </div>
               {/* Video Info */}
-              <div className="mt-6">
-                <h1 className="text-2xl font-bold text-white mb-2">{selectedDemo.title}</h1>
-                
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <div className="flex items-center text-gray-400">
-                    <Eye className="h-4 w-4 mr-1" />
-                    <span>{selectedDemo.views?.toLocaleString()} views</span>
-                  </div>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-400">{selectedDemo.year}</span>
-                  {selectedDemo.event && (
-                    <>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-yellow-400">{selectedDemo.event}</span>
-                    </>
-                  )}
-                </div>
-                
                 <div className="flex flex-wrap items-center justify-between gap-2 py-4 border-t border-b border-gray-800">
                   <div className="flex flex-wrap gap-4">
                     <button 
@@ -186,26 +147,30 @@ const VideoPlayerPage = ({
                     <span>Report</span>
                   </button>
                 </div>
+              </div>
+              <div className="mt-6">
+                <h1 className="text-2xl font-bold text-white mb-2">{selectedDemo.title}</h1>
+                
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="flex items-center text-gray-400">
+                    <Eye className="h-4 w-4 mr-1" />
+                    <span>{selectedDemo.views?.toLocaleString()} views</span>
+                  </div>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-400">{selectedDemo.year}</span>
+                  {selectedDemo.event && (
+                    <>
+                      <span className="text-gray-400">•</span>
+                      <span className="text-yellow-400">{selectedDemo.event}</span>
+                    </>
+                  )}
+                </div>
                 
                 {/* Video Details */}
                 <div className="flex flex-col md:flex-row gap-6 mt-6">
                   {/* Left Column - Details */}
                   <div className="md:w-2/3">
-                    <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 mb-6 border border-gray-700">
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        <span className="bg-yellow-400 text-gray-900 text-sm font-bold px-3 py-1 rounded">{selectedDemo.map}</span>
-                        {selectedDemo.team && (
-                          <span className="bg-gray-700 text-sm px-3 py-1 rounded">{selectedDemo.team}</span>
-                        )}
-                        {selectedDemo.event && (
-                          <span className="bg-gray-700 text-sm px-3 py-1 rounded">{selectedDemo.event}</span>
-                        )}
-                        <span className="bg-gray-700 text-sm px-3 py-1 rounded">{selectedDemo.year}</span>
-                        <span className={`px-3 py-1 rounded-full text-sm ${selectedDemo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
-                          {selectedDemo.isPro ? 'PRO POV' : 'COMMUNITY POV'}
-                        </span>
-                      </div>
-                      
+                    <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 mb-4 border border-gray-700">
                       <div className="relative">
                         <p className={`text-gray-300 ${showFullDescription ? '' : 'line-clamp-3'}`}>
                           {description}
@@ -220,7 +185,80 @@ const VideoPlayerPage = ({
                         )}
                       </div>
                     </div>
-                    
+
+                    {/* Additional Features and Featured Players Section */}
+                    <div className="flex flex-col md:flex-row gap-6 mb-6">
+                      {/* Additional Features */}
+                      <div className="md:w-1/2 bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 border border-gray-700">
+                        <h3 className="text-white font-medium mb-3 flex items-center text-sm">
+                          <Tag className="h-4 w-4 mr-2 text-yellow-400" />
+                          Additional Features
+                        </h3>
+                        <div className="space-y-2 text-xs">
+                          {/* Download .dem button placeholder */}
+                          <button className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-600 transition-colors w-full text-left flex items-center justify-between">
+                            <span>Download .dem</span>
+                            <ChevronRight className="ml-auto h-3 w-3 text-gray-500" />
+                          </button>
+                          {/* Matchroom button placeholder */}
+                          <button className="bg-gray-700 text-white font-bold py-1 px-3 rounded hover:bg-gray-600 transition-colors w-full text-left flex items-center justify-between">
+                            <span>Go to Matchroom</span>
+                            <ChevronRight className="ml-auto h-3 w-3 text-gray-500" />
+                          </button>
+                        </div>
+                        {/* Utilities list placeholder */}
+                        <p className="text-gray-400 text-xs mt-3">Utilities Used: Placeholder</p>
+                      </div>
+
+                      {/* Featured Players - Placed next to Additional Features */}
+                      <div className="md:w-1/2 bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 border border-gray-700">
+                        <h3 className="text-white font-medium mb-3 flex items-center text-sm">
+                          <Shield className="h-4 w-4 mr-2 text-yellow-400" />
+                          Featured Players
+                        </h3>
+                        <div className="space-y-3 text-xs">
+                          {selectedDemo.players.map((player, idx) => (
+                            <Link
+                              href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                              key={idx}
+                              className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-700/50 transition-colors"
+                            >
+                              <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-bold text-xs">
+                                {player.charAt(0)}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-white font-medium">{player}</p>
+                                {selectedDemo.team && (
+                                  <p className="text-gray-400 text-xs">{selectedDemo.team}</p>
+                                )}
+                              </div>
+                              <ChevronRight className="ml-auto h-3 w-3 text-gray-500" />
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Original Map, Team, Event, Year, POV Type badges - Keep these */}
+                    <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 mb-6 border border-gray-700">
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <span className="bg-yellow-400 text-gray-900 text-sm font-bold px-3 py-1 rounded">{selectedDemo.map}</span>
+                        {selectedDemo.team && (
+                          <span className="bg-gray-700 text-sm px-3 py-1 rounded">{selectedDemo.team}</span>
+                        )}
+                        {selectedDemo.event && (
+                          <span className="bg-gray-700 text-sm px-3 py-1 rounded">{selectedDemo.event}</span>
+                        )}
+                        <span className="bg-gray-700 text-sm px-3 py-1 rounded">{selectedDemo.year}</span>
+                        <span className={`px-3 py-1 rounded-full text-sm ${selectedDemo.isPro ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 'bg-gray-700 text-white'}`}>
+                          {selectedDemo.isPro ? 'PRO POV' : 'COMMUNITY POV'}
+                        </span>
+                      </div>
+                    </div>
+
+
+                    {/* Removed Positions and Tags sections - they are now part of the description */}
+                    {/*
                     <div className="mb-6">
                       <h3 className="text-gray-300 text-sm font-medium mb-2">Positions:</h3>
                       <div className="flex flex-wrap gap-2">
@@ -235,8 +273,8 @@ const VideoPlayerPage = ({
                         ))}
                       </div>
                     </div>
-                    
-                    <div>
+
+                    <div className="mb-6">
                       <h3 className="text-gray-300 text-sm font-medium mb-2">Tags:</h3>
                       <div className="flex flex-wrap gap-2">
                         {selectedDemo.tags.map((tag, i) => (
@@ -246,32 +284,10 @@ const VideoPlayerPage = ({
                         ))}
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Right Column - Players */}
-                  <div className="md:w-1/3">
-                    <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 border border-gray-700">
-                      <h3 className="text-white font-medium mb-3 flex items-center">
-                        <Shield className="h-4 w-4 mr-2 text-yellow-400" />
-                        Featured Players
-                      </h3>
-                      <div className="space-y-4">
-                        {selectedDemo.players.map((player, idx) => (
-                          <Link 
-                            href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                            key={idx} 
-                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700/50 transition-colors"
-                          >
-                            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-bold">
-                              {player.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="text-white font-medium">{player}</p>
-                              {selectedDemo.team && (
-                                <p className="text-gray-400 text-xs">{selectedDemo.team}</p>
-                              )}
-                            </div>
-                            <ChevronRight className="ml-auto h-4 w-4 text-gray-500" />
+                    */}
+
+                    {/* Map, Team, Event, Year, POV Type badges - These are now kept */}
+
                           </Link>
                         ))}
                       </div>
