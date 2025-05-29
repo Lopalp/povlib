@@ -3,7 +3,7 @@ import { X, Map as MapIcon, Users, Calendar, Trophy, Zap } from 'lucide-react';
 
 const FilterModal = ({ demoType, filterOptions, filtersApplied, onClose, onFilterChange, onResetFilters, onApplyFilters }) => {
   return (
-    <div className="fixed inset-0 bg-gray-900/95 flex items-center justify-center z-50 p-4 backdrop-blur-sm"> 
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       {/* Use the same glassmorphism effect as the Navbar */}
       <div className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]">
         <div className="p-6">
