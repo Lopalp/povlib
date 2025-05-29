@@ -98,13 +98,16 @@ const POVlib = () => {
     tagsSet.add("Players");
     tagsSet.add("Teams");
     tagsSet.add("Map + CT Position");
-    return Array.from(tagsSet);
+    const allTags = Array.from(tagsSet);
+
+    // Shuffle the array randomly
+    for (let i = allTags.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allTags[i], allTags[j]] = [allTags[j], allTags[i]];
+    }
+    return allTags.slice(0, 5); // Take only the first 5 elements
   }, [filteredDemos]);
 
-  const handleTagClick = (tag) => {
-    setSearchQuery(tag);
-    setFiltersApplied(prev => ({ ...prev, search: tag }));
-  };
 
   // Helper functions for Map/Positions filters
   const getFilteredDemosByMap = useCallback(
