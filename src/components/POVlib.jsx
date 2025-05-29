@@ -24,6 +24,7 @@ import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
+import DemoCard from './POVlib/DemoCard'; // Import DemoCard to pass handleTagClick
 
 // Helper function for mapping a demo object
 const mapDemo = (demo) => ({
@@ -53,6 +54,10 @@ const POVlib = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
+
+  const handleTagClick = (tag) => {
+    setActiveTag(tag);
+  };
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideoId, setActiveVideoId] = useState('');
@@ -278,10 +283,16 @@ const POVlib = () => {
     }
   };
   
-  const handleTagClick = (tag) => {
-    setActiveTag(tag);
-  };
+  const recentlyAddedDemos = useMemo(() => {
+    if (activeTag === null) {
+      return filteredDemos.slice(0, 10);
+    } else {
+ return filteredDemos.filter(demo => demo.tags.includes(activeTag));
+    }
+  }, [activeTag, filteredDemos]);
 
+  
+ 
   // Video selection and navigation
   const onSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
@@ -403,9 +414,10 @@ const POVlib = () => {
         
         {/* Kategorieabschnitte */}
         <CategorySection
-          title="Recently Added"
-          demos={filteredDemos}
+          title={activeTag === null ? 'Recently Added' : activeTag}
+          demos={recentlyAddedDemos}
           onSelectDemo={onSelectDemo}
+          onTagClick={handleTagClick} // Pass the handler down
         />
         {!filtersApplied.map && (
           <>
