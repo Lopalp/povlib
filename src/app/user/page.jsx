@@ -1,168 +1,126 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Edit3, MapPin, Clock, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from './Navbar';
-import Footer from './Footer';
-import PostCard from './PostCard';
-import FilterModal from './FilterModal';
+import Navbar from '../../components/POVlib/Navbar';
+import Footer from '../../components/POVlib/Footer';
+import DemoCard from '../../components/POVlib/DemoCard';
+// import { getUserProfile, getDemosByUser } from '@/lib/supabase'; // Uncomment when available
 
-import {
-  getUserProfile,
-  getPostsByUser,
-  getFilterOptions
-} from '@/lib/supabase';
-
-const UserPage = ({ userName }) => {
+const UserPage = () => {
   const router = useRouter();
-  const [profile, setProfile] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [filterOptions, setFilterOptions] = useState({});
-  const [filters, setFilters] = useState({ category: '', date: '' });
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const observer = useRef();
+  const [user, setUser] = useState(null);
+  const [demos, setDemos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Load profile and initial posts
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true);
       try {
-        setIsLoading(true);
-        const options = await getFilterOptions();
-        setFilterOptions(options);
+        // TODO: Replace with real auth/session logic
+        // const profile = await getUserProfile();
+        // const userDemos = await getDemosByUser(profile.id);
+        // setUser(profile);
+        // setDemos(userDemos);
 
-        const userData = await getUserProfile(userName);
-        if (!userData) throw new Error('User not found');
-        setProfile(userData);
-
-        const initial = await getPostsByUser(userName, filters, 1, 12);
-        setPosts(initial);
-        setHasMore(initial.length === 12);
+        // Placeholder data
+        const profile = { name: 'Max Mustermann', joinedAt: '2023-08-15', stats: { totalViews: 12345 } };
+        const userDemos = [];
+        setUser(profile);
+        setDemos(userDemos);
       } catch (err) {
         console.error(err);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
+        setError('Failed to load user data.');
       }
+      setLoading(false);
     };
-
     loadData();
-  }, [userName, filters]);
-
-  // Infinite scroll
-  const loadMore = async () => {
-    if (!hasMore || isLoading) return;
-    setIsLoading(true);
-    try {
-      const next = page + 1;
-      const more = await getPostsByUser(userName, filters, next, 12);
-      setPosts(prev => [...prev, ...more]);
-      setHasMore(more.length === 12);
-      setPage(next);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const lastRef = useCallback(node => {
-    if (isLoading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) loadMore();
-    });
-    if (node) observer.current.observe(node);
-  }, [isLoading, hasMore]);
-
-  // Handlers
-  const handleBack = () => router.back();
-  const handleEdit = () => {/* open edit modal */};
-  const handleOpenFilter = () => setIsFilterOpen(true);
-  const handleApplyFilters = () => setIsFilterOpen(false);
-  const handleFilterChange = changes => setFilters(prev => ({ ...prev, ...changes }));
-
-  // Loading state
-  if (isLoading && !posts.length) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading user...</div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200 flex flex-col">
       <Navbar />
-      {/* Profile Header */}
-      <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center gap-8">
-        <img
-          src={profile.avatar || '/images/avatar-placeholder.png'}
-          alt={userName}
-          className="w-32 h-32 rounded-full border-4 border-yellow-400/50"
-        />
-        <div className="flex-1 text-center md:text-left space-y-2">
-          <h1 className="text-4xl font-bold">{profile.name || userName}</h1>
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start text-gray-400">
-            <div className="flex items-center gap-1"><MapPin size={16} />{profile.location}</div>
-            <div className="flex items-center gap-1"><Clock size={16} />Joined {new Date(profile.joinedAt).toLocaleDateString()}</div>
-            <div className="flex items-center gap-1"><Users size={16} />{profile.followers} Followers</div>
+
+      <main className="flex-grow container mx-auto px-6 py-12">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mb-4" />
+            <p>Loading user data...</p>
           </div>
-        </div>
-        <button
-          onClick={handleEdit}
-          className="flex items-center px-4 py-2 border border-gray-600 rounded-lg hover:border-yellow-400 transition"
-        >
-          <Edit3 size={16} className="mr-2" /> Edit Profile
-        </button>
-      </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button
+              onClick={() => router.refresh()}
+              className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg"
+            >
+              Retry
+            </button>
+          </div>
+        ) : !user ? (
+          <div className="text-center py-20 space-y-4">
+            <p className="text-gray-400">Du bist nicht eingeloggt.</p>
+            <button
+              onClick={() => router.push('/signin')}
+              className="px-6 py-2 bg-yellow-400 text-gray-900 rounded-lg"
+            >
+              Einloggen
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Profile Header */}
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+              <div className="w-32 h-32 rounded-full bg-gray-800 flex items-center justify-center text-yellow-400 text-6xl font-bold">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="md:flex-1 text-center md:text-left">
+                <h1 className="text-4xl font-bold mb-2">{user.name}</h1>
+                <p className="text-gray-400">
+                  Beigetreten am {new Date(user.joinedAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Posts</h2>
-          <button
-            onClick={handleOpenFilter}
-            className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm rounded-lg hover:bg-gray-700 transition"
-          >Filter</button>
-        </div>
+            {/* Stats */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-gray-800/60 backdrop-blur-sm p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold">{demos.length}</div>
+                <p className="text-gray-400">Deine POVs</p>
+              </div>
+              {user.stats?.totalViews && (
+                <div className="bg-gray-800/60 backdrop-blur-sm p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold">
+                    {user.stats.totalViews.toLocaleString()}
+                  </div>
+                  <p className="text-gray-400">Aufrufe gesamt</p>
+                </div>
+              )}
+            </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {posts.map((post, i) => {
-            if (i === posts.length - 1) {
-              return <div ref={lastRef} key={post.id}><PostCard post={post} /></div>;
-            }
-            return <PostCard key={post.id} post={post} />;
-          })}
-        </div>
-
-        {isLoading && <div className="text-center py-6">Loading more...</div>}
-        {!hasMore && posts.length > 0 && <div className="text-center py-6">End of posts.</div>}
-        {posts.length === 0 && !isLoading && <div className="text-center py-12 text-gray-400">No posts found.</div>}
+            {/* User's Demos */}
+            <div className="mt-12">
+              <h2 className="text-2xl font-bold mb-6">Deine POVs</h2>
+              {demos.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {demos.map((demo) => (
+                    <DemoCard
+                      key={demo.id}
+                      demo={demo}
+                      onSelect={() => router.push(`/demos/${demo.id}`)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400">
+                  Du hast noch keine POV-Demos hochgeladen.
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </main>
-
-      {isFilterOpen && (
-        <FilterModal
-          options={filterOptions}
-          selected={filters}
-          onClose={() => setIsFilterOpen(false)}
-          onChange={handleFilterChange}
-          onApply={handleApplyFilters}
-        />
-      )}
 
       <Footer />
     </div>
