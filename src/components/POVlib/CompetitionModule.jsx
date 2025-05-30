@@ -11,58 +11,77 @@ export default function CompetitionModule({
   clipCount = 4
 }) {
   const [clips, setClips] = useState([]);
-  const [selectedBet, setSelectedBet] = useState(null);
   const [odds, setOdds] = useState({});
+  const [selectedBet, setSelectedBet] = useState(null);
+  const [betAmount, setBetAmount] = useState('');
   const [timeLeft, setTimeLeft] = useState('');
 
-  // load random demos and assign random odds
+  // Load random demos + random odds
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
       const selected = demos.sort(() => 0.5 - Math.random()).slice(0, clipCount);
       setClips(selected);
-      // random odds between 1.1x and 3.0x
       const o = {};
-      selected.forEach(d => {
-        o[d.id] = 1 + Math.random() * 2; 
-      });
+      selected.forEach(d => { o[d.id] = 1 + Math.random() * 2; });
       setOdds(o);
     })();
   }, [clipCount]);
 
-  // countdown
+  // Countdown timer
   const endTime = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + durationDays);
     return d;
   }, [durationDays]);
   useEffect(() => {
-    const update = () => {
+    const tick = () => {
       const diff = endTime - Date.now();
-      if (diff <= 0) return setTimeLeft('Closed');
+      if (diff <= 0) return setTimeLeft('Voting closed');
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       setTimeLeft(`${d}d ${h}h ${m}m`);
     };
-    update();
-    const iv = setInterval(update, 60000);
+    tick();
+    const iv = setInterval(tick, 60000);
     return () => clearInterval(iv);
   }, [endTime]);
 
-  const handleBet = id => {
-    if (timeLeft === 'Closed') return;
+  // Profit calculation
+  const profit = id => {
+    const amt = parseFloat(betAmount) || 0;
+    const o = odds[id] || 1;
+    return Math.floor(amt * (o - 1));
+  };
+
+  // Handle bet selection
+  const handleSelect = id => {
+    if (timeLeft === 'Voting closed') return;
     setSelectedBet(prev => (prev === id ? null : id));
   };
 
   return (
     <section className="bg-gray-800 rounded-2xl p-8 space-y-6 shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <h2 className="text-3xl font-bold text-white">{title}</h2>
         <span className="px-3 py-1 bg-yellow-500 text-gray-900 font-medium rounded-full text-sm">
           {timeLeft}
         </span>
+      </div>
+
+      {/* Bet Amount Input */}
+      <div className="flex items-center space-x-2">
+        <label className="text-gray-300">Bet coins:</label>
+        <input
+          type="number"
+          min="0"
+          value={betAmount}
+          onChange={e => setBetAmount(e.target.value)}
+          className="w-24 px-3 py-1 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
+          placeholder="0"
+        />
       </div>
 
       {/* Clips Grid */}
@@ -73,10 +92,9 @@ export default function CompetitionModule({
             <div
               key={clip.id}
               className={`
-                relative bg-gray-700 rounded-2xl overflow-hidden border-2
+                relative bg-gray-700 rounded-2xl overflow-hidden border-2 transition-colors
                 ${isSelected ? 'border-green-400' : 'border-transparent'}
                 ${selectedBet && !isSelected ? 'filter grayscale contrast-75' : ''}
-                transition-all
               `}
             >
               {/* Video Preview */}
@@ -84,9 +102,7 @@ export default function CompetitionModule({
                 <video
                   src={clip.videoUrl || clip.video_id}
                   poster={clip.thumbnail}
-                  muted
-                  loop
-                  playsInline
+                  muted loop playsInline
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
@@ -95,25 +111,32 @@ export default function CompetitionModule({
               </div>
 
               {/* Glassmorphic Overlay */}
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md space-y-1">
+              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
                 <h3 className="text-white font-bold truncate">{clip.title}</h3>
                 <p className="text-gray-300 text-sm">by {clip.submitter || 'Unknown'}</p>
               </div>
 
-              {/* Odds & Bet Button */}
+              {/* Bet Button & Profit */}
               <div className="absolute bottom-4 inset-x-4 flex justify-between items-center">
-                <span className="text-sm bg-gray-900 bg-opacity-60 text-yellow-400 px-2 py-1 rounded-full">
-                  {odds[clip.id]?.toFixed(2)}x
-                </span>
+                {/* Profit Display */}
+                {betAmount && isSelected && (
+                  <span className="text-sm bg-green-500 text-white px-2 py-1 rounded-full">
+                    +{profit(clip.id)}
+                  </span>
+                )}
+                {/* Select/Bet Button */}
                 <button
-                  onClick={() => handleBet(clip.id)}
-                  className={`px-4 py-1 font-semibold rounded-lg text-sm transition-colors
+                  onClick={() => handleSelect(clip.id)}
+                  className={`
+                    filter-none px-4 py-1 font-medium rounded-lg text-sm transition-colors
                     ${isSelected
                       ? 'bg-green-500 text-white'
                       : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'}
                   `}
                 >
-                  {isSelected ? 'Selected' : 'Bet'}
+                  {betAmount
+                    ? (isSelected ? 'Bet placed' : 'Bet')
+                    : (isSelected ? 'Selected'   : 'Select')}
                 </button>
               </div>
             </div>
@@ -127,9 +150,17 @@ export default function CompetitionModule({
           Submit Your Clip
         </button>
         <p className="text-gray-400 text-sm text-center md:text-right">
-          Bet coins on your favorite clip to win according to the odds!
+          Bet coins on your favorite clip and win coins equal to your profit!
         </p>
       </div>
+
+      {selectedBet && (
+        <p className="text-center text-green-400 font-medium">
+          You bet <strong>{betAmount}</strong> coins on <strong>
+            {clips.find(c => c.id === selectedBet)?.title}
+          </strong> and can win <strong>+{profit(selectedBet)}</strong>!
+        </p>
+      )}
     </section>
   );
 }
