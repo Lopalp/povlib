@@ -2,54 +2,36 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { PlayCircle } from 'lucide-react';
+import { getFilteredDemos } from '@/lib/supabase';
 import DemoCardVertical from './DemoCardVertical';
-
-const dummyClips = [
-  { 
-    id: 'c1', 
-    title: 'Epic AWP Flick', 
-    thumbnail: '/images/clip1.png', 
-    videoUrl: '/videos/clip1.mp4',
-    tags: ['AWP','One-Tap'], 
-    submitter: 'User123' 
-  },
-  { 
-    id: 'c2', 
-    title: 'Insane Ninja Defuse', 
-    thumbnail: '/images/clip2.png', 
-    videoUrl: '/videos/clip2.mp4',
-    tags: ['Ninja','Clutch'], 
-    submitter: 'ProPlayer' 
-  },
-  { 
-    id: 'c3', 
-    title: '4K Spraydown', 
-    thumbnail: '/images/clip3.png', 
-    videoUrl: '/videos/clip3.mp4',
-    tags: ['Spray','Rifle'], 
-    submitter: 'User456' 
-  },
-  { 
-    id: 'c4', 
-    title: 'Perfect Flash Pop', 
-    thumbnail: '/images/clip4.png', 
-    videoUrl: '/videos/clip4.mp4',
-    tags: ['Flash','Utility'], 
-    submitter: 'ProPlayer2' 
-  },
-];
 
 export default function CompetitionModule({
   title = 'Clip of the Week',
   durationDays = 7,
+  clipCount = 4
 }) {
-  const [votes, setVotes] = useState(() =>
-    Object.fromEntries(dummyClips.map(c => [c.id, Math.floor(Math.random() * 50)]))
-  );
+  const [clips, setClips] = useState([]);
+  const [votes, setVotes] = useState({});
   const [userVote, setUserVote] = useState(null);
   const [timeLeft, setTimeLeft] = useState('');
 
+  // load random demos from the DB
+  useEffect(() => {
+    (async () => {
+      const demos = await getFilteredDemos({}, 'all');
+      // pick `clipCount` random demos
+      const shuffled = demos.sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, clipCount);
+      setClips(selected);
+      // init random vote counts
+      const initial = Object.fromEntries(
+        selected.map(d => [d.id, Math.floor(Math.random() * 50)])
+      );
+      setVotes(initial);
+    })();
+  }, [clipCount]);
+
+  // compute end time and countdown
   const endTime = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + durationDays);
@@ -73,8 +55,9 @@ export default function CompetitionModule({
     return () => clearInterval(iv);
   }, [endTime]);
 
-  const totalVotes = useMemo(() =>
-    Object.values(votes).reduce((sum, v) => sum + v, 0), [votes]
+  const totalVotes = useMemo(
+    () => Object.values(votes).reduce((sum, v) => sum + v, 0),
+    [votes]
   );
 
   const handleVote = id => {
@@ -91,18 +74,21 @@ export default function CompetitionModule({
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {dummyClips.map(clip => {
-          const voted = userVote === clip.id;
-          const percent = totalVotes > 0
-            ? Math.round((votes[clip.id] / totalVotes) * 100)
+        {clips.map(demo => {
+          const voted = userVote === demo.id;
+          const percent = totalVotes
+            ? Math.round((votes[demo.id] / totalVotes) * 100)
             : 0;
 
           return (
-            <div key={clip.id} className="relative">
-              {/* Vertical Demo Card */}
-              <DemoCardVertical demo={clip} onSelect={() => handleVote(clip.id)} />
+            <div key={demo.id} className="relative">
+              {/* Vertical card shows video */}
+              <DemoCardVertical demo={{
+                ...demo,
+                videoUrl: demo.videoUrl || demo.video_id // assume either field
+              }} onSelect={() => handleVote(demo.id)} />
 
-              {/* Fill overlay after vote */}
+              {/* Vote-fill overlay */}
               {userVote && (
                 <div
                   className="absolute bottom-0 left-0 right-0 bg-green-500 opacity-50 transition-all duration-500"
@@ -110,11 +96,11 @@ export default function CompetitionModule({
                 />
               )}
 
-              {/* Vote button or percent badge */}
+              {/* Vote button / percentage */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
                 {!userVote ? (
                   <button
-                    onClick={() => handleVote(clip.id)}
+                    onClick={() => handleVote(demo.id)}
                     className="px-4 py-1 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition"
                   >
                     Vote
@@ -132,7 +118,7 @@ export default function CompetitionModule({
 
       {userVote && (
         <p className="text-center text-green-400 font-medium">
-          You voted for <strong>{dummyClips.find(c => c.id === userVote).title}</strong>!
+          You voted for <strong>{clips.find(c => c.id === userVote)?.title}</strong>!
         </p>
       )}
     </section>
