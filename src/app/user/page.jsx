@@ -1,85 +1,168 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import Navbar from '../../components/POVlib/Navbar';
-import Footer from '../../components/POVlib/Footer';
 
-const UserPage = () => {
-  // Beispielhaft: ersetze durch echte Auth-/Session-Logik
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Edit3, MapPin, Clock, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import PostCard from './PostCard';
+import FilterModal from './FilterModal';
 
+import {
+  getUserProfile,
+  getPostsByUser,
+  getFilterOptions
+} from '@/lib/supabase';
+
+const UserPage = ({ userName }) => {
+  const router = useRouter();
+  const [profile, setProfile] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({});
+  const [filters, setFilters] = useState({ category: '', date: '' });
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const observer = useRef();
+
+  // Load profile and initial posts
   useEffect(() => {
-    // Simuliere Fetching des Benutzers
-    setTimeout(() => {
-      // Kommentiere aus, um nicht eingeloggt zu simulieren
-      setUser({
-        name: 'Max Mustermann',
-        email: 'max@example.com',
-        avatarUrl: '/images/avatar-placeholder.png',
-        joinedAt: '2023-08-15',
-      });
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const options = await getFilterOptions();
+        setFilterOptions(options);
+
+        const userData = await getUserProfile(userName);
+        if (!userData) throw new Error('User not found');
+        setProfile(userData);
+
+        const initial = await getPostsByUser(userName, filters, 1, 12);
+        setPosts(initial);
+        setHasMore(initial.length === 12);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [userName, filters]);
+
+  // Infinite scroll
+  const loadMore = async () => {
+    if (!hasMore || isLoading) return;
+    setIsLoading(true);
+    try {
+      const next = page + 1;
+      const more = await getPostsByUser(userName, filters, next, 12);
+      setPosts(prev => [...prev, ...more]);
+      setHasMore(more.length === 12);
+      setPage(next);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const lastRef = useCallback(node => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) loadMore();
+    });
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
+
+  // Handlers
+  const handleBack = () => router.back();
+  const handleEdit = () => {/* open edit modal */};
+  const handleOpenFilter = () => setIsFilterOpen(true);
+  const handleApplyFilters = () => setIsFilterOpen(false);
+  const handleFilterChange = changes => setFilters(prev => ({ ...prev, ...changes }));
+
+  // Loading state
+  if (isLoading && !posts.length) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading user...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <Navbar />
-
-      <main className="flex-grow pt-20 pb-12 bg-gray-50">
-        <div className="container mx-auto px-4 md:px-8">
-          <h1 className="text-3xl font-bold mb-8">Mein Profil</h1>
-
-          {loading ? (
-            <div className="flex justify-center py-20">
-              {/* Einfache Tailwind-Ladespinner */}
-              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : user ? (
-            <div className="bg-white rounded-2xl shadow p-8 max-w-2xl mx-auto space-y-6">
-              <div className="flex items-center space-x-6">
-                {/* Avatar als normales img-Element */}
-                <img
-                  src={user.avatarUrl}
-                  alt="User Avatar"
-                  className="w-24 h-24 rounded-full object-cover"
-                />
-                <div>
-                  <h2 className="text-2xl font-semibold">{user.name}</h2>
-                  <p className="text-gray-500">Seit dem {new Date(user.joinedAt).toLocaleDateString('de-DE')}</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-medium">E-Mail</h3>
-                  <p className="text-gray-700">{user.email}</p>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium">Account-Status</h3>
-                  <p className="text-green-600 font-medium">Aktiv</p>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-gray-200 flex justify-end">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                  Profil bearbeiten
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-20 space-y-4">
-              <p className="text-gray-600">Du bist nicht eingeloggt.</p>
-              <a
-                href="/login"
-                className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                Einloggen
-              </a>
-            </div>
-          )}
+      {/* Profile Header */}
+      <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center gap-8">
+        <img
+          src={profile.avatar || '/images/avatar-placeholder.png'}
+          alt={userName}
+          className="w-32 h-32 rounded-full border-4 border-yellow-400/50"
+        />
+        <div className="flex-1 text-center md:text-left space-y-2">
+          <h1 className="text-4xl font-bold">{profile.name || userName}</h1>
+          <div className="flex flex-wrap gap-4 justify-center md:justify-start text-gray-400">
+            <div className="flex items-center gap-1"><MapPin size={16} />{profile.location}</div>
+            <div className="flex items-center gap-1"><Clock size={16} />Joined {new Date(profile.joinedAt).toLocaleDateString()}</div>
+            <div className="flex items-center gap-1"><Users size={16} />{profile.followers} Followers</div>
+          </div>
         </div>
+        <button
+          onClick={handleEdit}
+          className="flex items-center px-4 py-2 border border-gray-600 rounded-lg hover:border-yellow-400 transition"
+        >
+          <Edit3 size={16} className="mr-2" /> Edit Profile
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Posts</h2>
+          <button
+            onClick={handleOpenFilter}
+            className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm rounded-lg hover:bg-gray-700 transition"
+          >Filter</button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {posts.map((post, i) => {
+            if (i === posts.length - 1) {
+              return <div ref={lastRef} key={post.id}><PostCard post={post} /></div>;
+            }
+            return <PostCard key={post.id} post={post} />;
+          })}
+        </div>
+
+        {isLoading && <div className="text-center py-6">Loading more...</div>}
+        {!hasMore && posts.length > 0 && <div className="text-center py-6">End of posts.</div>}
+        {posts.length === 0 && !isLoading && <div className="text-center py-12 text-gray-400">No posts found.</div>}
       </main>
+
+      {isFilterOpen && (
+        <FilterModal
+          options={filterOptions}
+          selected={filters}
+          onClose={() => setIsFilterOpen(false)}
+          onChange={handleFilterChange}
+          onApply={handleApplyFilters}
+        />
+      )}
 
       <Footer />
     </div>
