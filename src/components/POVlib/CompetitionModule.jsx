@@ -11,54 +11,52 @@ export default function CompetitionModule({
   clipCount = 4
 }) {
   const [clips, setClips] = useState([]);
-  const [votes, setVotes] = useState({});
-  const [userVote, setUserVote] = useState(null);
+  const [selectedBet, setSelectedBet] = useState(null);
+  const [odds, setOdds] = useState({});
   const [timeLeft, setTimeLeft] = useState('');
 
-  // Laden der Clips
+  // load random demos and assign random odds
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
-      const shuffled = demos.sort(() => 0.5 - Math.random()).slice(0, clipCount);
-      setClips(shuffled);
-      setVotes(Object.fromEntries(shuffled.map(d => [d.id, Math.floor(Math.random()*50)])));
+      const selected = demos.sort(() => 0.5 - Math.random()).slice(0, clipCount);
+      setClips(selected);
+      // random odds between 1.1x and 3.0x
+      const o = {};
+      selected.forEach(d => {
+        o[d.id] = 1 + Math.random() * 2; 
+      });
+      setOdds(o);
     })();
   }, [clipCount]);
 
-  // Countdown
+  // countdown
   const endTime = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + durationDays);
     return d;
   }, [durationDays]);
   useEffect(() => {
-    const tick = () => {
+    const update = () => {
       const diff = endTime - Date.now();
-      if (diff <= 0) return setTimeLeft('Voting closed');
+      if (diff <= 0) return setTimeLeft('Closed');
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      setTimeLeft(`${d}d ${h}h ${m}m left`);
+      setTimeLeft(`${d}d ${h}h ${m}m`);
     };
-    tick();
-    const iv = setInterval(tick, 60000);
+    update();
+    const iv = setInterval(update, 60000);
     return () => clearInterval(iv);
   }, [endTime]);
 
-  const totalVotes = useMemo(
-    () => Object.values(votes).reduce((a,b) => a + b, 0),
-    [votes]
-  );
-
-  const handleVote = id => {
-    if (userVote || timeLeft === 'Voting closed') return;
-    setUserVote(id);
-    setVotes(v => ({ ...v, [id]: v[id] + 1 }));
+  const handleBet = id => {
+    if (timeLeft === 'Closed') return;
+    setSelectedBet(prev => (prev === id ? null : id));
   };
 
   return (
     <section className="bg-gray-800 rounded-2xl p-8 space-y-6 shadow-lg">
-      
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold text-white">{title}</h2>
@@ -67,28 +65,28 @@ export default function CompetitionModule({
         </span>
       </div>
 
-      {/* Grid */}
+      {/* Clips Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {clips.map(clip => {
-          const voted = userVote === clip.id;
-          const pct = totalVotes
-            ? Math.round((votes[clip.id] / totalVotes) * 100)
-            : 0;
-          // Limit auf 3 Tags
-          const tags = clip.tags.slice(0, 3);
-          const extra = clip.tags.length - tags.length;
-
+          const isSelected = selectedBet === clip.id;
           return (
             <div
               key={clip.id}
-              className="relative bg-gray-700 rounded-2xl overflow-hidden border-2 border-transparent hover:border-yellow-400 transition-colors"
+              className={`
+                relative bg-gray-700 rounded-2xl overflow-hidden border-2
+                ${isSelected ? 'border-green-400' : 'border-transparent'}
+                ${selectedBet && !isSelected ? 'filter grayscale contrast-75' : ''}
+                transition-all
+              `}
             >
-              {/* Video */}
+              {/* Video Preview */}
               <div className="relative w-full pb-[133%] bg-black">
                 <video
                   src={clip.videoUrl || clip.video_id}
                   poster={clip.thumbnail}
-                  muted loop playsInline
+                  muted
+                  loop
+                  playsInline
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
@@ -96,43 +94,27 @@ export default function CompetitionModule({
                 </div>
               </div>
 
-              {/* Overlay mit Glassmorph */}
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md space-y-2">
+              {/* Glassmorphic Overlay */}
+              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md space-y-1">
                 <h3 className="text-white font-bold truncate">{clip.title}</h3>
                 <p className="text-gray-300 text-sm">by {clip.submitter || 'Unknown'}</p>
-                
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {tags.map(t => (
-                    <span key={t} className="text-xs bg-yellow-400 text-gray-900 px-2 py-0.5 rounded-full">
-                      #{t}
-                    </span>
-                  ))}
-                  {extra > 0 && (
-                    <span className="text-xs bg-gray-600 text-gray-300 px-2 py-0.5 rounded-full">
-                      +{extra}
-                    </span>
-                  )}
-                </div>
+              </div>
 
-                {/* Vote / Fortschrittsleiste */}
-                <div className="mt-3">
-                  {!userVote ? (
-                    <button
-                      onClick={() => handleVote(clip.id)}
-                      className="w-full py-2 bg-yellow-400 text-gray-900 font-medium rounded-lg hover:bg-yellow-300 transition-colors"
-                    >
-                      Vote
-                    </button>
-                  ) : (
-                    <div className="w-full h-2 bg-gray-600 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  )}
-                </div>
+              {/* Odds & Bet Button */}
+              <div className="absolute bottom-4 inset-x-4 flex justify-between items-center">
+                <span className="text-sm bg-gray-900 bg-opacity-60 text-yellow-400 px-2 py-1 rounded-full">
+                  {odds[clip.id]?.toFixed(2)}x
+                </span>
+                <button
+                  onClick={() => handleBet(clip.id)}
+                  className={`px-4 py-1 font-semibold rounded-lg text-sm transition-colors
+                    ${isSelected
+                      ? 'bg-green-500 text-white'
+                      : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'}
+                  `}
+                >
+                  {isSelected ? 'Selected' : 'Bet'}
+                </button>
               </div>
             </div>
           );
@@ -142,18 +124,12 @@ export default function CompetitionModule({
       {/* Footer */}
       <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-4 md:space-y-0">
         <button className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition">
-          Submit Your Clip for Next Voting
+          Submit Your Clip
         </button>
         <p className="text-gray-400 text-sm text-center md:text-right">
-          You can also <span className="font-semibold text-yellow-400">bet coins</span> on who will win and earn according to the odds!
+          Bet coins on your favorite clip to win according to the odds!
         </p>
       </div>
-
-      {userVote && (
-        <p className="text-center text-green-400 font-medium">
-          You voted for <strong>{clips.find(c => c.id === userVote)?.title}</strong>!
-        </p>
-      )}
     </section>
   );
 }
