@@ -1,29 +1,51 @@
-// src/app/user/page.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
 import DemoCard from '../../components/POVlib/DemoCard';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
+import { CategorySection } from '../../components/POVlib/CategorySection';
+import { getFilteredDemos } from '@/lib/supabase';
+
+const mapDemo = demo => ({
+  id: demo.id,
+  title: demo.title,
+  thumbnail: demo.thumbnail,
+  videoId: demo.video_id,
+  map: demo.map,
+  positions: demo.positions || [],
+  tags: demo.tags || [],
+  players: demo.players || [],
+  team: demo.team,
+  year: demo.year,
+  event: demo.event,
+  result: demo.result,
+  views: demo.views || 0,
+  likes: demo.likes || 0,
+  isPro: demo.is_pro
+});
 
 const UserPage = () => {
-  // Simulated user state — replace with real auth/session logic
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Form state for creating a new demo
+  // History demos
+  const [historyDemos, setHistoryDemos] = useState([]);
+
+  // Create demo form state
   const [matchLink, setMatchLink] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Modal states
+  // Modal state
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
   useEffect(() => {
-    // Simulate fetching user
     setTimeout(() => {
       setUser({
         name: 'Jane Doe',
@@ -35,15 +57,27 @@ const UserPage = () => {
     }, 800);
   }, []);
 
+  // load history when user is set
+  useEffect(() => {
+    const loadHistory = async () => {
+      if (!user) return;
+      const demos = await getFilteredDemos({ player: user.name }, 'all');
+      setHistoryDemos(demos.map(mapDemo));
+    };
+    loadHistory();
+  }, [user]);
+
+  const handleSelectDemo = demo => {
+    router.push(`/demos/${demo.id}`);
+  };
+
   const handleUpgradeToPro = () => {
-    // TODO: integrate payment flow
     alert('Start Pro upgrade flow');
   };
 
   const handleMatchLinkSubmit = e => {
     e.preventDefault();
     if (!matchLink) return;
-    // TODO: submit matchLink, consume 1 credit
     console.log('Submitting match link:', matchLink);
     setMatchLink('');
     setIsCreateDemoOpen(false);
@@ -63,14 +97,12 @@ const UserPage = () => {
   const handleUploadSubmit = e => {
     e.preventDefault();
     if (!selectedFile) return;
-    // TODO: upload file, consume 1 credit
     console.log('Uploading demo file:', selectedFile);
     setSelectedFile(null);
     setIsCreateDemoOpen(false);
   };
 
   const handleLinkAccount = () => {
-    // TODO: Faceit connect flow
     alert('Start Faceit linking flow');
   };
 
@@ -106,6 +138,7 @@ const UserPage = () => {
 
       <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
         <div className="container mx-auto px-4 md:px-8 space-y-12">
+
           {/* PROFILE HEADER */}
           <section className="bg-gray-800 rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold text-yellow-400">
@@ -121,13 +154,15 @@ const UserPage = () => {
             </div>
           </section>
 
+          {/* HISTORY */}
+          <CategorySection
+            title="History"
+            demos={historyDemos}
+            onSelectDemo={handleSelectDemo}
+          />
+
           {/* DASHBOARD SECTIONS */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* History */}
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h3 className="text-xl font-semibold mb-2">History</h3>
-              <p className="text-gray-400">View your past demos and runs.</p>
-            </div>
             {/* Favorites */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Favorites</h3>
@@ -138,6 +173,8 @@ const UserPage = () => {
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
             </div>
+            {/* Empty placeholder to keep grid */}
+            <div></div>
           </section>
 
           {/* ACTION BUTTONS */}
