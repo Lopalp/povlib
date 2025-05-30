@@ -16,42 +16,27 @@ const mapDemo = demo => ({
   title: demo.title,
   thumbnail: demo.thumbnail,
   videoId: demo.video_id,
-  map: demo.map,
-  positions: demo.positions || [],
   tags: demo.tags || [],
-  players: demo.players || [],
-  team: demo.team,
-  year: demo.year,
-  event: demo.event,
-  result: demo.result,
   views: demo.views || 0,
   likes: demo.likes || 0,
-  isPro: demo.is_pro
 });
 
 export default function UserPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [allDemos, setAllDemos] = useState([]);
   const [historyDemos, setHistoryDemos] = useState([]);
   const [favDemos, setFavDemos] = useState([]);
 
-  // stats derived
-  const totalDemos = allDemos.length;
-  const totalViews = useMemo(() => allDemos.reduce((sum, d) => sum + d.views, 0), [allDemos]);
-
-  // demo creation state
   const [matchLink, setMatchLink] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // modal state
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
-  // simulate loading user
+  // Simulate loading user
   useEffect(() => {
     setTimeout(() => {
       setUser({
@@ -66,7 +51,7 @@ export default function UserPage() {
     }, 500);
   }, []);
 
-  // load demos & random filters
+  // Load demos and pick random tags
   useEffect(() => {
     if (!loading && user) {
       (async () => {
@@ -74,7 +59,7 @@ export default function UserPage() {
         const mapped = demos.map(mapDemo);
         setAllDemos(mapped);
 
-        const tags = [...new Set(mapped.flatMap(d => d.tags))];
+        const tags = Array.from(new Set(mapped.flatMap(d => d.tags)));
         if (tags.length) {
           const t1 = tags[Math.floor(Math.random() * tags.length)];
           setHistoryDemos(mapped.filter(d => d.tags.includes(t1)));
@@ -88,12 +73,19 @@ export default function UserPage() {
     }
   }, [loading, user]);
 
+  // Stats
+  const totalDemos = allDemos.length;
+  const totalViews = useMemo(() => allDemos.reduce((sum, d) => sum + d.views, 0), [allDemos]);
+  const totalLikes = useMemo(() => allDemos.reduce((sum, d) => sum + d.likes, 0), [allDemos]);
+  const avgLikes   = totalDemos ? (totalLikes / totalDemos).toFixed(1) : 0;
+  const uniqueTags = useMemo(() => new Set(allDemos.flatMap(d => d.tags)).size, [allDemos]);
+
   const handleSelectDemo   = demo => router.push(`/demos/${demo.id}`);
-  const handleUpgradeToPro = ()  => alert('Start Pro upgrade flow');
-  const handleMatchSubmit  = e     => { e.preventDefault(); if (!matchLink) return; setMatchLink(''); setIsCreateDemoOpen(false); };
-  const handleFileChange   = e     => { const f = e.target.files[0]; if (f?.name.endsWith('.dem')) setSelectedFile(f); else setUploadError('Please upload a valid .dem file.'); };
-  const handleUploadSubmit = e     => { e.preventDefault(); if (!selectedFile) return; setSelectedFile(null); setIsCreateDemoOpen(false); };
-  const handleLinkAccount  = ()    => alert('Start Faceit linking flow');
+  const handleUpgradeToPro = ()   => setIsCompareOpen(true);
+  const handleMatchSubmit  = e      => { e.preventDefault(); if (!matchLink) return; setMatchLink(''); setIsCreateDemoOpen(false); };
+  const handleFileChange   = e      => { const f = e.target.files[0]; if (f?.name.endsWith('.dem')) setSelectedFile(f); else setUploadError('Please upload a valid .dem file.'); };
+  const handleUploadSubmit = e      => { e.preventDefault(); if (!selectedFile) return; setSelectedFile(null); setIsCreateDemoOpen(false); };
+  const handleLinkAccount  = ()     => alert('Start Faceit linking flow');
 
   if (loading) {
     return (
@@ -114,84 +106,87 @@ export default function UserPage() {
 
   return <>
     <Navbar />
-    <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
-      <div className="container mx-auto px-4 md:px-8 space-y-12">
 
-        {/* --- Profile Header --- */}
-        <section className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-          {/* Avatar */}
-          <div className="flex justify-center md:justify-start">
-            <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center text-5xl font-bold text-yellow-400">
+    <main className="pt-24 pb-16 bg-gray-900 text-gray-200">
+      <div className="container mx-auto px-4 md:px-8 space-y-16">
+
+        {/* PROFILE & STATS */}
+        <section className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-8 grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+          {/* Avatar + Info */}
+          <div className="flex flex-col items-center md:items-start space-y-2">
+            <div className="w-28 h-28 rounded-full bg-gray-600 flex items-center justify-center text-5xl font-bold text-yellow-400">
               {user.name.charAt(0)}
             </div>
-          </div>
-
-          {/* Info */}
-          <div className="flex flex-col space-y-2 text-center md:text-left">
-            <h1 className="text-4xl font-bold">{user.name}</h1>
+            <h1 className="text-3xl font-bold">{user.name}</h1>
             <p className="text-gray-400">{user.email}</p>
-            <p className="text-gray-400">Member since {user.joinDate}</p>
-            <p className="text-gray-400">Next billing: {user.nextBilling}</p>
+            <p className="text-gray-400">Since {user.joinDate}</p>
           </div>
 
-          {/* Stats & Plan */}
-          <div className="flex flex-col md:items-end space-y-4">
-            <div className="flex space-x-6">
-              <div className="text-center">
-                <div className="text-sm text-gray-400">Demos</div>
-                <div className="text-2xl font-bold text-yellow-400">{totalDemos}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-sm text-gray-400">Views</div>
-                <div className="text-2xl font-bold text-yellow-400">{totalViews.toLocaleString()}</div>
-              </div>
+          {/* Key Stats */}
+          <div className="col-span-2 grid grid-cols-2 gap-6 text-center">
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400">Demos</div>
+              <div className="text-2xl font-bold text-yellow-400">{totalDemos}</div>
             </div>
-            <div className="flex items-center space-x-3">
-              <span className="uppercase text-sm font-semibold text-gray-200">{user.plan}</span>
-              {user.plan !== 'Pro' && (
-                <button
-                  onClick={handleUpgradeToPro}
-                  className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
-                >
-                  Get Pro
-                </button>
-              )}
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400">Views</div>
+              <div className="text-2xl font-bold text-yellow-400">{totalViews.toLocaleString()}</div>
             </div>
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400">Likes</div>
+              <div className="text-2xl font-bold text-yellow-400">{totalLikes}</div>
+            </div>
+            <div className="bg-gray-800 rounded-lg p-4">
+              <div className="text-sm text-gray-400">Avg. Likes</div>
+              <div className="text-2xl font-bold text-yellow-400">{avgLikes}</div>
+            </div>
+          </div>
+
+          {/* Plan & Actions */}
+          <div className="flex flex-col items-center md:items-end space-y-4">
+            <div className="text-gray-400 uppercase text-sm">Plan: <span className="font-bold text-white">{user.plan}</span></div>
+            <div className="text-gray-400 text-sm">Next billing: <span className="font-bold text-white">{user.nextBilling}</span></div>
+            {user.plan !== 'Pro' && (
+              <button
+                onClick={handleUpgradeToPro}
+                className="mt-2 px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+              >
+                Upgrade to Pro
+              </button>
+            )}
           </div>
         </section>
 
-        {/* --- History & Favorites --- */}
-        <CategorySection title="History"   demos={historyDemos} onSelectDemo={handleSelectDemo} />
-        <CategorySection title="Favorites" demos={favDemos}    onSelectDemo={handleSelectDemo} />
-
-        {/* --- Utility Book --- */}
-        <UtilityBook />
-
-        {/* --- Action Buttons --- */}
-        <section className="text-center space-x-4">
+        {/* QUICK ACTIONS */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <button
             onClick={() => setIsCreateDemoOpen(true)}
-            className="mt-6 px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+            className="w-full bg-yellow-400 text-gray-900 font-bold py-4 rounded-lg hover:bg-yellow-300 transition"
           >
-            Create New Demo
+            + Create New Demo
           </button>
           <button
             onClick={() => setIsCompareOpen(true)}
-            className="mt-6 px-6 py-3 bg-gray-700 text-white font-bold rounded-lg hover:bg-gray-600 transition"
+            className="w-full bg-gray-700 text-white font-bold py-4 rounded-lg hover:bg-gray-600 transition"
           >
-            Compare Plans
+            Compare Plans & Benefits
           </button>
         </section>
+
+        {/* CONTENT SECTIONS */}
+        <CategorySection title="History"   demos={historyDemos} onSelectDemo={handleSelectDemo} />
+        <CategorySection title="Favorites" demos={favDemos}    onSelectDemo={handleSelectDemo} />
+        <UtilityBook />
       </div>
     </main>
 
+    {/* MODALS */}
     <ComparePlansModal
       isOpen={isCompareOpen}
       onClose={() => setIsCompareOpen(false)}
       onUpgradeToPro={handleUpgradeToPro}
-      currentPlan={user.plan === 'Pro' ? 'pro' : 'standard'}
+      currentPlan={user.plan.toLowerCase()}
     />
-
     <CreateDemoModal
       isOpen={isCreateDemoOpen}
       onClose={() => setIsCreateDemoOpen(false)}
