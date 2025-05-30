@@ -1,13 +1,13 @@
 // src/app/user/page.jsx
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
-import CategorySection from '../../components/containers/CategorySection';
+import { CategorySection } from '../../components/containers/CategorySection';
 import { getFilteredDemos } from '@/lib/supabase';
 
 const mapDemo = demo => ({
