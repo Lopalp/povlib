@@ -1,3 +1,4 @@
+// src/app/user/page.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -5,6 +6,7 @@ import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
 import DemoCard from '../../components/POVlib/DemoCard';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
+import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
 
 const UserPage = () => {
   // Simulated user state — replace with real auth/session logic
@@ -16,8 +18,9 @@ const UserPage = () => {
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Modal state for comparing plans
+  // Modal states
   const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
   useEffect(() => {
     // Simulate fetching user
@@ -37,15 +40,16 @@ const UserPage = () => {
     alert('Start Pro upgrade flow');
   };
 
-  const handleMatchLinkSubmit = (e) => {
+  const handleMatchLinkSubmit = e => {
     e.preventDefault();
     if (!matchLink) return;
     // TODO: submit matchLink, consume 1 credit
     console.log('Submitting match link:', matchLink);
     setMatchLink('');
+    setIsCreateDemoOpen(false);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     setUploadError('');
     const file = e.target.files[0];
     if (file && file.name.endsWith('.dem')) {
@@ -56,12 +60,18 @@ const UserPage = () => {
     }
   };
 
-  const handleUploadSubmit = (e) => {
+  const handleUploadSubmit = e => {
     e.preventDefault();
     if (!selectedFile) return;
     // TODO: upload file, consume 1 credit
     console.log('Uploading demo file:', selectedFile);
     setSelectedFile(null);
+    setIsCreateDemoOpen(false);
+  };
+
+  const handleLinkAccount = () => {
+    // TODO: Faceit connect flow
+    alert('Start Faceit linking flow');
   };
 
   if (loading) {
@@ -117,73 +127,30 @@ const UserPage = () => {
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">History</h3>
               <p className="text-gray-400">View your past demos and runs.</p>
-              {/* TODO: history list */}
             </div>
             {/* Favorites */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Favorites</h3>
               <p className="text-gray-400">Your bookmarked demos for quick access.</p>
-              {/* TODO: favorites list */}
             </div>
             {/* Utility Book */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
-              {/* TODO: utility content */}
             </div>
           </section>
 
-          {/* CREATE NEW DEMO */}
-          <section className="bg-gray-800 rounded-lg p-6 space-y-6">
-            <h3 className="text-2xl font-semibold">Create New Demo</h3>
-            <p className="text-gray-400">Each run consumes 1 credit.</p>
-
-            <form onSubmit={handleMatchLinkSubmit} className="flex gap-2">
-              <input
-                type="text"
-                value={matchLink}
-                onChange={(e) => setMatchLink(e.target.value)}
-                placeholder="Paste match link here"
-                className="flex-1 px-4 py-2 bg-gray-700 rounded-lg focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={!matchLink}
-                className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg disabled:opacity-50"
-              >
-                Run Link
-              </button>
-            </form>
-
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => alert('Connect Faceit flow')}
-                className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition"
-              >
-                Link Faceit Account
-              </button>
-              <form onSubmit={handleUploadSubmit} className="flex items-center gap-2">
-                <label className="px-4 py-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition">
-                  Upload .dem
-                  <input type="file" accept=".dem" onChange={handleFileChange} className="hidden" />
-                </label>
-                <button
-                  type="submit"
-                  disabled={!selectedFile}
-                  className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg disabled:opacity-50"
-                >
-                  Run Upload
-                </button>
-              </form>
-            </div>
-            {uploadError && <p className="text-red-500">{uploadError}</p>}
-          </section>
-
-          {/* COMPARE PLANS TRIGGER */}
-          <section className="text-center">
+          {/* ACTION BUTTONS */}
+          <section className="text-center space-x-4">
+            <button
+              onClick={() => setIsCreateDemoOpen(true)}
+              className="mt-6 px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+            >
+              Create New Demo
+            </button>
             <button
               onClick={() => setIsCompareOpen(true)}
-              className="mt-6 px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+              className="mt-6 px-6 py-3 bg-gray-700 text-white font-bold rounded-lg hover:bg-gray-600 transition"
             >
               Compare Plans
             </button>
@@ -191,12 +158,24 @@ const UserPage = () => {
         </div>
       </main>
 
-      {/* Compare Plans Modal */}
+      {/* Modals */}
       <ComparePlansModal
         isOpen={isCompareOpen}
         onClose={() => setIsCompareOpen(false)}
         onUpgradeToPro={handleUpgradeToPro}
         currentPlan={user.isPro ? 'pro' : 'standard'}
+      />
+      <CreateDemoModal
+        isOpen={isCreateDemoOpen}
+        onClose={() => setIsCreateDemoOpen(false)}
+        matchLink={matchLink}
+        onMatchLinkChange={setMatchLink}
+        onMatchLinkSubmit={handleMatchLinkSubmit}
+        selectedFile={selectedFile}
+        onFileChange={handleFileChange}
+        onFileSubmit={handleUploadSubmit}
+        uploadError={uploadError}
+        onLinkAccount={handleLinkAccount}
       />
 
       <Footer />
