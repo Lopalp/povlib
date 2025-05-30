@@ -2,18 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
-import { Spinner } from '../../components/POVlib/Spinner';
-import { Avatar } from '../../components/POVlib/Avatar';
 
 const UserPage = () => {
-  // Example user state - replace with real auth/session logic
+  // Beispielhaft: ersetze durch echte Auth-/Session-Logik
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching user (replace with fetch/auth logic)
+    // Simuliere Fetching des Benutzers
     setTimeout(() => {
-      // Uncomment to simulate logged-in user
+      // Kommentiere aus, um nicht eingeloggt zu simulieren
       setUser({
         name: 'Max Mustermann',
         email: 'max@example.com',
@@ -34,15 +32,21 @@ const UserPage = () => {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <Spinner size="lg" />
+              {/* Einfache Tailwind-Ladespinner */}
+              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : user ? (
             <div className="bg-white rounded-2xl shadow p-8 max-w-2xl mx-auto space-y-6">
               <div className="flex items-center space-x-6">
-                <Avatar src={user.avatarUrl} alt="User Avatar" size="xl" />
+                {/* Avatar als normales img-Element */}
+                <img
+                  src={user.avatarUrl}
+                  alt="User Avatar"
+                  className="w-24 h-24 rounded-full object-cover"
+                />
                 <div>
                   <h2 className="text-2xl font-semibold">{user.name}</h2>
-                  <p className="text-gray-500">Seit dem {new Date(user.joinedAt).toLocaleDateString()}</p>
+                  <p className="text-gray-500">Seit dem {new Date(user.joinedAt).toLocaleDateString('de-DE')}</p>
                 </div>
               </div>
 
