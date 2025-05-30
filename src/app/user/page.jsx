@@ -7,32 +7,13 @@ import Footer from '../../components/POVlib/Footer';
 import DemoCard from '../../components/POVlib/DemoCard';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
-import { getFilteredDemos } from '@/lib/supabase';
-
-const mapDemo = demo => ({
-  id: demo.id,
-  title: demo.title,
-  thumbnail: demo.thumbnail,
-  videoId: demo.video_id,
-  map: demo.map,
-  positions: demo.positions || [],
-  tags: demo.tags || [],
-  players: demo.players || [],
-  team: demo.team,
-  year: demo.year,
-  event: demo.event,
-  result: demo.result,
-  views: demo.views || 0,
-  likes: demo.likes || 0,
-  isPro: demo.is_pro
-});
 
 const UserPage = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // History demos
+  // History demos (dummy data for now)
   const [historyDemos, setHistoryDemos] = useState([]);
 
   // Create demo form state
@@ -44,8 +25,27 @@ const UserPage = () => {
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
+  // generate some placeholder demos
+  const dummyHistory = Array.from({ length: 8 }, (_, i) => ({
+    id: `hist-${i}`,
+    title: `Demo ${i + 1}`,
+    thumbnail: '/images/demo-placeholder.png',  // make sure this file exists
+    videoId: '',
+    map: 'Mirage',
+    positions: [],
+    tags: ['Random', 'Tag'],
+    players: [],
+    team: '',
+    year: '2024',
+    event: '',
+    result: '',
+    views: Math.floor(Math.random() * 1000),
+    likes: Math.floor(Math.random() * 100),
+    isPro: false,
+  }));
+
   useEffect(() => {
-    // simulate auth
+    // simulate auth fetch
     setTimeout(() => {
       setUser({
         name: 'Jane Doe',
@@ -57,16 +57,14 @@ const UserPage = () => {
     }, 800);
   }, []);
 
+  // once loaded, set dummy history
   useEffect(() => {
-    const loadHistory = async () => {
-      if (!user) return;
-      const demos = await getFilteredDemos({ player: user.name }, 'all');
-      setHistoryDemos(demos.map(mapDemo));
-    };
-    loadHistory();
-  }, [user]);
+    if (!loading && user) {
+      setHistoryDemos(dummyHistory);
+    }
+  }, [loading, user]);
 
-  const handleSelectDemo = demo => {
+  const handleSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
   };
 
@@ -74,7 +72,7 @@ const UserPage = () => {
     alert('Start Pro upgrade flow');
   };
 
-  const handleMatchLinkSubmit = e => {
+  const handleMatchLinkSubmit = (e) => {
     e.preventDefault();
     if (!matchLink) return;
     console.log('Submitting match link:', matchLink);
@@ -82,7 +80,7 @@ const UserPage = () => {
     setIsCreateDemoOpen(false);
   };
 
-  const handleFileChange = e => {
+  const handleFileChange = (e) => {
     setUploadError('');
     const file = e.target.files[0];
     if (file && file.name.endsWith('.dem')) {
@@ -93,7 +91,7 @@ const UserPage = () => {
     }
   };
 
-  const handleUploadSubmit = e => {
+  const handleUploadSubmit = (e) => {
     e.preventDefault();
     if (!selectedFile) return;
     console.log('Uploading demo file:', selectedFile);
@@ -160,7 +158,7 @@ const UserPage = () => {
               <p className="text-gray-400">No history yet.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {historyDemos.map(demo => (
+                {historyDemos.map((demo) => (
                   <DemoCard
                     key={demo.id}
                     demo={demo}
@@ -183,8 +181,7 @@ const UserPage = () => {
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
             </div>
-            {/* Placeholder */}
-            <div></div>
+            <div></div>{/* placeholder */}
           </section>
 
           {/* ACTION BUTTONS */}
