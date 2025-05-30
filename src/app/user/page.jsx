@@ -86,20 +86,6 @@ const UserPage = () => {
       <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
         <div className="container mx-auto px-4 md:px-8 space-y-12">
           
-          {/* GET PRO */}
-          <section className="bg-yellow-400 text-gray-900 rounded-lg p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-              <h2 className="text-2xl font-bold">Upgrade to Pro</h2>
-              <p className="mt-1">Unlock advanced features, extra credits, priority support and more.</p>
-            </div>
-            <button
-              onClick={handlePurchasePro}
-              className="mt-4 md:mt-0 px-6 py-3 bg-gray-900 text-yellow-400 font-bold rounded-lg hover:bg-gray-800 transition"
-            >
-              Get Pro
-            </button>
-          </section>
-
           {/* PROFILE HEADER */}
           <section className="bg-gray-800 rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold text-yellow-400">
@@ -187,34 +173,50 @@ const UserPage = () => {
             {uploadError && <p className="text-red-500">{uploadError}</p>}
           </section>
 
-          {/* PRO vs STANDARD */}
-          <section className="bg-gray-800 rounded-lg p-6">
-            <h3 className="text-2xl font-semibold mb-4">Pro vs Standard</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-gray-700">
-                    <th className="px-4 py-2">Feature</th>
-                    <th className="px-4 py-2">Standard</th>
-                    <th className="px-4 py-2">Pro</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ['Monthly credits', '5', 'Unlimited'],
-                    ['Priority processing', '—', '✓'],
-                    ['Exclusive utility book', 'Basic', 'Full'],
-                    ['Premium support', '—', '✓'],
-                    ['Early access demos', '—', '✓'],
-                  ].map(([feat, std, pro]) => (
-                    <tr key={feat} className="border-b border-gray-700">
-                      <td className="px-4 py-2">{feat}</td>
-                      <td className="px-4 py-2">{std}</td>
-                      <td className="px-4 py-2">{pro}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* COMPARE PLANS */}
+          <section className="bg-gray-800 rounded-lg p-6 space-y-6">
+            <h3 className="text-2xl font-semibold">Compare Plans</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Standard Card */}
+              <div className="border border-gray-700 rounded-lg p-6 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-xl font-bold mb-4">Standard</h4>
+                  <ul className="space-y-2 text-gray-400">
+                    <li>5 credits / month</li>
+                    <li>Basic utility book</li>
+                    <li>Standard processing</li>
+                    <li>Community support</li>
+                  </ul>
+                </div>
+                <button
+                  disabled
+                  className="mt-6 px-4 py-2 bg-gray-700 text-gray-500 font-semibold rounded-lg cursor-not-allowed"
+                >
+                  Current Plan
+                </button>
+              </div>
+
+              {/* Pro Card */}
+              <div className="bg-yellow-400 rounded-lg p-6 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-xl font-bold mb-4 text-gray-900">Pro</h4>
+                  <ul className="space-y-2 text-gray-900">
+                    <li>Unlimited credits</li>
+                    <li>Full utility book</li>
+                    <li>Priority processing</li>
+                    <li>Premium support</li>
+                    <li>Early access demos</li>
+                  </ul>
+                </div>
+                <button
+                  onClick={handlePurchasePro}
+                  className="mt-6 px-4 py-2 bg-gray-900 text-yellow-400 font-semibold rounded-lg hover:bg-gray-800 transition"
+                >
+                  Upgrade to Pro
+                </button>
+              </div>
+
             </div>
           </section>
 
