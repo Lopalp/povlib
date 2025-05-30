@@ -1,7 +1,7 @@
 jsx
 import React from 'react';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '../../components/POVlib/Navbar';
+import Footer from '../../components/POVlib/Footer';
 
 const UserPage = ({ user }) => {
   return (
