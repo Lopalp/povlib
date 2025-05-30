@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Settings } from 'lucide-react';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
@@ -31,9 +32,12 @@ const mapDemo = demo => ({
 
 export default function UserPage() {
   const router = useRouter();
+
+  // user & loading
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // demo lists
   const [allDemos, setAllDemos] = useState([]);
   const [historyDemos, setHistoryDemos] = useState([]);
   const [favDemos, setFavDemos] = useState([]);
@@ -41,22 +45,23 @@ export default function UserPage() {
   const [latestDemos, setLatestDemos] = useState([]);
   const [ownDemos, setOwnDemos] = useState([]);
 
-  // Create-demo state
+  // create-demo state
   const [matchLink, setMatchLink] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Modals
+  // modals
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
-  // Tabs
-  const tabs = ['Overview', 'Your Demos', 'History', 'Favorites', 'Utility'];
+  // tabs
+  const tabs = ['Overview', 'Your Demos', 'History', 'Favorites', 'Utility', 'Settings'];
   const [activeTab, setActiveTab] = useState('Overview');
 
-  // Derived stats
+  // derived stats
   const totalDemos = allDemos.length;
   const totalViews = useMemo(() => allDemos.reduce((sum, d) => sum + d.views, 0), [allDemos]);
+  const followerCount = 1234; // placeholder
 
   // simulate user fetch
   useEffect(() => {
@@ -82,7 +87,6 @@ export default function UserPage() {
         setAllDemos(mapped);
         setOwnDemos(mapped.filter(d => d.players.includes(user.name)));
 
-        // random-history/fav
         const tags = [...new Set(mapped.flatMap(d => d.tags))];
         if (tags.length) {
           setHistoryDemos(mapped.filter(d => d.tags.includes(tags[0])));
@@ -92,9 +96,8 @@ export default function UserPage() {
           setFavDemos(mapped);
         }
 
-        // trending/latest
-        setTrendingDemos([...mapped].sort((a, b) => b.views - a.views).slice(0, 6));
-        setLatestDemos([...mapped].sort((a, b) => b.year - a.year).slice(0, 6));
+        setTrendingDemos([...mapped].sort((a,b)=>b.views-a.views).slice(0,6));
+        setLatestDemos([...mapped].sort((a,b)=>b.year-b.year).slice(0,6));
       })();
     }
   }, [loading, user]);
@@ -102,75 +105,78 @@ export default function UserPage() {
   // handlers
   const goDemo = demo => router.push(`/demos/${demo.id}`);
   const handleUpgrade = () => setIsCompareOpen(true);
-  const onMatchSubmit = e => {
-    e.preventDefault();
-    if (!matchLink) return;
-    setMatchLink('');
-    setIsCreateDemoOpen(false);
-  };
+  const onMatchSubmit = e => { e.preventDefault(); if(!matchLink) return; setMatchLink(''); setIsCreateDemoOpen(false); };
   const onFileChange = e => {
     const f = e.target.files[0];
-    if (f?.name.endsWith('.dem')) {
-      setSelectedFile(f);
-      setUploadError('');
-    } else {
-      setUploadError('Please upload a valid .dem file.');
-      setSelectedFile(null);
-    }
+    if (f?.name.endsWith('.dem')) { setSelectedFile(f); setUploadError(''); }
+    else { setUploadError('Please upload a valid .dem file.'); setSelectedFile(null); }
   };
-  const onFileSubmit = e => {
-    e.preventDefault();
-    if (!selectedFile) return;
-    setSelectedFile(null);
-    setIsCreateDemoOpen(false);
-  };
+  const onFileSubmit = e => { e.preventDefault(); if(!selectedFile) return; setSelectedFile(null); setIsCreateDemoOpen(false); };
   const linkFaceit = () => alert('Link Faceit account');
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="w-16 h-16 border-4 border-gray-700 border-t-yellow-400 rounded-full animate-spin" />
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="w-16 h-16 border-4 border-gray-700 border-t-yellow-400 rounded-full animate-spin" />
+    </div>
+  );
+  if (!user) return (
+    <>
+      <Navbar />
+      <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
+        <p>You need <a href="/signin" className="text-yellow-400 underline">log in</a> to view your profile.</p>
       </div>
-    );
-  }
-  if (!user) {
-    return (
-      <>
-        <Navbar />
-        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
-          <p>
-            You need to{' '}
-            <a href="/signin" className="text-yellow-400 underline">
-              log in
-            </a>{' '}
-            to view your profile.
-          </p>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+      <Footer />
+    </>
+  );
 
   return (
     <>
       <Navbar />
 
-      <main className="pt-28 pb-12 bg-gray-900 text-gray-200">
-        <div className="container mx-auto px-4 md:px-8 space-y-8">
+      <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
+        <div className="container mx-auto px-4 md:px-8 space-y-6">
 
-          {/* Profile Header */}
-          <section className="bg-gray-800 rounded-xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div className="flex justify-center md:justify-start">
-              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold text-yellow-400">
+          {/* Profile Banner */}
+          <section className="bg-gray-800 rounded-xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
+            {/* Avatar */}
+            <div className="relative">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold text-yellow-400">
                 {user.name.charAt(0)}
               </div>
+              <button
+                onClick={() => setActiveTab('Settings')}
+                className="absolute top-0 right-0 p-1 bg-gray-700 rounded-full hover:bg-gray-600"
+                aria-label="Settings"
+              >
+                <Settings className="w-5 h-5 text-gray-300" />
+              </button>
             </div>
-            <div className="text-center md:text-left space-y-1">
-              <h1 className="text-3xl md:text-4xl font-bold">{user.name}</h1>
+
+            {/* User Info */}
+            <div className="flex-1 space-y-2 text-center md:text-left">
+              <h1 className="text-3xl font-bold">{user.name}</h1>
               <p className="text-gray-400">{user.email}</p>
-              <p className="text-gray-400">Member since {user.joinDate}</p>
-              <p className="text-gray-400">Next billing: {user.nextBilling}</p>
+              <div className="flex justify-center md:justify-start space-x-4 text-sm text-gray-400">
+                <span>Member since {user.joinDate}</span>
+                <span>{followerCount.toLocaleString()} Followers</span>
+              </div>
+              <div className="mt-2">
+                <button
+                  onClick={() => setIsCreateDemoOpen(true)}
+                  className="px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition"
+                >
+                  Your Demo
+                </button>
+                <button
+                  onClick={linkFaceit}
+                  className="ml-3 px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition"
+                >
+                  Link Faceit
+                </button>
+              </div>
             </div>
+
+            {/* Stats & Plan */}
             <div className="flex flex-col items-center md:items-end space-y-4">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
@@ -197,12 +203,12 @@ export default function UserPage() {
           </section>
 
           {/* Tabs */}
-          <nav className="flex space-x-6 border-b border-gray-700">
+          <nav className="flex space-x-6 border-b border-gray-700 pb-2">
             {tabs.map(t => (
               <button
                 key={t}
                 onClick={() => setActiveTab(t)}
-                className={`pb-2 font-medium ${
+                className={`font-medium ${
                   activeTab === t
                     ? 'border-b-2 border-yellow-400 text-white'
                     : 'text-gray-400 hover:text-white'
@@ -214,37 +220,29 @@ export default function UserPage() {
           </nav>
 
           {/* Tab Content */}
-          <div className="pt-4 space-y-8">
+          <div className="pt-6 space-y-8">
             {activeTab === 'Overview' && (
               <>
                 <CategorySection title="Trending" demos={trendingDemos} onSelectDemo={goDemo} />
                 <CategorySection title="Latest" demos={latestDemos} onSelectDemo={goDemo} />
               </>
             )}
-
             {activeTab === 'Your Demos' && (
-              <>
-                <div className="text-right">
-                  <button
-                    onClick={() => setIsCreateDemoOpen(true)}
-                    className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
-                  >
-                    Create Your Demo
-                  </button>
-                </div>
-                <CategorySection title="Your Demos" demos={ownDemos} onSelectDemo={goDemo} />
-              </>
+              <CategorySection title="Your Demos" demos={ownDemos} onSelectDemo={goDemo} />
             )}
-
             {activeTab === 'History' && (
               <CategorySection title="History" demos={historyDemos} onSelectDemo={goDemo} />
             )}
-
             {activeTab === 'Favorites' && (
               <CategorySection title="Favorites" demos={favDemos} onSelectDemo={goDemo} />
             )}
-
             {activeTab === 'Utility' && <UtilityBook />}
+            {activeTab === 'Settings' && (
+              <section className="text-center text-gray-400">
+                <h2 className="text-xl font-bold text-white mb-4">Settings</h2>
+                <p>Here you will be able to adjust your profile and account settings.</p>
+              </section>
+            )}
           </div>
         </div>
       </main>
