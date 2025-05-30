@@ -2,41 +2,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-
-const dummyClips = [
-  { 
-    id: 'c1', 
-    title: 'Epic AWP Flick', 
-    thumbnail: '/images/clip1.png', 
-    videoUrl: '/videos/clip1.mp4',
-    tags: ['AWP','One-Tap'], 
-    submitter: 'User123' 
-  },
-  { 
-    id: 'c2', 
-    title: 'Insane Ninja Defuse', 
-    thumbnail: '/images/clip2.png', 
-    videoUrl: '/videos/clip2.mp4',
-    tags: ['Ninja','Clutch'], 
-    submitter: 'ProPlayer' 
-  },
-  { 
-    id: 'c3', 
-    title: '4K Spraydown', 
-    thumbnail: '/images/clip3.png', 
-    videoUrl: '/videos/clip3.mp4',
-    tags: ['Spray','Rifle'], 
-    submitter: 'User456' 
-  },
-  { 
-    id: 'c4', 
-    title: 'Perfect Flash Pop', 
-    thumbnail: '/images/clip4.png', 
-    videoUrl: '/videos/clip4.mp4',
-    tags: ['Flash','Utility'], 
-    submitter: 'ProPlayer2' 
-  },
-];
+import { PlayCircle } from 'lucide-react';
+import { getFilteredDemos } from '@/lib/supabase';
 
 export default function CompetitionModule({
   title = 'Clip of the Week',
@@ -48,107 +15,85 @@ export default function CompetitionModule({
   const [userVote, setUserVote] = useState(null);
   const [timeLeft, setTimeLeft] = useState('');
 
-  // load random clips
+  // load random demos
   useEffect(() => {
-    const selected = dummyClips.sort(() => 0.5 - Math.random()).slice(0, clipCount);
-    setClips(selected);
-    setVotes(Object.fromEntries(selected.map(c => [c.id, Math.floor(Math.random() * 50)])));
+    (async () => {
+      const demos = await getFilteredDemos({}, 'all');
+      const shuffled = demos.sort(() => 0.5 - Math.random()).slice(0, clipCount);
+      setClips(shuffled);
+      setVotes(Object.fromEntries(shuffled.map(d => [d.id, Math.floor(Math.random()*50)])));
+    })();
   }, [clipCount]);
 
-  // compute end time and countdown
+  // countdown
   const endTime = useMemo(() => {
     const d = new Date();
-    d.setDate(d.getDate() + durationDays);
+    d.setDate(d.getDate()+durationDays);
     return d;
   }, [durationDays]);
 
   useEffect(() => {
-    const update = () => {
+    const tick = () => {
       const diff = endTime - Date.now();
-      if (diff <= 0) {
-        setTimeLeft('Voting closed');
-        return;
-      }
-      const days = Math.floor(diff / 86400000);
-      const hours = Math.floor((diff % 86400000) / 3600000);
-      const mins = Math.floor((diff % 3600000) / 60000);
-      setTimeLeft(`${days}d ${hours}h ${mins}m left`);
+      if (diff<=0) return setTimeLeft('Voting closed');
+      const d = Math.floor(diff/86400000);
+      const h = Math.floor((diff%86400000)/3600000);
+      const m = Math.floor((diff%3600000)/60000);
+      setTimeLeft(`${d}d ${h}h ${m}m left`);
     };
-    update();
-    const iv = setInterval(update, 60000);
-    return () => clearInterval(iv);
-  }, [endTime]);
+    tick();
+    const iv = setInterval(tick,60000);
+    return ()=>clearInterval(iv);
+  },[endTime]);
 
-  const totalVotes = useMemo(
-    () => Object.values(votes).reduce((sum, v) => sum + v, 0),
-    [votes]
-  );
+  const totalVotes = useMemo(()=>Object.values(votes).reduce((a,b)=>a+b,0),[votes]);
 
   const handleVote = id => {
-    if (userVote || timeLeft === 'Voting closed') return;
+    if (userVote || timeLeft==='Voting closed') return;
     setUserVote(id);
-    setVotes(prev => ({ ...prev, [id]: prev[id] + 1 }));
+    setVotes(v=>({...v,[id]:v[id]+1}));
   };
 
   return (
     <section className="bg-gray-800 rounded-2xl p-8 space-y-6 shadow-lg">
-      {/* Prominent timer */}
-      <div className="text-center">
-        <span className="inline-block bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-full text-sm">
-          {timeLeft}
-        </span>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-white">{title}</h2>
+        <div className="text-lg font-semibold text-yellow-400">{timeLeft}</div>
       </div>
-
-      {/* Title */}
-      <h2 className="text-3xl font-bold text-white text-center">{title}</h2>
 
       {/* Clips Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {clips.map(clip => {
-          const voted = userVote === clip.id;
-          const percent = totalVotes
-            ? Math.round((votes[clip.id] / totalVotes) * 100)
-            : 0;
-
+          const voted = userVote===clip.id;
+          const pct = totalVotes ? Math.round((votes[clip.id]/totalVotes)*100) : 0;
           return (
             <div
               key={clip.id}
-              className="relative group bg-gray-700 rounded-2xl overflow-hidden"
+              className="relative group border-2 border-transparent rounded-2xl overflow-hidden hover:border-yellow-400 hover:shadow-xl transition-colors"
             >
-              {/* Vote-fill overlay */}
-              {userVote && (
-                <div
-                  className="absolute bottom-0 left-0 right-0 bg-green-500 opacity-50 transition-all duration-500"
-                  style={{ height: `${percent}%` }}
-                />
-              )}
-
-              {/* Video Preview */}
+              {/* Video */}
               <div className="relative w-full pb-[133%] bg-black">
                 <video
-                  src={clip.videoUrl}
+                  src={clip.videoUrl || clip.video_id}
                   poster={clip.thumbnail}
-                  muted
-                  loop
-                  playsInline
+                  muted loop playsInline
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-25 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <PlayCircle className="w-12 h-12 text-white" />
                 </div>
               </div>
 
-              {/* Glass Overlay Text */}
-              <div className="absolute inset-0 flex flex-col justify-end p-4 bg-white/10 backdrop-blur-md pointer-events-none">
-                <h3 className="text-white text-lg font-bold line-clamp-2">
-                  {clip.title}
-                </h3>
-                <p className="text-gray-200 text-sm mt-1">by {clip.submitter}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
+              {/* Glass Overlay */}
+              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
+                <h3 className="text-white font-bold truncate">{clip.title}</h3>
+                <p className="text-gray-300 text-sm mt-1">by {clip.submitter || 'Unknown'}</p>
+                <div className="mt-2 flex flex-wrap gap-1">
                   {clip.tags.map(tag => (
                     <span
                       key={tag}
-                      className="text-xs bg-yellow-400 text-gray-900 px-2 py-1 rounded-full"
+                      className="text-xs bg-yellow-400 text-gray-900 px-2 py-0.5 rounded-full"
                     >
                       #{tag}
                     </span>
@@ -156,18 +101,26 @@ export default function CompetitionModule({
                 </div>
               </div>
 
-              {/* Vote button / percentage badge */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+              {/* Fill Overlay */}
+              {userVote && (
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-green-500 opacity-30 transition-all duration-500"
+                  style={{ height: `${pct}%` }}
+                />
+              )}
+
+              {/* Vote / Percentage */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
                 {!userVote ? (
                   <button
-                    onClick={() => handleVote(clip.id)}
-                    className="px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition"
+                    onClick={()=>handleVote(clip.id)}
+                    className="px-4 py-1 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition-colors"
                   >
                     Vote
                   </button>
                 ) : (
                   <span className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm">
-                    {percent}% 
+                    {pct}%
                   </span>
                 )}
               </div>
@@ -176,22 +129,21 @@ export default function CompetitionModule({
         })}
       </div>
 
-      {/* Footer actions */}
-      <div className="pt-6 text-center space-y-4">
+      {/* Footer Actions */}
+      <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-4 md:space-y-0">
         <button
-          onClick={() => {/* TODO: open submit flow */}}
-          className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+          className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
         >
-          Send in Your Clip
+          Submit Your Clip for Next Voting
         </button>
-        <p className="text-sm text-gray-400">
-          You can also <strong>bet your coins</strong> on who wins and earn coins according to odds!
+        <p className="text-gray-400 text-sm text-center md:text-right">
+          You can also <span className="font-semibold text-yellow-400">bet coins</span> on who will win and earn according to the odds!
         </p>
       </div>
 
       {userVote && (
-        <p className="text-center text-green-400 font-medium">
-          You voted for <strong>{clips.find(c => c.id === userVote)?.title}</strong>!
+        <p className="text-center text-green-400 font-medium mt-4">
+          You voted for <strong>{clips.find(c=>c.id===userVote).title}</strong>!
         </p>
       )}
     </section>
