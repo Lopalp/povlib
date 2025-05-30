@@ -7,7 +7,6 @@ import Footer from '../../components/POVlib/Footer';
 import DemoCard from '../../components/POVlib/DemoCard';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
-import { CategorySection } from '../../components/POVlib/CategorySection';
 import { getFilteredDemos } from '@/lib/supabase';
 
 const mapDemo = demo => ({
@@ -46,6 +45,7 @@ const UserPage = () => {
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
   useEffect(() => {
+    // simulate auth
     setTimeout(() => {
       setUser({
         name: 'Jane Doe',
@@ -57,7 +57,6 @@ const UserPage = () => {
     }, 800);
   }, []);
 
-  // load history when user is set
   useEffect(() => {
     const loadHistory = async () => {
       if (!user) return;
@@ -155,11 +154,22 @@ const UserPage = () => {
           </section>
 
           {/* HISTORY */}
-          <CategorySection
-            title="History"
-            demos={historyDemos}
-            onSelectDemo={handleSelectDemo}
-          />
+          <section className="space-y-4">
+            <h2 className="text-2xl font-bold">History</h2>
+            {historyDemos.length === 0 ? (
+              <p className="text-gray-400">No history yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {historyDemos.map(demo => (
+                  <DemoCard
+                    key={demo.id}
+                    demo={demo}
+                    onSelect={() => handleSelectDemo(demo)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
 
           {/* DASHBOARD SECTIONS */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -173,7 +183,7 @@ const UserPage = () => {
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
             </div>
-            {/* Empty placeholder to keep grid */}
+            {/* Placeholder */}
             <div></div>
           </section>
 
