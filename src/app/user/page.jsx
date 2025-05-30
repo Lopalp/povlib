@@ -202,22 +202,30 @@ export default function UserPage() {
             </div>
           </section>
 
-          {/* Tabs */}
-          <nav className="flex space-x-6 border-b border-gray-700 pb-2">
-            {tabs.map(t => (
-              <button
-                key={t}
-                onClick={() => setActiveTab(t)}
-                className={`font-medium ${
-                  activeTab === t
-                    ? 'border-b-2 border-yellow-400 text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </nav>
+          {/* Tab Navigation (Map style) */}
+          <style jsx>{`
+            .custom-scrollbar::-webkit-scrollbar { display: none; }
+            .custom-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+          `}</style>
+          <div className="bg-gray-900 border-b border-gray-800 sticky top-16 z-30">
+            <div className="container mx-auto px-4 md:px-8">
+              <div className="flex overflow-x-auto custom-scrollbar">
+                {tabs.map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setActiveTab(t)}
+                    className={`px-4 py-4 text-sm font-bold whitespace-nowrap ${
+                      activeTab === t
+                        ? 'text-yellow-400 border-b-2 border-yellow-400 bg-gradient-to-t from-yellow-400/10 to-transparent'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Tab Content */}
           <div className="pt-6 space-y-8">
