@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Eye, Heart, Tag, Share2, Flag, Bookmark, 
+ ArrowLeft, Eye, Heart, Tag, Share2, Flag, Bookmark, X,
   ThumbsUp, ChevronDown, ChevronRight, MapPin, Shield, Play
 } from 'lucide-react';
 import YouTubeEmbed from './YouTubeEmbed';
@@ -23,6 +23,8 @@ const VideoPlayerPage = ({
   setIsMenuOpen = () => {}
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
+ const [showMatchroomSubmit, setShowMatchroomSubmit] = useState(true);
+  const [matchroomSubmitStatus, setMatchroomSubmitStatus] = useState('initial'); // 'initial', 'submitted'
 
   if (!selectedDemo) return null;
 
@@ -135,6 +137,38 @@ const VideoPlayerPage = ({
                   </button>
                 )}
               </section>
+
+ {/* Matchroom Submit Section */}
+ {showMatchroomSubmit && (
+ <section className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-6 mb-8 border border-gray-700 relative">
+ {matchroomSubmitStatus === 'initial' ? (
+ <>
+ <button onClick={() => setShowMatchroomSubmit(false)} className="absolute top-3 right-3 text-gray-400 hover:text-white">
+ <X className="h-5 w-5" />
+ </button>
+ <h2 className="text-xl font-semibold text-white mb-3">Submit Matchroom</h2>
+ <p className="text-gray-300 text-sm mb-4">
+                Help us improve! If you can find the matchroom for this demo, we'll grant you 1 credit to create a video from your own demo.
+ </p>
+ <div className="flex gap-3">
+ <input 
+ type="text" 
+ placeholder="Enter Matchroom Link" 
+ className="flex-1 px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400" 
+ />
+ <button 
+ onClick={() => setMatchroomSubmitStatus('submitted')} 
+ className="px-6 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-colors"
+ >
+ Submit
+ </button>
+ </div>
+ </>
+          ) : (
+ <p className="text-gray-300 text-sm">Thanks for your support! Once the link has been verified by our admins, you will receive a notification and the credit will be added to your account. Please note that this process might take a while.</p>
+          )}
+ </section>
+        )}
 
               {/* Additional Features */}
               <div className="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
