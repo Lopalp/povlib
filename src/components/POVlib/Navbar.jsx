@@ -134,7 +134,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
             )}
 
-            <Link href="/components/POVlib/UserPage">
+            <Link href="/home/user/povlib/src/components/POVlib/UserPage.jsx">
               <button className="hidden md:block p-2 relative text-gray-300 hover:text-yellow-400 outline-none focus:outline-none">
                 <BellRing className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full" />
