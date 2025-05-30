@@ -8,7 +8,7 @@ import Footer from '../../components/POVlib/Footer';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
 import { CategorySection } from '../../components/containers/CategorySection';
-import { getFilteredDemos } from '../../lib/supabase';
+import { getFilteredDemos } from '@/lib/supabase';
 
 const mapDemo = demo => ({
   id: demo.id,
@@ -32,6 +32,9 @@ const UserPage = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [allDemos, setAllDemos] = useState([]);
+  const [randomTag, setRandomTag] = useState('');
   const [historyDemos, setHistoryDemos] = useState([]);
 
   // Create-demo form state
@@ -43,7 +46,7 @@ const UserPage = () => {
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
-  // simulate user fetch
+  // simulate fetching user
   useEffect(() => {
     setTimeout(() => {
       setUser({
@@ -53,15 +56,34 @@ const UserPage = () => {
         isPro: false
       });
       setLoading(false);
-    }, 800);
+    }, 500);
   }, []);
 
-  // load history demos once user is available
+  // once user is loaded, fetch all demos and pick a random tag
   useEffect(() => {
     if (!loading && user) {
       (async () => {
-        const demos = await getFilteredDemos({ player: user.name }, 'all');
-        setHistoryDemos(demos.map(mapDemo));
+        try {
+          const demos = await getFilteredDemos({}, 'all');
+          const mapped = demos.map(mapDemo);
+          setAllDemos(mapped);
+
+          // collect all tags
+          const tags = mapped.flatMap(d => d.tags);
+          const uniqueTags = [...new Set(tags)];
+          if (uniqueTags.length > 0) {
+            const tag = uniqueTags[Math.floor(Math.random() * uniqueTags.length)];
+            setRandomTag(tag);
+            setHistoryDemos(mapped.filter(d => d.tags.includes(tag)));
+          } else {
+            // fallback: show all demos
+            setRandomTag('');
+            setHistoryDemos(mapped);
+          }
+        } catch (err) {
+          console.error('Error loading demos for history:', err);
+          setHistoryDemos([]);
+        }
       })();
     }
   }, [loading, user]);
@@ -153,9 +175,9 @@ const UserPage = () => {
             </div>
           </section>
 
-          {/* History Section */}
+          {/* History Section with random tag filter */}
           <CategorySection
-            title="History"
+            title={`History${randomTag ? ` — #${randomTag}` : ''}`}
             demos={historyDemos}
             onSelectDemo={handleSelectDemo}
           />
@@ -170,7 +192,7 @@ const UserPage = () => {
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
             </div>
-            <div />
+            <div /> {/* placeholder */}
           </section>
 
           {/* Action Buttons */}
@@ -191,7 +213,6 @@ const UserPage = () => {
         </div>
       </main>
 
-      {/* Modals */}
       <ComparePlansModal
         isOpen={isCompareOpen}
         onClose={() => setIsCompareOpen(false)}
