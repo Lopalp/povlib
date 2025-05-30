@@ -13,7 +13,14 @@ const UserPage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // History demos (dummy data for now)
+  // Dummy history data
+  const dummyHistory = Array.from({ length: 8 }, (_, i) => ({
+    id: `hist-${i}`,
+    title: `Demo ${i + 1}`,
+    thumbnail: '/images/demo-placeholder.png',
+    views: Math.floor(Math.random() * 1000),
+    likes: Math.floor(Math.random() * 100),
+  }));
   const [historyDemos, setHistoryDemos] = useState([]);
 
   // Create demo form state
@@ -24,25 +31,6 @@ const UserPage = () => {
   // Modal state
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
-
-  // generate some placeholder demos
-  const dummyHistory = Array.from({ length: 8 }, (_, i) => ({
-    id: `hist-${i}`,
-    title: `Demo ${i + 1}`,
-    thumbnail: '/images/demo-placeholder.png',  // make sure this file exists
-    videoId: '',
-    map: 'Mirage',
-    positions: [],
-    tags: ['Random', 'Tag'],
-    players: [],
-    team: '',
-    year: '2024',
-    event: '',
-    result: '',
-    views: Math.floor(Math.random() * 1000),
-    likes: Math.floor(Math.random() * 100),
-    isPro: false,
-  }));
 
   useEffect(() => {
     // simulate auth fetch
@@ -57,7 +45,7 @@ const UserPage = () => {
     }, 800);
   }, []);
 
-  // once loaded, set dummy history
+  // populate dummy history once loaded
   useEffect(() => {
     if (!loading && user) {
       setHistoryDemos(dummyHistory);
@@ -159,11 +147,13 @@ const UserPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {historyDemos.map((demo) => (
-                  <DemoCard
+                  <div
                     key={demo.id}
-                    demo={demo}
-                    onSelect={() => handleSelectDemo(demo)}
-                  />
+                    onClick={() => handleSelectDemo(demo)}
+                    className="cursor-pointer"
+                  >
+                    <DemoCard demo={demo} />
+                  </div>
                 ))}
               </div>
             )}
