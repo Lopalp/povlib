@@ -16,27 +16,49 @@ const mapDemo = demo => ({
   title: demo.title,
   thumbnail: demo.thumbnail,
   videoId: demo.video_id,
+  map: demo.map,
+  positions: demo.positions || [],
   tags: demo.tags || [],
+  players: demo.players || [],
+  team: demo.team,
+  year: demo.year,
+  event: demo.event,
+  result: demo.result,
   views: demo.views || 0,
   likes: demo.likes || 0,
+  isPro: demo.is_pro
 });
 
 export default function UserPage() {
   const router = useRouter();
+
+  // user & loading
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [allDemos, setAllDemos] = useState([]);
-  const [historyDemos, setHistoryDemos] = useState([]);
-  const [favDemos, setFavDemos] = useState([]);
 
-  const [matchLink, setMatchLink] = useState('');
+  // demo lists
+  const [allDemos, setAllDemos]     = useState([]);
+  const [historyDemos, setHistoryDemos] = useState([]);
+  const [favDemos, setFavDemos]     = useState([]);
+
+  // create-demo state
+  const [matchLink, setMatchLink]     = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  // modals
+  const [isCompareOpen, setIsCompareOpen]   = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
-  // Simulate loading user
+  // UI state
+  const tabs = ['Overview','History','Favorites','Utility'];
+  const [activeTab, setActiveTab] = useState('Overview');
+
+  // stats derived
+  const totalDemos = allDemos.length;
+  const totalViews = useMemo(() => allDemos.reduce((s,d)=>s+d.views,0), [allDemos]);
+
+  // simulate fetching user
   useEffect(() => {
     setTimeout(() => {
       setUser({
@@ -51,20 +73,19 @@ export default function UserPage() {
     }, 500);
   }, []);
 
-  // Load demos and pick random tags
+  // fetch demos and populate history/favorites
   useEffect(() => {
     if (!loading && user) {
       (async () => {
         const demos = await getFilteredDemos({}, 'all');
         const mapped = demos.map(mapDemo);
         setAllDemos(mapped);
-
-        const tags = Array.from(new Set(mapped.flatMap(d => d.tags)));
+        const tags = [...new Set(mapped.flatMap(d=>d.tags))];
         if (tags.length) {
-          const t1 = tags[Math.floor(Math.random() * tags.length)];
-          setHistoryDemos(mapped.filter(d => d.tags.includes(t1)));
-          const t2 = tags[Math.floor(Math.random() * tags.length)];
-          setFavDemos(mapped.filter(d => d.tags.includes(t2)));
+          const t1 = tags[Math.floor(Math.random()*tags.length)];
+          const t2 = tags[Math.floor(Math.random()*tags.length)];
+          setHistoryDemos(mapped.filter(d=>d.tags.includes(t1)));
+          setFavDemos(mapped.filter(d=>d.tags.includes(t2)));
         } else {
           setHistoryDemos(mapped);
           setFavDemos(mapped);
@@ -73,133 +94,150 @@ export default function UserPage() {
     }
   }, [loading, user]);
 
-  // Stats
-  const totalDemos = allDemos.length;
-  const totalViews = useMemo(() => allDemos.reduce((sum, d) => sum + d.views, 0), [allDemos]);
-  const totalLikes = useMemo(() => allDemos.reduce((sum, d) => sum + d.likes, 0), [allDemos]);
-  const avgLikes   = totalDemos ? (totalLikes / totalDemos).toFixed(1) : 0;
-  const uniqueTags = useMemo(() => new Set(allDemos.flatMap(d => d.tags)).size, [allDemos]);
+  // handlers
+  const goDemo = d => router.push(`/demos/${d.id}`);
+  const handleUpgrade = () => setIsCompareOpen(true);
+  const onMatchSubmit = e => { e.preventDefault(); if(!matchLink) return; setMatchLink(''); setIsCreateDemoOpen(false); };
+  const onFileChange = e => {
+    const f = e.target.files[0];
+    if (f?.name.endsWith('.dem')) { setSelectedFile(f); setUploadError(''); }
+    else { setUploadError('Please upload a valid .dem file.'); setSelectedFile(null); }
+  };
+  const onFileSubmit = e => { e.preventDefault(); if(!selectedFile) return; setSelectedFile(null); setIsCreateDemoOpen(false); };
+  const linkFaceit = () => alert('Link Faceit flow');
 
-  const handleSelectDemo   = demo => router.push(`/demos/${demo.id}`);
-  const handleUpgradeToPro = ()   => setIsCompareOpen(true);
-  const handleMatchSubmit  = e      => { e.preventDefault(); if (!matchLink) return; setMatchLink(''); setIsCreateDemoOpen(false); };
-  const handleFileChange   = e      => { const f = e.target.files[0]; if (f?.name.endsWith('.dem')) setSelectedFile(f); else setUploadError('Please upload a valid .dem file.'); };
-  const handleUploadSubmit = e      => { e.preventDefault(); if (!selectedFile) return; setSelectedFile(null); setIsCreateDemoOpen(false); };
-  const handleLinkAccount  = ()     => alert('Start Faceit linking flow');
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="w-16 h-16 border-4 border-gray-700 border-t-yellow-400 rounded-full animate-spin" />
-      </div>
-    );
-  }
-  if (!user) {
-    return <>
-      <Navbar />
-      <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
-        <p>You need to <a href="/signin" className="text-yellow-400 underline">log in</a> to view your profile.</p>
-      </div>
-      <Footer/>
-    </>;
-  }
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="w-16 h-16 border-4 border-gray-700 border-t-yellow-400 rounded-full animate-spin" />
+    </div>
+  );
+  if (!user) return <>
+    <Navbar/>
+    <div className="pt-24 flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
+      <p>You need <a href="/signin" className="text-yellow-400 underline">log in</a> to view your profile.</p>
+    </div>
+    <Footer/>
+  </>;
 
   return <>
-    <Navbar />
+    <Navbar/>
 
-    <main className="pt-24 pb-16 bg-gray-900 text-gray-200">
-      <div className="container mx-auto px-4 md:px-8 space-y-16">
+    {/* pro-banner */}
+    {user.plan !== 'Pro' && (
+      <div className="bg-yellow-400 text-gray-900 text-center py-2">
+        Upgrade to <strong>Pro</strong> for unlimited demos & premium features!{' '}
+        <button onClick={handleUpgrade} className="underline font-semibold">Learn more</button>
+      </div>
+    )}
 
-        {/* PROFILE & STATS */}
-        <section className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-8 grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
-          {/* Avatar + Info */}
-          <div className="flex flex-col items-center md:items-start space-y-2">
-            <div className="w-28 h-28 rounded-full bg-gray-600 flex items-center justify-center text-5xl font-bold text-yellow-400">
+    <main className="pt-6 pb-12 bg-gray-900 text-gray-200">
+      <div className="container mx-auto px-4 md:px-8 space-y-8">
+
+        {/* Header */}
+        <section className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="flex-shrink-0">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gray-600 flex items-center justify-center text-4xl md:text-5xl font-bold text-yellow-400">
               {user.name.charAt(0)}
             </div>
-            <h1 className="text-3xl font-bold">{user.name}</h1>
-            <p className="text-gray-400">{user.email}</p>
-            <p className="text-gray-400">Since {user.joinDate}</p>
           </div>
-
-          {/* Key Stats */}
-          <div className="col-span-2 grid grid-cols-2 gap-6 text-center">
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400">Demos</div>
+          <div className="flex-1 space-y-1 text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl font-bold">{user.name}</h1>
+            <p className="text-gray-400">{user.email}</p>
+            <p className="text-gray-400">Member since {user.joinDate}</p>
+            <p className="text-gray-400">Next billing: {user.nextBilling}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 text-center">
+            <div>
+              <div className="text-sm uppercase text-gray-400">Demos</div>
               <div className="text-2xl font-bold text-yellow-400">{totalDemos}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400">Views</div>
+            <div>
+              <div className="text-sm uppercase text-gray-400">Views</div>
               <div className="text-2xl font-bold text-yellow-400">{totalViews.toLocaleString()}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400">Likes</div>
-              <div className="text-2xl font-bold text-yellow-400">{totalLikes}</div>
+            <div className="col-span-2">
+              <div className="text-sm uppercase text-gray-400">Plan</div>
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <span className="font-semibold">{user.plan}</span>
+                {user.plan !== 'Pro' && (
+                  <button onClick={handleUpgrade} className="px-3 py-1 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-300">
+                    Upgrade
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400">Avg. Likes</div>
-              <div className="text-2xl font-bold text-yellow-400">{avgLikes}</div>
-            </div>
-          </div>
-
-          {/* Plan & Actions */}
-          <div className="flex flex-col items-center md:items-end space-y-4">
-            <div className="text-gray-400 uppercase text-sm">Plan: <span className="font-bold text-white">{user.plan}</span></div>
-            <div className="text-gray-400 text-sm">Next billing: <span className="font-bold text-white">{user.nextBilling}</span></div>
-            {user.plan !== 'Pro' && (
-              <button
-                onClick={handleUpgradeToPro}
-                className="mt-2 px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
-              >
-                Upgrade to Pro
-              </button>
-            )}
           </div>
         </section>
 
-        {/* QUICK ACTIONS */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <button
-            onClick={() => setIsCreateDemoOpen(true)}
-            className="w-full bg-yellow-400 text-gray-900 font-bold py-4 rounded-lg hover:bg-yellow-300 transition"
-          >
-            + Create New Demo
-          </button>
-          <button
-            onClick={() => setIsCompareOpen(true)}
-            className="w-full bg-gray-700 text-white font-bold py-4 rounded-lg hover:bg-gray-600 transition"
-          >
-            Compare Plans & Benefits
-          </button>
-        </section>
+        {/* Tabs */}
+        <nav className="flex space-x-4 border-b border-gray-700">
+          {tabs.map(t => (
+            <button
+              key={t}
+              onClick={() => setActiveTab(t)}
+              className={`pb-2 font-medium ${
+                activeTab === t ? 'border-b-2 border-yellow-400 text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </nav>
 
-        {/* CONTENT SECTIONS */}
-        <CategorySection title="History"   demos={historyDemos} onSelectDemo={handleSelectDemo} />
-        <CategorySection title="Favorites" demos={favDemos}    onSelectDemo={handleSelectDemo} />
-        <UtilityBook />
+        {/* Content */}
+        {activeTab === 'Overview' && (
+          <section className="text-center py-12 space-y-4">
+            <button
+              onClick={() => setIsCreateDemoOpen(true)}
+              className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+            >
+              Create New Demo
+            </button>
+            <button
+              onClick={linkFaceit}
+              className="px-6 py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-700 transition"
+            >
+              Link Faceit Account
+            </button>
+          </section>
+        )}
+
+        {activeTab === 'History' && (
+          <CategorySection title="History" demos={historyDemos} onSelectDemo={goDemo} />
+        )}
+
+        {activeTab === 'Favorites' && (
+          <CategorySection title="Favorites" demos={favDemos} onSelectDemo={goDemo} />
+        )}
+
+        {activeTab === 'Utility' && (
+          <UtilityBook />
+        )}
+        
+
       </div>
     </main>
 
-    {/* MODALS */}
     <ComparePlansModal
       isOpen={isCompareOpen}
       onClose={() => setIsCompareOpen(false)}
-      onUpgradeToPro={handleUpgradeToPro}
-      currentPlan={user.plan.toLowerCase()}
+      onUpgradeToPro={handleUpgrade}
+      currentPlan={user.plan === 'Pro' ? 'pro' : 'standard'}
     />
+
     <CreateDemoModal
       isOpen={isCreateDemoOpen}
       onClose={() => setIsCreateDemoOpen(false)}
       matchLink={matchLink}
       onMatchLinkChange={setMatchLink}
-      onMatchLinkSubmit={handleMatchSubmit}
+      onMatchLinkSubmit={onMatchSubmit}
       selectedFile={selectedFile}
-      onFileChange={handleFileChange}
-      onFileSubmit={handleUploadSubmit}
+      onFileChange={onFileChange}
+      onFileSubmit={onFileSubmit}
       uploadError={uploadError}
-      onLinkAccount={handleLinkAccount}
+      onLinkAccount={linkFaceit}
     />
 
-    <Footer />
-  </>;
+    <Footer/>
+  </>
 }
