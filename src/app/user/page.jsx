@@ -13,13 +13,23 @@ const UserPage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Dummy history data
+  // Dummy history data including all expected fields
   const dummyHistory = Array.from({ length: 8 }, (_, i) => ({
     id: `hist-${i}`,
     title: `Demo ${i + 1}`,
-    thumbnail: '/images/demo-placeholder.png',
+    thumbnail: '/images/demo-placeholder.png',        // your placeholder
+    videoId: '',
+    map: 'Mirage',
+    positions: [],
+    tags: ['Random'],
+    players: [],                                     // ensure players is defined
+    team: '',
+    year: '2024',
+    event: '',
+    result: '',
     views: Math.floor(Math.random() * 1000),
     likes: Math.floor(Math.random() * 100),
+    isPro: false,
   }));
   const [historyDemos, setHistoryDemos] = useState([]);
 
@@ -33,7 +43,7 @@ const UserPage = () => {
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
   useEffect(() => {
-    // simulate auth fetch
+    // simulate fetching user
     setTimeout(() => {
       setUser({
         name: 'Jane Doe',
@@ -45,14 +55,14 @@ const UserPage = () => {
     }, 800);
   }, []);
 
-  // populate dummy history once loaded
+  // populate dummy history once user is loaded
   useEffect(() => {
     if (!loading && user) {
       setHistoryDemos(dummyHistory);
     }
   }, [loading, user]);
 
-  const handleSelectDemo = (demo) => {
+  const handleSelectDemo = demo => {
     router.push(`/demos/${demo.id}`);
   };
 
@@ -60,7 +70,7 @@ const UserPage = () => {
     alert('Start Pro upgrade flow');
   };
 
-  const handleMatchLinkSubmit = (e) => {
+  const handleMatchLinkSubmit = e => {
     e.preventDefault();
     if (!matchLink) return;
     console.log('Submitting match link:', matchLink);
@@ -68,7 +78,7 @@ const UserPage = () => {
     setIsCreateDemoOpen(false);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     setUploadError('');
     const file = e.target.files[0];
     if (file && file.name.endsWith('.dem')) {
@@ -79,7 +89,7 @@ const UserPage = () => {
     }
   };
 
-  const handleUploadSubmit = (e) => {
+  const handleUploadSubmit = e => {
     e.preventDefault();
     if (!selectedFile) return;
     console.log('Uploading demo file:', selectedFile);
@@ -146,7 +156,7 @@ const UserPage = () => {
               <p className="text-gray-400">No history yet.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {historyDemos.map((demo) => (
+                {historyDemos.map(demo => (
                   <div
                     key={demo.id}
                     onClick={() => handleSelectDemo(demo)}
@@ -161,17 +171,15 @@ const UserPage = () => {
 
           {/* DASHBOARD SECTIONS */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Favorites */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Favorites</h3>
               <p className="text-gray-400">Your bookmarked demos for quick access.</p>
             </div>
-            {/* Utility Book */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
             </div>
-            <div></div>{/* placeholder */}
+            <div /> {/* placeholder */}
           </section>
 
           {/* ACTION BUTTONS */}
