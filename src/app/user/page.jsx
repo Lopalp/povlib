@@ -4,15 +4,20 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
 import DemoCard from '../../components/POVlib/DemoCard';
+import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 
 const UserPage = () => {
   // Simulated user state — replace with real auth/session logic
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
   // Form state for creating a new demo
   const [matchLink, setMatchLink] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+
+  // Modal state for comparing plans
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   useEffect(() => {
     // Simulate fetching user
@@ -27,9 +32,9 @@ const UserPage = () => {
     }, 800);
   }, []);
 
-  const handlePurchasePro = () => {
+  const handleUpgradeToPro = () => {
     // TODO: integrate payment flow
-    alert('Pro purchase flow here');
+    alert('Start Pro upgrade flow');
   };
 
   const handleMatchLinkSubmit = (e) => {
@@ -72,7 +77,13 @@ const UserPage = () => {
       <>
         <Navbar />
         <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
-          <p>You need to <a href="/signin" className="text-yellow-400 underline">log in</a> to view your profile.</p>
+          <p>
+            You need to{' '}
+            <a href="/signin" className="text-yellow-400 underline">
+              log in
+            </a>{' '}
+            to view your profile.
+          </p>
         </div>
         <Footer />
       </>
@@ -85,7 +96,6 @@ const UserPage = () => {
 
       <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
         <div className="container mx-auto px-4 md:px-8 space-y-12">
-          
           {/* PROFILE HEADER */}
           <section className="bg-gray-800 rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold text-yellow-400">
@@ -103,28 +113,24 @@ const UserPage = () => {
 
           {/* DASHBOARD SECTIONS */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
             {/* History */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">History</h3>
               <p className="text-gray-400">View your past demos and runs.</p>
               {/* TODO: history list */}
             </div>
-
             {/* Favorites */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Favorites</h3>
               <p className="text-gray-400">Your bookmarked demos for quick access.</p>
               {/* TODO: favorites list */}
             </div>
-
             {/* Utility Book */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Utility Book</h3>
               <p className="text-gray-400">Reference smoke lineups and flash guides.</p>
               {/* TODO: utility content */}
             </div>
-
           </section>
 
           {/* CREATE NEW DEMO */}
@@ -136,7 +142,7 @@ const UserPage = () => {
               <input
                 type="text"
                 value={matchLink}
-                onChange={e => setMatchLink(e.target.value)}
+                onChange={(e) => setMatchLink(e.target.value)}
                 placeholder="Paste match link here"
                 className="flex-1 px-4 py-2 bg-gray-700 rounded-lg focus:outline-none"
               />
@@ -173,55 +179,25 @@ const UserPage = () => {
             {uploadError && <p className="text-red-500">{uploadError}</p>}
           </section>
 
-          {/* COMPARE PLANS */}
-          <section className="bg-gray-800 rounded-lg p-6 space-y-6">
-            <h3 className="text-2xl font-semibold">Compare Plans</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* Standard Card */}
-              <div className="border border-gray-700 rounded-lg p-6 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xl font-bold mb-4">Standard</h4>
-                  <ul className="space-y-2 text-gray-400">
-                    <li>5 credits / month</li>
-                    <li>Basic utility book</li>
-                    <li>Standard processing</li>
-                    <li>Community support</li>
-                  </ul>
-                </div>
-                <button
-                  disabled
-                  className="mt-6 px-4 py-2 bg-gray-700 text-gray-500 font-semibold rounded-lg cursor-not-allowed"
-                >
-                  Current Plan
-                </button>
-              </div>
-
-              {/* Pro Card */}
-              <div className="bg-yellow-400 rounded-lg p-6 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xl font-bold mb-4 text-gray-900">Pro</h4>
-                  <ul className="space-y-2 text-gray-900">
-                    <li>Unlimited credits</li>
-                    <li>Full utility book</li>
-                    <li>Priority processing</li>
-                    <li>Premium support</li>
-                    <li>Early access demos</li>
-                  </ul>
-                </div>
-                <button
-                  onClick={handlePurchasePro}
-                  className="mt-6 px-4 py-2 bg-gray-900 text-yellow-400 font-semibold rounded-lg hover:bg-gray-800 transition"
-                >
-                  Upgrade to Pro
-                </button>
-              </div>
-
-            </div>
+          {/* COMPARE PLANS TRIGGER */}
+          <section className="text-center">
+            <button
+              onClick={() => setIsCompareOpen(true)}
+              className="mt-6 px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition"
+            >
+              Compare Plans
+            </button>
           </section>
-
         </div>
       </main>
+
+      {/* Compare Plans Modal */}
+      <ComparePlansModal
+        isOpen={isCompareOpen}
+        onClose={() => setIsCompareOpen(false)}
+        onUpgradeToPro={handleUpgradeToPro}
+        currentPlan={user.isPro ? 'pro' : 'standard'}
+      />
 
       <Footer />
     </>
