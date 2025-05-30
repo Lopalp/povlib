@@ -58,8 +58,7 @@ export default function CompetitionModule({
           <div className="flex items-center space-x-2">
             <h2 className="text-3xl font-bold text-white">{title}</h2>
             <button
-              onMouseEnter={() => setIsInfoOpen(true)}
-              onMouseLeave={() => setIsInfoOpen(false)}
+              onClick={() => setIsInfoOpen(true)}
               className="p-1 rounded-full hover:bg-gray-700"
             >
               <Info className="w-5 h-5 text-gray-400 hover:text-white" />
@@ -82,10 +81,11 @@ export default function CompetitionModule({
                     relative w-full bg-gray-700 rounded-2xl overflow-hidden border-2 transition-colors
                     ${isSelected ? 'border-green-400' : 'border-transparent'}
                     hover:border-yellow-400
+                    ${selectedClip && !isSelected ? 'filter grayscale contrast-75' : ''}
                   `}
                 >
                   {/* Video Preview */}
-                  <div className={`${selectedClip && !isSelected ? 'filter grayscale contrast-75' : ''} relative w-full pb-[133%] bg-black`}>
+                  <div className="relative w-full pb-[133%] bg-black">
                     <video
                       src={clip.videoUrl || clip.video_id}
                       poster={clip.thumbnail}
@@ -104,6 +104,7 @@ export default function CompetitionModule({
                     <p className="text-gray-300 text-sm">by {clip.submitter || 'Unknown'}</p>
                   </div>
                 </div>
+
                 {/* Select Button under card */}
                 <button
                   onClick={() => handleSelect(clip.id)}
@@ -143,7 +144,7 @@ export default function CompetitionModule({
       {isInfoOpen && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-          onMouseLeave={() => setIsInfoOpen(false)}
+          onClick={e => e.target === e.currentTarget && setIsInfoOpen(false)}
         >
           <div className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl max-w-md w-full p-6 shadow-lg">
             <div className="flex justify-between items-center mb-4">
@@ -156,13 +157,13 @@ export default function CompetitionModule({
               </button>
             </div>
             <p className="text-gray-300 mb-2">
-              Each week we feature a selection of top POV clips. You can <strong>select</strong> your favorite. The clip with the most selections at the end wins.
+              Each round features top POV clips. Select your favorite clip below.
             </p>
             <p className="text-gray-300 mb-2">
-              Use the “Submit Your Clip” button to enter your own clip into next week’s round.
+              The clip with the most selections when time runs out wins the title.
             </p>
             <p className="text-gray-300">
-              Get involved, share with friends, and may the best clip win!
+              Use "Submit Your Clip" to enter your clips in upcoming rounds.
             </p>
           </div>
         </div>
@@ -170,4 +171,3 @@ export default function CompetitionModule({
     </>
   );
 }
- 
