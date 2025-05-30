@@ -22,6 +22,7 @@ import Navbar from './POVlib/Navbar';
 import Footer from './POVlib/Footer';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
+import CompetitionModule from '../../components/POVlib/CompetitionModule';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
 import DemoCard from './POVlib/DemoCard'; // Import DemoCard to pass handleTagClick
