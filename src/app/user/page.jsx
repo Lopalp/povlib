@@ -1,14 +1,14 @@
+// src/app/user/page.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
-import DemoCard from '../../components/POVlib/DemoCard';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
-import CategorySection from '../../components/containers/CategorySection';
-import { getFilteredDemos } from '@/lib/supabase';
+import { CategorySection } from '../../components/containers/CategorySection';
+import { getFilteredDemos } from '../../lib/supabase';
 
 const mapDemo = demo => ({
   id: demo.id,
@@ -34,7 +34,7 @@ const UserPage = () => {
   const [loading, setLoading] = useState(true);
   const [historyDemos, setHistoryDemos] = useState([]);
 
-  // Create-demo state
+  // Create-demo form state
   const [matchLink, setMatchLink] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
@@ -43,7 +43,7 @@ const UserPage = () => {
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
-  // simulate auth/session
+  // simulate user fetch
   useEffect(() => {
     setTimeout(() => {
       setUser({
@@ -56,7 +56,7 @@ const UserPage = () => {
     }, 800);
   }, []);
 
-  // fetch real history demos by player
+  // load history demos once user is available
   useEffect(() => {
     if (!loading && user) {
       (async () => {
@@ -77,7 +77,7 @@ const UserPage = () => {
   const handleMatchLinkSubmit = e => {
     e.preventDefault();
     if (!matchLink) return;
-    // TODO: consume credit & generate demo
+    // TODO: consume 1 credit & generate demo from link
     setMatchLink('');
     setIsCreateDemoOpen(false);
   };
@@ -96,7 +96,7 @@ const UserPage = () => {
   const handleUploadSubmit = e => {
     e.preventDefault();
     if (!selectedFile) return;
-    // TODO: consume credit & upload demo
+    // TODO: consume 1 credit & upload .dem
     setSelectedFile(null);
     setIsCreateDemoOpen(false);
   };
@@ -138,7 +138,7 @@ const UserPage = () => {
       <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
         <div className="container mx-auto px-4 md:px-8 space-y-12">
 
-          {/* PROFILE HEADER */}
+          {/* Profile Header */}
           <section className="bg-gray-800 rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-3xl font-bold text-yellow-400">
               {user.name.charAt(0)}
@@ -153,14 +153,14 @@ const UserPage = () => {
             </div>
           </section>
 
-          {/* HISTORY (uses real demos) */}
+          {/* History Section */}
           <CategorySection
             title="History"
             demos={historyDemos}
             onSelectDemo={handleSelectDemo}
           />
 
-          {/* DASHBOARD SECTIONS */}
+          {/* Dashboard Sections */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Favorites</h3>
@@ -173,7 +173,7 @@ const UserPage = () => {
             <div />
           </section>
 
-          {/* ACTION BUTTONS */}
+          {/* Action Buttons */}
           <section className="text-center space-x-4">
             <button
               onClick={() => setIsCreateDemoOpen(true)}
@@ -191,13 +191,13 @@ const UserPage = () => {
         </div>
       </main>
 
+      {/* Modals */}
       <ComparePlansModal
         isOpen={isCompareOpen}
         onClose={() => setIsCompareOpen(false)}
         onUpgradeToPro={handleUpgradeToPro}
         currentPlan={user.isPro ? 'pro' : 'standard'}
       />
-
       <CreateDemoModal
         isOpen={isCreateDemoOpen}
         onClose={() => setIsCreateDemoOpen(false)}
