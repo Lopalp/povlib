@@ -3,12 +3,41 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { PlayCircle } from 'lucide-react';
+import DemoCardVertical from './DemoCardVertical';
 
 const dummyClips = [
-  { id: 'c1', title: 'Epic AWP Flick', thumbnail: '/images/clip1.png', tags: ['AWP','One-Tap'], submitter: 'User123' },
-  { id: 'c2', title: 'Insane Ninja Defuse', thumbnail: '/images/clip2.png', tags: ['Ninja','Clutch'], submitter: 'ProPlayer' },
-  { id: 'c3', title: '4K Spraydown', thumbnail: '/images/clip3.png', tags: ['Spray','Rifle'], submitter: 'User456' },
-  { id: 'c4', title: 'Perfect Flash Pop', thumbnail: '/images/clip4.png', tags: ['Flash','Utility'], submitter: 'ProPlayer2' },
+  { 
+    id: 'c1', 
+    title: 'Epic AWP Flick', 
+    thumbnail: '/images/clip1.png', 
+    videoUrl: '/videos/clip1.mp4',
+    tags: ['AWP','One-Tap'], 
+    submitter: 'User123' 
+  },
+  { 
+    id: 'c2', 
+    title: 'Insane Ninja Defuse', 
+    thumbnail: '/images/clip2.png', 
+    videoUrl: '/videos/clip2.mp4',
+    tags: ['Ninja','Clutch'], 
+    submitter: 'ProPlayer' 
+  },
+  { 
+    id: 'c3', 
+    title: '4K Spraydown', 
+    thumbnail: '/images/clip3.png', 
+    videoUrl: '/videos/clip3.mp4',
+    tags: ['Spray','Rifle'], 
+    submitter: 'User456' 
+  },
+  { 
+    id: 'c4', 
+    title: 'Perfect Flash Pop', 
+    thumbnail: '/images/clip4.png', 
+    videoUrl: '/videos/clip4.mp4',
+    tags: ['Flash','Utility'], 
+    submitter: 'ProPlayer2' 
+  },
 ];
 
 export default function CompetitionModule({
@@ -69,57 +98,32 @@ export default function CompetitionModule({
             : 0;
 
           return (
-            <div key={clip.id} className="relative bg-gray-700 rounded-xl overflow-hidden">
-              {/* fill overlay */}
+            <div key={clip.id} className="relative">
+              {/* Vertical Demo Card */}
+              <DemoCardVertical demo={clip} onSelect={() => handleVote(clip.id)} />
+
+              {/* Fill overlay after vote */}
               {userVote && (
                 <div
-                  className="absolute bottom-0 left-0 right-0 bg-green-500 opacity-50 transition-height duration-500"
+                  className="absolute bottom-0 left-0 right-0 bg-green-500 opacity-50 transition-all duration-500"
                   style={{ height: `${percent}%` }}
                 />
               )}
 
-              {/* thumbnail */}
-              <div className="relative w-full pb-[56.25%] overflow-hidden">
-                <img
-                  src={clip.thumbnail}
-                  alt={clip.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <PlayCircle className="w-12 h-12 text-white" />
-                </div>
-              </div>
-
-              {/* content */}
-              <div className="p-4 flex flex-col h-48 justify-between relative">
-                <div>
-                  <h3 className="text-lg font-semibold text-white truncate">{clip.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1">by {clip.submitter}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {clip.tags.map(tag => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-yellow-400 text-gray-900 px-2 py-1 rounded-full"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  {!userVote ? (
-                    <button
-                      onClick={() => handleVote(clip.id)}
-                      className="px-3 py-1 rounded-lg bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300 transition"
-                    >
-                      Vote
-                    </button>
-                  ) : (
-                    <span className="px-3 py-1 rounded-lg bg-green-500 text-white text-sm">
-                      {percent}% 
-                    </span>
-                  )}
-                </div>
+              {/* Vote button or percent badge */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                {!userVote ? (
+                  <button
+                    onClick={() => handleVote(clip.id)}
+                    className="px-4 py-1 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition"
+                  >
+                    Vote
+                  </button>
+                ) : (
+                  <span className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm">
+                    {percent}% 
+                  </span>
+                )}
               </div>
             </div>
           );
