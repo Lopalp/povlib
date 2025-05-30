@@ -48,7 +48,7 @@ export default function CompetitionModule({
     return () => clearInterval(iv);
   }, [endTime]);
 
-  // Profit when winning
+  // Profit calculation
   const profit = id => {
     const amt = parseFloat(betAmount) || 0;
     return Math.floor(amt * (odds[id] - 1));
@@ -70,19 +70,6 @@ export default function CompetitionModule({
         </span>
       </div>
 
-      {/* Bet Input */}
-      <div className="flex items-center gap-2">
-        <label className="text-gray-300 font-medium">Bet coins:</label>
-        <input
-          type="number"
-          min="0"
-          value={betAmount}
-          onChange={e => setBetAmount(e.target.value)}
-          placeholder="0"
-          className="w-24 px-3 py-1 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
-        />
-      </div>
-
       {/* Clips Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {clips.map(clip => {
@@ -96,7 +83,7 @@ export default function CompetitionModule({
                 hover:border-yellow-400 transition-colors
               `}
             >
-              {/* Video Preview with conditional grayscale */}
+              {/* Video Preview */}
               <div className={`${selectedBet && !isSelected ? 'filter grayscale contrast-75' : ''} relative w-full pb-[133%] bg-black`}>
                 <video
                   src={clip.videoUrl || clip.video_id}
@@ -111,34 +98,44 @@ export default function CompetitionModule({
                 </div>
               </div>
 
-              {/* Glassmorphic overlay */}
-              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
+              {/* Glassmorphic Overlay */}
+              <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md space-y-1">
                 <h3 className="text-white font-bold truncate">{clip.title}</h3>
                 <p className="text-gray-300 text-sm">by {clip.submitter || 'Unknown'}</p>
               </div>
 
-              {/* Button & profit */}
-              <div className="absolute bottom-4 inset-x-4 flex justify-between items-center">
-                {/* Profit badge */}
-                {betAmount && isSelected && (
-                  <span className="text-sm bg-green-500 text-white px-2 py-1 rounded-full">
+              {/* Bet controls inside the card */}
+              <div className="absolute bottom-4 inset-x-4 flex flex-col space-y-2">
+                {/* Input and Button */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    min="0"
+                    value={betAmount}
+                    onChange={e => setBetAmount(e.target.value)}
+                    placeholder="0"
+                    className="w-16 px-2 py-1 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none"
+                  />
+                  <button
+                    onClick={() => handleSelect(clip.id)}
+                    className={`
+                      flex-1 px-4 py-1 font-medium rounded-lg text-sm transition-colors
+                      ${isSelected
+                        ? 'bg-green-500 text-white'
+                        : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'}
+                    `}
+                  >
+                    {betAmount
+                      ? (isSelected ? 'Bet placed' : 'Bet')
+                      : (isSelected ? 'Selected'   : 'Select')}
+                  </button>
+                </div>
+                {/* Profit message */}
+                {isSelected && betAmount && (
+                  <div className="text-center text-green-400 font-medium text-sm">
                     +{profit(clip.id)}
-                  </span>
+                  </div>
                 )}
-                {/* Select/Bet button */}
-                <button
-                  onClick={() => handleSelect(clip.id)}
-                  className={`
-                    filter-none pointer-events-auto px-4 py-1 font-medium rounded-lg text-sm transition-colors
-                    ${isSelected
-                      ? 'bg-green-500 text-white'
-                      : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'}
-                  `}
-                >
-                  {betAmount
-                    ? (isSelected ? 'Bet placed' : 'Bet')
-                    : (isSelected ? 'Selected'   : 'Select')}
-                </button>
               </div>
             </div>
           );
@@ -154,15 +151,6 @@ export default function CompetitionModule({
           Bet coins on your favorite clip and win coins equal to your profit!
         </p>
       </div>
-
-      {/* Summary */}
-      {selectedBet && betAmount && (
-        <p className="text-center text-green-400 font-medium mt-4">
-          You bet <strong>{betAmount}</strong> coins on <strong>
-            {clips.find(c => c.id === selectedBet)?.title}
-          </strong> and can win <strong>+{profit(selectedBet)}</strong>!
-        </p>
-      )}
     </section>
   );
 }
