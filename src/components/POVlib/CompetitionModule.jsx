@@ -5,10 +5,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { PlayCircle } from 'lucide-react';
 
 const dummyClips = [
-  { id: 'c1', title: 'Epic AWP Flick', thumbnail: '/images/clip1.png', tags: ['AWP', 'One-Tap'] },
-  { id: 'c2', title: 'Insane Ninja Defuse', thumbnail: '/images/clip2.png', tags: ['Ninja', 'Clutch'] },
-  { id: 'c3', title: '4K Spraydown', thumbnail: '/images/clip3.png', tags: ['Spray', 'Rifle'] },
-  { id: 'c4', title: 'Perfect Flash Pop', thumbnail: '/images/clip4.png', tags: ['Flash', 'Utility'] },
+  { id: 'c1', title: 'Epic AWP Flick', thumbnail: '/images/clip1.png', tags: ['AWP','One-Tap'], submitter: 'User123' },
+  { id: 'c2', title: 'Insane Ninja Defuse', thumbnail: '/images/clip2.png', tags: ['Ninja','Clutch'], submitter: 'ProPlayer' },
+  { id: 'c3', title: '4K Spraydown', thumbnail: '/images/clip3.png', tags: ['Spray','Rifle'], submitter: 'User456' },
+  { id: 'c4', title: 'Perfect Flash Pop', thumbnail: '/images/clip4.png', tags: ['Flash','Utility'], submitter: 'ProPlayer2' },
 ];
 
 export default function CompetitionModule({
@@ -29,7 +29,7 @@ export default function CompetitionModule({
 
   useEffect(() => {
     const update = () => {
-      const diff = endTime - new Date();
+      const diff = endTime - Date.now();
       if (diff <= 0) {
         setTimeLeft('Voting closed');
         return;
@@ -44,10 +44,14 @@ export default function CompetitionModule({
     return () => clearInterval(iv);
   }, [endTime]);
 
+  const totalVotes = useMemo(() =>
+    Object.values(votes).reduce((sum, v) => sum + v, 0), [votes]
+  );
+
   const handleVote = id => {
     if (userVote || timeLeft === 'Voting closed') return;
     setUserVote(id);
-    setVotes(v => ({ ...v, [id]: v[id] + 1 }));
+    setVotes(prev => ({ ...prev, [id]: prev[id] + 1 }));
   };
 
   return (
@@ -60,28 +64,37 @@ export default function CompetitionModule({
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {dummyClips.map(clip => {
           const voted = userVote === clip.id;
+          const percent = totalVotes > 0
+            ? Math.round((votes[clip.id] / totalVotes) * 100)
+            : 0;
+
           return (
-            <div
-              key={clip.id}
-              className={`
-                group bg-gradient-to-br from-gray-700 to-gray-600 rounded-xl overflow-hidden 
-                transform hover:scale-105 transition-transform duration-200 
-                ${voted ? 'ring-4 ring-green-400' : 'ring-1 ring-transparent'}
-              `}
-            >
+            <div key={clip.id} className="relative bg-gray-700 rounded-xl overflow-hidden">
+              {/* fill overlay */}
+              {userVote && (
+                <div
+                  className="absolute bottom-0 left-0 right-0 bg-green-500 opacity-50 transition-height duration-500"
+                  style={{ height: `${percent}%` }}
+                />
+              )}
+
+              {/* thumbnail */}
               <div className="relative w-full pb-[56.25%] overflow-hidden">
                 <img
                   src={clip.thumbnail}
                   alt={clip.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                   <PlayCircle className="w-12 h-12 text-white" />
                 </div>
               </div>
-              <div className="p-4 flex flex-col h-48 justify-between">
+
+              {/* content */}
+              <div className="p-4 flex flex-col h-48 justify-between relative">
                 <div>
                   <h3 className="text-lg font-semibold text-white truncate">{clip.title}</h3>
+                  <p className="text-xs text-gray-400 mt-1">by {clip.submitter}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {clip.tags.map(tag => (
                       <span
@@ -93,22 +106,19 @@ export default function CompetitionModule({
                     ))}
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-4">
-                  <button
-                    onClick={() => handleVote(clip.id)}
-                    disabled={!!userVote}
-                    className={`
-                      px-3 py-1 rounded-lg text-sm font-semibold transition-colors
-                      ${voted
-                        ? 'bg-green-500 text-white cursor-default'
-                        : userVote
-                          ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                          : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'}
-                    `}
-                  >
-                    {voted ? 'Voted' : 'Vote'}
-                  </button>
-                  <span className="text-sm text-gray-300">{votes[clip.id]} votes</span>
+                <div className="mt-4 flex items-center justify-between">
+                  {!userVote ? (
+                    <button
+                      onClick={() => handleVote(clip.id)}
+                      className="px-3 py-1 rounded-lg bg-yellow-400 text-gray-900 font-semibold hover:bg-yellow-300 transition"
+                    >
+                      Vote
+                    </button>
+                  ) : (
+                    <span className="px-3 py-1 rounded-lg bg-green-500 text-white text-sm">
+                      {percent}% 
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -118,7 +128,7 @@ export default function CompetitionModule({
 
       {userVote && (
         <p className="text-center text-green-400 font-medium">
-          Thanks for voting! Check back when voting closes to see the winner.
+          You voted for <strong>{dummyClips.find(c => c.id === userVote).title}</strong>!
         </p>
       )}
     </section>
