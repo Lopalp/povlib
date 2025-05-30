@@ -49,12 +49,18 @@ export default function UserPage() {
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
   // Tabs
-  const tabs = ['Overview','History','Favorites','Utility'];
+  const tabs = ['Overview','Your Demos','History','Favorites','Utility'];
   const [activeTab, setActiveTab] = useState('Overview');
 
   // Derived stats
   const totalDemos = allDemos.length;
-  const totalViews = useMemo(() => allDemos.reduce((sum,d) => sum + d.views, 0), [allDemos]);
+  const totalViews = useMemo(() => allDemos.reduce((sum,d)=>sum+d.views,0), [allDemos]);
+
+  // Own demos
+  const ownDemos = useMemo(() => 
+    allDemos.filter(demo => demo.players.includes(user?.name)), 
+    [allDemos, user]
+  );
 
   // simulate user fetch
   useEffect(() => {
@@ -80,12 +86,12 @@ export default function UserPage() {
         setAllDemos(mapped);
 
         // History & favorites by random tag
-        const tags = [...new Set(mapped.flatMap(d => d.tags))];
+        const tags = [...new Set(mapped.flatMap(d=>d.tags))];
         if (tags.length) {
           const t1 = tags[Math.floor(Math.random()*tags.length)];
-          setHistoryDemos(mapped.filter(d => d.tags.includes(t1)));
+          setHistoryDemos(mapped.filter(d=>d.tags.includes(t1)));
           const t2 = tags[Math.floor(Math.random()*tags.length)];
-          setFavDemos(mapped.filter(d => d.tags.includes(t2)));
+          setFavDemos(mapped.filter(d=>d.tags.includes(t2)));
         } else {
           setHistoryDemos(mapped);
           setFavDemos(mapped);
@@ -93,23 +99,23 @@ export default function UserPage() {
 
         // Trending by views
         setTrendingDemos([...mapped].sort((a,b)=>b.views-a.views).slice(0,6));
-        // Latest as most recent year
-        setLatestDemos([...mapped].sort((a,b)=>b.year - a.year).slice(0,6));
+        // Latest by year
+        setLatestDemos([...mapped].sort((a,b)=>b.year-b.year).slice(0,6));
       })();
     }
   }, [loading, user]);
 
   // handlers
-  const goDemo     = d => router.push(`/demos/${d.id}`);
-  const doUpgrade  = () => setIsCompareOpen(true);
+  const goDemo     = demo => router.push(`/demos/${demo.id}`);
+  const handleUpgrade = () => setIsCompareOpen(true);
   const onMatchSubmit = e => { e.preventDefault(); if(!matchLink) return; setMatchLink(''); setIsCreateDemoOpen(false); };
-  const onFileChange  = e => {
+  const onFileChange = e => {
     const f = e.target.files[0];
     if (f?.name.endsWith('.dem')) { setSelectedFile(f); setUploadError(''); }
     else { setUploadError('Please upload a valid .dem file.'); setSelectedFile(null); }
   };
   const onFileSubmit = e => { e.preventDefault(); if(!selectedFile) return; setSelectedFile(null); setIsCreateDemoOpen(false); };
-  const linkFaceit   = () => alert('Start Faceit linking flow');
+  const linkFaceit = () => alert('Link Faceit account');
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -158,7 +164,7 @@ export default function UserPage() {
               <span className="uppercase text-sm font-semibold">{user.plan}</span>
               {user.plan !== 'Pro' && (
                 <button
-                  onClick={doUpgrade}
+                  onClick={handleUpgrade}
                   className="px-3 py-1 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-300"
                 >
                   Upgrade
@@ -186,32 +192,43 @@ export default function UserPage() {
         </nav>
 
         {/* Tab Content */}
-        {activeTab === 'Overview' && (
-          <div className="space-y-12 pt-4">
-            <CategorySection title="Trending" demos={trendingDemos} onSelectDemo={goDemo} />
-            <CategorySection title="Latest"   demos={latestDemos}   onSelectDemo={goDemo} />
-          </div>
-        )}
+        <div className="pt-4 space-y-8">
+          {activeTab === 'Overview' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CategorySection title="Trending" demos={trendingDemos} onSelectDemo={goDemo} />
+              <CategorySection title="Latest"   demos={latestDemos}   onSelectDemo={goDemo} />
+              <button
+                onClick={() => setActiveTab('Your Demos')}
+                className="col-span-full mt-4 mx-auto px-6 py-3 bg-gray-800 text-gray-200 font-bold rounded-lg hover:bg-gray-700 transition"
+              >
+                View Your Demos
+              </button>
+            </div>
+          )}
 
-        {activeTab === 'History' && (
-          <CategorySection title="History" demos={historyDemos} onSelectDemo={goDemo} />
-        )}
+          {activeTab === 'Your Demos' && (
+            <CategorySection title="Your Demos" demos={ownDemos} onSelectDemo={goDemo} />
+          )}
 
-        {activeTab === 'Favorites' && (
-          <CategorySection title="Favorites" demos={favDemos} onSelectDemo={goDemo} />
-        )}
+          {activeTab === 'History' && (
+            <CategorySection title="History" demos={historyDemos} onSelectDemo={goDemo} />
+          )}
 
-        {activeTab === 'Utility' && (
-          <UtilityBook />
-        )}
+          {activeTab === 'Favorites' && (
+            <CategorySection title="Favorites" demos={favDemos} onSelectDemo={goDemo} />
+          )}
 
+          {activeTab === 'Utility' && (
+            <UtilityBook />
+          )}
+        </div>
       </div>
     </main>
 
     <ComparePlansModal
       isOpen={isCompareOpen}
       onClose={() => setIsCompareOpen(false)}
-      onUpgradeToPro={doUpgrade}
+      onUpgradeToPro={handleUpgrade}
       currentPlan={user.plan === 'Pro' ? 'pro' : 'standard'}
     />
 
@@ -228,6 +245,6 @@ export default function UserPage() {
       onLinkAccount={linkFaceit}
     />
 
-    <Footer />
+    <Footer/>
   </>;
 }
