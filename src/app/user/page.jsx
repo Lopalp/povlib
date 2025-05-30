@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/POVlib/Navbar';
 import Footer from '../../components/POVlib/Footer';
 import DemoCard from '../../components/POVlib/DemoCard';
 import ComparePlansModal from '../../components/POVlib/ComparePlansModal';
 import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
-import { CategorySection } from '../../containers/CategorySection';
+import CategorySection from '../../components/containers/CategorySection';
 import { getFilteredDemos } from '@/lib/supabase';
 
 const mapDemo = demo => ({
@@ -34,10 +34,12 @@ const UserPage = () => {
   const [loading, setLoading] = useState(true);
   const [historyDemos, setHistoryDemos] = useState([]);
 
+  // Create-demo state
   const [matchLink, setMatchLink] = useState('');
   const [uploadError, setUploadError] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
 
+  // Modal state
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
 
@@ -54,7 +56,7 @@ const UserPage = () => {
     }, 800);
   }, []);
 
-  // load real history demos by player name
+  // fetch real history demos by player
   useEffect(() => {
     if (!loading && user) {
       (async () => {
@@ -75,7 +77,7 @@ const UserPage = () => {
   const handleMatchLinkSubmit = e => {
     e.preventDefault();
     if (!matchLink) return;
-    /* TODO: consume credit & generate demo */
+    // TODO: consume credit & generate demo
     setMatchLink('');
     setIsCreateDemoOpen(false);
   };
@@ -94,7 +96,7 @@ const UserPage = () => {
   const handleUploadSubmit = e => {
     e.preventDefault();
     if (!selectedFile) return;
-    /* TODO: consume credit & upload demo */
+    // TODO: consume credit & upload demo
     setSelectedFile(null);
     setIsCreateDemoOpen(false);
   };
@@ -151,7 +153,7 @@ const UserPage = () => {
             </div>
           </section>
 
-          {/* HISTORY (like start page) */}
+          {/* HISTORY (uses real demos) */}
           <CategorySection
             title="History"
             demos={historyDemos}
@@ -195,6 +197,7 @@ const UserPage = () => {
         onUpgradeToPro={handleUpgradeToPro}
         currentPlan={user.isPro ? 'pro' : 'standard'}
       />
+
       <CreateDemoModal
         isOpen={isCreateDemoOpen}
         onClose={() => setIsCreateDemoOpen(false)}
