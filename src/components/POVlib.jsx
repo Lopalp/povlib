@@ -286,7 +286,7 @@ const POVlib = () => {
   
   const recentlyAddedDemos = useMemo(() => {
     if (activeTag === null) {
-      return filteredDemos.slice(0, 10);
+      return filteredDemos.slice(0, 12);
     } else {
  return filteredDemos.filter(demo => demo.tags.includes(activeTag));
     }
