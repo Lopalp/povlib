@@ -14,34 +14,21 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const ctPercentage = (ctRounds / totalRounds) * 100;
   const mockKDA = "23/5/2"; // Placeholder for K/D/A
 
-  // Glassmorphism classes (same as in the Navbar)
-  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
-
   return (
     <article
       className={`
-        relative flex flex-col rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-200
-        hover:shadow-xl hover:border-yellow-500 border border-gray-700
+        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md transition-all duration-200
+        hover:shadow-xl hover:border-yellow-500 cursor-pointer overflow-hidden
         ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
       `}
       onClick={() => onSelect(demo)}
     >
-      {/* ======= Background Thumbnail (scaled, bleeding top & bottom) ======= */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center transform scale-110"
-          style={{ backgroundImage: `url(${demo.thumbnail})` }}
-        />
-        {/* Dark overlay to improve contrast */}
-        <div className="absolute inset-0 bg-black/60" />
-      </div>
-
-      {/* ======= Actual Thumbnail on Top ======= */}
+      {/* ======= Thumbnail Section ======= */}
       <div className="relative w-full aspect-video overflow-hidden group">
         <img
           src={demo.thumbnail}
           alt={demo.title}
-          className="w-full h-full object-cover brightness-100 transition-all duration-200 group-hover:brightness-75"
+          className="w-full h-full object-cover brightness-90 transition-all duration-200 group-hover:brightness-75"
           loading="lazy"
         />
 
@@ -56,75 +43,70 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
       </div>
 
-      {/* ======= Content Section with Glassmorphism ======= */}
-      <div className={`flex flex-col flex-grow p-4 gap-3 ${glassBg}`}>
-        {/* Header (Title + Meta) */}
+      {/* ======= Content Section ======= */}
+      <div className="flex flex-col flex-grow p-4 space-y-3">
+        {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
             group-hover:text-yellow-400 transition-colors duration-200">
             {demo.title}
           </h3>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-200">
-            <span className="px-2 py-1 bg-gray-700/50 rounded-full">{demo.map}</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
+            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
             {demo.team && (
-              <span className="px-2 py-1 bg-gray-700/50 rounded-full">{demo.team}</span>
+              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
             )}
-            <span className="px-2 py-1 bg-gray-700/50 rounded-full">{demo.year}</span>
+            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
           </div>
         </header>
 
-        {/* First Divider */}
-        <div className="border-t border-gray-600" />
+        <div className="border-t border-gray-700"></div>
 
-        {/* Player + KDA */}
+        {/* ----- Player + KDA ----- */}
         <section className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <User className="h-5 w-5 text-gray-300" />
+            <User className="h-5 w-5 text-gray-400" />
             {demo.players.slice(0, 1).map((player, idx) => (
               <Link
                 key={idx}
                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-sm font-medium text-gray-100 hover:text-yellow-400 transition-colors duration-200"
+                className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
                 onClick={(e) => handlePlayerClick(e, player)}
               >
                 {player}
               </Link>
             ))}
           </div>
-          <div className="text-xs font-semibold text-gray-300 tracking-wide bg-gray-700/50 px-2 py-1 rounded-md">
+          <div className="text-xs font-semibold text-gray-400 tracking-wide bg-gray-700 px-2 py-1 rounded-md">
             {mockKDA}
           </div>
         </section>
 
-        {/* Tags + Positions */}
+        {/* ----- Tags + Positions ----- */}
         <section className="flex flex-wrap gap-2">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
               key={i}
-              className="flex items-center gap-1 text-xs font-medium bg-gray-700/50 text-gray-200 px-2 py-1 rounded-full
-                hover:bg-gray-600/50 transition-colors duration-150"
+              className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
+                hover:bg-gray-600 transition-colors duration-150"
             >
-              {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-300" />}
+              {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
               {item}
             </span>
           ))}
           {(demo.positions.length + demo.tags.length) > 4 && (
-            <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded-full">
+            <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
               +{demo.positions.length + demo.tags.length - 4} more
             </span>
           )}
         </section>
 
-        {/* Flexible spacer to push second divider to bottom */}
-        <div className="flex-grow" />
+        <div className="border-t border-gray-700"></div>
 
-        {/* Second Divider */}
-        <div className="border-t border-gray-600" />
-
-        {/* CT/T Rounds Bar */}
+        {/* ----- CT/T Rounds Bar ----- */}
         <footer className="mt-2">
-          <div className="h-2 w-full rounded-full bg-gray-700/50 overflow-hidden flex">
+          <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
             <div
               className="bg-blue-500/60 h-full transition-all duration-300"
               style={{ width: `${ctPercentage}%` }}
@@ -134,7 +116,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
               style={{ width: `${100 - ctPercentage}%` }}
             />
           </div>
-          <div className="mt-1 flex justify-between text-[10px] text-gray-400 font-medium">
+          <div className="mt-1 flex justify-between text-[10px] text-gray-500 font-medium">
             <span>CT: {ctRounds}</span>
             <span>T: {tRounds}</span>
           </div>
