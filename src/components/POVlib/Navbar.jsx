@@ -150,7 +150,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                 </button>
                 {userMenuOpen && (
                   <ul className={`absolute right-0 mt-2 w-48 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>
-                    <li><Link href="/profile" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">Your Profile</Link></li>
+                    <li><Link href="/user" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">Your Profile</Link></li>
                     <li><Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Favorites</Link></li>
                     <li><Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Settings</Link></li>
                     <li className="border-t border-gray-600 my-1"></li>
