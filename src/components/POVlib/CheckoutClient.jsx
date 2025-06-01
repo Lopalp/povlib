@@ -1,11 +1,11 @@
-// components/POVlib/CheckoutPage.jsx
+// src/components/POVlib/CheckoutClient.jsx
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { CreditCard, Paypal, Shield } from 'lucide-react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
-// 1) Hier definieren wir einmalig alle Details zu jedem Plan
+// 1) Definitions of all plan details
 const PLAN_DETAILS = {
   free: {
     key: 'free',
@@ -23,7 +23,7 @@ const PLAN_DETAILS = {
     name: 'Basic',
     features: [
       '10 full demos per month',
-      'Up to 1080p @ 30fps',
+      'Up to 1080p @ 30fps',
       'Access to the Pro Utility Book',
       'Standard processing queue',
     ],
@@ -61,25 +61,21 @@ const PLAN_DETAILS = {
   },
 };
 
-const CheckoutPage = () => {
-  const searchParams = useSearchParams();
+export default function CheckoutClient({ initialPlanKey }) {
+  // 2) initialPlanKey kommt von der Server-Page via props
   const router = useRouter();
-
-  // 2) Auslesen des Query-Parameters „plan“
-  const planKey = searchParams.get('plan') || 'free';
-  const plan = PLAN_DETAILS[planKey] || PLAN_DETAILS.free;
-
   const [selectedMethod, setSelectedMethod] = useState('card');
   const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' | 'annual'
   const [isTeam, setIsTeam] = useState(false);
 
-  // 3) Basis-Monatsrate aus den PLAN_DETAILS
-  const baseMonthlyRate = useMemo(
-    () => plan.baseMonthlyRate,
-    [plan]
-  );
+  // 3) Wenn initialPlanKey ungültig, default auf „free“
+  const validKey = PLAN_DETAILS[initialPlanKey] ? initialPlanKey : 'free';
+  const plan = PLAN_DETAILS[validKey];
 
-  // 4) Einheitspreis berechnen (Annual = 20% Rabatt)
+  // 4) Basis-Monatsrate aus PLAN_DETAILS
+  const baseMonthlyRate = useMemo(() => plan.baseMonthlyRate, [plan]);
+
+  // 5) Einheitspreis berechnen (Annual = 20% Rabatt)
   const unitPrice = useMemo(() => {
     if (billingCycle === 'annual') {
       return +(baseMonthlyRate * 12 * 0.8).toFixed(2);
@@ -87,49 +83,49 @@ const CheckoutPage = () => {
     return +baseMonthlyRate.toFixed(2);
   }, [baseMonthlyRate, billingCycle]);
 
-  // 5) Finaler Gesamtpreis (Team = 7 Sitze mit zusätzlichem Rabatt)
+  // 6) Finaler Gesamtpreis (Team = 7 Sitze mit Zusatz-Rabatt)
   const finalPrice = useMemo(() => {
     if (isTeam) {
       const seats = 7;
       if (billingCycle === 'annual') {
-        return +((unitPrice * seats) * 0.85).toFixed(2); // 15 % extra off
+        // 15% extra Rabatt auf die Annual-Summe
+        return +((unitPrice * seats) * 0.85).toFixed(2);
       }
-      return +((unitPrice * seats) * 0.9).toFixed(2); // 10 % off
+      // 10% Rabatt auf Monats-Team
+      return +((unitPrice * seats) * 0.9).toFixed(2);
     }
     return +unitPrice.toFixed(2);
   }, [unitPrice, isTeam, billingCycle]);
 
-  // 6) Label z. B. „$44.00 /mo“ oder „$399.00 /yr“
+  // 7) Label z. B. „$44.00 /mo“ oder „$399.00 /yr“
   const priceLabel = useMemo(() => {
     const currency = '$';
     if (billingCycle === 'annual') {
       return `${currency}${finalPrice.toFixed(2)} /yr`;
     }
-    // Für „Free“ setzen wir /mo auch auf 0
     return `${currency}${finalPrice.toFixed(2)} /mo`;
   }, [finalPrice, billingCycle]);
 
-  // 7) Klartext unterhalb des Betrags
+  // 8) Beschreibender Text: monthly vs. annual
   const billingText = useMemo(() => {
     if (billingCycle === 'annual') return 'billed annually (20% off)';
     return 'billed monthly';
   }, [billingCycle]);
 
+  // 9) Beschreibender Text: Team vs. Individual
   const seatText = isTeam ? 'Team License (7 seats)' : 'Individual';
 
-  // 8) Falls ein unbekannter planKey in der URL steht, zurück zur Start-Seite umleiten
+  // 10) Falls initialPlanKey ungültig, direkt auf „plan=free“ umleiten
   useEffect(() => {
-    if (!PLAN_DETAILS[planKey]) {
-      router.replace('/');
+    if (!PLAN_DETAILS[initialPlanKey]) {
+      router.replace('/checkout?plan=free');
     }
-  }, [planKey, router]);
+  }, [initialPlanKey, router]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* ─────────────
-            Linke Spalte: Benefits
-            ───────────── */}
+        {/* ───── Linke Spalte: Benefits ───── */}
         <div className="bg-gray-800 rounded-2xl p-8 shadow-lg flex flex-col">
           <h2 className="text-3xl font-extrabold mb-4 text-yellow-400">
             You’re One Step Away from {plan.name}!
@@ -161,9 +157,7 @@ const CheckoutPage = () => {
           </div>
         </div>
 
-        {/* ─────────────
-            Rechte Spalte: Checkout
-            ───────────── */}
+        {/* ───── Rechte Spalte: Checkout ───── */}
         <div className="bg-gray-800 rounded-2xl p-8 shadow-lg flex flex-col">
           <h2 className="text-2xl font-bold mb-6 text-white">Checkout</h2>
 
@@ -223,7 +217,7 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          {/* Team-Checkbox */}
+          {/* Team License Checkbox */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 text-gray-200">
               License Type
@@ -238,7 +232,9 @@ const CheckoutPage = () => {
               <span className="text-gray-300">Team License (7 seats)</span>
               {isTeam && (
                 <span className="ml-2 text-xs text-gray-400">
-                  {billingCycle === 'annual' ? '(15% off total)' : '(10% off total)'}
+                  {billingCycle === 'annual'
+                    ? '(15% off total)'
+                    : '(10% off total)'}
                 </span>
               )}
             </label>
@@ -359,7 +355,7 @@ const CheckoutPage = () => {
             </form>
           )}
 
-          {/* Abschluss-Button */}
+          {/* Complete Purchase Button */}
           <button
             type="button"
             className="w-full py-3 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition-colors shadow-[0_0_15px_rgba(250,204,21,0.3)]"
@@ -376,6 +372,4 @@ const CheckoutPage = () => {
       </div>
     </div>
   );
-};
-
-export default CheckoutPage;
+}
