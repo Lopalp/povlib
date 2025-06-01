@@ -7,24 +7,24 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
     e.stopPropagation();
   };
 
-  // Example CT vs. T rounds calculation
+  // Rounds calculation (CT vs. T)
   const ctRounds = demo.id % 7 + 6;
   const tRounds = demo.id % 5 + 8;
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
-  const mockKDA = demo.kda || "—"; // use placeholder “—” if no KDA provided
+  const mockKDA = "23/5/2"; // Placeholder
 
   return (
     <article
       className={`
-        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md hover:shadow-xl 
-        overflow-hidden transition-all duration-200 cursor-pointer
-        ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
-        min-h-[24rem]        /* Reserve full height even if some fields are missing */
+        flex flex-col justify-between bg-gray-800 border border-gray-700 rounded-2xl shadow-md 
+        hover:shadow-xl overflow-hidden transition-shadow duration-200 cursor-pointer
+        ${featured ? 'w-full' : 'w-80 md:w-72'} 
+        h-[32rem] ${className}
       `}
       onClick={() => onSelect(demo)}
     >
-      {/* ======= Thumbnail Section ======= */}
+      {/* ======= Thumbnail ======= */}
       <div className="relative w-full aspect-video overflow-hidden">
         <img
           src={demo.thumbnail}
@@ -32,61 +32,58 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           className="w-full h-full object-cover brightness-90 transition-all duration-200 group-hover:brightness-75"
           loading="lazy"
         />
-
         {/* Play Button Overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
-            className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
-            hover:bg-black/80 hover:scale-105 transition-all duration-200"
+            className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 
+            text-yellow-400 hover:bg-black/80 hover:scale-105 transition-all duration-200"
           >
             <Play className="h-5 w-5" fill="currentColor" />
           </button>
         </div>
       </div>
 
-      {/* ======= Content Section ======= */}
-      <div className="flex flex-col flex-grow p-4 space-y-3">
-        {/* ----- Header: Title + Metadata ----- */}
-        <header className="space-y-2">
+      {/* ======= Content ======= */}
+      <div className="flex flex-col flex-grow px-4 py-3 space-y-3">
+        {/* ----- Title ----- */}
+        <header className="min-h-[3rem]">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
             group-hover:text-yellow-400 transition-colors duration-200">
             {demo.title}
           </h3>
-
-          <div className="flex flex-col space-y-1">
-            {/* Always show a placeholder slot for “Map” (it’s required) */}
-            <span className="text-xs uppercase text-gray-300 bg-gray-700 px-2 py-1 rounded-full">
-              Map: {demo.map || "—"}
-            </span>
-
-            {/* Team & Year: even if missing, placeholders keep the same height */}
-            <div className="flex items-center space-x-2 text-xs text-gray-300">
-              <span className="bg-gray-700 px-2 py-1 rounded-full">
-                Team: {demo.team || "—"}
-              </span>
-              <span className="bg-gray-700 px-2 py-1 rounded-full">
-                Year: {demo.year || "—"}
-              </span>
-            </div>
-          </div>
         </header>
 
-        <div className="border-t border-gray-700" />
+        {/* ----- Map, Team & Year ----- */}
+        <section className="flex flex-wrap items-center gap-2 text-xs text-gray-300 min-h-[2rem]">
+          <span className="px-2 py-1 bg-gray-700 rounded-full">Map: {demo.map || 'Unknown'}</span>
+          <span className="px-2 py-1 bg-gray-700 rounded-full">
+            Team: {demo.team || 'N/A'}
+          </span>
+          <span className="px-2 py-1 bg-gray-700 rounded-full">
+            Year: {demo.year || 'N/A'}
+          </span>
+        </section>
 
-        {/* ----- Player + KDA Section ----- */}
-        <section className="flex items-center justify-between">
+        {/* Divider */}
+        <div className="border-t border-gray-700"></div>
+
+        {/* ----- Player + K/D/A ----- */}
+        <section className="flex items-center justify-between min-h-[2.5rem]">
           <div className="flex items-center space-x-2">
             <User className="h-5 w-5 text-gray-400" />
             {demo.players && demo.players.length > 0 ? (
-              <Link
-                href={`/players/${demo.players[0].replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
-                onClick={(e) => handlePlayerClick(e, demo.players[0])}
-              >
-                {demo.players[0]}
-              </Link>
+              demo.players.slice(0, 1).map((player, idx) => (
+                <Link
+                  key={idx}
+                  href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                  className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
+                  onClick={(e) => handlePlayerClick(e, player)}
+                >
+                  {player}
+                </Link>
+              ))
             ) : (
-              <span className="text-sm font-medium text-gray-500">No player</span>
+              <span className="text-sm text-gray-500">No player</span>
             )}
           </div>
           <div className="text-xs font-semibold text-gray-400 tracking-wide bg-gray-700 px-2 py-1 rounded-md">
@@ -94,42 +91,51 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </section>
 
-        <div className="border-t border-gray-700" />
+        {/* Divider */}
+        <div className="border-t border-gray-700"></div>
 
-        {/* ----- Tags & Positions Section ----- */}
+        {/* ----- Tags & Positions ----- */}
         <section className="flex flex-wrap gap-2 min-h-[2.5rem]">
-          {(() => {
-            // Collect up to 4 items from positions + tags
-            const items = [
-              ...demo.positions.slice(0, 2),
-              ...demo.tags.slice(0, 2),
-            ];
-            if (items.length === 0) {
-              return (
-                <span className="text-xs text-gray-500 italic">No tags or positions</span>
-              );
-            }
-            return items.map((item, i) => (
+          {demo.positions && demo.positions.length > 0 ? (
+            demo.positions.slice(0, 2).map((pos, i) => (
               <span
-                key={i}
+                key={`pos-${i}`}
                 className="text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
                   hover:bg-gray-600 transition-colors duration-150"
               >
-                {item}
+                {pos}
               </span>
-            ));
-          })()}
-          {demo.positions.length + demo.tags.length > 4 && (
+            ))
+          ) : (
+            <span className="text-xs text-gray-500">No positions</span>
+          )}
+
+          {demo.tags && demo.tags.length > 0 ? (
+            demo.tags.slice(0, 2).map((tag, i) => (
+              <span
+                key={`tag-${i}`}
+                className="text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
+                  hover:bg-gray-600 transition-colors duration-150"
+              >
+                {tag}
+              </span>
+            ))
+          ) : (
+            <span className="text-xs text-gray-500">No tags</span>
+          )}
+
+          {demo.positions && demo.tags && (demo.positions.length + demo.tags.length) > 4 && (
             <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
               +{demo.positions.length + demo.tags.length - 4} more
             </span>
           )}
         </section>
 
-        <div className="border-t border-gray-700" />
+        {/* Divider */}
+        <div className="border-t border-gray-700"></div>
 
-        {/* ----- CT vs. T Rounds Bar (Footer) ----- */}
-        <footer className="mt-2">
+        {/* ----- CT vs. T Rounds Bar ----- */}
+        <footer className="mt-auto">
           <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
             <div
               className="bg-blue-500/60 h-full transition-all duration-300"
