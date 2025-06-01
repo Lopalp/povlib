@@ -73,7 +73,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg} outline-none focus:outline-none`}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
@@ -110,7 +110,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
           </nav>
 
           <div className="flex items-center space-x-4">
-            <button onClick={toggleSearch} className="p-2 text-gray-300 hover:text-yellow-400 outline-none focus:outline-none">
+            <button onClick={toggleSearch} className="p-2 text-gray-300 hover:text-yellow-400">
               <Search className="h-5 w-5" />
             </button>
             {searchActive && (
@@ -119,15 +119,15 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                     type="text"
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search POVs, maps, players or teams..." // Removed focus:outline-none here
-                    className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white focus:outline-none"
+                    placeholder="Search POVs, maps, players or teams..."
+                    className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white"
                   />
                   {searchQuery && (
-                    <button type="button" onClick={() => setSearchQuery('')} className="px-3 outline-none focus:outline-none">
+                    <button type="button" onClick={() => setSearchQuery('')} className="px-3">
                       <X className="h-5 w-5 text-gray-300 hover:text-white" />
                     </button>
                   )}
-                  <button type="submit" className="px-3 outline-none focus:outline-none">
+                  <button type="submit" className="px-3">
                     <Search className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                 </form>
@@ -135,7 +135,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
             )}
 
             <Link href="/user">
-              <button className="hidden md:block p-2 relative text-gray-300 hover:text-yellow-400 outline-none focus:outline-none">
+              <button className="hidden md:block p-2 relative text-gray-300 hover:text-yellow-400">
                 <BellRing className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full" />
               </button>
@@ -145,7 +145,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
               <div className="relative">
                 <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover outline-none focus:outline-none" />}
+                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />}
                   </div>
                 </button>
                 {userMenuOpen && (
@@ -154,17 +154,17 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                     <li><Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Favorites</Link></li>
                     <li><Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">Settings</Link></li>
                     <li className="border-t border-gray-600 my-1"></li>
-                    <li><button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white outline-none focus:outline-none">Sign Out</button></li>
+                    <li><button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white">Sign Out</button></li>
                   </ul>
                 )}
               </div>
             ) : (
-              <Link href="/signin" className="hidden lg:flex items-center px-4 py-2 border border-yellow-400/30 rounded-full text-white hover:bg-yellow-400 hover:text-gray-900 transition-colors outline-none focus:outline-none">
+              <Link href="/signin" className="hidden lg:flex items-center px-4 py-2 border border-yellow-400/30 rounded-full text-white hover:bg-yellow-400 hover:text-gray-900 transition-colors">
                 <LogIn className="h-4 w-4 mr-2" /> Sign In
               </Link>
             )}
             
-            <button onClick={() => setIsMenuOpen(o => !o)} className="md:hidden p-2 text-gray-300 hover:text-yellow-400 outline-none focus:outline-none">
+            <button onClick={() => setIsMenuOpen(o => !o)} className="md:hidden p-2 text-gray-300 hover:text-yellow-400">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
