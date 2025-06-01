@@ -11,9 +11,7 @@ import {
   Tv,
   BookOpen,
   Settings2,
-  ArrowRightCircle,
 } from 'lucide-react';
-import Link from 'next/link';
 
 const UnderConstructionModal = ({ isOpen, onClose }) => {
   const tabs = [
@@ -23,7 +21,6 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <PlayCircle className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Our Demo Library is a curated collection of the best POV clips you’ve ever seen. Explore highlights from top matches, save your favorites, and discover new plays every day. While we put the finishing touches on this section, imagine having instant access to top-tier demos—all in one place.`,
-      href: '/demos',
     },
     {
       key: 'extendedPlayer',
@@ -31,7 +28,6 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <Settings2 className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Experience your demos like never before with our Extended Demo Player. Slow motion, heatmaps, advanced scoreboard overlays, and multi-angle views are coming soon. Whether you’re analyzing a clutch moment or perfecting your angles, this player will be your go-to tool for deep, frame-by-frame breakdowns.`,
-      href: '/player',
     },
     {
       key: 'watchAnywhere',
@@ -39,7 +35,6 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <Tv className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Never miss a beat—watch your demos on any device, wherever you go. Desktop, tablet, or mobile: our responsive viewer will let you relive your best plays on the bus, at the café, or while you’re on the road to the next LAN. Stay connected and keep your skills sharp, no matter where you are.`,
-      href: '/watch-anywhere',
     },
     {
       key: 'utilityBook',
@@ -47,7 +42,6 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <BookOpen className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Unlock exclusive strategies and grenade lineups straight from pro players with our Utility Book. Step-by-step breakdowns, annotated screenshots, and insider tips will elevate your game to the next level. Think of it as a living textbook—compiled by champions, for champions.`,
-      href: '/utility-book',
     },
   ];
 
@@ -61,7 +55,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const { title, icon, imageSrc, description, href } = tabs[currentIndex];
+  const { title, icon, imageSrc, description } = tabs[currentIndex];
 
   const handlePrev = () => {
     if (currentIndex > 0) {
@@ -117,17 +111,14 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          {/* Title + Icon Link */}
-          <div className="flex items-center justify-center mb-4 gap-2">
-            <div className="bg-yellow-400/20 rounded-full p-2">{icon}</div>
+          {/* Title + Icon */}
+          <div className="flex flex-col items-center mb-4">
+            <div className="bg-yellow-400/20 rounded-full p-2 mb-2">
+              {icon}
+            </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white text-center">
               {title}
             </h2>
-            <Link href={href}>
-              <a className="text-yellow-400 hover:text-yellow-300 ml-2">
-                <ArrowRightCircle className="h-6 w-6" />
-              </a>
-            </Link>
           </div>
 
           {/* Divider */}
@@ -169,14 +160,6 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
             <p className="text-gray-400 italic mb-4 text-sm sm:text-base">
               Everything here is a demo—features may be incomplete or non-functional.
             </p>
-            <a
-              href="https://discord.gg/XDwTABQr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#5865F2] text-white font-semibold text-sm sm:text-base rounded-md hover:bg-[#4752C4] transition-colors shadow-[0_0_15px_rgba(88,101,242,0.5)]"
-            >
-              Join Our Server
-            </a>
           </div>
         </div>
       </div>
