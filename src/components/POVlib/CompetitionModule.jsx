@@ -38,7 +38,7 @@ export default function CompetitionModule({
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      setTimeLeft(`${d}d ${h}h ${m}m`);
+      setTimeLeft(`${d}d ${h}h ${m}m left`);
     };
     tick();
     const iv = setInterval(tick, 60000);
@@ -59,14 +59,13 @@ export default function CompetitionModule({
             <h2 className="text-2xl md:text-3xl font-bold text-white">{title}</h2>
             <button
               onClick={() => setIsInfoOpen(true)}
-              className="p-1 rounded-full hover:bg-gray-700"
+              className="p-1 rounded-full hover:bg-gray-800 transition-colors"
             >
-              <Info className="w-5 h-5 text-gray-400 hover:text-white" />
+              <Info className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
             </button>
           </div>
-          {/* Timer styled like Hero tags */}
           <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20">
-            {timeLeft === 'Closed' ? 'Closed' : `${timeLeft} left`}
+            {timeLeft}
           </span>
         </div>
 
@@ -80,7 +79,7 @@ export default function CompetitionModule({
                 <div
                   className={`
                     relative w-full bg-gray-800 rounded-2xl overflow-hidden border-2 transition-colors
-                    ${isSelected ? 'border-green-400' : 'border-transparent'}
+                    ${isSelected ? 'border-yellow-400' : 'border-transparent'}
                     hover:border-yellow-400
                     ${selectedClip && !isSelected ? 'filter grayscale contrast-75' : ''}
                   `}
@@ -110,13 +109,11 @@ export default function CompetitionModule({
                 <button
                   onClick={() => handleSelect(clip.id)}
                   className={`
-                    w-full inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 transition-colors
-                    ${isSelected
-                      ? 'border-green-400 bg-green-400 text-white'
-                      : 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'}
+                    w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white text-sm font-semibold transition-colors
+                    ${isSelected ? 'border-yellow-400 text-yellow-400' : 'hover:border-yellow-400'}
                   `}
                 >
-                  <span className="text-sm">{isSelected ? 'Selected' : 'Select'}</span>
+                  {isSelected ? 'Selected' : 'Select'}
                 </button>
               </div>
             );
@@ -124,21 +121,21 @@ export default function CompetitionModule({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 mt-6">
+        <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-4 md:space-y-0">
           <button
-            onClick={() => {/* handle submission logic */}}
+            onClick={() => setIsInfoOpen(true)}
             className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors"
           >
             Submit Your Clip
           </button>
-          <p className="text-gray-300 text-sm text-center md:text-right">
+          <p className="text-gray-400 text-sm text-center md:text-right">
             Bet coins on your favorite clip and win coins equal to your profit!
           </p>
         </div>
 
         {/* Summary */}
         {selectedClip && (
-          <p className="text-center text-green-400 font-medium">
+          <p className="text-center text-yellow-400 font-medium">
             You selected: <strong>{clips.find(c => c.id === selectedClip)?.title}</strong>
           </p>
         )}
