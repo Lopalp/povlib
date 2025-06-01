@@ -185,7 +185,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
               ))}
             </ul>
             <Link href={`/checkout?plan=${nextPlanData.key}`}>
-              <button className="mt-6 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg w-full hover:bg-yellow-300 transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)]">
+              <button className="mt-6 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg w-full hover:bg-yellow-300 transition-colors">
                 Upgrade to {nextPlanData.name}
               </button>
             </Link>

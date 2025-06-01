@@ -8,17 +8,17 @@ import Link from 'next/link';
 const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
   if (!isOpen) return null;
 
-  // Hilfsfunktion, um Button-Styling je nach PlanKey anzupassen
+  // Style-Helper: Button-Klassen je nach Plan-Typ
   const buttonClasses = (planKey) =>
-    planKey === 'standard'
+    planKey === 'advanced'
       ? 'bg-gray-900 text-yellow-400 hover:bg-gray-800 shadow-[0_0_15px_rgba(250,204,21,0.3)]'
       : 'bg-gray-700 text-white hover:bg-gray-600';
 
-  // Label im Button: „Choose for <Preis>” oder einfach „Select”
+  // Label für den Button: „Choose for $XX“ oder „Select $XX“
   const buttonLabel = (planKey, priceLabel) =>
-    planKey === 'standard' ? `Choose for ${priceLabel}` : `Select ${priceLabel}`;
+    planKey === 'advanced' ? `Choose for ${priceLabel}` : `Select ${priceLabel}`;
 
-  // Alle vier Pläne in der gleichen Reihenfolge wie PlanComparisonModule
+  // Alle 4 Pläne in der Reihenfolge: free, basic, advanced, pro
   const plans = [
     {
       key: 'free',
@@ -38,7 +38,7 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
       priceLabel: '$6.99/mo',
       features: [
         '10 full demos per month',
-        'Up to 1080p @ 30fps',
+        'Up to 1080p @ 30fps',
         'Access to the Pro Utility Book',
         'Standard processing queue',
       ],
@@ -85,7 +85,9 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl max-w-4xl w-full overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]">
+      <div
+        className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]"
+      >
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <h2 className="text-xl font-bold text-white">Compare Plans</h2>
@@ -97,15 +99,17 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Body: Grid mit responsiven Spalten */}
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map(({ key, name, priceLabel, features, highlight }) => (
               <div
                 key={key}
-                className={`border border-gray-700 rounded-lg p-6 flex flex-col justify-between 
-                  ${key === 'advanced' ? 'relative bg-yellow-400 shadow-lg ring-2 ring-yellow-300' : ''}
-                `}
+                className={`border border-gray-700 rounded-lg p-6 flex flex-col justify-between ${
+                  key === 'advanced'
+                    ? 'relative bg-yellow-400 shadow-lg ring-2 ring-yellow-300'
+                    : 'bg-gray-800'
+                }`}
               >
                 {key === 'advanced' && (
                   <div className="absolute -top-3 right-3 bg-gray-900 text-yellow-400 text-xs font-semibold px-2 py-1 rounded-full">
@@ -128,15 +132,28 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
                   >
                     {priceLabel}
                   </p>
-                  <ul className={`${key === 'advanced' ? 'text-gray-900' : 'text-gray-400'} space-y-2`}>
+                  <ul
+                    className={`mb-4 ${
+                      key === 'advanced' ? 'text-gray-900' : 'text-gray-400'
+                    } space-y-2`}
+                  >
                     {features.map((f, i) => (
-                      <li key={i}>{f}</li>
+                      <li key={i} className="flex items-start">
+                        <span className="mr-2">
+                          {key === 'advanced' ? '★' : '•'}
+                        </span>
+                        <span>{f}</span>
+                      </li>
                     ))}
                   </ul>
                   {highlight && (
                     <p
-                      className={`mt-2 text-sm italic ${
-                        key === 'advanced' ? 'text-gray-800' : key === 'pro' ? 'text-gray-400' : 'text-gray-600'
+                      className={`mb-4 text-sm italic ${
+                        key === 'advanced'
+                          ? 'text-gray-800'
+                          : key === 'pro'
+                          ? 'text-gray-400'
+                          : 'text-gray-600'
                       }`}
                     >
                       {highlight}
@@ -144,6 +161,7 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
                   )}
                 </div>
 
+                {/* Auswahl-Button */}
                 {currentPlan === key ? (
                   <button
                     disabled
@@ -152,15 +170,12 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
                     Current Plan
                   </button>
                 ) : (
-                  <Link href={`/checkout?plan=${key}`}>
-                    <button
-                      className={`mt-6 px-4 py-2 font-semibold rounded-lg w-full transition ${buttonClasses(
-                        key
-                      )}`}
-                    >
-                      {buttonLabel(key, priceLabel)}
-                    </button>
-                  </Link>
+                <Link href={`/checkout?plan=${key}`}>
+                  <button className={`mt-6 px-4 py-2 font-semibold rounded-lg w-full transition ${buttonClasses(key)}`}>
+                    {buttonLabel(key, priceLabel)}
+                  </button>
+                </Link>
+
                 )}
               </div>
             ))}
