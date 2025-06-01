@@ -8,16 +8,6 @@ import Link from 'next/link';
 const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
   if (!isOpen) return null;
 
-  // Style-Helper: Button-Klassen je nach Plan-Typ
-  const buttonClasses = (planKey) =>
-    planKey === 'advanced'
-      ? 'bg-gray-900 text-yellow-400 hover:bg-gray-800 shadow-[0_0_15px_rgba(250,204,21,0.3)]'
-      : 'bg-gray-700 text-white hover:bg-gray-600';
-
-  // Label für den Button: „Choose for $XX“ oder „Select $XX“
-  const buttonLabel = (planKey, priceLabel) =>
-    planKey === 'advanced' ? `Choose for ${priceLabel}` : `Select ${priceLabel}`;
-
   // Alle 4 Pläne in der Reihenfolge: free, basic, advanced, pro
   const plans = [
     {
@@ -77,6 +67,10 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
       highlight: 'Ideal for serious players & teams',
     },
   ];
+
+  // Label für den Button: „Choose for $XX“ oder „Select $XX“
+  const buttonLabel = (planKey, priceLabel) =>
+    planKey === 'advanced' ? `Choose for ${priceLabel}` : `Select ${priceLabel}`;
 
   return (
     <div
@@ -170,12 +164,21 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
                     Current Plan
                   </button>
                 ) : (
-                <Link href={`/checkout?plan=${key}`}>
-                  <button className={`mt-6 px-4 py-2 font-semibold rounded-lg w-full transition ${buttonClasses(key)}`}>
-                    {buttonLabel(key, priceLabel)}
-                  </button>
-                </Link>
-
+                  <Link href={`/checkout?plan=${key}`}>
+                    {/**
+                     * Primär-Button = gelber Rand, gelbe Schrift, Hover-Effekt gelb
+                     * Sekundär-Button = grauer Rand, weiße Schrift, Hover-Effekt gelber Rand
+                     */}
+                    {key === 'advanced' ? (
+                      <button className="mt-6 flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
+                        {buttonLabel(key, priceLabel)}
+                      </button>
+                    ) : (
+                      <button className="mt-6 flex items-center justify-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition w-full">
+                        {buttonLabel(key, priceLabel)}
+                      </button>
+                    )}
+                  </Link>
                 )}
               </div>
             ))}
