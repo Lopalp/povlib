@@ -85,7 +85,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
   if (!currentPlanData) {
     return (
       <div className="bg-red-800 text-red-200 rounded-lg p-6">
-        <p className="font-semibold">Error: Unknown plan "{currentPlan}".</p>
+        <p className="text-sm font-semibold">Error: Unknown plan "{currentPlan}".</p>
       </div>
     );
   }
@@ -94,26 +94,26 @@ const PlanComparisonModule = ({ currentPlan }) => {
   if (!nextPlanData) {
     return (
       <>
-        <div className="bg-gray-800 rounded-2xl p-8 shadow-lg text-center text-gray-200">
-          <h2 className="text-2xl font-bold mb-4 text-white">
+        <div className="bg-gray-900 rounded-2xl p-8 shadow-lg text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             You’re on the highest plan!
           </h2>
-          <p className="mb-6 text-gray-300">
-            You already have the <span className="font-semibold text-white">{currentPlanData.name}</span> plan,
-            which offers all available features.
+          <p className="text-sm text-gray-300 mb-6">
+            You already have the <span className="font-semibold text-yellow-400">{currentPlanData.name}</span> plan, which offers all available features.
           </p>
           <button
             onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
-            className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
           >
-            <X className="w-5 h-5 mr-2" />
-            Manage Subscription
+            <X className="w-5 h-5" />
+            <span className="text-sm">Manage Subscription</span>
           </button>
           <button
             onClick={() => setIsCompareOpen(true)}
-            className="mt-4 px-6 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)]"
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition shadow-[0_0_10px_rgba(250,204,21,0.2)]"
           >
-            View All Plans
+            <span className="text-sm">View All Plans</span>
+            <ArrowRight className="w-5 h-5" />
           </button>
         </div>
         <ComparePlansModal
@@ -131,12 +131,10 @@ const PlanComparisonModule = ({ currentPlan }) => {
       <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Compare Your Plan</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
           <span className="flex items-center text-gray-400 text-sm">
             Next tier:&nbsp;
-            <span className="font-semibold text-yellow-400">
-              {nextPlanData.name}
-            </span>
+            <span className="font-semibold text-yellow-400">{nextPlanData.name}</span>
             <ArrowRight className="w-5 h-5 ml-1 text-yellow-400" />
           </span>
         </div>
@@ -144,49 +142,44 @@ const PlanComparisonModule = ({ currentPlan }) => {
         {/* Vergleichsgitter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Aktueller Plan */}
-          <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-800">
-            <h3 className="text-lg font-bold mb-2 text-gray-200">
-              {currentPlanData.name}
-            </h3>
-            <p className="text-3xl font-extrabold text-yellow-400 mb-4">
-              {currentPlanData.priceLabel}
-            </p>
-            <ul className="space-y-2 text-gray-400 flex-grow">
+          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-800">
+            <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200">{currentPlanData.name}</h3>
+            <p className="text-3xl font-extrabold text-yellow-400 mb-4">{currentPlanData.priceLabel}</p>
+            <ul className="space-y-2 text-gray-400 flex-grow text-sm">
               {currentPlanData.features.map((feat, i) => (
-                <li key={i} className="flex items-center">
-                  <span className="mr-2 text-xs">•</span> {feat}
+                <li key={i} className="flex items-start">
+                  <span className="mr-2 text-xs">•</span>
+                  <span>{feat}</span>
                 </li>
               ))}
             </ul>
             <button
               disabled
-              className="mt-6 px-4 py-2 font-semibold rounded-lg w-full bg-gray-700 text-gray-500 cursor-not-allowed"
+              className="mt-6 px-5 py-2 font-semibold rounded-md w-full border-2 border-yellow-400 bg-gray-700 text-gray-500 cursor-not-allowed"
             >
-              Current Plan
+              <span className="text-sm">Current Plan</span>
             </button>
           </div>
 
           {/* Nächster Plan */}
-          <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-900 shadow-md">
+          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-900 shadow-md">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold mb-2 text-white">
-                {nextPlanData.name}
-              </h3>
+              <h3 className="text-lg md:text-xl font-bold mb-2 text-white">{nextPlanData.name}</h3>
               <span className="text-sm text-yellow-400 font-semibold">Upgrade</span>
             </div>
-            <p className="text-3xl font-extrabold text-white mb-4">
-              {nextPlanData.priceLabel}
-            </p>
-            <ul className="space-y-2 text-gray-200 flex-grow">
+            <p className="text-3xl font-extrabold text-white mb-4">{nextPlanData.priceLabel}</p>
+            <ul className="space-y-2 text-gray-200 flex-grow text-sm">
               {nextPlanData.features.map((feat, i) => (
-                <li key={i} className="flex items-center">
-                  <span className="mr-2 text-xs text-yellow-400">★</span> {feat}
+                <li key={i} className="flex items-start">
+                  <span className="mr-2 text-xs text-yellow-400">★</span>
+                  <span>{feat}</span>
                 </li>
               ))}
             </ul>
             <Link href={`/checkout?plan=${nextPlanData.key}`}>
-              <button className="mt-6 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg w-full hover:bg-yellow-300 transition-colors">
-                Upgrade to {nextPlanData.name}
+              <button className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
+                <span className="text-sm">Upgrade to {nextPlanData.name}</span>
+                <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
           </div>
@@ -194,9 +187,10 @@ const PlanComparisonModule = ({ currentPlan }) => {
 
         <button
           onClick={() => setIsCompareOpen(true)}
-          className="mt-6 px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg w-full hover:bg-gray-700 transition-colors"
+          className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full"
         >
-          View All Plans
+          <span className="text-sm">View All Plans</span>
+          <ArrowRight className="w-5 h-5" />
         </button>
       </section>
 
