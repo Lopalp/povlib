@@ -1,3 +1,4 @@
+// components/POVlib/POVlib.jsx
 'use client';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ import SelectedFilters from './POVlib/SelectedFilters';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
 import DemoCard from './POVlib/DemoCard'; // Import DemoCard to pass handleTagClick
+import PlanComparisonModule from './POVlib/PlanComparisonModule'; // <-- Plan comparison import
 
 // Helper function for mapping a demo object
 const mapDemo = (demo) => ({
@@ -47,10 +49,40 @@ const mapDemo = (demo) => ({
 });
 
 const POVlib = () => {
-  
   const router = useRouter();
 
+  // -------------------------------
+  // Plan state for comparison module
+  // -------------------------------
+  const [currentPlan, setCurrentPlan] = useState('free'); // default—could come from user profile/API
+  const handleUpgrade = (nextPlanKey) => {
+    if (!nextPlanKey) {
+      // User is already on the highest tier or clicked "Manage Subscription"
+      // Implement logic for opening billing portal / subscription management
+      console.log('Manage subscription clicked');
+      return;
+    }
+    // Example API call to upgrade plan, then update local state:
+    fetch('/api/upgrade-plan', {
+      method: 'POST',
+      body: JSON.stringify({ newPlan: nextPlanKey }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Upgrade failed');
+        return res.json();
+      })
+      .then((data) => {
+        setCurrentPlan(nextPlanKey);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert('Upgrade failed. Please try again.');
+      });
+  };
+
+  // -------------------------------
   // UI States
+  // -------------------------------
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
@@ -69,7 +101,9 @@ const POVlib = () => {
   const [error, setError] = useState(null);
   const [isVideoPlayerPage, setIsVideoPlayerPage] = useState(false);
 
+  // -------------------------------
   // Data States
+  // -------------------------------
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
   const [latestDemos, setLatestDemos] = useState([]);
@@ -114,7 +148,6 @@ const POVlib = () => {
     }
     return allTags.slice(0, 5); // Take only the first 5 elements
   }, [filteredDemos]);
-
 
   // Helper functions for Map/Positions filters
   const getFilteredDemosByMap = useCallback(
@@ -173,7 +206,7 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
 
-  // Load Map and Position demos
+  // Load Map demos
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -191,6 +224,7 @@ const POVlib = () => {
     }
   }, [mapDemos, filtersApplied.map]);
 
+  // Load Position demos
   useEffect(() => {
     const loadPositionDemos = async (position) => {
       if (!positionDemos[position]) {
@@ -283,25 +317,18 @@ const POVlib = () => {
       console.error('Error updating positions:', err);
     }
   };
-  
+
   const recentlyAddedDemos = useMemo(() => {
     if (activeTag === null) {
       return filteredDemos.slice(0, 12);
     } else {
- return filteredDemos.filter(demo => demo.tags.includes(activeTag));
+      return filteredDemos.filter(demo => demo.tags.includes(activeTag));
     }
   }, [activeTag, filteredDemos]);
 
-  
- 
   // Video selection and navigation
   const onSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
-    console.debug(demo)
-    /* setSelectedDemo(demo);
-    setActiveVideoId(demo.videoId);
-    setIsVideoPlayerPage(true);
-    window.scrollTo(0, 0); */
   };
 
   const onCloseVideoPlayer = () => {
@@ -311,9 +338,7 @@ const POVlib = () => {
   };
 
   if (isLoading && !filteredDemos.length) {
-    return (
-      <LoadingFullscreen />
-    );
+    return <LoadingFullscreen />;
   }
 
   if (error) {
@@ -412,15 +437,23 @@ const POVlib = () => {
             </Link>
           </div>
         </div>
-        
-        {/* Kategorieabschnitte */}
+
+        {/* Category Sections */}
         <CategorySection
           title={activeTag === null ? 'Recently Added' : activeTag}
           demos={recentlyAddedDemos}
           onSelectDemo={onSelectDemo}
-          onTagClick={handleTagClick} // Pass the handler down
+          onTagClick={handleTagClick}
         />
+
+        {/* Competition Module */}
         <CompetitionModule />
+
+        {/* Plan Comparison Module inserted directly under CompetitionModule */}
+        <div className="mt-8">
+          <PlanComparisonModule currentPlan={currentPlan} onUpgrade={handleUpgrade} />
+        </div>
+
         {!filtersApplied.map && (
           <>
             <CategorySection
@@ -435,6 +468,7 @@ const POVlib = () => {
             />
           </>
         )}
+
         {/* Revised Navigation Cards Below - Use the template image you had for Maps here */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -449,7 +483,7 @@ const POVlib = () => {
                 <p className="text-gray-300">View all players</p>
               </div>
             </Link>
-            <Link href="/maps" className="relative block rounded-xl overflow-hidden">
+            <Link href="/maps" className="relative block rounded-xl overflow-hidden group">
               <img
                 src="/images/maps-example.png"
                 alt="Maps"
