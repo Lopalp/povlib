@@ -84,7 +84,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
 
   if (!currentPlanData) {
     return (
-      <div className="bg-red-800 text-red-200 rounded-lg p-6">
+      <div className="bg-red-800 text-red-200 rounded-2xl p-6">
         <p className="text-sm font-semibold">Error: Unknown plan "{currentPlan}".</p>
       </div>
     );
@@ -99,13 +99,11 @@ const PlanComparisonModule = ({ currentPlan }) => {
             You’re on the highest plan!
           </h2>
           <p className="text-sm text-gray-300 mb-6">
-            You already have the{' '}
-            <span className="font-semibold text-yellow-400">{currentPlanData.name}</span>{' '}
-            plan, which offers all available features.
+            You already have the <span className="font-semibold text-yellow-400">{currentPlanData.name}</span> plan, which offers all available features.
           </p>
           <button
             onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
-            className="flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
           >
             <X className="w-5 h-5" />
             <span className="text-sm">Manage Subscription</span>
@@ -140,13 +138,9 @@ const PlanComparisonModule = ({ currentPlan }) => {
         {/* Vergleichsgitter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Aktueller Plan */}
-          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-800">
-            <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200">
-              {currentPlanData.name}
-            </h3>
-            <p className="text-3xl font-extrabold text-yellow-400 mb-4">
-              {currentPlanData.priceLabel}
-            </p>
+          <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-800">
+            <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200">{currentPlanData.name}</h3>
+            <p className="text-3xl font-extrabold text-yellow-400 mb-4">{currentPlanData.priceLabel}</p>
             <ul className="space-y-2 text-gray-400 flex-grow text-sm">
               {currentPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-start">
@@ -157,22 +151,19 @@ const PlanComparisonModule = ({ currentPlan }) => {
             </ul>
             <button
               disabled
-              className="mt-6 px-5 py-2 font-semibold rounded-md w-full border-2 border-yellow-400 bg-gray-700 text-gray-500 cursor-not-allowed"
+              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 bg-gray-700 text-gray-500 cursor-not-allowed"
             >
               <span className="text-sm">Current Plan</span>
             </button>
           </div>
 
           {/* Nächster Plan */}
-          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-900 shadow-md">
-            <div>
-              <h3 className="text-lg md:text-xl font-bold mb-2 text-white">
-                {nextPlanData.name}
-              </h3>
+          <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-900 shadow-md">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg md:text-xl font-bold text-white">{nextPlanData.name}</h3>
+              <span className="text-sm text-yellow-400 font-semibold">Upgrade</span>
             </div>
-            <p className="text-3xl font-extrabold text-white mb-4">
-              {nextPlanData.priceLabel}
-            </p>
+            <p className="text-3xl font-extrabold text-white mb-4">{nextPlanData.priceLabel}</p>
             <ul className="space-y-2 text-gray-200 flex-grow text-sm">
               {nextPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-start">
@@ -182,7 +173,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
               ))}
             </ul>
             <Link href={`/checkout?plan=${nextPlanData.key}`}>
-              <button className="mt-6 flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
+              <button className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
                 <span className="text-sm">Upgrade to {nextPlanData.name}</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
