@@ -112,33 +112,29 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
 
         {/* Navigation Buttons */}
         <div className="flex justify-between items-center mt-2">
-          <button
-            onClick={handlePrev}
-            disabled={currentIndex === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
-              ${
-                currentIndex === 0
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                  : 'bg-gray-700 text-white hover:bg-gray-600'
-              }`}
-          >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="hidden sm:inline">Previous</span>
-          </button>
+          {currentIndex > 0 ? (
+            <button
+              onClick={handlePrev}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-gray-700 text-white hover:bg-gray-600"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              <span className="hidden sm:inline">Previous</span>
+            </button>
+          ) : (
+            <div className="w-24" /> {/* placeholder to keep spacing */}
+          )}
 
-          <button
-            onClick={handleNext}
-            disabled={currentIndex === tabs.length - 1}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
-              ${
-                currentIndex === tabs.length - 1
-                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                  : 'bg-gray-700 text-white hover:bg-gray-600'
-              }`}
-          >
-            <span className="hidden sm:inline">Next</span>
-            <ChevronRight className="h-5 w-5" />
-          </button>
+          {currentIndex < tabs.length - 1 ? (
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-gray-700 text-white hover:bg-gray-600"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          ) : (
+            <div className="w-24" /> {/* placeholder to keep spacing */}
+          )}
         </div>
 
         {/* Footer */}
