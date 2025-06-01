@@ -73,30 +73,31 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative w-full max-w-2xl bg-transparent rounded-2xl overflow-hidden shadow-xl">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 text-gray-300 hover:text-yellow-400 transition-colors"
-        >
-          <X className="h-6 w-6" />
-        </button>
+      <div className="relative w-full max-w-2xl rounded-2xl overflow-hidden shadow-xl">
+        {/* Background Image */}
+        <img
+          src={imageSrc}
+          alt={title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
 
-        {/* Image Section */}
-        <div className="w-full h-64 sm:h-80 md:h-96 overflow-hidden">
-          <img
-            src={imageSrc}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {/* Semi-transparent overlay for slight darkening */}
+        <div className="absolute inset-0 bg-black/30" />
 
-        {/* Glass Panel with Content */}
+        {/* Content Panel (Glass Effect) */}
         <div
-          className={`bg-black/40 backdrop-blur-lg border border-gray-700 rounded-b-2xl px-6 py-8 transform transition-all duration-500 ${
+          className={`relative z-10 mx-4 sm:mx-0 bg-black/40 backdrop-blur-lg border border-gray-700 rounded-2xl p-6 sm:p-8 transform transition-all duration-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-20 text-gray-300 hover:text-yellow-400 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
           {/* Title */}
           <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-4">
             {title}
@@ -109,7 +110,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
 
           {/* Navigation Buttons */}
           <div className="flex justify-between items-center mb-6">
-            {currentIndex > 0 && (
+            {currentIndex > 0 ? (
               <button
                 onClick={handlePrev}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors"
@@ -117,8 +118,10 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
                 <ChevronLeft className="h-5 w-5" />
                 <span className="hidden sm:inline">Previous</span>
               </button>
+            ) : (
+              <div className="w-20" />
             )}
-            {currentIndex < tabs.length - 1 && (
+            {currentIndex < tabs.length - 1 ? (
               <button
                 onClick={handleNext}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
@@ -126,6 +129,8 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
                 <span className="hidden sm:inline">Next</span>
                 <ChevronRight className="h-5 w-5" />
               </button>
+            ) : (
+              <div className="w-20" />
             )}
           </div>
 
