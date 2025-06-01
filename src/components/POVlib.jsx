@@ -27,9 +27,9 @@ import SelectedFilters from './POVlib/SelectedFilters';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
 import DemoCard from './POVlib/DemoCard'; // Import DemoCard to pass handleTagClick
-import PlanComparisonModule from './POVlib/PlanComparisonModule'; // <-- Plan comparison import
+import PlanComparisonModule from './POVlib/PlanComparisonModule';
+import UnderConstructionModal from './POVlib/UnderConstructionModal';
 
-// Helper function for mapping a demo object
 const mapDemo = (demo) => ({
   id: demo.id,
   title: demo.title,
@@ -51,14 +51,18 @@ const mapDemo = (demo) => ({
 const POVlib = () => {
   const router = useRouter();
 
-  // -------------------------------
+  // -------------------------------------
+  // Under Construction Modal (show on load)
+  // -------------------------------------
+  const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(true);
+
+  // -------------------------------------
   // Plan state for comparison module
-  // -------------------------------
+  // -------------------------------------
   const [currentPlan, setCurrentPlan] = useState('free'); // default—could come from user profile/API
   const handleUpgrade = (nextPlanKey) => {
     if (!nextPlanKey) {
       // User is already on the highest tier or clicked "Manage Subscription"
-      // Implement logic for opening billing portal / subscription management
       console.log('Manage subscription clicked');
       return;
     }
@@ -80,9 +84,9 @@ const POVlib = () => {
       });
   };
 
-  // -------------------------------
+  // -------------------------------------
   // UI States
-  // -------------------------------
+  // -------------------------------------
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
@@ -101,9 +105,9 @@ const POVlib = () => {
   const [error, setError] = useState(null);
   const [isVideoPlayerPage, setIsVideoPlayerPage] = useState(false);
 
-  // -------------------------------
+  // -------------------------------------
   // Data States
-  // -------------------------------
+  // -------------------------------------
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
   const [latestDemos, setLatestDemos] = useState([]);
@@ -390,6 +394,11 @@ const POVlib = () => {
         }
       `}</style>
 
+      <UnderConstructionModal
+        isOpen={isUnderConstructionOpen}
+        onClose={() => setIsUnderConstructionOpen(false)}
+      />
+
       <Navbar
         demoType={demoType}
         onSwitchDemoType={setDemoType}
@@ -469,7 +478,7 @@ const POVlib = () => {
           </>
         )}
 
-        {/* Revised Navigation Cards Below - Use the template image you had for Maps here */}
+        {/* Revised Navigation Cards Below */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link href="/players" className="relative block rounded-xl overflow-hidden group">
