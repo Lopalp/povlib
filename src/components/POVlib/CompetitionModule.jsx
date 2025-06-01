@@ -15,7 +15,7 @@ export default function CompetitionModule({
   const [timeLeft, setTimeLeft] = useState('');
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
-  // load clips
+  // 1) Clips laden
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
@@ -24,7 +24,7 @@ export default function CompetitionModule({
     })();
   }, [clipCount]);
 
-  // countdown
+  // 2) Countdown berechnen
   const endTime = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + durationDays);
@@ -38,7 +38,7 @@ export default function CompetitionModule({
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      setTimeLeft(`${d}d ${h}h ${m}m left`);
+      setTimeLeft(`${d}d ${h}h ${m}m`);
     };
     tick();
     const iv = setInterval(tick, 60000);
@@ -53,9 +53,9 @@ export default function CompetitionModule({
   return (
     <>
       <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
-        {/* Header mit Info-Icon */}
+        {/* Header mit Titel und Info-Icon */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center space-x-2">
             <h2 className="text-2xl md:text-3xl font-bold text-white">{title}</h2>
             <button
               onClick={() => setIsInfoOpen(true)}
@@ -64,27 +64,27 @@ export default function CompetitionModule({
               <Info className="w-5 h-5 text-gray-400 hover:text-yellow-400 transition-colors" />
             </button>
           </div>
-          <span className="px-3 py-1 bg-yellow-400 text-gray-900 font-medium rounded-full text-sm">
+          <span className="px-3 py-1 bg-yellow-400 text-black font-semibold rounded-full text-sm">
             {timeLeft}
           </span>
         </div>
 
-        {/* Clips Grid */}
+        {/* Clips-Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {clips.map(clip => {
             const isSelected = selectedClip === clip.id;
             return (
-              <div key={clip.id} className="flex flex-col items-center gap-4">
-                {/* Card */}
+              <div key={clip.id} className="flex flex-col items-center space-y-2">
+                {/* Clip-Card */}
                 <div
                   className={`
-                    relative w-full bg-gray-800 rounded-lg overflow-hidden border-2 transition-colors
+                    relative w-full bg-gray-800 rounded-2xl overflow-hidden border-2 transition-colors
                     ${isSelected ? 'border-green-400' : 'border-transparent'}
                     hover:border-yellow-400
                     ${selectedClip && !isSelected ? 'filter grayscale contrast-75' : ''}
                   `}
                 >
-                  {/* Video Preview */}
+                  {/* Video-Vorschau */}
                   <div className="relative w-full pb-[133%] bg-black">
                     <video
                       src={clip.videoUrl || clip.video_id}
@@ -98,53 +98,54 @@ export default function CompetitionModule({
                       <PlayCircle className="w-12 h-12 text-white" />
                     </div>
                   </div>
-                  {/* Overlay */}
+                  {/* Overlay mit Titel */}
                   <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
-                    <h3 className="text-white font-bold truncate">{clip.title}</h3>
-                    <p className="text-gray-300 text-sm">by {clip.submitter || 'Unknown'}</p>
+                    <h3 className="text-base md:text-lg font-semibold text-white truncate">
+                      {clip.title}
+                    </h3>
+                    <p className="text-gray-300 text-xs">by {clip.submitter || 'Unknown'}</p>
                   </div>
                 </div>
 
-                {/* Select Button unter der Karte */}
+                {/* Select-Button unter der Card */}
                 <button
                   onClick={() => handleSelect(clip.id)}
                   className={`
-                    w-full inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 font-semibold transition
+                    w-full px-5 py-2 text-sm font-semibold rounded-md transition-colors
                     ${isSelected
-                      ? 'border-green-400 text-green-400 hover:bg-green-400 hover:text-black'
-                      : 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'}
+                      ? 'bg-green-500 text-white'
+                      : 'bg-yellow-400 text-gray-900 hover:bg-yellow-300'}
                   `}
                 >
-                  <span className="text-sm">
-                    {isSelected ? 'Selected' : 'Select'}
-                  </span>
+                  {isSelected ? 'Selected' : 'Select'}
                 </button>
               </div>
             );
           })}
         </div>
 
-        {/* Footer */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
+        {/* Footer mit Submit-Button und Text */}
+        <div className="flex flex-col md:flex-row items-center justify-between mt-6 space-y-4 md:space-y-0">
           <button
-            className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full md:w-auto"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
           >
-            <span className="text-sm">Submit Your Clip</span>
+            Submit Your Clip
           </button>
-          <p className="text-gray-400 text-sm text-center md:text-right">
+          <p className="text-gray-300 text-sm text-center md:text-right">
             Bet coins on your favorite clip and win coins equal to your profit!
           </p>
         </div>
 
-        {/* Auswahl-Bestätigung */}
+        {/* Auswahl-Übersicht */}
         {selectedClip && (
           <p className="text-center text-green-400 font-medium">
-            You selected: <strong>{clips.find(c => c.id === selectedClip)?.title}</strong>
+            You selected:{' '}
+            <strong>{clips.find(c => c.id === selectedClip)?.title}</strong>
           </p>
         )}
       </section>
 
-      {/* Info-Modal mit Glow */}
+      {/* Info-Modal */}
       {isInfoOpen && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
