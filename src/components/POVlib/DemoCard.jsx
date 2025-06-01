@@ -14,81 +14,84 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const ctPercentage = (ctRounds / totalRounds) * 100;
   const mockKDA = "23/5/2"; // Placeholder for K/D/A
 
+  // Glassmorphism classes (same as in the Navbar)
+  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
+
   return (
     <article
       className={`
-        relative flex flex-col bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden 
-        hover:border-yellow-500 transition-all duration-200 cursor-pointer
+        relative flex flex-col rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-200
+        hover:shadow-xl hover:border-yellow-500 border border-gray-700
         ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
       `}
       onClick={() => onSelect(demo)}
     >
-      {/* ======= Thumbnail Section with Scaled Background ======= */}
-      <div className="relative w-full h-40 overflow-hidden">
-        {/* Scaled‐up “background” thumbnail that touches top & bottom */}
+      {/* ======= Background Thumbnail (scaled, bleeding top & bottom) ======= */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center transform scale-110"
+          style={{ backgroundImage: `url(${demo.thumbnail})` }}
+        ></div>
+        {/* Dark overlay to improve contrast */}
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
+
+      {/* ======= Actual Thumbnail on Top ======= */}
+      <div className="relative w-full aspect-video overflow-hidden group">
         <img
           src={demo.thumbnail}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover scale-110 brightness-50"
+          alt={demo.title}
+          className="w-full h-full object-cover brightness-100 transition-all duration-200 group-hover:brightness-75"
+          loading="lazy"
         />
 
-        {/* “Real” thumbnail centered on top */}
-        <div className="relative flex items-center justify-center h-full">
-          <img
-            src={demo.thumbnail}
-            alt={demo.title}
-            className="w-11/12 h-auto object-contain rounded-lg shadow-lg"
-          />
-
-          {/* Play Button Overlay (appears on hover) */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-            <button
-              className="rounded-full p-3 border-2 border-yellow-400 text-yellow-400 bg-black/50 
-                hover:scale-105 transition-transform duration-200"
-            >
-              <Play className="h-5 w-5" fill="currentColor" />
-            </button>
-          </div>
+        {/* Play Button Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
+              hover:bg-black/80 hover:scale-105 transition-all duration-200"
+          >
+            <Play className="h-5 w-5" fill="currentColor" />
+          </button>
         </div>
       </div>
 
       {/* ======= Content Section with Glassmorphism ======= */}
-      <div className="flex flex-col p-4 space-y-3 bg-black/40 backdrop-blur-lg border border-gray-700">
+      <div className={`mt-auto p-4 space-y-3 ${glassBg} rounded-t-2xl`}>
         {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
-            hover:text-yellow-400 transition-colors duration-200"
-          >
+            group-hover:text-yellow-400 transition-colors duration-200">
             {demo.title}
           </h3>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-200">
+            <span className="px-2 py-1 bg-gray-700/50 rounded-full">{demo.map}</span>
             {demo.team && (
-              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
+              <span className="px-2 py-1 bg-gray-700/50 rounded-full">{demo.team}</span>
             )}
-            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
+            <span className="px-2 py-1 bg-gray-700/50 rounded-full">{demo.year}</span>
           </div>
         </header>
 
-        <div className="border-t border-gray-700"></div>
+        <div className="border-t border-gray-600"></div>
 
         {/* ----- Player + KDA ----- */}
         <section className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <User className="h-5 w-5 text-gray-400" />
+            <User className="h-5 w-5 text-gray-300" />
             {demo.players.slice(0, 1).map((player, idx) => (
               <Link
                 key={idx}
                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-sm font-medium text-white hover:text-yellow-400 transition-colors duration-200"
+                className="text-sm font-medium text-gray-100 hover:text-yellow-400 transition-colors duration-200"
                 onClick={(e) => handlePlayerClick(e, player)}
               >
                 {player}
               </Link>
             ))}
           </div>
-          <div className="text-xs font-semibold text-gray-400 tracking-wide bg-gray-700 px-2 py-1 rounded-md">
+          <div className="text-xs font-semibold text-gray-300 tracking-wide bg-gray-700/50 px-2 py-1 rounded-md">
             {mockKDA}
           </div>
         </section>
@@ -98,25 +101,25 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
               key={i}
-              className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
-                hover:bg-gray-600 transition-colors duration-150"
+              className="flex items-center gap-1 text-xs font-medium bg-gray-700/50 text-gray-200 px-2 py-1 rounded-full
+                hover:bg-gray-600/50 transition-colors duration-150"
             >
-              {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
+              {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-300" />}
               {item}
             </span>
           ))}
           {(demo.positions.length + demo.tags.length) > 4 && (
-            <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
+            <span className="text-xs text-gray-400 bg-gray-700/50 px-2 py-1 rounded-full">
               +{demo.positions.length + demo.tags.length - 4} more
             </span>
           )}
         </section>
 
-        <div className="border-t border-gray-700"></div>
+        <div className="border-t border-gray-600"></div>
 
         {/* ----- CT/T Rounds Bar ----- */}
         <footer className="mt-2">
-          <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
+          <div className="h-2 w-full rounded-full bg-gray-700/50 overflow-hidden flex">
             <div
               className="bg-blue-500/60 h-full transition-all duration-300"
               style={{ width: `${ctPercentage}%` }}
@@ -126,7 +129,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
               style={{ width: `${100 - ctPercentage}%` }}
             />
           </div>
-          <div className="mt-1 flex justify-between text-[10px] text-gray-300 font-medium">
+          <div className="mt-1 flex justify-between text-[10px] text-gray-400 font-medium">
             <span>CT: {ctRounds}</span>
             <span>T: {tRounds}</span>
           </div>
