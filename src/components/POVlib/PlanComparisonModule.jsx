@@ -99,18 +99,21 @@ const PlanComparisonModule = ({ currentPlan }) => {
             You’re on the highest plan!
           </h2>
           <p className="text-sm text-gray-300 mb-6">
-            You already have the <span className="font-semibold text-yellow-400">{currentPlanData.name}</span> plan, which offers all available features.
+            You already have the{' '}
+            <span className="font-semibold text-yellow-400">{currentPlanData.name}</span>{' '}
+            plan, which offers all available features.
           </p>
           <button
             onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
+            disabled
+            className="flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold cursor-not-allowed"
           >
             <X className="w-5 h-5" />
-            <span className="text-sm">Manage Subscription</span>
+            <span className="text-sm">Current Plan</span>
           </button>
           <button
             onClick={() => setIsCompareOpen(true)}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition shadow-[0_0_10px_rgba(250,204,21,0.2)]"
+            className="mt-4 flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
           >
             <span className="text-sm">View All Plans</span>
             <ArrowRight className="w-5 h-5" />
@@ -155,14 +158,14 @@ const PlanComparisonModule = ({ currentPlan }) => {
             </ul>
             <button
               disabled
-              className="mt-6 px-5 py-2 font-semibold rounded-md w-full border-2 border-yellow-400 bg-gray-700 text-gray-500 cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold cursor-not-allowed"
             >
               <span className="text-sm">Current Plan</span>
             </button>
           </div>
 
           {/* Nächster Plan */}
-          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-900 shadow-md">
+          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-900">
             <div className="flex justify-between items-center">
               <h3 className="text-lg md:text-xl font-bold mb-2 text-white">{nextPlanData.name}</h3>
               <span className="text-sm text-yellow-400 font-semibold">Upgrade</span>
@@ -177,7 +180,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
               ))}
             </ul>
             <Link href={`/checkout?plan=${nextPlanData.key}`}>
-              <button className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
+              <button className="mt-6 flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
                 <span className="text-sm">Upgrade to {nextPlanData.name}</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
@@ -187,7 +190,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
 
         <button
           onClick={() => setIsCompareOpen(true)}
-          className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full"
+          className="mt-6 flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full"
         >
           <span className="text-sm">View All Plans</span>
           <ArrowRight className="w-5 h-5" />
