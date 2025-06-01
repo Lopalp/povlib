@@ -9,25 +9,25 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
     {
       key: 'demoLibrary',
       title: 'Demo Library',
-      imageSrc: '/images/under-construction/demo-library.png',
+      imageSrc: '/demo.png',
       description: `Our Demo Library is a curated collection of the best POV clips you’ve ever seen. Explore highlights from top matches, save your favorites, and discover new plays every day. While we put the finishing touches on this section, imagine having instant access to top-tier demos—all in one place.`,
     },
     {
       key: 'extendedPlayer',
       title: 'Extended Demo Player',
-      imageSrc: '/images/under-construction/extended-player.png',
+      imageSrc: '/demo.png',
       description: `Experience your demos like never before with our Extended Demo Player. Slow motion, heatmaps, advanced scoreboard overlays, and multi-angle views are coming soon. Whether you’re analyzing a clutch moment or perfecting your angles, this player will be your go-to tool for deep, frame-by-frame breakdowns.`,
     },
     {
       key: 'watchAnywhere',
       title: 'Watch Anywhere',
-      imageSrc: '/images/under-construction/watch-anywhere.png',
+      imageSrc: '/demo.png',
       description: `Never miss a beat—watch your demos on any device, wherever you go. Desktop, tablet, or mobile: our responsive viewer will let you relive your best plays on the bus, at the café, or while you’re on the road to the next LAN. Stay connected and keep your skills sharp, no matter where you are.`,
     },
     {
       key: 'utilityBook',
       title: 'Pro Players Utility Book',
-      imageSrc: '/images/under-construction/utility-book.png',
+      imageSrc: '/demo.png',
       description: `Unlock exclusive strategies and grenade lineups straight from pro players with our Utility Book. Step-by-step breakdowns, annotated screenshots, and insider tips will elevate your game to the next level. Think of it as a living textbook—compiled by champions, for champions.`,
     },
   ];
@@ -109,7 +109,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
 
           {/* Navigation Buttons */}
           <div className="flex justify-between items-center mb-6">
-            {currentIndex > 0 ? (
+            {currentIndex > 0 && (
               <button
                 onClick={handlePrev}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors"
@@ -117,9 +117,8 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
                 <ChevronLeft className="h-5 w-5" />
                 <span className="hidden sm:inline">Previous</span>
               </button>
-            ) : <div /> }
-
-            {currentIndex < tabs.length - 1 ? (
+            )}
+            {currentIndex < tabs.length - 1 && (
               <button
                 onClick={handleNext}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
@@ -127,7 +126,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
                 <span className="hidden sm:inline">Next</span>
                 <ChevronRight className="h-5 w-5" />
               </button>
-            ) : <div /> }
+            )}
           </div>
 
           {/* Footer / Call to Action */}
