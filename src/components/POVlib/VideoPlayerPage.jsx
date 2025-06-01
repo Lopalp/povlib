@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Eye, Heart, Tag, Share2, Flag, Bookmark, X,
-  ThumbsUp, ChevronDown, ChevronRight, MapPin, Shield, Play
+  ThumbsUp, ChevronDown, ChevronRight, MapPin, Shield, Play, Download, FileText, ExternalLink
 } from 'lucide-react';
 import YouTubeEmbed from './YouTubeEmbed';
 import Navbar from './Navbar';
@@ -136,23 +136,22 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* Tags (styled like on Start Page) */}
-              {selectedDemo.tags?.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 mb-6">
-                  {selectedDemo.tags.map(tag => (
-                    <button
-                      key={tag}
-                      className="px-3 py-1 bg-gray-800 rounded-full text-sm hover:bg-yellow-400/20 transition-colors"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Description Section */}
+              {/* Description Section with Tags at Top */}
               <section className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-6 mb-8 border border-gray-700">
                 <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
+                {/* Tags moved into description */}
+                {selectedDemo.tags?.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    {selectedDemo.tags.map(tag => (
+                      <span
+                        key={tag}
+                        className="flex items-center px-3 py-1 bg-gray-700 rounded-full text-sm text-gray-200 hover:bg-yellow-400/20 transition-colors"
+                      >
+                        <Tag className="h-4 w-4 mr-1 text-yellow-400" /> {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <p className={`${showFullDescription ? '' : 'line-clamp-4'} text-gray-300 text-sm`}>
                   {description}
                 </p>
@@ -203,46 +202,35 @@ const VideoPlayerPage = ({
                 </section>
               )}
 
-              {/* Additional Features */}
+              {/* Additional Features with Icons */}
               <div className="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700">
                 <h3 className="text-white font-medium mb-4 flex items-center text-base">
                   <Tag className="h-5 w-5 mr-2 text-yellow-400" /> Additional Features
                 </h3>
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <a
                     href={selectedDemo.video_url}
                     download
-                    className="flex-1 flex items-center justify-center bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg hover:bg-yellow-300 transition-colors text-sm"
+                    className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors rounded-lg py-2 text-sm text-gray-200"
                   >
-                    Download Video
+                    <Download className="h-5 w-5 mr-2 text-yellow-400" /> Download Video
                   </a>
                   <a
                     href={selectedDemo.dem_url}
                     download
-                    className="flex-1 flex items-center justify-center bg-yellow-400 text-gray-900 font-bold py-2 rounded-lg hover:bg-yellow-300 transition-colors text-sm"
+                    className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors rounded-lg py-2 text-sm text-gray-200"
                   >
-                    Download Demo
+                    <FileText className="h-5 w-5 mr-2 text-yellow-400" /> Download Demo
                   </a>
                   <a
                     href={selectedDemo.matchroom_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors rounded-lg py-2 text-sm"
+                    className="flex items-center justify-center bg-gray-700 hover:bg-gray-600 transition-colors rounded-lg py-2 text-sm text-gray-200"
                   >
-                    <img src="/images/faceit-logo.png" alt="Faceit" className="h-5 w-5 mr-2" />
-                    Go to Matchroom
+                    <ExternalLink className="h-5 w-5 mr-2 text-yellow-400" /> Go to Matchroom
                   </a>
                 </div>
-              </div>
-
-              {/* Utilities Section */}
-              <div className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-4 mb-8 border border-gray-700">
-                <h3 className="text-white font-medium mb-3 text-base">Utilities</h3>
-                <ul className="list-disc list-inside text-xs text-gray-300 space-y-1">
-                  <li>Utility 1</li>
-                  <li>Utility 2</li>
-                  <li>Utility 3</li>
-                </ul>
               </div>
 
               {/* Featured Players */}
@@ -286,7 +274,7 @@ const VideoPlayerPage = ({
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-white font-medium text-sm line-clamp-2">{d.title}</h3>
+                        <h3 className="text-white font-medium text-sm line-clamp-2">```{d.title}```</h3>
                         <div className="text-gray-400 text-xs mt-1">{d.players.join(', ')}</div>
                         <div className="flex items-center text-gray-500 text-xs mt-2">
                           <span>{d.views.toLocaleString()} views</span><span className="mx-1">•</span><span>{d.map}</span>
