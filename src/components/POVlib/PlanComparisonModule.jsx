@@ -4,9 +4,14 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowRight, X } from 'lucide-react';
 import ComparePlansModal from './ComparePlansModal';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
-  // 1) Define all plans in ascending order of price/feature set.
+const PlanComparisonModule = ({ currentPlan }) => {
+  const router = useRouter();
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+
+  // 1) Alle Pläne in aufsteigender Reihenfolge
   const allPlans = useMemo(
     () => [
       {
@@ -14,93 +19,62 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
         name: 'Free',
         priceLabel: 'Free',
         features: [
-          '2 halftime demos per week – constantly fresh training material',
+          '2 Halftime demos per week',
           'Access to the full demo library',
-          'Community support & discussion',
+          'Risk-free entry into POVLib',
+          'Community support',
         ],
-        highlight: 'Start risk-free and explore the basics.',
+        highlight: 'Start for free and explore all basics.',
       },
       {
         key: 'basic',
         name: 'Basic',
-        priceLabel: '$6.99/month',
+        priceLabel: '$6.99/mo',
         features: [
-          '10 full demos per month for steady progress',
-          'Up to 1080p @ 30 FPS for crystal-clear playback',
+          '10 full demos per month',
+          'Up to 1080p @ 30fps',
           'Access to the Pro Utility Book',
           'Standard processing queue',
-          'Community support',
         ],
-        highlight: 'Best for players who want a reliable monthly boost.',
+        highlight: 'Most popular entry-level pack.',
       },
       {
         key: 'advanced',
         name: 'Advanced',
-        priceLabel: '$12.99/month',
+        priceLabel: '$12.99/mo',
         features: [
-          'Create highlight clips & quick replays',
+          'Create highlight clips',
           'Up to 30 demos per month',
-          'Design and customize your own Utility Book',
-          'Generate 2D views from any demo',
-          'Multiple POV options for varied perspectives',
-          'Interactive quizzes during POV playback',
-          'Create demos for any player, anytime',
-          'Capture and display your keystrokes in matches',
-          'Priority processing queue',
-          'Premium support',
+          'Build your own Utility Book',
+          '2D views & multiple POVs',
+          'Custom quizzes while watching demos',
+          'Generate demos for any player',
+          'Get your own keystrokes in your games',
         ],
-        highlight: 'For ambitious players ready to fine-tune every detail.',
+        highlight: 'Everything you need to level up.',
       },
       {
         key: 'pro',
         name: 'Pro',
-        priceLabel: '$25.99/month',
+        priceLabel: '$25.99/mo',
         features: [
-          'Up to 4K demo resolution',
-          'Customized death screens for instant feedback',
-          'Early access to all new features',
-          'Dedicated custom support',
-          'Professional analytics video overlay',
-          'Fully customizable video exports',
-          'Connect multiple games under one account',
-          'Select and analyze specific rounds at will',
-          'Fastest generation times in our queue',
-          'Express processing priority',
-          '24/7 priority support',
+          'Up to 4K demo exports',
+          'Customized death screens',
+          'Early access to new features',
+          'Dedicated support',
+          'Professional analytics video view',
+          'Customizable videos',
+          'Connect multiple games',
+          'Select specific rounds',
+          'Fastest generation times',
         ],
-        highlight: 'Everything you need for a pro‐level analysis workflow.',
-      },
-      {
-        key: 'pro_annual',
-        name: 'Pro (Annual)',
-        priceLabel: '$249.99/year',
-        features: [
-          'All Pro features (4K demos, custom death screens, etc.)',
-          'Save 20% compared to the monthly Pro plan',
-          'Billed once per year for hassle-free access',
-          'Dedicated custom support & early feature access',
-        ],
-        highlight: 'Maximize savings with a full year of Pro advantages.',
-      },
-      {
-        key: 'team',
-        name: 'Team (7 seats)',
-        priceLabel: '$149.99/month',
-        features: [
-          'All Pro features for up to 7 team members',
-          'Team analytics dashboard & centralized billing',
-          'Admin controls to manage seats & permissions',
-          'Volume-discounted pricing vs. individual Pro accounts',
-          'Dedicated priority support for your entire team',
-          'Early access to new enterprise tools',
-        ],
-        highlight: 'Perfect for small squads and coaching staff—unite your team.',
+        highlight: 'For serious players and teams.',
       },
     ],
     []
   );
 
-  // 2) Find index of current plan → determine next plan (if any).
+  // 2) Aktuellen Plan und nächsten Plan finden
   const { currentPlanData, nextPlanData } = useMemo(() => {
     const idx = allPlans.findIndex((p) => p.key === currentPlan);
     const current = idx >= 0 ? allPlans[idx] : null;
@@ -108,29 +82,28 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
     return { currentPlanData: current, nextPlanData: next };
   }, [currentPlan, allPlans]);
 
-  // 3) If currentPlanData is not found (unexpected key), bail out.
   if (!currentPlanData) {
     return (
       <div className="bg-red-800 text-red-200 rounded-lg p-6">
-        <p className="font-semibold">Error: Unknown plan “{currentPlan}”.</p>
+        <p className="font-semibold">Error: Unknown plan "{currentPlan}".</p>
       </div>
     );
   }
 
-  // 4) If user is on the highest tier, show a special message.
+  // 3) Wenn der Nutzer schon beim höchsten Plan ist
   if (!nextPlanData) {
-    const [isCompareOpen, setIsCompareOpen] = useState(false);
-
     return (
       <>
         <div className="bg-gray-800 rounded-2xl p-8 shadow-lg text-center text-gray-200">
-          <h2 className="text-2xl font-bold mb-4">You’re on the highest plan!</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            You’re on the highest plan!
+          </h2>
           <p className="mb-6">
             You already have the <span className="font-semibold">{currentPlanData.name}</span> plan,
             which offers all available features.
           </p>
           <button
-            onClick={() => onUpgrade(null)}
+            onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
             className="inline-flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
           >
             <X className="w-5 h-5 mr-2" />
@@ -146,16 +119,13 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
         <ComparePlansModal
           isOpen={isCompareOpen}
           onClose={() => setIsCompareOpen(false)}
-          onSelectPlan={onUpgrade}
           currentPlan={currentPlan}
         />
       </>
     );
   }
 
-  // 5) Otherwise, render side-by-side comparison of currentPlanData vs. nextPlanData.
-  const [isCompareOpen, setIsCompareOpen] = useState(false);
-
+  // 4) Anzeige der aktuellen Plan-Karte und des nächsten Plankarte
   return (
     <>
       <section className="bg-gray-800 rounded-2xl p-8 space-y-6 shadow-lg">
@@ -163,16 +133,21 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">Compare Your Plan</h2>
           <span className="flex items-center text-gray-400 text-sm">
-            Next tier: <span className="ml-1 font-semibold text-yellow-400">{nextPlanData.name}</span>
+            Next tier:&nbsp;
+            <span className="font-semibold text-yellow-400">
+              {nextPlanData.name}
+            </span>
             <ArrowRight className="w-5 h-5 ml-1 text-yellow-400" />
           </span>
         </div>
 
-        {/* Comparison Grid */}
+        {/* Vergleichsgitter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Current Plan Card */}
+          {/* Aktueller Plan */}
           <div className="border border-gray-700 rounded-lg p-6 flex flex-col">
-            <h3 className="text-lg font-bold mb-2 text-gray-200">{currentPlanData.name}</h3>
+            <h3 className="text-lg font-bold mb-2 text-gray-200">
+              {currentPlanData.name}
+            </h3>
             <p className="text-3xl font-extrabold text-yellow-400 mb-4">
               {currentPlanData.priceLabel}
             </p>
@@ -191,13 +166,17 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
             </button>
           </div>
 
-          {/* Next Plan Card */}
+          {/* Nächster Plan */}
           <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-900 shadow-md">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold mb-2 text-white">{nextPlanData.name}</h3>
+              <h3 className="text-lg font-bold mb-2 text-white">
+                {nextPlanData.name}
+              </h3>
               <span className="text-sm text-yellow-400 font-semibold">Upgrade</span>
             </div>
-            <p className="text-3xl font-extrabold text-white mb-4">{nextPlanData.priceLabel}</p>
+            <p className="text-3xl font-extrabold text-white mb-4">
+              {nextPlanData.priceLabel}
+            </p>
             <ul className="space-y-2 text-gray-200 flex-grow">
               {nextPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-center">
@@ -205,12 +184,11 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => onUpgrade(nextPlanData.key)}
-              className="mt-6 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg w-full hover:bg-yellow-300 transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)]"
-            >
-              Upgrade to {nextPlanData.name}
-            </button>
+            <Link href={`/checkout?plan=${nextPlanData.key}`}>
+              <button className="mt-6 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg w-full hover:bg-yellow-300 transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)]">
+                Upgrade to {nextPlanData.name}
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -225,7 +203,6 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
       <ComparePlansModal
         isOpen={isCompareOpen}
         onClose={() => setIsCompareOpen(false)}
-        onSelectPlan={onUpgrade}
         currentPlan={currentPlan}
       />
     </>
