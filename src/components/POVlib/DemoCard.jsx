@@ -20,7 +20,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   return (
     <article
       className={`
-        relative flex flex-col h-full rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-200
+        relative flex flex-col rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-200
         hover:shadow-xl hover:border-yellow-500 border border-gray-700
         ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
       `}
@@ -57,8 +57,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
 
       {/* ======= Content Section with Glassmorphism ======= */}
-      <div className={`flex flex-col flex-grow ${glassBg} p-4`}>
-        {/* ----- Header (Title + Meta) ----- */}
+      <div className={`flex flex-col flex-grow p-4 gap-3 ${glassBg}`}>
+        {/* Header (Title + Meta) */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
             group-hover:text-yellow-400 transition-colors duration-200">
@@ -74,9 +74,10 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </header>
 
+        {/* First Divider */}
         <div className="border-t border-gray-600" />
 
-        {/* ----- Player + KDA ----- */}
+        {/* Player + KDA */}
         <section className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <User className="h-5 w-5 text-gray-300" />
@@ -96,8 +97,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </section>
 
-        {/* ----- Tags + Positions ----- */}
-        <section className="flex flex-wrap gap-2 mt-3">
+        {/* Tags + Positions */}
+        <section className="flex flex-wrap gap-2">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
               key={i}
@@ -115,12 +116,13 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           )}
         </section>
 
-        {/* ===== Flexible Spacer to Push Divider & Footer Down ===== */}
+        {/* Flexible spacer to push second divider to bottom */}
         <div className="flex-grow" />
 
+        {/* Second Divider */}
         <div className="border-t border-gray-600" />
 
-        {/* ----- CT/T Rounds Bar ----- */}
+        {/* CT/T Rounds Bar */}
         <footer className="mt-2">
           <div className="h-2 w-full rounded-full bg-gray-700/50 overflow-hidden flex">
             <div
