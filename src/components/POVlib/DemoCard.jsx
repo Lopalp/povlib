@@ -56,8 +56,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
       </div>
 
-      {/* ======= Content Section with Glassmorphism ======= */}
-      <div className={`mt-auto p-4 space-y-3 ${glassBg} rounded-t-2xl`}>
+      {/* ======= Content Section with Glassmorphism (no top-rounded corners) ======= */}
+      <div className={`mt-auto p-4 space-y-3 ${glassBg}`}>
         {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
@@ -77,7 +77,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         <div className="border-t border-gray-600"></div>
 
         {/* ----- Player + KDA ----- */}
-        <section className="flex items-center justify-between">
+        <section className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <User className="h-5 w-5 text-gray-300" />
             {demo.players.slice(0, 1).map((player, idx) => (
@@ -96,8 +96,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </section>
 
-        {/* ----- Tags + Positions ----- */}
-        <section className="flex flex-wrap gap-2">
+        {/* ----- Tags + Positions (keep normal spacing) ----- */}
+        <section className="flex flex-wrap gap-2 mb-4">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
               key={i}
