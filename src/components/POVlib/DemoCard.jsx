@@ -17,38 +17,48 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   return (
     <article
       className={`
-        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md transition-all duration-200
-        hover:shadow-xl hover:border-yellow-500 cursor-pointer overflow-hidden
+        relative flex flex-col bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden 
+        hover:border-yellow-500 transition-all duration-200 cursor-pointer
         ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
       `}
       onClick={() => onSelect(demo)}
     >
-      {/* ======= Thumbnail Section ======= */}
-      <div className="relative w-full aspect-video overflow-hidden group">
+      {/* ======= Thumbnail Section with Scaled Background ======= */}
+      <div className="relative w-full h-40 overflow-hidden">
+        {/* Scaled‐up “background” thumbnail that touches top & bottom */}
         <img
           src={demo.thumbnail}
-          alt={demo.title}
-          className="w-full h-full object-cover brightness-90 transition-all duration-200 group-hover:brightness-75"
-          loading="lazy"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover scale-110 brightness-50"
         />
 
-        {/* Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
-              hover:bg-black/80 hover:scale-105 transition-all duration-200"
-          >
-            <Play className="h-5 w-5" fill="currentColor" />
-          </button>
+        {/* “Real” thumbnail centered on top */}
+        <div className="relative flex items-center justify-center h-full">
+          <img
+            src={demo.thumbnail}
+            alt={demo.title}
+            className="w-11/12 h-auto object-contain rounded-lg shadow-lg"
+          />
+
+          {/* Play Button Overlay (appears on hover) */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+            <button
+              className="rounded-full p-3 border-2 border-yellow-400 text-yellow-400 bg-black/50 
+                hover:scale-105 transition-transform duration-200"
+            >
+              <Play className="h-5 w-5" fill="currentColor" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ======= Content Section ======= */}
-      <div className="flex flex-col flex-grow p-4 space-y-3">
+      {/* ======= Content Section with Glassmorphism ======= */}
+      <div className="flex flex-col p-4 space-y-3 bg-black/40 backdrop-blur-lg border border-gray-700">
         {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
-            group-hover:text-yellow-400 transition-colors duration-200">
+            hover:text-yellow-400 transition-colors duration-200"
+          >
             {demo.title}
           </h3>
 
@@ -71,7 +81,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
               <Link
                 key={idx}
                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
+                className="text-sm font-medium text-white hover:text-yellow-400 transition-colors duration-200"
                 onClick={(e) => handlePlayerClick(e, player)}
               >
                 {player}
@@ -116,7 +126,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
               style={{ width: `${100 - ctPercentage}%` }}
             />
           </div>
-          <div className="mt-1 flex justify-between text-[10px] text-gray-500 font-medium">
+          <div className="mt-1 flex justify-between text-[10px] text-gray-300 font-medium">
             <span>CT: {ctRounds}</span>
             <span>T: {tRounds}</span>
           </div>
