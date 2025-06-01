@@ -20,7 +20,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   return (
     <article
       className={`
-        relative flex flex-col rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-200
+        relative flex flex-col h-full rounded-2xl shadow-md overflow-hidden cursor-pointer transition-all duration-200
         hover:shadow-xl hover:border-yellow-500 border border-gray-700
         ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
       `}
@@ -56,8 +56,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         </div>
       </div>
 
-      {/* ======= Content Section with Glassmorphism (no top-rounded corners) ======= */}
-      <div className={`p-4 space-y-3 ${glassBg}`}>
+      {/* ======= Content Section with Glassmorphism ======= */}
+      <div className={`flex flex-col flex-grow ${glassBg} p-4`}>
         {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
@@ -74,10 +74,10 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </header>
 
-        <div className="border-t border-gray-600"></div>
+        <div className="border-t border-gray-600" />
 
-        {/* ----- Player + KDA (with extra bottom spacing before next divider) ----- */}
-        <section className="flex items-center justify-between mb-6">
+        {/* ----- Player + KDA ----- */}
+        <section className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <User className="h-5 w-5 text-gray-300" />
             {demo.players.slice(0, 1).map((player, idx) => (
@@ -96,8 +96,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </section>
 
-        {/* ----- Tags + Positions (optional) ----- */}
-        <section className="flex flex-wrap gap-2">
+        {/* ----- Tags + Positions ----- */}
+        <section className="flex flex-wrap gap-2 mt-3">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
               key={i}
@@ -115,7 +115,10 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           )}
         </section>
 
-        <div className="border-t border-gray-600"></div>
+        {/* ===== Flexible Spacer to Push Divider & Footer Down ===== */}
+        <div className="flex-grow" />
+
+        <div className="border-t border-gray-600" />
 
         {/* ----- CT/T Rounds Bar ----- */}
         <footer className="mt-2">
