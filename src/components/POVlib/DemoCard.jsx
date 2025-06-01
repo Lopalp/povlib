@@ -1,30 +1,30 @@
 import React from 'react';
 import Link from 'next/link';
-import { Play, Shield, Tag as TagIcon, User } from 'lucide-react';
+import { Play, Tag as TagIcon, User } from 'lucide-react';
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const handlePlayerClick = (e, player) => {
     e.stopPropagation();
   };
 
-  // Beispielhafte Rundenberechnung (CT vs. T)
+  // Example CT vs. T rounds calculation
   const ctRounds = demo.id % 7 + 6;
   const tRounds = demo.id % 5 + 8;
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
-  const mockKDA = "23/5/2"; // Platzhalter für K/D/A
+  const mockKDA = "23/5/2"; // Placeholder for K/D/A
 
   return (
     <article
       className={`
-        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md hover:shadow-xl 
-        overflow-hidden transition-all duration-200 cursor-pointer
+        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md transition-all duration-200
+        hover:shadow-xl hover:border-yellow-500 cursor-pointer overflow-hidden
         ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
       `}
       onClick={() => onSelect(demo)}
     >
-      {/* ======= Thumbnail-Bereich ======= */}
-      <div className="relative w-full aspect-video overflow-hidden">
+      {/* ======= Thumbnail Section ======= */}
+      <div className="relative w-full aspect-video overflow-hidden group">
         <img
           src={demo.thumbnail}
           alt={demo.title}
@@ -32,20 +32,20 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           loading="lazy"
         />
 
-        {/* Play-Button Overlay */}
+        {/* Play Button Overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
-            hover:bg-black/80 hover:scale-105 transition-all duration-200"
+              hover:bg-black/80 hover:scale-105 transition-all duration-200"
           >
             <Play className="h-5 w-5" fill="currentColor" />
           </button>
         </div>
       </div>
 
-      {/* ======= Inhaltsbereich ======= */}
+      {/* ======= Content Section ======= */}
       <div className="flex flex-col flex-grow p-4 space-y-3">
-        {/* ----- Header (Titel + Meta) ----- */}
+        {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
             group-hover:text-yellow-400 transition-colors duration-200">
@@ -63,7 +63,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
         <div className="border-t border-gray-700"></div>
 
-        {/* ----- Spieler + KDA ----- */}
+        {/* ----- Player + KDA ----- */}
         <section className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <User className="h-5 w-5 text-gray-400" />
@@ -83,7 +83,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </section>
 
-        {/* ----- Tags + Positionen ----- */}
+        {/* ----- Tags + Positions ----- */}
         <section className="flex flex-wrap gap-2">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
@@ -97,14 +97,14 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           ))}
           {(demo.positions.length + demo.tags.length) > 4 && (
             <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
-              +{demo.positions.length + demo.tags.length - 4} weitere
+              +{demo.positions.length + demo.tags.length - 4} more
             </span>
           )}
         </section>
 
         <div className="border-t border-gray-700"></div>
 
-        {/* ----- CT/T Runden-Leiste ----- */}
+        {/* ----- CT/T Rounds Bar ----- */}
         <footer className="mt-2">
           <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
             <div
