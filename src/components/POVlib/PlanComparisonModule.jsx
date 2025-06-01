@@ -12,55 +12,89 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
       {
         key: 'free',
         name: 'Free',
-        priceLabel: 'Kostenlos',
+        priceLabel: 'Free',
         features: [
-          '2 Halbzeit-Demos pro Woche – ständig neues Lernmaterial',
-          'Zugriff auf die gesamte Demo-Bibliothek',
-          'Perfekt zum Reinschnuppern ohne Verpflichtung',
-          'Community-Support und Austausch',
+          '2 halftime demos per week – constantly fresh training material',
+          'Access to the full demo library',
+          'Community support & discussion',
         ],
-        highlight: 'Starte direkt ohne Risiko und entdecke alle Basics.',
+        highlight: 'Start risk-free and explore the basics.',
       },
       {
         key: 'basic',
         name: 'Basic',
-        priceLabel: '6,99 €',
+        priceLabel: '$6.99/month',
         features: [
-          '10 komplette Demos pro Monat – klare Schritte zum Aufstieg',
-          'Qualität bis zu 1080p & 30 FPS für kristallklare Sicht',
-          'Zugang zum Pro Utility Book – Profi-Wissen zum Greifen nah',
-          'Schneller Support über unser Community-Forum',
+          '10 full demos per month for steady progress',
+          'Up to 1080p @ 30 FPS for crystal-clear playback',
+          'Access to the Pro Utility Book',
+          'Standard processing queue',
+          'Community support',
         ],
-        highlight: 'Ideal für Einsteiger, die regelmäßig trainieren wollen.',
+        highlight: 'Best for players who want a reliable monthly boost.',
       },
       {
         key: 'advanced',
         name: 'Advanced',
-        priceLabel: '14,99 €',
+        priceLabel: '$12.99/month',
         features: [
-          'Bis zu 30 Demos pro Monat – maximales Lernvolumen',
-          'Erstelle eigene Highlight-Clips & Utility Books',
-          '2D-Ansichten deiner Demos & mehrere POV-Optionen',
-          'Interaktive Quizze beim Anschauen unserer Demo-Videos',
-          'Demo-Erstellung für jeden Spieler – volle Flexibilität',
-          'Zeige deine eigenen Keystrokes in jedem Spiel',
+          'Create highlight clips & quick replays',
+          'Up to 30 demos per month',
+          'Design and customize your own Utility Book',
+          'Generate 2D views from any demo',
+          'Multiple POV options for varied perspectives',
+          'Interactive quizzes during POV playback',
+          'Create demos for any player, anytime',
+          'Capture and display your keystrokes in matches',
+          'Priority processing queue',
+          'Premium support',
         ],
-        highlight: 'Für ambitionierte Spieler, die ihre Skills schärfen wollen.',
+        highlight: 'For ambitious players ready to fine-tune every detail.',
       },
       {
         key: 'pro',
         name: 'Pro',
-        priceLabel: '25,99 €',
+        priceLabel: '$25.99/month',
         features: [
-          'Demos in bis zu 4K-Auflösung – jedes Detail überzeugt',
-          'Individuelle Deathscreens & komplett anpassbare Videos',
-          'Exklusiver Early-Access zu neuen Features',
-          'Persönlicher, priorisierter Support rund um die Uhr',
-          'Professionelle Analyse-Videos mit erweiterten Statistiken',
-          'Verknüpfe mehrere Spiele & wähle gezielt Runden aus',
-          'Superschnelle Generierungszeiten – keine Wartezeit',
+          'Up to 4K demo resolution',
+          'Customized death screens for instant feedback',
+          'Early access to all new features',
+          'Dedicated custom support',
+          'Professional analytics video overlay',
+          'Fully customizable video exports',
+          'Connect multiple games under one account',
+          'Select and analyze specific rounds at will',
+          'Fastest generation times in our queue',
+          'Express processing priority',
+          '24/7 priority support',
         ],
-        highlight: 'Für Profis und Teams, die keine Kompromisse eingehen.',
+        highlight: 'Everything you need for a pro‐level analysis workflow.',
+      },
+      {
+        key: 'pro_annual',
+        name: 'Pro (Annual)',
+        priceLabel: '$249.99/year',
+        features: [
+          'All Pro features (4K demos, custom death screens, etc.)',
+          'Save 20% compared to the monthly Pro plan',
+          'Billed once per year for hassle-free access',
+          'Dedicated custom support & early feature access',
+        ],
+        highlight: 'Maximize savings with a full year of Pro advantages.',
+      },
+      {
+        key: 'team',
+        name: 'Team (7 seats)',
+        priceLabel: '$149.99/month',
+        features: [
+          'All Pro features for up to 7 team members',
+          'Team analytics dashboard & centralized billing',
+          'Admin controls to manage seats & permissions',
+          'Volume-discounted pricing vs. individual Pro accounts',
+          'Dedicated priority support for your entire team',
+          'Early access to new enterprise tools',
+        ],
+        highlight: 'Perfect for small squads and coaching staff—unite your team.',
       },
     ],
     []
@@ -78,7 +112,7 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
   if (!currentPlanData) {
     return (
       <div className="bg-red-800 text-red-200 rounded-lg p-6">
-        <p className="font-semibold">Fehler: Unbekannter Plan &quot;{currentPlan}&quot;.</p>
+        <p className="font-semibold">Error: Unknown plan “{currentPlan}”.</p>
       </div>
     );
   }
@@ -90,22 +124,23 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
     return (
       <>
         <div className="bg-gray-800 rounded-2xl p-8 shadow-lg text-center text-gray-200">
-          <h2 className="text-2xl font-bold mb-4">Du bist bereits im Top-Level!</h2>
+          <h2 className="text-2xl font-bold mb-4">You’re on the highest plan!</h2>
           <p className="mb-6">
-            Du nutzt den <span className="font-semibold">{currentPlanData.name}</span>-Plan mit allen verfügbaren Features.
+            You already have the <span className="font-semibold">{currentPlanData.name}</span> plan,
+            which offers all available features.
           </p>
           <button
             onClick={() => onUpgrade(null)}
             className="inline-flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
           >
             <X className="w-5 h-5 mr-2" />
-            Abo verwalten
+            Manage Subscription
           </button>
           <button
             onClick={() => setIsCompareOpen(true)}
             className="mt-4 px-6 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)]"
           >
-            Alle Pläne anzeigen
+            View All Plans
           </button>
         </div>
         <ComparePlansModal
@@ -126,9 +161,9 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
       <section className="bg-gray-800 rounded-2xl p-8 space-y-6 shadow-lg">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Vergleiche deinen Plan</h2>
+          <h2 className="text-2xl font-bold text-white">Compare Your Plan</h2>
           <span className="flex items-center text-gray-400 text-sm">
-            Nächstes Level: <span className="ml-1 font-semibold text-yellow-400">{nextPlanData.name}</span>
+            Next tier: <span className="ml-1 font-semibold text-yellow-400">{nextPlanData.name}</span>
             <ArrowRight className="w-5 h-5 ml-1 text-yellow-400" />
           </span>
         </div>
@@ -148,12 +183,11 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 italic text-sm text-gray-500">{currentPlanData.highlight}</p>
             <button
               disabled
               className="mt-6 px-4 py-2 font-semibold rounded-lg w-full bg-gray-700 text-gray-500 cursor-not-allowed"
             >
-              Aktueller Plan
+              Current Plan
             </button>
           </div>
 
@@ -171,12 +205,11 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 italic text-sm text-gray-300">{nextPlanData.highlight}</p>
             <button
               onClick={() => onUpgrade(nextPlanData.key)}
               className="mt-6 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg w-full hover:bg-yellow-300 transition-colors shadow-[0_0_10px_rgba(250,204,21,0.2)]"
             >
-              Upgrade auf {nextPlanData.name}
+              Upgrade to {nextPlanData.name}
             </button>
           </div>
         </div>
@@ -185,7 +218,7 @@ const PlanComparisonModule = ({ currentPlan, onUpgrade }) => {
           onClick={() => setIsCompareOpen(true)}
           className="mt-6 px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg w-full hover:bg-gray-600 transition-colors"
         >
-          Alle Pläne anzeigen
+          View All Plans
         </button>
       </section>
 
