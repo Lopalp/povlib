@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Play, Shield, Tag as TagIcon, User } from 'lucide-react';
+import { Play, Tag as TagIcon, User } from 'lucide-react';
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const handlePlayerClick = (e, player) => {
@@ -17,9 +17,9 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   return (
     <article
       className={`
-        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md hover:shadow-xl 
-        overflow-hidden transition-all duration-200 cursor-pointer
-        ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
+        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md 
+        hover:shadow-xl overflow-hidden transition-all duration-200 cursor-pointer
+        ${featured ? 'w-full' : 'w-80 md:w-72'} min-h-[360px] ${className}
       `}
       onClick={() => onSelect(demo)}
     >
@@ -31,7 +31,6 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           className="w-full h-full object-cover brightness-90 transition-all duration-200 group-hover:brightness-75"
           loading="lazy"
         />
-
         {/* Play-Button Overlay */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
@@ -44,68 +43,79 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
 
       {/* ======= Inhaltsbereich ======= */}
-      <div className="flex flex-col flex-grow p-4 space-y-3">
+      <div className="flex flex-col flex-grow p-4">
         {/* ----- Header (Titel + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
-            group-hover:text-yellow-400 transition-colors duration-200">
+            group-hover:text-yellow-400 transition-colors duration-200 min-h-[3rem]"
+          >
             {demo.title}
           </h3>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300 min-h-[1.5rem]">
             <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
-            {demo.team && (
-              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
-            )}
+            {demo.team
+              ? <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
+              : <span className="px-2 py-1 invisible">—</span> /* Platzhalter, wenn kein Team */ }
             <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
           </div>
         </header>
 
-        <div className="border-t border-gray-700"></div>
+        <div className="border-t border-gray-700 my-2"></div>
 
         {/* ----- Spieler + KDA ----- */}
-        <section className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <User className="h-5 w-5 text-gray-400" />
-            {demo.players.slice(0, 1).map((player, idx) => (
-              <Link
-                key={idx}
-                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
-                onClick={(e) => handlePlayerClick(e, player)}
-              >
-                {player}
-              </Link>
-            ))}
-          </div>
+        <section className="flex items-center justify-between mb-2 min-h-[2.5rem]">
+          {demo.players && demo.players.length > 0 ? (
+            <div className="flex items-center space-x-2">
+              <User className="h-5 w-5 text-gray-400" />
+              {demo.players.slice(0, 1).map((player, idx) => (
+                <Link
+                  key={idx}
+                  href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                  className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
+                  onClick={(e) => handlePlayerClick(e, player)}
+                >
+                  {player}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="min-h-[1.5rem]"></div> /* Platzhalter, falls keine Spieler */}
           <div className="text-xs font-semibold text-gray-400 tracking-wide bg-gray-700 px-2 py-1 rounded-md">
             {mockKDA}
           </div>
         </section>
 
+        <div className="border-t border-gray-700 my-2"></div>
+
         {/* ----- Tags + Positionen ----- */}
-        <section className="flex flex-wrap gap-2">
-          {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-            <span
-              key={i}
-              className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
-                hover:bg-gray-600 transition-colors duration-150"
-            >
-              {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
-              {item}
-            </span>
-          ))}
-          {(demo.positions.length + demo.tags.length) > 4 && (
-            <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
-              +{demo.positions.length + demo.tags.length - 4} weitere
-            </span>
-          )}
+        <section className="flex flex-wrap gap-2 mb-2 min-h-[2.5rem]">
+          {demo.positions && demo.positions.length + demo.tags.length > 0 ? (
+            <>
+              {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
+                <span
+                  key={i}
+                  className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
+                    hover:bg-gray-600 transition-colors duration-150"
+                >
+                  {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
+                  {item}
+                </span>
+              ))}
+              {(demo.positions.length + demo.tags.length) > 4 && (
+                <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
+                  +{demo.positions.length + demo.tags.length - 4} weitere
+                </span>
+              )}
+            </>
+          ) : (
+            <div className="min-h-[1.5rem]"></div> /* Platzhalter, wenn keine Tags/Positionen */}
         </section>
 
-        <div className="border-t border-gray-700"></div>
+        <div className="border-t border-gray-700 my-2"></div>
 
         {/* ----- CT/T Runden-Leiste ----- */}
-        <footer className="mt-2">
+        <footer className="mt-auto">
           <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
             <div
               className="bg-blue-500/60 h-full transition-all duration-300"
