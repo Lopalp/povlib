@@ -4,6 +4,144 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
+// Switch component (Apple-style)
+const Switch = ({ checked, onChange, label }) => (
+  <label className="flex items-center cursor-pointer">
+    <div className="relative">
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={checked}
+        onChange={onChange}
+      />
+      <div
+        className={`block w-10 h-6 rounded-full transition-colors ${
+          checked ? 'bg-yellow-400' : 'bg-gray-700'
+        }`}
+      />
+      <div
+        className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
+          checked ? 'translate-x-4' : 'translate-x-0'
+        }`}
+      />
+    </div>
+    {label && <span className="ml-3 select-none text-gray-200">{label}</span>}
+  </label>
+);
+
+// Collapsible section component
+const CollapsibleSection = ({ title, children, defaultOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div className="border-t border-gray-700">
+      <button
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="w-full flex justify-between items-center px-4 py-3 text-left bg-gray-800 hover:bg-gray-700 transition-colors"
+      >
+        <span className="text-lg font-semibold text-gray-200">{title}</span>
+        <span className="text-gray-400">{isOpen ? '−' : '+'}</span>
+      </button>
+      {isOpen && <div className="px-6 py-4">{children}</div>}
+    </div>
+  );
+};
+
+// Player card component
+const PlayerCard = ({
+  player,
+  index,
+  isSelected,
+  onToggleSelect,
+  onToggleApplyAll,
+  applyAll,
+  details,
+  setDetails,
+  highlighted,
+}) => {
+  const bgClass = highlighted
+    ? 'border-2 border-yellow-400'
+    : 'border border-gray-700';
+  return (
+    <div
+      className={`flex flex-col bg-gray-800 rounded-lg p-4 ${bgClass}`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          {/* Placeholder for profile image */}
+          <img
+            src={player.avatarUrl || '/placeholder-avatar.png'}
+            alt={`${player.name} avatar`}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <div>
+            <div className="text-gray-200 font-semibold">{player.name}</div>
+            <div className="text-gray-400 text-sm">
+              K/D/A: {player.kda} / Faceit LvL: {player.faceitLevel}
+            </div>
+          </div>
+        </div>
+        <Switch
+          checked={isSelected}
+          onChange={onToggleSelect}
+          label=""
+        />
+      </div>
+
+      <CollapsibleSection title="Player Details" defaultOpen={false}>
+        <div className="space-y-4">
+          <Switch
+            checked={details.keystrokes}
+            onChange={() =>
+              setDetails((prev) => ({ ...prev, keystrokes: !prev.keystrokes }))
+            }
+            label="Show Keystrokes"
+          />
+          <div className="space-y-2">
+            <span className="text-gray-300">Halves:</span>
+            <div className="flex gap-4">
+              <Switch
+                checked={details.firstHalf}
+                onChange={() =>
+                  setDetails((prev) => ({ ...prev, firstHalf: !prev.firstHalf }))
+                }
+                label="1st Half"
+              />
+              <Switch
+                checked={details.secondHalf}
+                onChange={() =>
+                  setDetails((prev) => ({ ...prev, secondHalf: !prev.secondHalf }))
+                }
+                label="2nd Half"
+              />
+              <Switch
+                checked={details.overtime}
+                onChange={() =>
+                  setDetails((prev) => ({ ...prev, overtime: !prev.overtime }))
+                }
+                label="Overtime"
+              />
+            </div>
+          </div>
+          <Switch
+            checked={details.highlightClip}
+            onChange={() =>
+              setDetails((prev) => ({ ...prev, highlightClip: !prev.highlightClip }))
+            }
+            label="Generate Highlight Clip"
+          />
+          <Switch
+            checked={details.failClip}
+            onChange={() =>
+              setDetails((prev) => ({ ...prev, failClip: !prev.failClip }))
+            }
+            label="Generate Fail Clip"
+          />
+        </div>
+      </CollapsibleSection>
+    </div>
+  );
+};
+
 const CreateDemoModal = ({
   isOpen,
   onClose,
@@ -15,21 +153,40 @@ const CreateDemoModal = ({
   onFileSubmit,
   uploadError,
   onLinkAccount,
-  players = Array.from({ length: 10 }, (_, i) => `Player ${i + 1}`),
 }) => {
+  // Global states
+  const [players, setPlayers] = useState(
+    Array.from({ length: 10 }, (_, i) => ({
+      id: i,
+      name: `Player ${i + 1}`,
+      kda: '0/0/0',
+      faceitLevel: '1',
+      avatarUrl: '', // can be replaced with real URLs
+    }))
+  );
+  const [selectedPlayers, setSelectedPlayers] = useState(
+    Array(10).fill(false)
+  );
+  const [applyToAll, setApplyToAll] = useState(false);
+
+  // Per-player details state array
+  const [playerDetails, setPlayerDetails] = useState(
+    Array.from({ length: 10 }, () => ({
+      keystrokes: false,
+      firstHalf: false,
+      secondHalf: false,
+      overtime: false,
+      highlightClip: false,
+      failClip: false,
+    }))
+  );
+
+  // Global options (collapsible sections below players)
   const [rounds, setRounds] = useState('');
-  const [firstHalf, setFirstHalf] = useState(false);
-  const [secondHalf, setSecondHalf] = useState(false);
-  const [overtime, setOvertime] = useState(false);
-  const [highlightClip, setHighlightClip] = useState(false);
-  const [failClip, setFailClip] = useState(false);
   const [resolution, setResolution] = useState('1080p');
   const [skipPistol, setSkipPistol] = useState(false);
   const [skipFullEco, setSkipFullEco] = useState(false);
-  const [showKeystrokes, setShowKeystrokes] = useState(false);
-  const [perPlayerOptions, setPerPlayerOptions] = useState(
-    players.map(() => ({ enabled: false, keystrokes: false }))
-  );
+  const [globalKeystrokes, setGlobalKeystrokes] = useState(false);
   const [customDeathScreens, setCustomDeathScreens] = useState(false);
   const [removeWatermark, setRemoveWatermark] = useState(false);
   const [generateQuizzes, setGenerateQuizzes] = useState(false);
@@ -38,21 +195,17 @@ const CreateDemoModal = ({
   const [render2DView, setRender2DView] = useState(false);
   const [team1Comms, setTeam1Comms] = useState(false);
   const [team2Comms, setTeam2Comms] = useState(false);
-  const [estimatedCost, setEstimatedCost] = useState(1);
 
+  // Cost calculation
+  const [estimatedCost, setEstimatedCost] = useState(1);
   useEffect(() => {
     let cost = 1;
     const flags = [
       rounds.trim() !== '',
-      firstHalf,
-      secondHalf,
-      overtime,
-      highlightClip,
-      failClip,
       resolution !== '1080p',
       skipPistol,
       skipFullEco,
-      showKeystrokes,
+      globalKeystrokes,
       customDeathScreens,
       removeWatermark,
       generateQuizzes,
@@ -65,25 +218,25 @@ const CreateDemoModal = ({
       utilQuizzes && cost++;
       economyQuizzes && cost++;
     }
-    perPlayerOptions.forEach((opt) => {
-      if (opt.enabled) {
+    selectedPlayers.forEach((sel, idx) => {
+      if (sel) {
         cost++;
-        if (opt.keystrokes) cost++;
+        const details = playerDetails[idx];
+        if (details.keystrokes) cost++;
+        if (details.firstHalf) cost++;
+        if (details.secondHalf) cost++;
+        if (details.overtime) cost++;
+        if (details.highlightClip) cost++;
+        if (details.failClip) cost++;
       }
     });
     setEstimatedCost(cost);
   }, [
     rounds,
-    firstHalf,
-    secondHalf,
-    overtime,
-    highlightClip,
-    failClip,
     resolution,
     skipPistol,
     skipFullEco,
-    showKeystrokes,
-    perPlayerOptions,
+    globalKeystrokes,
     customDeathScreens,
     removeWatermark,
     generateQuizzes,
@@ -92,13 +245,28 @@ const CreateDemoModal = ({
     render2DView,
     team1Comms,
     team2Comms,
+    selectedPlayers,
+    playerDetails,
   ]);
 
-  const togglePlayerOption = (index, field) => {
-    setPerPlayerOptions((prev) =>
-      prev.map((opt, i) =>
-        i === index ? { ...opt, [field]: !opt[field] } : opt
-      )
+  // Toggle selection of a single player
+  const togglePlayerSelect = (idx) => {
+    setSelectedPlayers((prev) =>
+      prev.map((v, i) => (i === idx ? !v : v))
+    );
+  };
+
+  // Apply one player's settings to all selected players
+  const applySettingsToAll = (sourceIdx) => {
+    if (!selectedPlayers[sourceIdx]) return;
+    const sourceDetails = playerDetails[sourceIdx];
+    setPlayerDetails((prev) =>
+      prev.map((details, i) => {
+        if (selectedPlayers[i] && i !== sourceIdx) {
+          return { ...sourceDetails };
+        }
+        return details;
+      })
     );
   };
 
@@ -109,7 +277,7 @@ const CreateDemoModal = ({
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl max-w-4xl w-full overflow-hidden shadow-[0_0_30px_rgba(250,204,21,0.15)]">
+      <div className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-[0_0_30px_rgba(250,204,21,0.15)]">
         {/* Header */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-700">
           <h2 className="text-2xl font-bold text-white">Create New Demo</h2>
@@ -121,23 +289,22 @@ const CreateDemoModal = ({
           </button>
         </div>
 
-        {/* Body */}
-        <div className="px-8 py-6 text-gray-200 space-y-8 max-h-[80vh] overflow-y-auto">
-          {/* Kosteninfo */}
+        {/* Content */}
+        <div className="px-8 py-6 text-gray-200 overflow-y-auto custom-scrollbar space-y-8">
+          {/* Cost info */}
           <p className="text-gray-400">
-            Jede Ausführung kostet{' '}
-            <span className="font-bold text-yellow-400">1 Basis-Credit</span> +
-            Extras je nach Auswahl. Aktuelle Gesamtkosten:{' '}
+            Each run costs{' '}
+            <span className="font-bold text-yellow-400">1 base credit</span> plus extras. Current total:{' '}
             <span className="font-bold text-yellow-400">
-              {estimatedCost} Credits
+              {estimatedCost} credits
             </span>
             .
           </p>
 
-          {/* 1. Eingabe: Match-Link oder Datei */}
+          {/* 1. Submit Match Data */}
           <section className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-300">
-              Match-Daten einreichen
+            <h3 className="text-xl font-semibold text-gray-300">
+              Submit Match Data
             </h3>
             <div className="flex gap-4">
               <form onSubmit={onMatchLinkSubmit} className="flex-1 flex gap-2">
@@ -145,21 +312,21 @@ const CreateDemoModal = ({
                   type="text"
                   value={matchLink}
                   onChange={(e) => onMatchLinkChange(e.target.value)}
-                  placeholder="Match-Link einfügen"
-                  className="flex-1 px-4 py-2 bg-gray-700 rounded-lg focus:outline-none"
+                  placeholder="Paste match link here"
+                  className="flex-1 px-4 py-3 bg-gray-700 rounded-lg focus:outline-none text-gray-200"
                 />
                 <button
                   type="submit"
                   disabled={!matchLink}
-                  className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg disabled:opacity-50"
+                  className="px-4 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg disabled:opacity-50"
                 >
-                  Link ausführen
+                  Run Link
                 </button>
               </form>
-              <span className="self-center text-gray-500">ODER</span>
+              <span className="self-center text-gray-500">OR</span>
               <form onSubmit={onFileSubmit} className="flex-1 flex items-center gap-2">
-                <label className="flex-1 px-4 py-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition text-center">
-                  {selectedFile ? selectedFile.name : '.dem-Datei hochladen'}
+                <label className="flex-1 px-4 py-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition text-center text-gray-200">
+                  {selectedFile ? selectedFile.name : 'Upload .dem file'}
                   <input
                     type="file"
                     accept=".dem"
@@ -170,100 +337,159 @@ const CreateDemoModal = ({
                 <button
                   type="submit"
                   disabled={!selectedFile}
-                  className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg disabled:opacity-50"
+                  className="px-4 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg disabled:opacity-50"
                 >
-                  Upload ausführen
+                  Run Upload
                 </button>
               </form>
             </div>
             {uploadError && <p className="text-red-500">{uploadError}</p>}
             <button
               onClick={onLinkAccount}
-              className="mt-2 px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+              className="mt-2 px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-gray-200"
             >
-              Faceit-Account verbinden
+              Link Faceit Account
             </button>
           </section>
 
-          {/* 2. Grundlegende Video-/Clip-Optionen */}
-          <section className="grid grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
-                Runden & Phasen
+          {/* 2. Player Selection */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-gray-300">
+                Select Players
               </h3>
-              <div className="space-y-2">
-                <label className="block text-gray-300">
-                  Bestimmte Runden (z.B. 1,2,3)
-                </label>
-                <input
-                  type="text"
-                  value={rounds}
-                  onChange={(e) => setRounds(e.target.value)}
-                  placeholder="Komma-getrennte Runden"
-                  className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none"
+              <Switch
+                checked={applyToAll}
+                onChange={() => setApplyToAll((prev) => !prev)}
+                label="Apply one player's settings to all selected"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              {players.map((player, idx) => (
+                <div key={player.id}>
+                  <PlayerCard
+                    player={player}
+                    index={idx}
+                    isSelected={selectedPlayers[idx]}
+                    onToggleSelect={() => togglePlayerSelect(idx)}
+                    applyAll={applyToAll}
+                    details={playerDetails[idx]}
+                    setDetails={(newDetails) =>
+                      setPlayerDetails((prev) =>
+                        prev.map((d, i) => (i === idx ? newDetails : d))
+                      )
+                    }
+                    highlighted={idx === 0}
+                  />
+                  {applyToAll && selectedPlayers[idx] && (
+                    <button
+                      onClick={() => applySettingsToAll(idx)}
+                      className="mt-2 w-full px-3 py-2 bg-yellow-400 text-gray-900 font-medium rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      Apply this player's settings to all
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* 3. Global Options: collapsible from here onward */}
+          <CollapsibleSection title="Rounds & Phases" defaultOpen={false}>
+            <div className="space-y-4">
+              <label className="block text-gray-300">Specific Rounds (e.g., 1,2,3):</label>
+              <input
+                type="text"
+                value={rounds}
+                onChange={(e) => setRounds(e.target.value)}
+                placeholder="Comma-separated rounds"
+                className="w-full px-4 py-3 bg-gray-700 rounded-lg focus:outline-none text-gray-200"
+              />
+              <div className="flex flex-wrap gap-6">
+                <Switch
+                  checked={playerDetails.some((d, i) => selectedPlayers[i] && d.firstHalf)}
+                  onChange={() => {
+                    const newVal = !playerDetails.some((d, i) => selectedPlayers[i] && d.firstHalf);
+                    setPlayerDetails((prev) =>
+                      prev.map((d, i) =>
+                        selectedPlayers[i]
+                          ? { ...d, firstHalf: newVal }
+                          : d
+                      )
+                    );
+                  }}
+                  label="1st Half for Selected"
+                />
+                <Switch
+                  checked={playerDetails.some((d, i) => selectedPlayers[i] && d.secondHalf)}
+                  onChange={() => {
+                    const newVal = !playerDetails.some((d, i) => selectedPlayers[i] && d.secondHalf);
+                    setPlayerDetails((prev) =>
+                      prev.map((d, i) =>
+                        selectedPlayers[i]
+                          ? { ...d, secondHalf: newVal }
+                          : d
+                      )
+                    );
+                  }}
+                  label="2nd Half for Selected"
+                />
+                <Switch
+                  checked={playerDetails.some((d, i) => selectedPlayers[i] && d.overtime)}
+                  onChange={() => {
+                    const newVal = !playerDetails.some((d, i) => selectedPlayers[i] && d.overtime);
+                    setPlayerDetails((prev) =>
+                      prev.map((d, i) =>
+                        selectedPlayers[i]
+                          ? { ...d, overtime: newVal }
+                          : d
+                      )
+                    );
+                  }}
+                  label="Overtime for Selected"
                 />
               </div>
-              <div className="flex flex-wrap gap-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={firstHalf}
-                    onChange={() => setFirstHalf(!firstHalf)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">1. Halbzeit</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={secondHalf}
-                    onChange={() => setSecondHalf(!secondHalf)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">2. Halbzeit</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={overtime}
-                    onChange={() => setOvertime(!overtime)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">Verlängerung</span>
-                </label>
-              </div>
             </div>
+          </CollapsibleSection>
 
+          <CollapsibleSection title="Clips & Resolution" defaultOpen={false}>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
-                Clips & Auflösung
-              </h3>
-              <div className="flex flex-wrap gap-4">
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={highlightClip}
-                    onChange={() => setHighlightClip(!highlightClip)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">Highlight-Clip</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={failClip}
-                    onChange={() => setFailClip(!failClip)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">Fail-Clip</span>
-                </label>
+              <div className="flex flex-wrap gap-6">
+                <Switch
+                  checked={playerDetails.some((d, i) => selectedPlayers[i] && d.highlightClip)}
+                  onChange={() => {
+                    const newVal = !playerDetails.some((d, i) => selectedPlayers[i] && d.highlightClip);
+                    setPlayerDetails((prev) =>
+                      prev.map((d, i) =>
+                        selectedPlayers[i]
+                          ? { ...d, highlightClip: newVal }
+                          : d
+                      )
+                    );
+                  }}
+                  label="Generate Highlight Clip"
+                />
+                <Switch
+                  checked={playerDetails.some((d, i) => selectedPlayers[i] && d.failClip)}
+                  onChange={() => {
+                    const newVal = !playerDetails.some((d, i) => selectedPlayers[i] && d.failClip);
+                    setPlayerDetails((prev) =>
+                      prev.map((d, i) =>
+                        selectedPlayers[i]
+                          ? { ...d, failClip: newVal }
+                          : d
+                      )
+                    );
+                  }}
+                  label="Generate Fail Clip"
+                />
               </div>
               <div className="space-y-2">
-                <label className="block text-gray-300">Auflösung</label>
+                <label className="block text-gray-300">Video Resolution:</label>
                 <select
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none"
+                  className="w-full px-4 py-3 bg-gray-700 rounded-lg focus:outline-none text-gray-200"
                 >
                   <option value="720p">720p</option>
                   <option value="1080p">1080p</option>
@@ -272,219 +498,120 @@ const CreateDemoModal = ({
                 </select>
               </div>
             </div>
-          </section>
+          </CollapsibleSection>
 
-          {/* 3. Economy & Keystrokes */}
-          <section className="grid grid-cols-2 gap-6">
+          <CollapsibleSection title="Economy & Keystrokes" defaultOpen={false}>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
-                Runden-Filter
-              </h3>
-              <div className="space-y-2">
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={skipPistol}
-                    onChange={() => setSkipPistol(!skipPistol)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">Pistol-Runden überspringen</span>
-                </label>
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={skipFullEco}
-                    onChange={() => setSkipFullEco(!skipFullEco)}
-                    className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                  />
-                  <span className="ml-2">Full-Eco überspringen</span>
-                </label>
+              <div className="flex flex-wrap gap-6">
+                <Switch
+                  checked={skipPistol}
+                  onChange={() => setSkipPistol((prev) => !prev)}
+                  label="Skip Pistol Rounds"
+                />
+                <Switch
+                  checked={skipFullEco}
+                  onChange={() => setSkipFullEco((prev) => !prev)}
+                  label="Skip Full Ecos"
+                />
               </div>
+              <Switch
+                checked={globalKeystrokes}
+                onChange={() => setGlobalKeystrokes((prev) => !prev)}
+                label="Show Keystrokes (Global)"
+              />
             </div>
+          </CollapsibleSection>
 
+          <CollapsibleSection title="Special Effects" defaultOpen={false}>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
-                Keystrokes
-              </h3>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={showKeystrokes}
-                  onChange={() => setShowKeystrokes(!showKeystrokes)}
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">Globale Keystrokes anzeigen</span>
-              </label>
+              <Switch
+                checked={customDeathScreens}
+                onChange={() => setCustomDeathScreens((prev) => !prev)}
+                label="Custom Death Screens"
+              />
+              <Switch
+                checked={removeWatermark}
+                onChange={() => setRemoveWatermark((prev) => !prev)}
+                label="Remove Watermark"
+              />
             </div>
-          </section>
+          </CollapsibleSection>
 
-          {/* 4. Per-Player-Darstellung */}
-          <section className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-300">
-              Optionen pro Spieler
-            </h3>
-            <div className="h-48 overflow-y-auto border border-gray-700 rounded-lg p-4 grid grid-cols-2 gap-4">
-              {perPlayerOptions.map((opt, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col bg-gray-800 rounded-lg p-3"
-                >
-                  <label className="inline-flex items-center mb-2">
-                    <input
-                      type="checkbox"
-                      checked={opt.enabled}
-                      onChange={() => togglePlayerOption(idx, 'enabled')}
-                      className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-700 rounded"
-                    />
-                    <span className="ml-2">{players[idx]}</span>
-                  </label>
-                  {opt.enabled && (
-                    <label className="inline-flex items-center mt-auto">
-                      <input
-                        type="checkbox"
-                        checked={opt.keystrokes}
-                        onChange={() =>
-                          togglePlayerOption(idx, 'keystrokes')
-                        }
-                        className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-700 rounded"
-                      />
-                      <span className="ml-2 text-sm">Keystrokes</span>
-                    </label>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 5. Zusätzliche Rendering-Optionen */}
-          <section className="grid grid-cols-2 gap-6">
+          <CollapsibleSection title="Generate Quizzes" defaultOpen={false}>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
-                Spezial-Effekte
-              </h3>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={customDeathScreens}
-                  onChange={() =>
-                    setCustomDeathScreens(!customDeathScreens)
+              <Switch
+                checked={generateQuizzes}
+                onChange={() => {
+                  setGenerateQuizzes((prev) => !prev);
+                  if (generateQuizzes) {
+                    setUtilQuizzes(false);
+                    setEconomyQuizzes(false);
                   }
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">Custom Death Screens</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={removeWatermark}
-                  onChange={() => setRemoveWatermark(!removeWatermark)}
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">Watermark entfernen</span>
-              </label>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-300">
-                Quizzes generieren
-              </h3>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={generateQuizzes}
-                  onChange={() => {
-                    setGenerateQuizzes(!generateQuizzes);
-                    if (generateQuizzes) {
-                      setUtilQuizzes(false);
-                      setEconomyQuizzes(false);
-                    }
-                  }}
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">Quizzes erstellen</span>
-              </label>
+                }}
+                label="Create Quizzes"
+              />
               {generateQuizzes && (
                 <div className="ml-6 space-y-2">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={utilQuizzes}
-                      onChange={() => setUtilQuizzes(!utilQuizzes)}
-                      className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                    />
-                    <span className="ml-2">Util-Quizzes</span>
-                  </label>
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={economyQuizzes}
-                      onChange={() => setEconomyQuizzes(!economyQuizzes)}
-                      className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                    />
-                    <span className="ml-2">Economy-Quizzes</span>
-                  </label>
+                  <Switch
+                    checked={utilQuizzes}
+                    onChange={() => setUtilQuizzes((prev) => !prev)}
+                    label="Utility Quizzes"
+                  />
+                  <Switch
+                    checked={economyQuizzes}
+                    onChange={() => setEconomyQuizzes((prev) => !prev)}
+                    label="Economy Quizzes"
+                  />
                 </div>
               )}
             </div>
-          </section>
+          </CollapsibleSection>
 
-          {/* 6. Weitere Rendering-Optionen */}
-          <section className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-300">
-              Zusätzliche Render-Optionen
-            </h3>
+          <CollapsibleSection title="Additional Render Options" defaultOpen={false}>
             <div className="flex flex-wrap gap-6">
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={render2DView}
-                  onChange={() => setRender2DView(!render2DView)}
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">2D-Ansicht rendern</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={team1Comms}
-                  onChange={() => setTeam1Comms(!team1Comms)}
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">Team 1 Voice Comms</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  checked={team2Comms}
-                  onChange={() => setTeam2Comms(!team2Comms)}
-                  className="form-checkbox h-5 w-5 text-yellow-400 bg-gray-800 rounded"
-                />
-                <span className="ml-2">Team 2 Voice Comms</span>
-              </label>
+              <Switch
+                checked={render2DView}
+                onChange={() => setRender2DView((prev) => !prev)}
+                label="Render 2D View"
+              />
+              <Switch
+                checked={team1Comms}
+                onChange={() => setTeam1Comms((prev) => !prev)}
+                label="Team 1 Voice Comms"
+              />
+              <Switch
+                checked={team2Comms}
+                onChange={() => setTeam2Comms((prev) => !prev)}
+                label="Team 2 Voice Comms"
+              />
             </div>
-          </section>
+          </CollapsibleSection>
         </div>
 
-        {/* Footer Actions */}
+        {/* Footer */}
         <div className="flex justify-end items-center px-8 py-6 border-t border-gray-700 bg-gray-800">
           <button
             onClick={onClose}
-            className="mr-4 px-5 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+            className="mr-4 px-5 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-gray-200"
           >
-            Abbrechen
+            Cancel
           </button>
           <button
             onClick={() => {
+              // Collect all settings and pass to parent handler
               const options = {
+                players: players
+                  .map((p, idx) => ({
+                    id: p.id,
+                    selected: selectedPlayers[idx],
+                    details: playerDetails[idx],
+                  }))
+                  .filter((p) => p.selected),
                 rounds,
-                halves: { firstHalf, secondHalf, overtime },
-                highlightClip,
-                failClip,
                 resolution,
                 skipPistol,
                 skipFullEco,
-                showKeystrokes,
-                perPlayerOptions,
+                globalKeystrokes,
                 customDeathScreens,
                 removeWatermark,
                 quizzes: { generateQuizzes, utilQuizzes, economyQuizzes },
@@ -492,11 +619,11 @@ const CreateDemoModal = ({
                 team1Comms,
                 team2Comms,
               };
-              // z.B. props.onCreateDemo(options);
+              // e.g. props.onCreateDemo(options);
             }}
-            className="px-6 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:opacity-90 transition-opacity"
+            className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:opacity-90 transition-opacity"
           >
-            Demo erstellen
+            Create Demo
           </button>
         </div>
       </div>
