@@ -2,50 +2,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { User } from 'lucide-react'; // Fallback user icon
+import { CollapsibleSection, Switch } from './SharedComponents';
 
-// Apple-style Switch (dark theme, yellow when on)
-export const Switch = ({ checked, onChange, label }) => (
-  <label className="flex items-center cursor-pointer">
-    <div className="relative">
-      <input
-        type="checkbox"
-        className="sr-only"
-        checked={checked}
-        onChange={onChange}
-      />
-      <div
-        className={`block w-10 h-6 rounded-full transition-colors ${
-          checked ? 'bg-yellow-400' : 'bg-gray-700'
-        }`}
-      />
-      <div
-        className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
-          checked ? 'translate-x-4' : 'translate-x-0'
-        }`}
-      />
-    </div>
-    {label && <span className="ml-3 select-none text-gray-200">{label}</span>}
-  </label>
-);
+//
+// Each PlayerCard includes ALL per-player demo options:
+//   • Rounds (text field) – guarded against undefined
+//   • Halves (1st half / 2nd half / overtime)
+//   • Clips (Highlight / Fail)
+//   • Resolution
+//   • Economy filters (Skip Pistol / Skip Full Eco)
+//   • Keystrokes
+//   • Special Effects (Custom Death Screens / Remove Watermark)
+//   • Quizzes (Generate + Util / Economy sub-options)
+//   • Additional Render (2D view / Team1 Comms / Team2 Comms)
+//   • “Apply this player’s settings to all” if “Apply to All” is ON.
+//
 
-// CollapsibleSection component
-export const CollapsibleSection = ({ title, children, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  return (
-    <div className="border-t border-gray-700">
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full flex justify-between items-center px-4 py-3 text-left bg-gray-800 hover:bg-gray-700 transition-colors"
-      >
-        <span className="text-lg font-semibold text-gray-200">{title}</span>
-        <span className="text-gray-400">{isOpen ? '−' : '+'}</span>
-      </button>
-      {isOpen && <div className="px-6 py-4">{children}</div>}
-    </div>
-  );
-};
-
-// PlayerCard: all demo‐options moved into each player’s card
 export const PlayerCard = ({
   player,
   index,
@@ -57,21 +30,30 @@ export const PlayerCard = ({
   highlighted,
   applySettingsToAll,
 }) => {
-  // Highlight the first player (index 0) with a thicker yellow border
+  // Highlight first player with a thick yellow border
   const borderClass = highlighted
     ? 'border-2 border-yellow-400'
     : 'border border-gray-700';
 
   return (
-    <div className={`flex flex-col bg-gray-800 rounded-lg p-4 ${borderClass}`}>
-      {/* Card Header: avatar, name, K/D/A, Faceit lvl, and switch to select player */}
+    <div
+      className={`flex flex-col bg-gray-800 rounded-lg p-4 ${borderClass}`}
+    >
+      {/* Header: avatar, name, KDA, Faceit level, toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <img
-            src={player.avatarUrl || '/placeholder-avatar.png'}
-            alt={`${player.name} avatar`}
-            className="w-10 h-10 rounded-full object-cover"
-          />
+          {player.avatarUrl ? (
+            <img
+              src={player.avatarUrl}
+              alt={`${player.name} avatar`}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-gray-400" />
+            </div>
+          )}
+
           <div>
             <div className="text-gray-200 font-semibold">{player.name}</div>
             <div className="text-gray-400 text-sm">
@@ -79,21 +61,24 @@ export const PlayerCard = ({
             </div>
           </div>
         </div>
+
+        {/* Apple-style switch to include/exclude this player */}
         <Switch checked={isSelected} onChange={onToggleSelect} label="" />
       </div>
 
-      {/* If selected, show all demo‐options in a collapsible panel */}
+      {/* If selected, show a collapsible “Player Settings” section */}
       {isSelected && (
         <CollapsibleSection title="Player Settings" defaultOpen={true}>
           <div className="space-y-4">
-            {/* Specific Rounds */}
+            {/* 1) Specific Rounds (text input) */}
             <div className="space-y-1">
               <label className="block text-gray-300">
                 Specific Rounds (e.g., 1,2,3):
               </label>
               <input
                 type="text"
-                value={details.rounds}
+                // Guard against undefined before calling trim()
+                value={typeof details.rounds === 'string' ? details.rounds : ''}
                 onChange={(e) =>
                   setDetails((prev) => ({ ...prev, rounds: e.target.value }))
                 }
@@ -102,7 +87,7 @@ export const PlayerCard = ({
               />
             </div>
 
-            {/* Halves */}
+            {/* 2) Halves */}
             <div className="space-y-1">
               <span className="text-gray-300">Halves:</span>
               <div className="flex gap-4">
@@ -139,7 +124,7 @@ export const PlayerCard = ({
               </div>
             </div>
 
-            {/* Highlight + Fail Clips */}
+            {/* 3) Clips */}
             <div className="flex flex-wrap gap-6">
               <Switch
                 checked={details.highlightClip}
@@ -154,13 +139,16 @@ export const PlayerCard = ({
               <Switch
                 checked={details.failClip}
                 onChange={() =>
-                  setDetails((prev) => ({ ...prev, failClip: !prev.failClip }))
+                  setDetails((prev) => ({
+                    ...prev,
+                    failClip: !prev.failClip,
+                  }))
                 }
                 label="Fail Clip"
               />
             </div>
 
-            {/* Video Resolution */}
+            {/* 4) Resolution */}
             <div className="space-y-1">
               <label className="block text-gray-300">Video Resolution:</label>
               <select
@@ -180,7 +168,7 @@ export const PlayerCard = ({
               </select>
             </div>
 
-            {/* Economy (Skip Pistol / Skip Full Eco) */}
+            {/* 5) Economy Filters */}
             <div className="flex flex-wrap gap-6">
               <Switch
                 checked={details.skipPistol}
@@ -204,16 +192,19 @@ export const PlayerCard = ({
               />
             </div>
 
-            {/* Keystrokes */}
+            {/* 6) Keystrokes */}
             <Switch
               checked={details.keystrokes}
               onChange={() =>
-                setDetails((prev) => ({ ...prev, keystrokes: !prev.keystrokes }))
+                setDetails((prev) => ({
+                  ...prev,
+                  keystrokes: !prev.keystrokes,
+                }))
               }
               label="Show Keystrokes"
             />
 
-            {/* Special Effects (Death Screens + Watermark) */}
+            {/* 7) Special Effects */}
             <div className="flex flex-wrap gap-6">
               <Switch
                 checked={details.customDeathScreens}
@@ -237,7 +228,7 @@ export const PlayerCard = ({
               />
             </div>
 
-            {/* Quizzes */}
+            {/* 8) Quizzes */}
             <div className="space-y-2">
               <Switch
                 checked={details.generateQuizzes}
@@ -277,7 +268,7 @@ export const PlayerCard = ({
               )}
             </div>
 
-            {/* Additional Render Options */}
+            {/* 9) Additional Render Options */}
             <div className="flex flex-wrap gap-6">
               <Switch
                 checked={details.render2DView}
@@ -311,7 +302,7 @@ export const PlayerCard = ({
               />
             </div>
 
-            {/* “Apply this player’s settings to all selected” */}
+            {/* 10) “Apply to All” button (if that toggle is ON) */}
             {applyAll && (
               <button
                 onClick={() => applySettingsToAll(index)}
@@ -328,23 +319,23 @@ export const PlayerCard = ({
 };
 
 const PlayerSelectionSection = () => {
-  // Dummy player data (name, KDA, Faceit level, avatar)
+  // 10 sample players; in real usage you’d fetch these from the parsed match/demo
   const [players] = useState(
     Array.from({ length: 10 }, (_, i) => ({
       id: i,
       name: `Player ${i + 1}`,
       kda: '0/0/0',
       faceitLevel: '1',
-      avatarUrl: '', // You can replace with real URLs later
+      avatarUrl: '', // empty == fallback icon
     }))
   );
 
-  // Track which players are checked
-  const [selectedPlayers, setSelectedPlayers] = useState(Array(10).fill(false));
-  // “Apply to all selected” switch
+  const [selectedPlayers, setSelectedPlayers] = useState(
+    Array(10).fill(false)
+  );
   const [applyToAll, setApplyToAll] = useState(false);
 
-  // Each player’s set of options
+  // Each player’s settings object—every field has a safe default.
   const [playerDetails, setPlayerDetails] = useState(
     Array.from({ length: 10 }, () => ({
       rounds: '',
@@ -368,56 +359,57 @@ const PlayerSelectionSection = () => {
     }))
   );
 
-  // Dynamically compute total cost
+  // Dynamically compute “estimated cost” whenever any toggle or selection changes.
   const [estimatedCost, setEstimatedCost] = useState(1);
   useEffect(() => {
-    let cost = 1; // base credit
-    selectedPlayers.forEach((sel, idx) => {
-      if (sel) {
-        cost++;
-        const d = playerDetails[idx];
-        if (d.rounds.trim()) cost++;
-        if (d.firstHalf) cost++;
-        if (d.secondHalf) cost++;
-        if (d.overtime) cost++;
-        if (d.highlightClip) cost++;
-        if (d.failClip) cost++;
-        if (d.resolution !== '1080p') cost++;
-        if (d.skipPistol) cost++;
-        if (d.skipFullEco) cost++;
-        if (d.keystrokes) cost++;
-        if (d.customDeathScreens) cost++;
-        if (d.removeWatermark) cost++;
-        if (d.generateQuizzes) cost++;
-        if (d.utilQuizzes) cost++;
-        if (d.economyQuizzes) cost++;
-        if (d.render2DView) cost++;
-        if (d.team1Comms) cost++;
-        if (d.team2Comms) cost++;
-      }
+    let cost = 1; // base cost
+    selectedPlayers.forEach((isSel, idx) => {
+      if (!isSel) return;
+      cost++; // Each selected player adds 1
+      const d = playerDetails[idx];
+
+      // Only call trim() if it’s a string
+      if (typeof d.rounds === 'string' && d.rounds.trim() !== '') cost++;
+      if (d.firstHalf) cost++;
+      if (d.secondHalf) cost++;
+      if (d.overtime) cost++;
+      if (d.highlightClip) cost++;
+      if (d.failClip) cost++;
+      if (d.resolution !== '1080p') cost++;
+      if (d.skipPistol) cost++;
+      if (d.skipFullEco) cost++;
+      if (d.keystrokes) cost++;
+      if (d.customDeathScreens) cost++;
+      if (d.removeWatermark) cost++;
+      if (d.generateQuizzes) cost++;
+      if (d.utilQuizzes) cost++;
+      if (d.economyQuizzes) cost++;
+      if (d.render2DView) cost++;
+      if (d.team1Comms) cost++;
+      if (d.team2Comms) cost++;
     });
     setEstimatedCost(cost);
   }, [selectedPlayers, playerDetails]);
 
-  // Toggle a single player’s checkbox
+  // Toggle one player’s inclusion
   const togglePlayerSelect = (idx) => {
-    setSelectedPlayers((prev) =>
-      prev.map((v, i) => (i === idx ? !v : v))
-    );
+    setSelectedPlayers((prev) => prev.map((v, i) => (i === idx ? !v : v)));
   };
 
-  // Copy one player’s settings to all other selected players
+  // Copy one player’s settings to all other checked players
   const applySettingsToAll = (sourceIdx) => {
     if (!selectedPlayers[sourceIdx]) return;
     const source = playerDetails[sourceIdx];
     setPlayerDetails((prev) =>
-      prev.map((d, i) => (selectedPlayers[i] ? { ...source } : d))
+      prev.map((d, i) =>
+        selectedPlayers[i] ? { ...source } : d
+      )
     );
   };
 
   return (
     <div className="space-y-6">
-      {/* Header with “Apply to All” switch */}
+      {/* 2 columns of PlayerCards */}
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold text-gray-300">Select Players</h3>
         <Switch
@@ -427,7 +419,6 @@ const PlayerSelectionSection = () => {
         />
       </div>
 
-      {/* Two-column grid of PlayerCard components */}
       <div className="grid grid-cols-2 gap-6">
         {players.map((player, idx) => (
           <PlayerCard
@@ -438,34 +429,37 @@ const PlayerSelectionSection = () => {
             onToggleSelect={() => togglePlayerSelect(idx)}
             applyAll={applyToAll}
             details={playerDetails[idx]}
-            setDetails={(newDetails) =>
+            setDetails={(newD) =>
               setPlayerDetails((prev) =>
-                prev.map((d, i) => (i === idx ? newDetails : d))
+                prev.map((d, i) => (i === idx ? newD : d))
               )
             }
-            highlighted={idx === 0} // highlight top-left player
+            highlighted={idx === 0} // first player is “highlighted”
             applySettingsToAll={applySettingsToAll}
           />
         ))}
       </div>
 
-      {/* Footer: cost + “Create Demo” button */}
+      {/* Footer: show total cost + “Create Demo” button */}
       <div className="flex justify-between items-center pt-4 border-t border-gray-700">
         <div className="text-gray-400">
           Total Estimated Cost:{' '}
-          <span className="font-bold text-yellow-400">{estimatedCost} credits</span>
+          <span className="font-bold text-yellow-400">
+            {estimatedCost} credits
+          </span>
         </div>
         <button
           onClick={() => {
+            // Collect only selected players + their settings
             const selectedData = players
               .map((p, i) => ({
                 ...p,
                 selected: selectedPlayers[i],
                 settings: playerDetails[i],
               }))
-              .filter((p) => p.selected);
-            const options = { players: selectedData };
-            // Call parent handler here, e.g. props.onCreateDemo(options)
+              .filter((x) => x.selected);
+            // Pass { players: selectedData } up to parent
+            // e.g. props.onCreateDemo({ players: selectedData });
           }}
           className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:opacity-90 transition-opacity"
         >

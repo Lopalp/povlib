@@ -21,27 +21,32 @@ const CreateDemoModal = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPlayers, setShowPlayers] = useState(false);
 
-  // When user submits a link, trigger parent handler and show a loading message
+  // 1) Handler for "Run Link"
   const handleMatchSubmit = (e) => {
     e.preventDefault();
     if (!matchLink) return;
+    // Trigger parent callback (but do NOT close the modal)
     onMatchLinkSubmit(e);
     setHasSubmitted(true);
     setIsProcessing(true);
-    // Simulate a brief preprocessing delay
+
+    // Simulate a brief preprocessing delay, then show players
     setTimeout(() => {
       setIsProcessing(false);
       setShowPlayers(true);
     }, 1500);
   };
 
-  // Similarly for file upload
+  // 2) Handler for "Run Upload"
   const handleFileSubmit = (e) => {
     e.preventDefault();
     if (!selectedFile) return;
+    // Trigger parent callback (but do NOT close the modal)
     onFileSubmit(e);
     setHasSubmitted(true);
     setIsProcessing(true);
+
+    // Simulate a brief preprocessing delay, then show players
     setTimeout(() => {
       setIsProcessing(false);
       setShowPlayers(true);
@@ -67,13 +72,16 @@ const CreateDemoModal = ({
           </button>
         </div>
 
-        {/* Content */}
+        {/* Content Container */}
         <div className="px-8 py-6 text-gray-200 overflow-y-auto custom-scrollbar">
-          {/* Step 1: Show match-link / file-upload forms until something is submitted */}
+          {/* Step 1: Match Data Input (only shown before any submission) */}
           {!hasSubmitted && (
             <section className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-300">Submit Match Data</h3>
+              <h3 className="text-xl font-semibold text-gray-300">
+                Submit Match Data
+              </h3>
               <div className="flex gap-4">
+                {/* Paste Link */}
                 <form onSubmit={handleMatchSubmit} className="flex-1 flex gap-2">
                   <input
                     type="text"
@@ -90,8 +98,14 @@ const CreateDemoModal = ({
                     Run Link
                   </button>
                 </form>
+
                 <span className="self-center text-gray-500">OR</span>
-                <form onSubmit={handleFileSubmit} className="flex-1 flex items-center gap-2">
+
+                {/* Upload .dem File */}
+                <form
+                  onSubmit={handleFileSubmit}
+                  className="flex-1 flex items-center gap-2"
+                >
                   <label className="flex-1 px-4 py-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition text-center text-gray-200">
                     {selectedFile ? selectedFile.name : 'Upload .dem file'}
                     <input
@@ -111,6 +125,7 @@ const CreateDemoModal = ({
                 </form>
               </div>
               {uploadError && <p className="text-red-500">{uploadError}</p>}
+
               <button
                 onClick={onLinkAccount}
                 className="mt-2 px-4 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors text-gray-200"
@@ -120,19 +135,21 @@ const CreateDemoModal = ({
             </section>
           )}
 
-          {/* Step 2: Show loading message while “processing” */}
+          {/* Step 2: Loading Indicator (shown immediately after submitting link/file) */}
           {hasSubmitted && isProcessing && (
             <div className="flex flex-col items-center justify-center py-20">
-              <div className="animate-pulse text-gray-300">Preprocessing match data…</div>
+              <div className="animate-pulse text-gray-300">
+                Preprocessing match data…
+              </div>
               <div className="text-gray-500 mt-2">This may take a moment.</div>
             </div>
           )}
 
-          {/* Step 3: Once preprocessing is done, show the player selection area */}
+          {/* Step 3: Player Selection (appears once preprocessing is done) */}
           {showPlayers && <PlayerSelectionSection />}
         </div>
 
-        {/* Footer: only show “Cancel” button until players appear */}
+        {/* Footer (only Cancel button until players appear) */}
         {!showPlayers && (
           <div className="flex justify-end items-center px-8 py-6 border-t border-gray-700 bg-gray-800">
             <button
