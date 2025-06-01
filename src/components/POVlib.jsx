@@ -386,7 +386,7 @@ const POVlib = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white">
       <style jsx>{`
         .bg-pattern {
           background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
@@ -418,7 +418,7 @@ const POVlib = () => {
         />
       )}
 
-      <main className="container mx-auto px-6 py-6 bg-pattern">
+      <main className="container mx-auto px-6 pt-8 bg-pattern">
         <SelectedFilters
           filtersApplied={filtersApplied}
           setFiltersApplied={setFiltersApplied}
@@ -426,7 +426,7 @@ const POVlib = () => {
         />
 
         {/* Filter Icon + Tag Bar */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-4">
           <Filter
             onClick={() => setIsFilterModalOpen(true)}
             className="text-yellow-400 cursor-pointer"
@@ -436,7 +436,7 @@ const POVlib = () => {
               <button
                 key={tag}
                 onClick={() => handleTagClick(tag)}
-                className="px-3 py-1 bg-gray-800 rounded-full text-sm hover:bg-yellow-400/20 transition-colors"
+                className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 hover:border-yellow-400 transition-colors"
               >
                 {tag}
               </button>
@@ -456,7 +456,9 @@ const POVlib = () => {
         />
 
         {/* Competition Module */}
-        <CompetitionModule />
+        <div className="mt-8">
+          <CompetitionModule />
+        </div>
 
         {/* Plan Comparison Module inserted directly under CompetitionModule */}
         <div className="mt-8">
@@ -481,24 +483,24 @@ const POVlib = () => {
         {/* Revised Navigation Cards Below */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Link href="/players" className="relative block rounded-xl overflow-hidden group">
+            <Link href="/players" className="relative block rounded-2xl overflow-hidden shadow-lg group">
               <img
                 src="/images/players-example.png"
                 alt="Players"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                 <h3 className="text-white text-2xl font-bold group-hover:underline">Players</h3>
                 <p className="text-gray-300">View all players</p>
               </div>
             </Link>
-            <Link href="/maps" className="relative block rounded-xl overflow-hidden group">
+            <Link href="/maps" className="relative block rounded-2xl overflow-hidden shadow-lg group">
               <img
                 src="/images/maps-example.png"
                 alt="Maps"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
                 <h3 className="text-white text-2xl font-bold group-hover:underline">Maps</h3>
                 <p className="text-gray-300 text-center">View all maps</p>
               </div>
