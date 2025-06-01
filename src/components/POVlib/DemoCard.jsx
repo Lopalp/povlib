@@ -31,9 +31,9 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
         <div
           className="absolute inset-0 bg-cover bg-center transform scale-110"
           style={{ backgroundImage: `url(${demo.thumbnail})` }}
-        ></div>
+        />
         {/* Dark overlay to improve contrast */}
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
       {/* ======= Actual Thumbnail on Top ======= */}
@@ -57,7 +57,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       </div>
 
       {/* ======= Content Section with Glassmorphism (no top-rounded corners) ======= */}
-      <div className={`mt-auto p-4 space-y-3 ${glassBg}`}>
+      <div className={`p-4 space-y-3 ${glassBg}`}>
         {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
@@ -76,8 +76,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
         <div className="border-t border-gray-600"></div>
 
-        {/* ----- Player + KDA ----- */}
-        <section className="flex items-center justify-between mb-4">
+        {/* ----- Player + KDA (with extra bottom spacing before next divider) ----- */}
+        <section className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <User className="h-5 w-5 text-gray-300" />
             {demo.players.slice(0, 1).map((player, idx) => (
@@ -96,8 +96,8 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           </div>
         </section>
 
-        {/* ----- Tags + Positions (keep normal spacing) ----- */}
-        <section className="flex flex-wrap gap-2 mb-4">
+        {/* ----- Tags + Positions (optional) ----- */}
+        <section className="flex flex-wrap gap-2">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
             <span
               key={i}
