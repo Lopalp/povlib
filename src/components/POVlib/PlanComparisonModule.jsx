@@ -95,16 +95,16 @@ const PlanComparisonModule = ({ currentPlan }) => {
     return (
       <>
         <div className="bg-gray-800 rounded-2xl p-8 shadow-lg text-center text-gray-200">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className="text-2xl font-bold mb-4 text-white">
             You’re on the highest plan!
           </h2>
-          <p className="mb-6">
-            You already have the <span className="font-semibold">{currentPlanData.name}</span> plan,
+          <p className="mb-6 text-gray-300">
+            You already have the <span className="font-semibold text-white">{currentPlanData.name}</span> plan,
             which offers all available features.
           </p>
           <button
             onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
-            className="inline-flex items-center px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             <X className="w-5 h-5 mr-2" />
             Manage Subscription
@@ -128,7 +128,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
   // 4) Anzeige der aktuellen Plan-Karte und des nächsten Plankarte
   return (
     <>
-      <section className="bg-gray-800 rounded-2xl p-8 space-y-6 shadow-lg">
+      <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-white">Compare Your Plan</h2>
@@ -144,7 +144,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
         {/* Vergleichsgitter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Aktueller Plan */}
-          <div className="border border-gray-700 rounded-lg p-6 flex flex-col">
+          <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-800">
             <h3 className="text-lg font-bold mb-2 text-gray-200">
               {currentPlanData.name}
             </h3>
@@ -167,7 +167,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
           </div>
 
           {/* Nächster Plan */}
-          <div className="border border-gray-700 rounded-lg p-6 flex flex-col bg-gray-900 shadow-md">
+          <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-900 shadow-md">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold mb-2 text-white">
                 {nextPlanData.name}
@@ -194,7 +194,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
 
         <button
           onClick={() => setIsCompareOpen(true)}
-          className="mt-6 px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg w-full hover:bg-gray-600 transition-colors"
+          className="mt-6 px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg w-full hover:bg-gray-700 transition-colors"
         >
           View All Plans
         </button>
