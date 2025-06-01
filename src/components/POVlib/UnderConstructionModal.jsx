@@ -23,10 +23,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <PlayCircle className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Our Demo Library is a curated collection of the best POV clips you’ve ever seen. Explore highlights from top matches, save your favorites, and discover new plays every day. While we put the finishing touches on this section, imagine having instant access to top-tier demos—all in one place.`,
-      cta: {
-        label: 'Go to Demo Library',
-        href: '/demos',
-      },
+      href: '/demos',
     },
     {
       key: 'extendedPlayer',
@@ -34,10 +31,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <Settings2 className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Experience your demos like never before with our Extended Demo Player. Slow motion, heatmaps, advanced scoreboard overlays, and multi-angle views are coming soon. Whether you’re analyzing a clutch moment or perfecting your angles, this player will be your go-to tool for deep, frame-by-frame breakdowns.`,
-      cta: {
-        label: 'Try Extended Player',
-        href: '/player',
-      },
+      href: '/player',
     },
     {
       key: 'watchAnywhere',
@@ -45,10 +39,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <Tv className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Never miss a beat—watch your demos on any device, wherever you go. Desktop, tablet, or mobile: our responsive viewer will let you relive your best plays on the bus, at the café, or while you’re on the road to the next LAN. Stay connected and keep your skills sharp, no matter where you are.`,
-      cta: {
-        label: 'Learn More',
-        href: '/watch-anywhere',
-      },
+      href: '/watch-anywhere',
     },
     {
       key: 'utilityBook',
@@ -56,46 +47,31 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       icon: <BookOpen className="h-8 w-8 text-yellow-400" />,
       imageSrc: '/demo.png',
       description: `Unlock exclusive strategies and grenade lineups straight from pro players with our Utility Book. Step-by-step breakdowns, annotated screenshots, and insider tips will elevate your game to the next level. Think of it as a living textbook—compiled by champions, for champions.`,
-      cta: {
-        label: 'View Utility Book',
-        href: '/utility-book',
-      },
+      href: '/utility-book',
     },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
+    if (!isOpen) {
       setCurrentIndex(0);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const { title, icon, imageSrc, description, cta } = tabs[currentIndex];
+  const { title, icon, imageSrc, description, href } = tabs[currentIndex];
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentIndex((idx) => idx - 1);
-        setIsVisible(true);
-      }, 200);
+      setCurrentIndex((idx) => idx - 1);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < tabs.length - 1) {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentIndex((idx) => idx + 1);
-        setIsVisible(true);
-      }, 200);
+      setCurrentIndex((idx) => idx + 1);
     }
   };
 
@@ -115,11 +91,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
         <div className="absolute inset-0 bg-black/60 z-10" />
 
         {/* Content Panel (Glass Effect) */}
-        <div
-          className={`relative z-20 mx-4 sm:mx-0 bg-black/30 backdrop-blur-lg border border-gray-700 rounded-2xl px-6 py-8 sm:px-8 sm:py-10 transform transition-all duration-500 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-        >
+        <div className="relative z-20 mx-4 sm:mx-0 bg-black/30 backdrop-blur-lg border border-gray-700 rounded-2xl px-6 py-8 sm:px-8 sm:py-10">
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -145,14 +117,17 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          {/* Icon and Title */}
-          <div className="flex flex-col items-center mb-4">
-            <div className="bg-yellow-400/20 rounded-full p-3 mb-2">
-              {icon}
-            </div>
+          {/* Title + Icon Link */}
+          <div className="flex items-center justify-center mb-4 gap-2">
+            <div className="bg-yellow-400/20 rounded-full p-2">{icon}</div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white text-center">
               {title}
             </h2>
+            <Link href={href}>
+              <a className="text-yellow-400 hover:text-yellow-300 ml-2">
+                <ArrowRightCircle className="h-6 w-6" />
+              </a>
+            </Link>
           </div>
 
           {/* Divider */}
@@ -162,16 +137,6 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed text-center mb-8">
             {description}
           </p>
-
-          {/* CTA Button */}
-          <div className="flex justify-center mb-8">
-            <Link href={cta.href}>
-              <a className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 text-gray-900 font-semibold text-sm sm:text-base rounded-md hover:bg-yellow-300 transition-all duration-200 shadow-[0_0_15px_rgba(250,204,21,0.6)]">
-                {cta.label}
-                <ArrowRightCircle className="h-5 w-5" />
-              </a>
-            </Link>
-          </div>
 
           {/* Navigation Buttons */}
           <div className="flex justify-between items-center mb-4">
