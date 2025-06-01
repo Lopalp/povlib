@@ -80,88 +80,111 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
       }}
     >
       <div
-        className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl w-full max-w-4xl sm:max-w-5xl lg:max-w-6xl max-h-[80vh] overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]"
+        className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]"
       >
         {/* Header */}
-        <div className="flex justify-between items-center px-5 py-4 border-b border-gray-700">
-          <h2 className="text-lg sm:text-xl font-bold text-white">Compare Plans</h2>
+        <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-700">
+          <h2 className="text-lg md:text-xl font-bold text-white">Compare Plans</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-yellow-400 transition-colors"
           >
-            <X className="h-5 w-5 sm:h-6 sm:w-6" />
+            <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Body: Grid mit responsiven Spalten */}
-        <div className="p-4 sm:p-6">
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {plans.map(({ key, name, priceLabel, features, highlight }) => {
-              // Gemeinsame Basis-Klassen für alle Karten
-              const baseCardClasses =
-                'rounded-lg p-5 flex flex-col justify-between min-h-[320px]';
-
-              // Unterschiedliche Stile für "advanced" vs. alle anderen
-              const cardClasses =
-                key === 'advanced'
-                  ? `${baseCardClasses} bg-gray-800 border-2 border-yellow-400 ring-2 ring-yellow-300 shadow-lg`
-                  : `${baseCardClasses} bg-gray-800 border border-gray-700`;
-
-              return (
-                <div key={key} className={cardClasses}>
-                  {/* Empfohlene Badge nur für "advanced" */}
-                  {key === 'advanced' && (
-                    <div className="absolute -top-2 right-2 bg-yellow-400 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
-                      Recommended
-                    </div>
-                  )}
-
-                  <div className="mt-4">
-                    <h3 className="text-lg font-bold mb-2 text-white">{name}</h3>
-                    <p className="text-2xl sm:text-3xl font-extrabold mb-4 text-yellow-400">
-                      {priceLabel}
-                    </p>
-                    <ul className="mb-4 text-gray-300 space-y-2">
-                      {features.map((f, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="mr-2 text-yellow-400">★</span>
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    {highlight && (
-                      <p className="mb-4 text-sm italic text-gray-400">{highlight}</p>
-                    )}
+        <div className="p-4 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {plans.map(({ key, name, priceLabel, features, highlight }) => (
+              <div
+                key={key}
+                className={`
+                  relative
+                  flex flex-col justify-between
+                  rounded-lg
+                  overflow-hidden
+                  ${
+                    key === 'advanced'
+                      ? 'bg-gray-900 ring-2 ring-yellow-400 shadow-lg'
+                      : 'bg-gray-800 border border-gray-700'
+                  }
+                `}
+              >
+                {/* „Recommended“-Badge nur für Advanced */}
+                {key === 'advanced' && (
+                  <div className="absolute -top-3 right-3 bg-yellow-400 text-gray-900 text-xs font-semibold px-2 py-1 rounded-full">
+                    Recommended
                   </div>
+                )}
 
-                  {/* Auswahl-Button */}
+                <div className="p-4 md:p-6 flex-1">
+                  <h3
+                    className={`font-bold mb-2 ${
+                      key === 'advanced' ? 'text-white' : 'text-gray-200'
+                    } text-base md:text-lg`}
+                  >
+                    {name}
+                  </h3>
+                  <p
+                    className={`font-extrabold mb-4 ${
+                      key === 'advanced' ? 'text-yellow-400' : 'text-yellow-400'
+                    } text-2xl md:text-3xl`}
+                  >
+                    {priceLabel}
+                  </p>
+                  <ul
+                    className={`mb-4 space-y-2 ${
+                      key === 'advanced' ? 'text-gray-300' : 'text-gray-400'
+                    } text-sm md:text-base`}
+                  >
+                    {features.map((f, i) => (
+                      <li key={i} className="flex items-start">
+                        <span className="mr-2">
+                          {key === 'advanced' ? '★' : '•'}
+                        </span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {highlight && (
+                    <p
+                      className={`italic text-sm md:text-base ${
+                        key === 'advanced' ? 'text-gray-400' : 'text-gray-500'
+                      }`}
+                    >
+                      {highlight}
+                    </p>
+                  )}
+                </div>
+
+                {/* Auswahl-Button */}
+                <div className="p-4 md:p-6">
                   {currentPlan === key ? (
                     <button
                       disabled
-                      className="mt-2 px-4 py-2 font-semibold rounded-md w-full bg-gray-700 text-gray-500 cursor-not-allowed"
+                      className="w-full px-4 py-2 font-semibold rounded-lg bg-gray-700 text-gray-500 cursor-not-allowed text-sm md:text-base"
                     >
                       Current Plan
                     </button>
                   ) : (
                     <Link href={`/checkout?plan=${key}`}>
-                      {/**
-                       * Primär-Button (gelb) für advanced
-                       * Sekundär-Button (weiß auf grau) für die anderen
-                       */}
                       {key === 'advanced' ? (
-                        <button className="mt-2 flex items-center justify-center gap-2 px-4 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition w-full">
+                        // Primär-Button auf dunklem Hintergrund
+                        <button className="w-full flex items-center justify-center gap-2 px-4 md:px-5 py-2 md:py-2.5 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition text-sm md:text-base">
                           {buttonLabel(key, priceLabel)}
                         </button>
                       ) : (
-                        <button className="mt-2 flex items-center justify-center gap-1 px-3 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition w-full">
+                        // Sekundär-Button
+                        <button className="w-full flex items-center justify-center gap-2 px-3 md:px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition text-sm md:text-base">
                           {buttonLabel(key, priceLabel)}
                         </button>
                       )}
                     </Link>
                   )}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </div>
