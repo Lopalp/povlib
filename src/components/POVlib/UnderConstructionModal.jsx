@@ -54,7 +54,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       setTimeout(() => {
         setCurrentIndex((idx) => idx - 1);
         setIsVisible(true);
-      }, 300);
+      }, 200);
     }
   };
 
@@ -64,92 +64,86 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       setTimeout(() => {
         setCurrentIndex((idx) => idx + 1);
         setIsVisible(true);
-      }, 300);
+      }, 200);
     }
   };
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative bg-gray-900 border border-gray-700 rounded-2xl max-w-2xl w-full p-4 sm:p-6 md:p-8 shadow-[0_0_25px_rgba(0,0,0,0.6)] overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-transparent rounded-2xl overflow-hidden shadow-xl">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-yellow-400 transition-colors z-20"
+          className="absolute top-4 right-4 z-20 text-gray-300 hover:text-yellow-400 transition-colors"
         >
           <X className="h-6 w-6" />
         </button>
 
-        {/* Content Container */}
+        {/* Image Section */}
+        <div className="w-full h-64 sm:h-80 md:h-96 overflow-hidden">
+          <img
+            src={imageSrc}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Glass Panel with Content */}
         <div
-          className={`transition-all duration-500 ${
+          className={`bg-black/40 backdrop-blur-lg border border-gray-700 rounded-b-2xl px-6 py-8 transform transition-all duration-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
           {/* Title */}
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-4">
             {title}
           </h2>
 
-          {/* Image */}
-          <div className="w-full h-48 md:h-56 lg:h-64 mb-6 overflow-hidden rounded-lg border border-gray-700 shadow-lg">
-            <img
-              src={imageSrc}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-
           {/* Description */}
-          <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-8 px-2 sm:px-0 text-center">
+          <p className="text-gray-300 text-base sm:text-lg leading-relaxed text-center mb-8">
             {description}
           </p>
-        </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between items-center mt-2">
-          {currentIndex > 0 ? (
-            <button
-              onClick={handlePrev}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-gray-700 text-white hover:bg-gray-600"
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center mb-6">
+            {currentIndex > 0 ? (
+              <button
+                onClick={handlePrev}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors"
+              >
+                <ChevronLeft className="h-5 w-5" />
+                <span className="hidden sm:inline">Previous</span>
+              </button>
+            ) : <div /> }
+
+            {currentIndex < tabs.length - 1 ? (
+              <button
+                onClick={handleNext}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            ) : <div /> }
+          </div>
+
+          {/* Footer / Call to Action */}
+          <div className="text-center">
+            <p className="text-gray-400 italic mb-4">
+              Everything here is a demo—features may be incomplete or non-functional.
+            </p>
+            <a
+              href="https://discord.gg/XDwTABQr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#5865F2] text-white font-semibold text-sm sm:text-base rounded-md hover:bg-[#4752C4] transition-colors shadow-[0_0_15px_rgba(88,101,242,0.5)]"
             >
-              <ChevronLeft className="h-5 w-5" />
-              <span className="hidden sm:inline">Previous</span>
-            </button>
-          ) : (
-            <div className="w-24" /> {/* placeholder to keep spacing */}
-          )}
-
-          {currentIndex < tabs.length - 1 ? (
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-gray-700 text-white hover:bg-gray-600"
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          ) : (
-            <div className="w-24" /> {/* placeholder to keep spacing */}
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-8 pt-4 border-t border-gray-800 text-center">
-          <p className="text-gray-400 italic mb-4">
-            Everything here is a demo—features may be incomplete or non-functional.
-          </p>
-          <a
-            href="https://discord.gg/XDwTABQr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#5865F2] text-white font-semibold text-sm sm:text-base rounded-md hover:bg-[#4752C4] transition-all duration-200 shadow-[0_0_15px_rgba(88,101,242,0.5)]"
-          >
-            Join Our Server
-          </a>
+              Join Our Server
+            </a>
+          </div>
         </div>
       </div>
     </div>
