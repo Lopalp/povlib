@@ -3,51 +3,30 @@ import { X, Map as MapIcon, Users, Calendar, Trophy, Zap, Slider, Tag } from 'lu
 
 const FilterModal = ({
   demoType,
+  filterOptions,
   filtersApplied,
   onClose,
   onFilterChange,
   onResetFilters,
   onApplyFilters
 }) => {
-  // Hardcoded map list
-  const maps = ['Dust2', 'Mirage', 'Inferno', 'Nuke', 'Overpass'];
-
-  // For each map, exactly 5 CT default positions (example placeholders)
-  const positions = {
-    Dust2: ['A Long CT', 'A Site CT', 'Mid CT', 'B Site CT', 'CT Spawn'],
-    Mirage: ['A Ramp CT', 'A Site CT', 'Palace CT', 'Connector CT', 'CT Spawn'],
-    Inferno: ['A Site CT', 'Arch CT', 'Balcony CT', 'Library CT', 'CT Spawn'],
-    Nuke: ['Ramp CT', 'Silo CT', 'Heaven CT', 'Lobby CT', 'CT Spawn'],
-    Overpass: ['A Site CT', 'Heaven CT', 'Connector CT', 'B Site CT', 'CT Spawn'],
-  };
-
-  // Hardcoded roles list
-  const roles = ['IGL', 'Support', 'Entry', 'Lurk', 'AWP', 'Rifler'];
-
-  // Hardcoded platform/league options
-  const leagueOptions = [
-    'Faceit',
-    'Faceit Top 1000',
-    'Faceit Pro League',
-    'ESEA',
-    'Pro Esport',
-    'Pros Playing Faceit',
-  ];
-
   const [availablePositions, setAvailablePositions] = useState([]);
 
-  // Update availablePositions whenever the selected map changes
+  // Update available positions whenever the selected map changes
   useEffect(() => {
     if (filtersApplied.map) {
-      setAvailablePositions(positions[filtersApplied.map] || []);
+      // Pull the positions array for the selected map; if undefined, fallback to an empty array
+      const positionsForMap = filterOptions.positions[filtersApplied.map] || [];
+      // Always include the five default CT positions if they exist
+      setAvailablePositions(positionsForMap);
     } else {
-      // If no map is selected, show all positions de-duplicated
-      const allPos = Object.values(positions)
+      // If no map selected, flatten all positions (deduplicated) from filterOptions.positions
+      const allPositions = Object.values(filterOptions.positions)
         .flat()
         .filter((pos, idx, arr) => arr.indexOf(pos) === idx);
-      setAvailablePositions(allPos);
+      setAvailablePositions(allPositions);
     }
-  }, [filtersApplied.map]);
+  }, [filtersApplied.map, filterOptions.positions]);
 
   return (
     <div
@@ -104,21 +83,19 @@ const FilterModal = ({
                 </label>
                 <select
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                  value={filtersApplied.map || ''}
-                  onChange={(e) =>
-                    onFilterChange({ map: e.target.value, position: '' })
-                  }
+                  value={filtersApplied.map}
+                  onChange={(e) => onFilterChange({ map: e.target.value, position: '' })}
                 >
                   <option value="">All Maps</option>
-                  {maps.map((mapName) => (
-                    <option key={mapName} value={mapName}>
-                      {mapName}
+                  {filterOptions.maps.map((map) => (
+                    <option key={map} value={map}>
+                      {map}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Position Selector */}
+              {/* Position Selector (depends on selected map) */}
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-300 mb-2">
                   <MapIcon className="h-4 w-4 mr-2 text-yellow-400" />
@@ -126,7 +103,7 @@ const FilterModal = ({
                 </label>
                 <select
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                  value={filtersApplied.position || ''}
+                  value={filtersApplied.position}
                   onChange={(e) => onFilterChange({ position: e.target.value })}
                   disabled={!filtersApplied.map}
                 >
@@ -148,11 +125,11 @@ const FilterModal = ({
               </label>
               <select
                 className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                value={filtersApplied.role || ''}
+                value={filtersApplied.role}
                 onChange={(e) => onFilterChange({ role: e.target.value })}
               >
                 <option value="">All Roles</option>
-                {roles.map((role) => (
+                {filterOptions.roles.map((role) => (
                   <option key={role} value={role}>
                     {role}
                   </option>
@@ -160,7 +137,7 @@ const FilterModal = ({
               </select>
             </div>
 
-            {/* Elo Range */}
+            {/* Elo Range Slider */}
             <div>
               <label className="flex items-center text-sm font-medium text-gray-300 mb-2">
                 <Slider className="h-4 w-4 mr-2 text-yellow-400" />
@@ -173,7 +150,7 @@ const FilterModal = ({
                   max="10000"
                   className="w-1/2 p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                   placeholder="Min Elo"
-                  value={filtersApplied.eloMin || ''}
+                  value={filtersApplied.eloMin}
                   onChange={(e) => onFilterChange({ eloMin: e.target.value })}
                 />
                 <input
@@ -182,7 +159,7 @@ const FilterModal = ({
                   max="10000"
                   className="w-1/2 p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                   placeholder="Max Elo"
-                  value={filtersApplied.eloMax || ''}
+                  value={filtersApplied.eloMax}
                   onChange={(e) => onFilterChange({ eloMax: e.target.value })}
                 />
               </div>
@@ -193,10 +170,8 @@ const FilterModal = ({
               <input
                 id="povlib-originals"
                 type="checkbox"
-                checked={filtersApplied.povlibOriginals || false}
-                onChange={(e) =>
-                  onFilterChange({ povlibOriginals: e.target.checked })
-                }
+                checked={filtersApplied.povlibOriginals}
+                onChange={(e) => onFilterChange({ povlibOriginals: e.target.checked })}
                 className="h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded focus:ring-yellow-400"
               />
               <label
@@ -214,28 +189,35 @@ const FilterModal = ({
                 Platform / League
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {leagueOptions.map((league) => (
-                  <label key={league} className="flex items-center space-x-2">
+                {[
+                  'Faceit',
+                  'Faceit Top 1000',
+                  'Faceit Pro League',
+                  'ESEA',
+                  'Pro Esport',
+                  'Pros Playing Faceit'
+                ].map((plat) => (
+                  <label key={plat} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      value={league}
-                      checked={filtersApplied.platforms?.includes(league) || false}
+                      value={plat}
+                      checked={filtersApplied.platforms?.includes(plat) || false}
                       onChange={(e) => {
                         const checked = e.target.checked;
                         const prev = filtersApplied.platforms || [];
                         if (checked) {
                           onFilterChange({
-                            platforms: [...prev, league]
+                            platforms: [...prev, plat]
                           });
                         } else {
                           onFilterChange({
-                            platforms: prev.filter((p) => p !== league)
+                            platforms: prev.filter((p) => p !== plat)
                           });
                         }
                       }}
                       className="h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded focus:ring-yellow-400"
                     />
-                    <span className="text-sm text-gray-300">{league}</span>
+                    <span className="text-sm text-gray-300">{plat}</span>
                   </label>
                 ))}
               </div>
@@ -250,7 +232,7 @@ const FilterModal = ({
                 </label>
                 <input
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                  value={filtersApplied.player || ''}
+                  value={filtersApplied.player}
                   onChange={(e) => onFilterChange({ player: e.target.value })}
                   placeholder="Search Player"
                 />
@@ -264,7 +246,7 @@ const FilterModal = ({
                   </label>
                   <input
                     className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                    value={filtersApplied.team || ''}
+                    value={filtersApplied.team}
                     onChange={(e) => onFilterChange({ team: e.target.value })}
                     placeholder="Search Team"
                   />
@@ -281,7 +263,7 @@ const FilterModal = ({
                 </label>
                 <input
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                  value={filtersApplied.year || ''}
+                  value={filtersApplied.year}
                   onChange={(e) => onFilterChange({ year: e.target.value })}
                   placeholder="Enter Year"
                 />
@@ -296,7 +278,7 @@ const FilterModal = ({
                     </label>
                     <input
                       className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                      value={filtersApplied.event || ''}
+                      value={filtersApplied.event}
                       onChange={(e) => onFilterChange({ event: e.target.value })}
                       placeholder="Search Event"
                     />
@@ -309,7 +291,7 @@ const FilterModal = ({
                     </label>
                     <select
                       className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
-                      value={filtersApplied.platform || ''}
+                      value={filtersApplied.platform}
                       onChange={(e) => onFilterChange({ platform: e.target.value })}
                     >
                       <option value="">All Platforms</option>
@@ -343,5 +325,5 @@ const FilterModal = ({
     </div>
   );
 };
-
+ 
 export default FilterModal;
