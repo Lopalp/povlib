@@ -325,5 +325,5 @@ const FilterModal = ({
     </div>
   );
 };
-
+ 
 export default FilterModal;
