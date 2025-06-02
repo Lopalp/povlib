@@ -1,24 +1,14 @@
-// components/POVlib/Navbar.jsx
-'use client'
-
-import React, { useState, useEffect, useContext } from 'react'
-import Link from 'next/link'
+"use client"
+import React, { useState, useEffect, useContext } from 'react';
+import Link from 'next/link';
 import {
-  Search,
-  Menu,
-  X,
-  ChevronDown,
-  User,
-  MapPin,
-  FileVideo,
-  BellRing,
-  LogIn
-} from 'lucide-react'
-import { UserContext } from '../../../context/UserContext'
-import LogoHeading from '@/components/typography/LogoHeading'
-import { createSupabaseBrowserClient } from '@/lib/supabaseClient'
-import { useRouter } from 'next/navigation'
-
+  Search, Menu, X, ChevronDown, User, MapPin, FileVideo, BellRing, LogIn
+} from 'lucide-react';
+import { UserContext } from '../../../context/UserContext';
+import LogoHeading from '@/components/typography/LogoHeading';
+import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
+ 
 const mapNamesDesktop = [
   { label: 'Mirage', slug: 'mirage' },
   { label: 'Inferno', slug: 'inferno' },
@@ -27,65 +17,64 @@ const mapNamesDesktop = [
   { label: 'Overpass', slug: 'overpass' },
   { label: 'Anubis', slug: 'anubis' },
   { label: 'Vertigo', slug: 'vertigo' }
-]
+];
 const mostPlayedMapsMobile = [
   { label: 'Mirage', slug: 'mirage' },
   { label: 'Inferno', slug: 'inferno' },
   { label: 'Nuke', slug: 'nuke' },
   { label: 'Ancient', slug: 'ancient' }
-]
+];
 
 export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, isMenuOpen }) {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [mapMenuOpen, setMapMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const { user, setUser } = useContext(UserContext)
-  const supabase = createSupabaseBrowserClient()
-  const router = useRouter()
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mapMenuOpen, setMapMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { user, setUser } = useContext(UserContext);
+  const supabase = createSupabaseBrowserClient();
+  const router = useRouter();
 
   // Glassmorphism background utility
-  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700'
+  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
 
   useEffect(() => {
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 0)
+      setIsScrolled(window.scrollY > 0);
       // Close any open menus/modals on scroll
-      setMapMenuOpen(false)
-      setUserMenuOpen(false)
-      setSearchActive(false)
-      setIsMenuOpen(false)
-    }
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [setSearchActive, setIsMenuOpen])
+      setMapMenuOpen(false);
+      setUserMenuOpen(false);
+      setSearchActive(false);
+      setIsMenuOpen(false);
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [setSearchActive, setIsMenuOpen]);
 
   const toggleSearch = () => {
-    setMapMenuOpen(false)
-    setSearchActive(prev => !prev)
-  }
+    setMapMenuOpen(false);
+    setSearchActive(prev => !prev);
+  };
   const toggleMaps = () => {
-    setSearchActive(false)
-    setMapMenuOpen(prev => !prev)
-  }
+    setSearchActive(false);
+    setMapMenuOpen(prev => !prev);
+  };
 
   const handleSearchSubmit = e => {
-    e.preventDefault()
+    e.preventDefault();
     // perform search
-    setSearchActive(false)
-  }
+    setSearchActive(false);
+  };
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (!error) {
-      setUser(null)
-      router.push('/')
-    }
-  }
+    const { error } = await supabase.auth.signOut();
+    if (!error) { setUser(null); router.push('/'); }
+  };
 
-  const linkClasses = 'text-sm font-medium transition-colors duration-200 hover:text-yellow-400'
+  const linkClasses = 'text-sm font-medium transition-colors duration-200 hover:text-yellow-400';
 
   return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}>
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
+    >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center gap-2">
@@ -93,36 +82,22 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className={`${linkClasses} text-white`}>
-              Home
-            </Link>
-
+            <Link href="/" className={`${linkClasses} text-white`}>Home</Link>
             <div className="relative">
-              <button
-                onClick={toggleMaps}
-                className={`${linkClasses} text-gray-300 flex items-center gap-1.5`}
-              >
+              <button onClick={toggleMaps} className={`${linkClasses} text-gray-300 flex items-center gap-1.5`}>
                 Maps <ChevronDown className="h-4 w-4" />
               </button>
               {mapMenuOpen && (
-                <ul
-                  className={`absolute left-0 mt-2 w-52 rounded-lg py-2 shadow-lg ${glassBg} z-50`}
-                >
+                <ul className={`absolute left-0 mt-2 w-52 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>
                   <li>
-                    <Link
-                      href="/maps"
-                      className="block px-4 py-2 text-sm text-white hover:text-yellow-400"
-                    >
+                    <Link href="/maps" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">
                       All Maps
                     </Link>
                   </li>
                   <li className="border-t border-gray-600 my-1"></li>
                   {mapNamesDesktop.map(m => (
                     <li key={m.slug}>
-                      <Link
-                        href={`/maps/${m.slug}`}
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-white"
-                      >
+                      <Link href={`/maps/${m.slug}`} className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
                         {m.label}
                       </Link>
                     </li>
@@ -130,27 +105,13 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                 </ul>
               )}
             </div>
-
-            <Link href="/demos" className={`${linkClasses} text-gray-200`}>
-              Demos
-            </Link>
-
-            <Link href="/players" className={`${linkClasses} text-gray-200`}>
-              Players
-            </Link>
-
-            {/* NEUER LINK ZUR UTILITY BOOK SEITE */}
-            <Link href="/utility-book" className={`${linkClasses} text-gray-200`}>
-              Utility Book
-            </Link>
-
+            <Link href="/demos" className={`${linkClasses} text-gray-200`}>Demos</Link>
+            <Link href="/players" className={`${linkClasses} text-gray-200`}>Players</Link>
+            {/* Neuer Link zur Utility Book Seite */}
+            <Link href="/utility-book" className={`${linkClasses} text-gray-200`}>Utility Book</Link>
             <div className="relative group">
-              <span className={`${linkClasses} text-gray-200 cursor-default`}>
-                Community
-              </span>
-              <div
-                className={`absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 rounded-lg py-2 text-center text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity ${glassBg}`}
-              >
+              <span className={`${linkClasses} text-gray-200 cursor-default`}>Community</span>
+              <div className={`absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 rounded-lg py-2 text-center text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity ${glassBg}`}>
                 To be continued
               </div>
             </div>
@@ -161,10 +122,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
               <Search className="h-5 w-5" />
             </button>
             {searchActive && (
-              <form
-                onSubmit={handleSearchSubmit}
-                className={`flex items-center rounded-full overflow-hidden shadow-lg ${glassBg}`}
-              >
+              <form onSubmit={handleSearchSubmit} className={`flex items-center rounded-full overflow-hidden shadow-lg ${glassBg}`}>
                 <input
                   type="text"
                   value={searchQuery}
@@ -173,11 +131,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                   className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white"
                 />
                 {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="px-3"
-                  >
+                  <button type="button" onClick={() => setSearchQuery('')} className="px-3">
                     <X className="h-5 w-5 text-gray-300 hover:text-white" />
                   </button>
                 )}
@@ -196,54 +150,31 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
             {user ? (
               <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(o => !o)}
-                  className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400"
-                >
+                <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    {user.avatar_url && (
-                      <img
-                        src={user.avatar_url}
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
+                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />}
                   </div>
                 </button>
                 {userMenuOpen && (
-                  <ul
-                    className={`absolute right-0 mt-2 w-48 rounded-lg py-2 shadow-lg ${glassBg} z-50`}
-                  >
+                  <ul className={`absolute right-0 mt-2 w-48 rounded-lg py-2 shadow-lg ${glassBg} z-50`}>
                     <li>
-                      <Link
-                        href="/user"
-                        className="block px-4 py-2 text-sm text-white hover:text-yellow-400"
-                      >
+                      <Link href="/user" className="block px-4 py-2 text-sm text-white hover:text-yellow-400">
                         Your Profile
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        href="/favorites"
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-white"
-                      >
+                      <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
                         Favorites
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        href="/settings"
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-white"
-                      >
+                      <Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
                         Settings
                       </Link>
                     </li>
                     <li className="border-t border-gray-600 my-1"></li>
                     <li>
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white"
-                      >
+                      <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white">
                         Sign Out
                       </button>
                     </li>
@@ -251,18 +182,12 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                 )}
               </div>
             ) : (
-              <Link
-                href="/signin"
-                className="hidden lg:flex items-center px-4 py-2 border border-yellow-400/30 rounded-full text-white hover:bg-yellow-400 hover:text-gray-900 transition-colors"
-              >
+              <Link href="/signin" className="hidden lg:flex items-center px-4 py-2 border border-yellow-400/30 rounded-full text-white hover:bg-yellow-400 hover:text-gray-900 transition-colors">
                 <LogIn className="h-4 w-4 mr-2" /> Sign In
               </Link>
             )}
-
-            <button
-              onClick={() => setIsMenuOpen(o => !o)}
-              className="md:hidden p-2 text-gray-300 hover:text-yellow-400"
-            >
+            
+            <button onClick={() => setIsMenuOpen(o => !o)} className="md:hidden p-2 text-gray-300 hover:text-yellow-400">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
@@ -270,19 +195,10 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
       </div>
 
       {isMenuOpen && (
-        <div
-          className={`fixed inset-0 z-50 ${glassBg.replace(
-            'border border-gray-700',
-            'bg-black/90 border border-gray-800'
-          )} overflow-y-auto`}
-        >
+        <div className={`fixed inset-0 z-50 ${glassBg.replace('border border-gray-700','bg-black/90 border border-gray-800')} overflow-y-auto`}>          
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
-              <Link
-                href="/"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white font-medium hover:text-yellow-400"
-              >
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white font-medium hover:text-yellow-400">
                 Home
               </Link>
               <div className="border-t border-gray-700 pt-4">
@@ -301,41 +217,21 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                     </Link>
                   ))}
                 </div>
-                <Link
-                  href="/maps"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="mt-3 block text-sm text-yellow-400 hover:underline"
-                >
+                <Link href="/maps" onClick={() => setIsMenuOpen(false)} className="mt-3 block text-sm text-yellow-400 hover:underline">
                   All Maps →
                 </Link>
               </div>
-              <Link
-                href="/demos"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400"
-              >
+              <Link href="/demos" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-200 hover:text-yellow-400">
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Demos
               </Link>
-              <Link
-                href="/players"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400"
-              >
+              <Link href="/players" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-200 hover:text-yellow-400">
                 <User className="h-5 w-5 text-yellow-400" /> Players
               </Link>
-              {/* NEUER MOBILER LINK ZUR UTILITY BOOK SEITE */}
-              <Link
-                href="/utility-book"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400"
-              >
+              {/* Neuer Mobile-Link zur Utility Book Seite */}
+              <Link href="/utility-book" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-200 hover:text-yellow-400">
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Utility Book
               </Link>
-              <Link
-                href="/login"
-                onClick={() => setIsMenuOpen(false)}
-                className="block w-full py-3 rounded-full bg-yellow-400 text-gray-900 text-center font-bold hover:bg-yellow-300 transition-colors"
-              >
+              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="block w-full py-3 rounded-full bg-yellow-400 text-gray-900 text-center font-bold hover:bg-yellow-300 transition-colors">
                 Sign In
               </Link>
             </nav>
@@ -343,5 +239,5 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
         </div>
       )}
     </header>
-  )
+);
 }
