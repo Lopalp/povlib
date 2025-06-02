@@ -3,6 +3,7 @@ import { X, Map as MapIcon, Users, Calendar, Trophy, Zap, Slider, Tag } from 'lu
 
 const FilterModal = ({
   demoType,
+  // filterOptions wird jetzt nur noch für maps und roles verwendet
   filterOptions,
   filtersApplied,
   onClose,
@@ -12,21 +13,26 @@ const FilterModal = ({
 }) => {
   const [availablePositions, setAvailablePositions] = useState([]);
 
-  // Update available positions whenever the selected map changes
+  // Hardcoded CT-Positionen pro Map
+  const mapPositions = {
+    Dust2: ['A Long', 'Short', 'B Site', 'Mid', 'CT Spawn'],
+    Mirage: ['Palace', 'A Ramp', 'Connector', 'Mid', 'CT Spawn'],
+    Inferno: ['Banana', 'Top Mid', 'A Site', 'Pit', 'CT Spawn'],
+    Nuke: ['Outside', 'Ramp', 'Heaven', 'Silo', 'CT Spawn'],
+    Overpass: ['Long', 'Short', 'Bathrooms', 'B Site', 'CT Spawn'],
+    // … weitere Maps falls nötig
+  };
+
   useEffect(() => {
-    if (filtersApplied.map) {
-      // Pull the positions array for the selected map; if undefined, fallback to an empty array
-      const positionsForMap = filterOptions.positions[filtersApplied.map] || [];
-      // Always include the five default CT positions if they exist
-      setAvailablePositions(positionsForMap);
+    if (filtersApplied.map && mapPositions[filtersApplied.map]) {
+      setAvailablePositions(mapPositions[filtersApplied.map]);
     } else {
-      // If no map selected, flatten all positions (deduplicated) from filterOptions.positions
-      const allPositions = Object.values(filterOptions.positions)
-        .flat()
-        .filter((pos, idx, arr) => arr.indexOf(pos) === idx);
-      setAvailablePositions(allPositions);
+      // Wenn keine Map gewählt ist, zeige alle Positionen (einmalig dedupliziert)
+      const allPos = Object.values(mapPositions).flat();
+      const unique = allPos.filter((pos, idx, arr) => arr.indexOf(pos) === idx);
+      setAvailablePositions(unique);
     }
-  }, [filtersApplied.map, filterOptions.positions]);
+  }, [filtersApplied.map]);
 
   return (
     <div
@@ -95,7 +101,7 @@ const FilterModal = ({
                 </select>
               </div>
 
-              {/* Position Selector (depends on selected map) */}
+              {/* Position Selector (hardcoded pro Map) */}
               <div>
                 <label className="flex items-center text-sm font-medium text-gray-300 mb-2">
                   <MapIcon className="h-4 w-4 mr-2 text-yellow-400" />
@@ -325,5 +331,5 @@ const FilterModal = ({
     </div>
   );
 };
- 
+
 export default FilterModal;
