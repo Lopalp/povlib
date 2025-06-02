@@ -5,6 +5,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, Filter, MapPin, User, Tag as TagIcon } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import DemoCard from './DemoCard';
 
 export default function UtilityBookPage() {
   // Dummy data for utility clips
@@ -72,7 +73,80 @@ export default function UtilityBookPage() {
     // …ggf. weitere Dummy-Utils
   ];
 
-  // State for filters and search
+  // Dummy data for demos
+  const dummyDemos = [
+    {
+      id: 101,
+      title: 's1mple ACE on Mirage',
+      thumbnail: '/images/demo1.png',
+      video_id: 'abc123',
+      map: 'Mirage',
+      positions: ['A Site'],
+      tags: ['ACE', 'Clutch'],
+      players: ['s1mple'],
+      team: 'NAVI',
+      year: 2024,
+      event: 'Blast Premier',
+      result: '16-14',
+      views: 12500,
+      likes: 340,
+      isPro: true
+    },
+    {
+      id: 102,
+      title: 'NiKo 1v3 Clutch on Inferno',
+      thumbnail: '/images/demo2.png',
+      video_id: 'def456',
+      map: 'Inferno',
+      positions: ['B Site', 'Mid'],
+      tags: ['Clutch'],
+      players: ['NiKo'],
+      team: 'G2',
+      year: 2024,
+      event: 'PGL Major',
+      result: '16-13',
+      views: 9800,
+      likes: 280,
+      isPro: true
+    },
+    {
+      id: 103,
+      title: 'dev1ce Perfect 5k on Dust2',
+      thumbnail: '/images/demo3.png',
+      video_id: 'ghi789',
+      map: 'Dust2',
+      positions: ['Long A'],
+      tags: ['5K'],
+      players: ['dev1ce'],
+      team: 'FaZe',
+      year: 2023,
+      event: 'IEM Cologne',
+      result: '16-9',
+      views: 14300,
+      likes: 415,
+      isPro: true
+    },
+    {
+      id: 104,
+      title: 'guardian 1v4 Hold on Nuke',
+      thumbnail: '/images/demo4.png',
+      video_id: 'jkl012',
+      map: 'Nuke',
+      positions: ['Ramp'],
+      tags: ['Clutch'],
+      players: ['guardian'],
+      team: 'Liquid',
+      year: 2024,
+      event: 'ESL Pro League',
+      result: '16-12',
+      views: 11200,
+      likes: 375,
+      isPro: true
+    }
+    // …ggf. weitere Dummy-Demos
+  ];
+
+  // State for filters and search (utilities)
   const [utils] = useState(dummyUtils);
   const [filtersApplied, setFiltersApplied] = useState({
     map: '',
@@ -110,12 +184,10 @@ export default function UtilityBookPage() {
       );
   }, [utils, filtersApplied, searchQuery]);
 
-  // Handler to reset a single filter
+  // Handlers to reset filters
   const removeFilter = (key) => {
     setFiltersApplied((prev) => ({ ...prev, [key]: '' }));
   };
-
-  // Handler to reset all filters
   const resetAllFilters = () => {
     setFiltersApplied({ map: '', side: '', type: '', player: '', landing: '' });
     setSearchQuery('');
@@ -125,8 +197,11 @@ export default function UtilityBookPage() {
     <>
       <Navbar />
 
+      {/* Spacer for Navbar */}
+      <div className="h-24 bg-gray-900"></div>
+
       {/* Hero Header */}
-      <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
+      <div className="relative py-20 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
         <div className="container mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Utility Book</h1>
@@ -156,7 +231,7 @@ export default function UtilityBookPage() {
         </div>
       </div>
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 py-12 space-y-12">
         {/* Filter Tags */}
         <FilterTags
           filtersApplied={filtersApplied}
@@ -180,7 +255,20 @@ export default function UtilityBookPage() {
         />
 
         {/* Utility Grid */}
-        <UtilityGrid utils={filteredUtils} />
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-6">Utility Clips</h2>
+          <UtilityGrid utils={filteredUtils} />
+        </section>
+
+        {/* Demo Cards Section */}
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-6">Featured Demos</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {dummyDemos.map((demo) => (
+              <DemoCard key={demo.id} demo={demo} onSelect={() => {}} />
+            ))}
+          </div>
+        </section>
       </main>
 
       <Footer />
@@ -327,12 +415,10 @@ function MapQuickFilters({ maps, setFiltersApplied }) {
           <button
             key={map}
             onClick={() => setFiltersApplied((prev) => ({ ...prev, map }))}
-            className="flex items-center justify-between p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all"
+            className="flex items-center justify-center p-4 bg-gray-800 rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all"
           >
-            <div className="flex items-center">
-              <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
-              <span className="text-white font-medium">{map}</span>
-            </div>
+            <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
+            <span className="text-white font-medium">{map}</span>
           </button>
         ))}
       </div>
@@ -348,7 +434,7 @@ function UtilityGrid({ utils }) {
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-gray-800/50 rounded-xl border border-gray-700">
         <div className="text-yellow-400 text-6xl mb-4">
-          <FileVideo />
+          <Filter />
         </div>
         <h3 className="text-white text-xl font-bold mb-2">No utilities found</h3>
         <p className="text-gray-400">Passe deine Filter an oder suche neu.</p>
