@@ -7,7 +7,6 @@ import {
 import YouTubeEmbed from './YouTubeEmbed';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import MatchTimeline from '../../components/POVlib/MatchTimeline';
 
 const demoMatchData = {
   rounds: [
@@ -51,7 +50,6 @@ const VideoPlayerPage = ({
 
   if (!selectedDemo) return null;
 
-  // Generate dynamic description
   const generateDescription = () => {
     let desc = `Experience top-tier CS2 gameplay featuring ${selectedDemo.players.join(', ')} on ${selectedDemo.map}. `;
     if (selectedDemo.team) desc += `Watch how ${selectedDemo.team} players demonstrate professional `;
@@ -149,7 +147,6 @@ const VideoPlayerPage = ({
               {/* Description Section with Tags at Top */}
               <section className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-6 mb-8 border border-gray-700">
                 <h2 className="text-xl font-semibold text-white mb-3">Description</h2>
-                {/* Tags moved into description */}
                 {selectedDemo.tags?.length > 0 && (
                   <div className="flex flex-wrap items-center gap-2 mb-4">
                     {selectedDemo.tags.map(tag => (
@@ -172,10 +169,30 @@ const VideoPlayerPage = ({
                 )}
               </section>
 
-              {/* Match Timeline Section */}
+              {/* Match Timeline as horizontal Zeitstrahl */}
               <section className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg p-6 mb-8 border border-gray-700">
-                <h2 className="text-xl font-semibold text-white mb-3">Match Timeline</h2>
-                <MatchTimeline matchData={demoMatchData} />
+                <h2 className="text-xl font-semibold text-white mb-6">Match Timeline</h2>
+                <div className="space-y-6">
+                  {demoMatchData.rounds.map((round, idx) => (
+                    <div key={round.roundNumber} className="flex flex-col">
+                      <span className="text-gray-300 text-sm mb-2">Runde {round.roundNumber}</span>
+                      <div className="relative h-4 bg-gray-600 rounded">
+                        {round.events.map((event, eIdx) => {
+                          // Annahme: Maximalzeit pro Runde = 60s
+                          const percent = Math.min((event.time / 60) * 100, 100);
+                          return (
+                            <div
+                              key={eIdx}
+                              className="absolute -top-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-gray-900"
+                              style={{ left: `${percent}%` }}
+                              title={`${event.type} – ${event.player} (${event.time}s)`}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </section>
 
               {/* Matchroom Submit Section */}
