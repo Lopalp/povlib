@@ -85,7 +85,14 @@ const ComparePlansModal = ({ isOpen, onClose, currentPlan }) => {
       }}
     >
       <div
-        className="bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl w-full max-w-6xl max-h-[80vh] overflow-y-auto shadow-[0_0_30px_rgba(250,204,21,0.15)]"
+        className={`
+          bg-black/40 backdrop-blur-lg border border-gray-700 rounded-xl w-full max-w-6xl
+          /* Auf kleinen Screens: max-height 80vh + Scroll */
+          max-h-[80vh] overflow-y-auto
+          /* Ab md: keine max-height, kein Scrollen */
+          md:max-h-none md:overflow-visible
+          shadow-[0_0_30px_rgba(250,204,21,0.15)]
+        `}
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 md:p-6 border-b border-gray-700">
