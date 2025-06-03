@@ -35,7 +35,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   const router = useRouter();
 
   // Glassmorphism background utility
-  const glassBg = 'bg-black/40 backdrop-blur-lg border border-gray-700';
+  const glassBg = 'bg-black/50 backdrop-blur-lg border border-gray-700';
 
   useEffect(() => {
     const onScroll = () => {
@@ -78,7 +78,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center gap-2">
-            <LogoHeading size={4} />
+            <LogoHeading size={2} />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
@@ -118,7 +118,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
           </nav>
 
           <div className="flex items-center space-x-4">
-            <button onClick={toggleSearch} className="p-2 text-gray-300 hover:text-yellow-400">
+            <button onClick={toggleSearch} className="p-2 text-gray-300 hover:text-yellow-400 cursor-pointer">
               <Search className="h-5 w-5" />
             </button>
             {searchActive && (
@@ -142,17 +142,19 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
             )}
 
             <Link href="/user">
-              <button className="hidden md:block p-2 relative text-gray-300 hover:text-yellow-400">
+              <button className="hidden md:block p-2 relative text-gray-300 hover:text-yellow-400 cursor-pointer">
                 <BellRing className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full" />
               </button>
             </Link>
 
+            <div style={{width: 0}}></div>
+
             {user ? (
               <div className="relative">
-                <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400">
+                <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    {user.avatar_url && <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />}
+                    {user.avatar_url ? <img src={user.avatar_url} alt={user.name.slice(0,1)} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-gray-400">{user.name.slice(0,1)}</div>}
                   </div>
                 </button>
                 {userMenuOpen && (
@@ -163,18 +165,18 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                       </Link>
                     </li>
                     <li>
-                      <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
+                      <Link href="/favorites" className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400">
                         Favorites
                       </Link>
                     </li>
                     <li>
-                      <Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-white">
+                      <Link href="/settings" className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400">
                         Settings
                       </Link>
                     </li>
                     <li className="border-t border-gray-600 my-1"></li>
                     <li>
-                      <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-white">
+                      <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-500 cursor-pointer">
                         Sign Out
                       </button>
                     </li>

@@ -65,6 +65,7 @@ const GoogleSignInButton = () => {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleSignIn,
+          locale: 'en'
         });
 
         console.log('Rendering Google Sign-In button...');
@@ -90,7 +91,7 @@ const GoogleSignInButton = () => {
   return (
     <>
         <Script
-        src="https://accounts.google.com/gsi/client"
+        src="https://accounts.google.com/gsi/client?hl=en"
         strategy="afterInteractive"
         async
         defer
