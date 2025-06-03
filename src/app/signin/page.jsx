@@ -41,7 +41,7 @@ export default function SignInPage() {
       </div>
 
       {/* Overlay Content */}
-      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+      <div className="absolute inset-0 flex items-center justify-center bg-black/70">
         <div className={`p-20 rounded-2xl shadow-lg text-left space-y-8 w-150 ${glassBg} justify-center items-center align-center flex flex-col`}
         style={{paddingBottom: 20}}>
           <div style={{ height: 10 }}></div>
