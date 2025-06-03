@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "parse-demo": "node scripts/parse-demo.mjs"
+    "lint": "next lint"
   },
   "dependencies": {
     "@google-cloud/storage": "^6.10.0",

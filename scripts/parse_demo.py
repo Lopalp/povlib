@@ -1,34 +1,69 @@
-import os
-import json
+"""Helper script to upload a .dem file to GCS and invoke the Cloud Run parser."""
+
 import argparse
-from google.cloud import storage
-import requests
+import json
+import os
 from pathlib import Path
 
-def parse_demo(file_path, project_id=None, bucket_name=None, cloud_run_url=None, timeout=600):
-    project_id = project_id or os.environ.get("GCP_PROJECT_ID")
-    bucket_name = bucket_name or os.environ.get("GCS_BUCKET_NAME")
-    cloud_run_url = cloud_run_url or os.environ.get("CLOUD_RUN_URL")
-    if not project_id or not bucket_name or not cloud_run_url:
-        raise ValueError("Missing configuration: project_id, bucket_name, and cloud_run_url are required")
-
-    client = storage.Client(project=project_id)
-    bucket = client.bucket(bucket_name)
-    dest = f"demos_for_analysis/{Path(file_path).name}"
-    bucket.blob(dest).upload_from_filename(file_path)
-
-    gcs_uri = f"gs://{bucket_name}/{dest}"
-    resp = requests.post(f"{cloud_run_url}/parse_gcs_demo", json={"gcs_uri": gcs_uri}, timeout=timeout)
-    resp.raise_for_status()
-    return resp.json()
+import requests
+from google.cloud import storage
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Upload a .dem file to GCS and parse via Cloud Run")
-    parser.add_argument("file", help="Path to the .dem file")
+# --- KONFIGURATION ---
+# Diese Werte können per Umgebungsvariablen überschrieben werden
+PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "storied-lodge-461717-p7")
+GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "povlib-demobucket")
+CLOUD_RUN_SERVICE_URL = os.environ.get(
+    "CLOUD_RUN_URL", "https://demo-parser-api-290911430119.europe-west1.run.app"
+)
+API_REQUEST_TIMEOUT = int(os.environ.get("API_TIMEOUT", "600"))  # Sekunden
+GCS_DEST_PREFIX = os.environ.get("GCS_DEST_PREFIX", "demos_fuer_analyse/")
+# --- ENDE KONFIGURATION ---
+
+
+def parse_demo(local_file):
+    """Upload the demo to GCS and parse it via Cloud Run."""
+
+    file_path = Path(local_file)
+    if not file_path.exists():
+        raise FileNotFoundError(f"Datei '{file_path}' wurde nicht gefunden")
+
+    destination = f"{GCS_DEST_PREFIX}{file_path.name}"
+    gcs_uri = f"gs://{GCS_BUCKET_NAME}/{destination}"
+
+    print(f"Lade '{file_path}' nach GCS hoch (Ziel: '{gcs_uri}')...")
+    client = storage.Client(project=PROJECT_ID)
+    bucket = client.bucket(GCS_BUCKET_NAME)
+    bucket.blob(destination).upload_from_filename(str(file_path), timeout=300)
+    print("Upload erfolgreich.")
+
+    api_endpoint = f"{CLOUD_RUN_SERVICE_URL}/parse_gcs_demo"
+    print(f"Sende GCS URI an API-Endpunkt: {api_endpoint}")
+
+    resp = requests.post(
+        api_endpoint,
+        json={"gcs_uri": gcs_uri},
+        headers={"Content-Type": "application/json"},
+        timeout=API_REQUEST_TIMEOUT,
+    )
+    print(f"Status Code: {resp.status_code}")
+
+    if resp.headers.get("Content-Type", "").startswith("application/json"):
+        print(json.dumps(resp.json(), indent=2, ensure_ascii=False))
+    else:
+        print(resp.text)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Upload a .dem file to GCS and parse it via Cloud Run"
+    )
+    parser.add_argument("file", help="Pfad zur .dem Datei")
     args = parser.parse_args()
-    result = parse_demo(args.file)
-    print(json.dumps(result, indent=2))
+
+    parse_demo(args.file)
+
 
 if __name__ == "__main__":
     main()
+

@@ -36,9 +36,8 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 ## Parsing Demos with Cloud Run
 
-The project includes small helpers to upload a demo file to Google Cloud Storage
-and trigger a Cloud Run service for parsing. You can use either a Node.js or a
-Python script.
+The project includes a helper script to upload a demo file to Google Cloud
+Storage and trigger a Cloud Run service for parsing.
 
 Set the following environment variables in your shell:
 
@@ -48,20 +47,9 @@ export GCS_BUCKET_NAME=<your-bucket>
 export CLOUD_RUN_URL=<https://your-cloud-run-url>
 ```
 
-### Node.js helper
-
-Install dependencies and run the script with a path to a `.dem` file:
-
-```
-npm run parse-demo ./path/to/file.dem
-```
-
-The script uploads the file, calls the `/parse_gcs_demo` endpoint and prints the
-JSON response.
-
 ### Python helper
 
-Alternatively you can run the Python script:
+Run the script with a path to a `.dem` file:
 
 ```bash
 python scripts/parse_demo.py ./path/to/file.dem
