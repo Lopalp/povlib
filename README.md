@@ -39,13 +39,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 The project includes a helper script to upload a demo file to Google Cloud
 Storage and trigger a Cloud Run service for parsing.
 
-The following environment variables **must** be set before running any of the
-helpers or API routes:
+The helper scripts and API routes will use the following default configuration,
+which can be overridden via environment variables:
 
 ```
-export GCP_PROJECT_ID=<your-project-id>
-export GCS_BUCKET_NAME=<your-bucket>
-export CLOUD_RUN_URL=<https://your-cloud-run-url>
+export GCP_PROJECT_ID=storied-lodge-461717-p7
+export GCS_BUCKET_NAME=povlib-demobucket
+export CLOUD_RUN_URL=https://demo-parser-api-290911430119.europe-west1.run.app
+export API_TIMEOUT_MS=600000   # optional
 ```
 
 ### Python helper

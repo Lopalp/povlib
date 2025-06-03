@@ -1,6 +1,13 @@
 import path from 'path';
 import { Storage } from '@google-cloud/storage';
 
+// Default values matching the provided Colab script
+const DEFAULT_PROJECT_ID = 'storied-lodge-461717-p7';
+const DEFAULT_BUCKET_NAME = 'povlib-demobucket';
+const DEFAULT_CLOUD_RUN_URL =
+  'https://demo-parser-api-290911430119.europe-west1.run.app';
+const DEFAULT_TIMEOUT_MS = parseInt(process.env.API_TIMEOUT_MS || '600000', 10);
+
 /**
  * Upload a demo file to Google Cloud Storage and trigger the Cloud Run parser.
  * @param {string} filePath - Local path to the .dem file.
@@ -15,11 +22,11 @@ import { Storage } from '@google-cloud/storage';
 export async function parseDemoWithCloudRun(
   filePath,
   {
-    projectId = process.env.GCP_PROJECT_ID,
-    bucketName = process.env.GCS_BUCKET_NAME,
+    projectId = process.env.GCP_PROJECT_ID || DEFAULT_PROJECT_ID,
+    bucketName = process.env.GCS_BUCKET_NAME || DEFAULT_BUCKET_NAME,
     destination = `demos_for_analysis/${path.basename(filePath)}`,
-    cloudRunUrl = process.env.CLOUD_RUN_URL,
-    timeoutMs = 10 * 60 * 1000,
+    cloudRunUrl = process.env.CLOUD_RUN_URL || DEFAULT_CLOUD_RUN_URL,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
   } = {}
 ) {
   if (!projectId || !bucketName || !cloudRunUrl) {
@@ -62,7 +69,10 @@ export async function parseDemoWithCloudRun(
  */
 export async function parseDemoFromGCSUri(
   gcsUri,
-  { cloudRunUrl = process.env.CLOUD_RUN_URL, timeoutMs = 10 * 60 * 1000 } = {}
+  {
+    cloudRunUrl = process.env.CLOUD_RUN_URL || DEFAULT_CLOUD_RUN_URL,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+  } = {}
 ) {
   if (!cloudRunUrl) {
     throw new Error('Missing configuration: cloudRunUrl is required');
@@ -101,8 +111,8 @@ export async function parseDemoFromGCSUri(
 export async function getSignedUploadUrl(
   fileName,
   {
-    projectId = process.env.GCP_PROJECT_ID,
-    bucketName = process.env.GCS_BUCKET_NAME,
+    projectId = process.env.GCP_PROJECT_ID || DEFAULT_PROJECT_ID,
+    bucketName = process.env.GCS_BUCKET_NAME || DEFAULT_BUCKET_NAME,
     prefix = 'demos_for_analysis/',
   } = {}
 ) {
