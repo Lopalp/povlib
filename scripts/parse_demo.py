@@ -10,19 +10,22 @@ from google.cloud import storage
 
 
 # --- KONFIGURATION ---
-# Diese Werte können per Umgebungsvariablen überschrieben werden
-PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "storied-lodge-461717-p7")
-GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "povlib-demobucket")
-CLOUD_RUN_SERVICE_URL = os.environ.get(
-    "CLOUD_RUN_URL", "https://demo-parser-api-290911430119.europe-west1.run.app"
-)
+# Diese Werte müssen über Umgebungsvariablen gesetzt werden
+PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
+GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME")
+CLOUD_RUN_SERVICE_URL = os.environ.get("CLOUD_RUN_URL")
 API_REQUEST_TIMEOUT = int(os.environ.get("API_TIMEOUT", "600"))  # Sekunden
-GCS_DEST_PREFIX = os.environ.get("GCS_DEST_PREFIX", "demos_fuer_analyse/")
+GCS_DEST_PREFIX = os.environ.get("GCS_DEST_PREFIX", "demos_for_analysis/")
 # --- ENDE KONFIGURATION ---
 
 
 def parse_demo(local_file):
     """Upload the demo to GCS and parse it via Cloud Run."""
+
+    if not PROJECT_ID or not GCS_BUCKET_NAME or not CLOUD_RUN_SERVICE_URL:
+        raise EnvironmentError(
+            "GCP_PROJECT_ID, GCS_BUCKET_NAME und CLOUD_RUN_URL müssen gesetzt sein"
+        )
 
     file_path = Path(local_file)
     if not file_path.exists():

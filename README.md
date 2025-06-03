@@ -39,7 +39,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 The project includes a helper script to upload a demo file to Google Cloud
 Storage and trigger a Cloud Run service for parsing.
 
-Set the following environment variables in your shell:
+The following environment variables **must** be set before running any of the
+helpers or API routes:
 
 ```
 export GCP_PROJECT_ID=<your-project-id>

@@ -24,7 +24,13 @@ const ParseDemoModal = ({ isOpen, onClose }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fileName: file.name }),
       });
-      if (!urlRes.ok) throw new Error(await urlRes.text());
+      if (!urlRes.ok) {
+        let msg = await urlRes.text();
+        try {
+          msg = JSON.parse(msg).error || msg;
+        } catch {}
+        throw new Error(msg);
+      }
       const { uploadUrl, gcsUri } = await urlRes.json();
 
       await new Promise((resolve, reject) => {
@@ -47,7 +53,13 @@ const ParseDemoModal = ({ isOpen, onClose }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gcsUri }),
       });
-      if (!parseRes.ok) throw new Error(await parseRes.text());
+      if (!parseRes.ok) {
+        let msg = await parseRes.text();
+        try {
+          msg = JSON.parse(msg).error || msg;
+        } catch {}
+        throw new Error(msg);
+      }
       const json = await parseRes.json();
       setOutput(json);
       setStage('done');
