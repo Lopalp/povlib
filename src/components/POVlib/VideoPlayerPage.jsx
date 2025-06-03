@@ -63,6 +63,8 @@ const VideoPlayerPage = ({
 
   // Upload/Cloud Run state
   const [demoFile, setDemoFile] = useState(null);
+  const [analysisStatus, setAnalysisStatus] = useState(null);
+  const [analysisMessage, setAnalysisMessage] = useState('');
 
   // Cloud Run Konfiguration direkt im Code
   const [cloudRunServiceUrl, setCloudRunServiceUrl] = useState(
@@ -78,15 +80,25 @@ const VideoPlayerPage = ({
       form.append('cloud_run_service_url', cloudRunServiceUrl);
       form.append('gcs_bucket_name', gcsBucketName);
 
+      setAnalysisStatus('pending');
+      setAnalysisMessage('Analyse gestartet...');
+
       const response = await fetch('/api/parse-demo', {
         method: 'POST',
         body: form
       });
 
       const result = await response.json();
-      console.log('Analyse Ergebnis', result);
+      if (response.ok) {
+        setAnalysisStatus('success');
+        setAnalysisMessage(JSON.stringify(result, null, 2));
+      } else {
+        setAnalysisStatus('error');
+        setAnalysisMessage(result.error || 'Unbekannter Fehler');
+      }
     } catch (err) {
-      console.error('Analyse Fehler', err);
+      setAnalysisStatus('error');
+      setAnalysisMessage(err.message);
     }
   };
 
@@ -335,6 +347,17 @@ const VideoPlayerPage = ({
                 >
                   Demo analysieren
                 </button>
+                {analysisStatus === 'pending' && (
+                  <p className="text-sm text-gray-300 mt-2">{analysisMessage}</p>
+                )}
+                {analysisStatus === 'success' && (
+                  <pre className="text-sm text-green-400 whitespace-pre-wrap mt-2">
+                    {analysisMessage}
+                  </pre>
+                )}
+                {analysisStatus === 'error' && (
+                  <p className="text-sm text-red-500 mt-2">Fehler: {analysisMessage}</p>
+                )}
               </div>
 
               {/* ─── Featured Players als horizontale Scroll-Liste ─── */}
