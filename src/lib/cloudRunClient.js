@@ -51,3 +51,71 @@ export async function parseDemoWithCloudRun(
     clearTimeout(timer);
   }
 }
+
+/**
+ * Request the Cloud Run parser for an already uploaded demo.
+ * @param {string} gcsUri - URI of the uploaded demo, e.g. gs://bucket/file.dem
+ * @param {object} [options]
+ * @param {string} [options.cloudRunUrl] - Cloud Run base URL
+ * @param {number} [options.timeoutMs] - Request timeout in ms
+ * @returns {Promise<object>} Parsed JSON
+ */
+export async function parseDemoFromGCSUri(
+  gcsUri,
+  { cloudRunUrl = process.env.CLOUD_RUN_URL, timeoutMs = 10 * 60 * 1000 } = {}
+) {
+  if (!cloudRunUrl) {
+    throw new Error('Missing configuration: cloudRunUrl is required');
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(`${cloudRunUrl}/parse_gcs_demo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gcs_uri: gcsUri }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Cloud Run request failed: ${res.status} ${text}`);
+    }
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Generate a signed GCS upload URL for a demo file.
+ * @param {string} fileName - Name of the file to upload.
+ * @param {object} [options]
+ * @param {string} [options.projectId]
+ * @param {string} [options.bucketName]
+ * @param {string} [options.prefix]
+ * @returns {Promise<{uploadUrl: string, gcsUri: string}>}
+ */
+export async function getSignedUploadUrl(
+  fileName,
+  {
+    projectId = process.env.GCP_PROJECT_ID,
+    bucketName = process.env.GCS_BUCKET_NAME,
+    prefix = 'demos_for_analysis/',
+  } = {}
+) {
+  if (!projectId || !bucketName) {
+    throw new Error('Missing configuration: projectId and bucketName are required');
+  }
+
+  const storage = new Storage({ projectId });
+  const bucket = storage.bucket(bucketName);
+  const destination = `${prefix}${Date.now()}_${fileName}`;
+  const file = bucket.file(destination);
+  const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  const [url] = await file.getSignedUrl({ version: 'v4', action: 'write', expires });
+
+  return { uploadUrl: url, gcsUri: `gs://${bucketName}/${destination}` };
+}

@@ -7,6 +7,8 @@ const ParseDemoModal = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(null);
+  const [stage, setStage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,22 +16,46 @@ const ParseDemoModal = ({ isOpen, onClose }) => {
     setLoading(true);
     setError(null);
     setOutput(null);
-    const formData = new FormData();
-    formData.append('file', file);
+    setProgress(0);
+    setStage('upload');
     try {
-      const res = await fetch('/api/parse-demo', {
+      const urlRes = await fetch('/api/get-upload-url', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName: file.name }),
       });
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
-      const json = await res.json();
+      if (!urlRes.ok) throw new Error(await urlRes.text());
+      const { uploadUrl, gcsUri } = await urlRes.json();
+
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', uploadUrl);
+        xhr.upload.onprogress = (evt) => {
+          if (evt.lengthComputable) {
+            setProgress(Math.round((evt.loaded / evt.total) * 100));
+          }
+        };
+        xhr.onload = () => (xhr.status < 400 ? resolve() : reject(new Error('Upload failed')));
+        xhr.onerror = () => reject(new Error('Upload failed'));
+        xhr.send(file);
+      });
+
+      setStage('parse');
+
+      const parseRes = await fetch('/api/parse-gcs-demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gcsUri }),
+      });
+      if (!parseRes.ok) throw new Error(await parseRes.text());
+      const json = await parseRes.json();
       setOutput(json);
+      setStage('done');
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+      setProgress(null);
     }
   };
 
@@ -59,10 +85,20 @@ const ParseDemoModal = ({ isOpen, onClose }) => {
             disabled={!file || loading}
             className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded disabled:opacity-50"
           >
-            {loading ? 'Parsing…' : 'Upload & Parse'}
+            {loading
+              ? stage === 'upload'
+                ? `Uploading ${progress ?? 0}%`
+                : 'Parsing…'
+              : 'Upload & Parse'}
           </button>
+          {loading && stage === 'upload' && (
+            <div className="text-sm text-gray-400">{progress ?? 0}% uploaded</div>
+          )}
         </form>
         {error && <div className="p-4 text-red-500 text-sm break-all">{error}</div>}
+        {loading && stage === 'parse' && (
+          <div className="p-4 text-gray-400 text-sm">Parsing…</div>
+        )}
         {output && (
           <pre className="p-4 text-gray-300 text-xs max-h-64 overflow-auto whitespace-pre-wrap">
             {JSON.stringify(output, null, 2)}

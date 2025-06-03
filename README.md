@@ -54,3 +54,12 @@ Run the script with a path to a `.dem` file:
 ```bash
 python scripts/parse_demo.py ./path/to/file.dem
 ```
+
+### Uploading in the browser
+
+Large demos should be uploaded directly to Google Cloud Storage. The
+`ParseDemoModal` component requests a signed upload URL from
+`/api/get-upload-url`, uploads the selected file and then calls
+`/api/parse-gcs-demo` to trigger the Cloud Run parser. Ensure the same
+environment variables are configured on the server so signed URLs can be
+generated.
