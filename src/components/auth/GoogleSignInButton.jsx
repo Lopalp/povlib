@@ -71,7 +71,7 @@ const GoogleSignInButton = () => {
         console.log('Rendering Google Sign-In button...');
         window.google.accounts.id.renderButton(
           googleButtonRef.current,
-          { theme: 'outline', size: 'large', type: 'standard' }
+          { theme: 'filled_black', size: 'large', type: 'standard' }
         );
       } catch (error) {
         console.error('Error initializing or rendering Google button:', error);

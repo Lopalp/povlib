@@ -5,6 +5,7 @@ import BackButton from "@/components/buttons/BackButton";
 import { useEffect, useState } from 'react';
 import { FaDiscord } from "react-icons/fa";
 import "./signin.css";
+import DiscordSignInButton from "@/components/auth/DiscordSignInButton";
 
 export default function SignInPage() {
   const [scale, setScale] = useState(5);
@@ -43,16 +44,23 @@ export default function SignInPage() {
       {/* Overlay Content */}
       <div className="absolute inset-0 flex items-center justify-center bg-black/70">
         <div className={`p-20 rounded-2xl shadow-lg text-left space-y-8 w-150 ${glassBg} justify-center items-center align-center flex flex-col`}
-        style={{paddingBottom: 20}}>
+        style={{paddingBottom: 20, paddingTop: 25}}>
           <div style={{ height: 10 }}></div>
           <LogoHeading size={4} />
           <p className="text-white text-lg font-medium m-0"
             style={{ fontWeight: 300, fontSize: "1.5rem", lineHeight: "2rem", marginTop: -10 }}
           >
-            The ultimate CS2 library.
+            The ultimate CS2 library
           </p>
-          <div style={{ height: 50 }}></div>
+          <div style={{ height: 10 }}></div>
+
+          <hr style={{width: 150, opacity: 0.25}}/>
+
           <GoogleSignInButton />
+
+          <DiscordSignInButton />
+
+          <hr style={{width: 150, opacity: 0.25}}/>
           <a 
             href="https://discord.gg/vqjmXGgFbJ"
             target="_blank"
@@ -63,6 +71,7 @@ export default function SignInPage() {
             <FaDiscord fontSize={"2rem"} color="#7289da"/>
             <p> Join our community on Discord!</p>
           </a>
+
           <div style={{ height: 10 }}></div>
           <BackButton text={"Back to home"} />
         </div>
