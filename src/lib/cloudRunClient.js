@@ -27,13 +27,15 @@ export async function parseDemoWithCloudRun(
     destination = `demos_for_analysis/${path.basename(filePath)}`,
     cloudRunUrl = process.env.CLOUD_RUN_URL || DEFAULT_CLOUD_RUN_URL,
     timeoutMs = DEFAULT_TIMEOUT_MS,
+    keyFilename = process.env.GOOGLE_APPLICATION_CREDENTIALS,
   } = {}
 ) {
   if (!projectId || !bucketName || !cloudRunUrl) {
     throw new Error('Missing configuration: projectId, bucketName and cloudRunUrl are required');
   }
-
-  const storage = new Storage({ projectId });
+  const storage = keyFilename
+    ? new Storage({ projectId, keyFilename })
+    : new Storage({ projectId });
   const bucket = storage.bucket(bucketName);
   await bucket.upload(filePath, { destination });
 
@@ -114,13 +116,16 @@ export async function getSignedUploadUrl(
     projectId = process.env.GCP_PROJECT_ID || DEFAULT_PROJECT_ID,
     bucketName = process.env.GCS_BUCKET_NAME || DEFAULT_BUCKET_NAME,
     prefix = 'demos_for_analysis/',
+    keyFilename = process.env.GOOGLE_APPLICATION_CREDENTIALS,
   } = {}
 ) {
   if (!projectId || !bucketName) {
     throw new Error('Missing configuration: projectId and bucketName are required');
   }
 
-  const storage = new Storage({ projectId });
+  const storage = keyFilename
+    ? new Storage({ projectId, keyFilename })
+    : new Storage({ projectId });
   const bucket = storage.bucket(bucketName);
   const destination = `${prefix}${Date.now()}_${fileName}`;
   const file = bucket.file(destination);

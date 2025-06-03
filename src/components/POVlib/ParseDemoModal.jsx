@@ -104,12 +104,23 @@ const ParseDemoModal = ({ isOpen, onClose }) => {
               : 'Upload & Parse'}
           </button>
           {loading && stage === 'upload' && (
-            <div className="text-sm text-gray-400">{progress ?? 0}% uploaded</div>
+            <div className="w-full bg-gray-700 rounded h-2 overflow-hidden">
+              <div
+                className="bg-yellow-400 h-2"
+                style={{ width: `${progress ?? 0}%` }}
+              />
+            </div>
+          )}
+          {loading && stage === 'upload' && (
+            <div className="text-sm text-gray-400 text-right">{progress ?? 0}%</div>
           )}
         </form>
         {error && <div className="p-4 text-red-500 text-sm break-all">{error}</div>}
         {loading && stage === 'parse' && (
           <div className="p-4 text-gray-400 text-sm">Parsing…</div>
+        )}
+        {stage === 'done' && !error && (
+          <div className="p-4 text-green-500 text-sm">Fertig!</div>
         )}
         {output && (
           <pre className="p-4 text-gray-300 text-xs max-h-64 overflow-auto whitespace-pre-wrap">

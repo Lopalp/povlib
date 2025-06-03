@@ -16,7 +16,9 @@ GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "povlib-demobucket")
 CLOUD_RUN_SERVICE_URL = os.environ.get(
     "CLOUD_RUN_URL", "https://demo-parser-api-290911430119.europe-west1.run.app"
 )
-API_REQUEST_TIMEOUT = int(os.environ.get("API_TIMEOUT", "600"))  # Sekunden
+API_TIMEOUT_MS = int(os.environ.get("API_TIMEOUT_MS", "600000"))
+API_REQUEST_TIMEOUT = API_TIMEOUT_MS / 1000  # Sekunden
+CREDENTIALS_PATH = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 GCS_DEST_PREFIX = os.environ.get("GCS_DEST_PREFIX", "demos_for_analysis/")
 # --- ENDE KONFIGURATION ---
 
@@ -37,7 +39,17 @@ def parse_demo(local_file):
     gcs_uri = f"gs://{GCS_BUCKET_NAME}/{destination}"
 
     print(f"Lade '{file_path}' nach GCS hoch (Ziel: '{gcs_uri}')...")
-    client = storage.Client(project=PROJECT_ID)
+    if CREDENTIALS_PATH:
+        client = storage.Client.from_service_account_file(
+            CREDENTIALS_PATH, project=PROJECT_ID
+        )
+    else:
+        try:
+            client = storage.Client(project=PROJECT_ID)
+        except Exception as e:  # fallback to show clearer message
+            raise EnvironmentError(
+                "Google Cloud credentials nicht gefunden. Setze GOOGLE_APPLICATION_CREDENTIALS oder authentifiziere dich mit gcloud." 
+            ) from e
     bucket = client.bucket(GCS_BUCKET_NAME)
     bucket.blob(destination).upload_from_filename(str(file_path), timeout=300)
     print("Upload erfolgreich.")

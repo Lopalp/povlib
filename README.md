@@ -47,7 +47,12 @@ export GCP_PROJECT_ID=storied-lodge-461717-p7
 export GCS_BUCKET_NAME=povlib-demobucket
 export CLOUD_RUN_URL=https://demo-parser-api-290911430119.europe-west1.run.app
 export API_TIMEOUT_MS=600000   # optional
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 ```
+
+The `GOOGLE_APPLICATION_CREDENTIALS` variable should point to a service
+account JSON key or use `gcloud auth application-default login` to set up
+application default credentials.
 
 ### Python helper
 
