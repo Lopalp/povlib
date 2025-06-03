@@ -61,6 +61,27 @@ const VideoPlayerPage = ({
   const [menuOpen, setMenuOpen] = useState(false); // für das Ellipsis-Dropdown
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
 
+  // Cloud Run Konfiguration direkt im Code
+  const cloudRunServiceUrl = "https://demo-parser-api-290911430119.europe-west1.run.app";
+  const gcsBucketName = "povlib-demobucket";
+
+  const handleAnalyzeDemo = async () => {
+    try {
+      const response = await fetch('/api/parse-demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cloud_run_service_url: cloudRunServiceUrl,
+          gcs_bucket_name: gcsBucketName
+        })
+      });
+      const result = await response.json();
+      console.log('Analyse Ergebnis', result);
+    } catch (err) {
+      console.error('Analyse Fehler', err);
+    }
+  };
+
   if (!selectedDemo) return null;
 
   const generateDescription = () => {
@@ -278,6 +299,13 @@ const VideoPlayerPage = ({
                   </button>
                 )}
               </div>
+
+              <button
+                onClick={handleAnalyzeDemo}
+                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 rounded hover:bg-yellow-300 transition-colors"
+              >
+                Demo analysieren
+              </button>
 
               {/* ─── Featured Players als horizontale Scroll-Liste ─── */}
               <div className="overflow-x-auto py-4">

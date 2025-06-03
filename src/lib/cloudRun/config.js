@@ -1,0 +1,9 @@
+export const project_id = "storied-lodge-461717-p7";
+export const gcs_bucket_name = "povlib-demobucket";
+export const gdrive_folder_path = "/content/drive/MyDrive/POVlib/";
+export const demo_filename_in_drive = "demo.dem";
+export const gdrive_full_file_path = `${gdrive_folder_path}${demo_filename_in_drive}`;
+export const gcs_destination_blob_name = `demos_fuer_analyse/${demo_filename_in_drive}`;
+export const cloud_run_service_url = "https://demo-parser-api-290911430119.europe-west1.run.app";
+export const api_endpoint_gcs = `${cloud_run_service_url}/parse_gcs_demo`;
+export const api_request_timeout = 600;
