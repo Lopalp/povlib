@@ -6,26 +6,26 @@ const DEFAULT_PROJECT_ID = 'storied-lodge-461717-p7';
 const DEFAULT_BUCKET_NAME = 'povlib-demobucket';
 const DEFAULT_CLOUD_RUN_URL =
   'https://demo-parser-api-290911430119.europe-west1.run.app';
-const DEFAULT_TIMEOUT_MS = parseInt(process.env.API_TIMEOUT_MS || '600000', 10);
+const DEFAULT_TIMEOUT_MS = 600000;
 
 /**
  * Upload a demo file to Google Cloud Storage and trigger the Cloud Run parser.
  * @param {string} filePath - Local path to the .dem file.
  * @param {object} [options]
- * @param {string} [options.projectId] - GCP project ID. Defaults to GCP_PROJECT_ID env var.
- * @param {string} [options.bucketName] - GCS bucket. Defaults to GCS_BUCKET_NAME env var.
+ * @param {string} [options.projectId] - GCP project ID.
+ * @param {string} [options.bucketName] - GCS bucket.
  * @param {string} [options.destination] - Path in the bucket. Defaults to `demos_for_analysis/<filename>`.
- * @param {string} [options.cloudRunUrl] - Base URL of the Cloud Run service. Defaults to CLOUD_RUN_URL env var.
+ * @param {string} [options.cloudRunUrl] - Base URL of the Cloud Run service.
  * @param {number} [options.timeoutMs] - Request timeout in milliseconds. Defaults to 10 minutes.
  * @returns {Promise<object>} Parsed JSON response from the Cloud Run service.
  */
 export async function parseDemoWithCloudRun(
   filePath,
   {
-    projectId = process.env.GCP_PROJECT_ID || DEFAULT_PROJECT_ID,
-    bucketName = process.env.GCS_BUCKET_NAME || DEFAULT_BUCKET_NAME,
+    projectId = DEFAULT_PROJECT_ID,
+    bucketName = DEFAULT_BUCKET_NAME,
     destination = `demos_for_analysis/${path.basename(filePath)}`,
-    cloudRunUrl = process.env.CLOUD_RUN_URL || DEFAULT_CLOUD_RUN_URL,
+    cloudRunUrl = DEFAULT_CLOUD_RUN_URL,
     timeoutMs = DEFAULT_TIMEOUT_MS,
     keyFilename = process.env.GOOGLE_APPLICATION_CREDENTIALS,
   } = {}
@@ -82,7 +82,7 @@ export async function parseDemoWithCloudRun(
 export async function parseDemoFromGCSUri(
   gcsUri,
   {
-    cloudRunUrl = process.env.CLOUD_RUN_URL || DEFAULT_CLOUD_RUN_URL,
+    cloudRunUrl = DEFAULT_CLOUD_RUN_URL,
     timeoutMs = DEFAULT_TIMEOUT_MS,
   } = {}
 ) {
@@ -123,8 +123,8 @@ export async function parseDemoFromGCSUri(
 export async function getSignedUploadUrl(
   fileName,
   {
-    projectId = process.env.GCP_PROJECT_ID || DEFAULT_PROJECT_ID,
-    bucketName = process.env.GCS_BUCKET_NAME || DEFAULT_BUCKET_NAME,
+    projectId = DEFAULT_PROJECT_ID,
+    bucketName = DEFAULT_BUCKET_NAME,
     prefix = 'demos_for_analysis/',
     keyFilename = process.env.GOOGLE_APPLICATION_CREDENTIALS,
   } = {}

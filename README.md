@@ -39,20 +39,17 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 The project includes a helper script to upload a demo file to Google Cloud
 Storage and trigger a Cloud Run service for parsing.
 
-The helper scripts and API routes will use the following default configuration,
-which can be overridden via environment variables:
+The helper scripts and API routes are preconfigured with the following
+values:
 
-```
-export GCP_PROJECT_ID=storied-lodge-461717-p7
-export GCS_BUCKET_NAME=povlib-demobucket
-export CLOUD_RUN_URL=https://demo-parser-api-290911430119.europe-west1.run.app
-export API_TIMEOUT_MS=600000   # optional
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
-```
+- **Project ID**: `storied-lodge-461717-p7`
+- **Bucket**: `povlib-demobucket`
+- **Cloud Run URL**:
+  `https://demo-parser-api-290911430119.europe-west1.run.app`
 
-The `GOOGLE_APPLICATION_CREDENTIALS` variable should point to a service
-account JSON key or use `gcloud auth application-default login` to set up
-application default credentials.
+Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the path of a
+service account JSON key (or authenticate via `gcloud auth
+application-default login`) so the Google Cloud SDK can access your project.
 
 ### Python helper
 
@@ -67,6 +64,6 @@ python scripts/parse_demo.py ./path/to/file.dem
 Large demos should be uploaded directly to Google Cloud Storage. The
 `ParseDemoModal` component requests a signed upload URL from
 `/api/get-upload-url`, uploads the selected file and then calls
-`/api/parse-gcs-demo` to trigger the Cloud Run parser. Ensure the same
-environment variables are configured on the server so signed URLs can be
-generated.
+`/api/parse-gcs-demo` to trigger the Cloud Run parser. Make sure the server
+can authenticate with Google Cloud (via `GOOGLE_APPLICATION_CREDENTIALS`) so
+signed URLs can be generated.
