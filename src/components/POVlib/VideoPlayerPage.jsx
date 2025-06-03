@@ -61,20 +61,28 @@ const VideoPlayerPage = ({
   const [menuOpen, setMenuOpen] = useState(false); // für das Ellipsis-Dropdown
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
 
+  // Upload/Cloud Run state
+  const [demoFile, setDemoFile] = useState(null);
+
   // Cloud Run Konfiguration direkt im Code
-  const cloudRunServiceUrl = "https://demo-parser-api-290911430119.europe-west1.run.app";
-  const gcsBucketName = "povlib-demobucket";
+  const [cloudRunServiceUrl, setCloudRunServiceUrl] = useState(
+    "https://demo-parser-api-290911430119.europe-west1.run.app"
+  );
+  const [gcsBucketName, setGcsBucketName] = useState("povlib-demobucket");
 
   const handleAnalyzeDemo = async () => {
+    if (!demoFile) return;
     try {
+      const form = new FormData();
+      form.append('file', demoFile);
+      form.append('cloud_run_service_url', cloudRunServiceUrl);
+      form.append('gcs_bucket_name', gcsBucketName);
+
       const response = await fetch('/api/parse-demo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cloud_run_service_url: cloudRunServiceUrl,
-          gcs_bucket_name: gcsBucketName
-        })
+        body: form
       });
+
       const result = await response.json();
       console.log('Analyse Ergebnis', result);
     } catch (err) {
@@ -300,12 +308,34 @@ const VideoPlayerPage = ({
                 )}
               </div>
 
-              <button
-                onClick={handleAnalyzeDemo}
-                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 rounded hover:bg-yellow-300 transition-colors"
-              >
-                Demo analysieren
-              </button>
+              <div className="mt-4 space-y-2">
+                <input
+                  type="file"
+                  accept=".dem"
+                  onChange={(e) => setDemoFile(e.target.files[0])}
+                  className="block w-full text-sm text-gray-300 file:bg-gray-700 file:border-0 file:rounded file:px-3 file:py-2 file:text-gray-200 file:mr-2"
+                />
+                <input
+                  type="text"
+                  value={cloudRunServiceUrl}
+                  onChange={(e) => setCloudRunServiceUrl(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 rounded text-gray-200"
+                  placeholder="Cloud Run URL"
+                />
+                <input
+                  type="text"
+                  value={gcsBucketName}
+                  onChange={(e) => setGcsBucketName(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 rounded text-gray-200"
+                  placeholder="GCS Bucket"
+                />
+                <button
+                  onClick={handleAnalyzeDemo}
+                  className="w-full px-4 py-2 bg-yellow-400 text-gray-900 rounded hover:bg-yellow-300 transition-colors"
+                >
+                  Demo analysieren
+                </button>
+              </div>
 
               {/* ─── Featured Players als horizontale Scroll-Liste ─── */}
               <div className="overflow-x-auto py-4">
