@@ -33,9 +33,19 @@ export async function parseDemoWithCloudRun(
   if (!projectId || !bucketName || !cloudRunUrl) {
     throw new Error('Missing configuration: projectId, bucketName and cloudRunUrl are required');
   }
-  const storage = keyFilename
-    ? new Storage({ projectId, keyFilename })
-    : new Storage({ projectId });
+  let storage;
+  try {
+    storage = keyFilename
+      ? new Storage({ projectId, keyFilename })
+      : new Storage({ projectId });
+  } catch (err) {
+    if (err.message && err.message.includes('Could not load the default credentials')) {
+      throw new Error(
+        'Google Cloud credentials not found. Set GOOGLE_APPLICATION_CREDENTIALS or run `gcloud auth application-default login`.'
+      );
+    }
+    throw err;
+  }
   const bucket = storage.bucket(bucketName);
   await bucket.upload(filePath, { destination });
 
@@ -123,9 +133,19 @@ export async function getSignedUploadUrl(
     throw new Error('Missing configuration: projectId and bucketName are required');
   }
 
-  const storage = keyFilename
-    ? new Storage({ projectId, keyFilename })
-    : new Storage({ projectId });
+  let storage;
+  try {
+    storage = keyFilename
+      ? new Storage({ projectId, keyFilename })
+      : new Storage({ projectId });
+  } catch (err) {
+    if (err.message && err.message.includes('Could not load the default credentials')) {
+      throw new Error(
+        'Google Cloud credentials not found. Set GOOGLE_APPLICATION_CREDENTIALS or run `gcloud auth application-default login`.'
+      );
+    }
+    throw err;
+  }
   const bucket = storage.bucket(bucketName);
   const destination = `${prefix}${Date.now()}_${fileName}`;
   const file = bucket.file(destination);
