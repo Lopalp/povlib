@@ -20,6 +20,7 @@ import {
 import YouTubeEmbed from './YouTubeEmbed';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import ParseDemoModal from './ParseDemoModal';
 
 const demoMatchData = {
   rounds: [
@@ -60,6 +61,7 @@ const VideoPlayerPage = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // für das Ellipsis-Dropdown
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
+  const [isParseModalOpen, setIsParseModalOpen] = useState(false);
 
   if (!selectedDemo) return null;
 
@@ -221,6 +223,16 @@ const VideoPlayerPage = ({
                           <ExternalLink className="h-4 w-4 text-yellow-400" />
                           <span>Matchroom öffnen</span>
                         </button>
+                        <button
+                          onClick={() => {
+                            setIsParseModalOpen(true);
+                            setMenuOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                        >
+                          <FileText className="h-4 w-4 text-yellow-400" />
+                          <span>Demo parsen</span>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -376,6 +388,11 @@ const VideoPlayerPage = ({
           </div>
         </div>
       </main>
+
+      <ParseDemoModal
+        isOpen={isParseModalOpen}
+        onClose={() => setIsParseModalOpen(false)}
+      />
 
       <Footer />
     </div>

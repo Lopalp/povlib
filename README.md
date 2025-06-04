@@ -34,3 +34,36 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Parsing Demos with Cloud Run
+
+The project includes a helper script to upload a demo file to Google Cloud
+Storage and trigger a Cloud Run service for parsing.
+
+The helper scripts and API routes are preconfigured with the following
+values:
+
+- **Project ID**: `storied-lodge-461717-p7`
+- **Bucket**: `povlib-demobucket`
+- **Cloud Run URL**:
+  `https://demo-parser-api-290911430119.europe-west1.run.app`
+
+Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the path of a
+service account JSON key (or authenticate via `gcloud auth
+application-default login`) so the Google Cloud SDK can access your project.
+
+### Python helper
+
+Run the script with a path to a `.dem` file:
+
+```bash
+python scripts/parse_demo.py ./path/to/file.dem
+```
+
+### Uploading in the browser
+
+Large demos should be uploaded directly to Google Cloud Storage. The
+`ParseDemoModal` component requests a signed upload URL from
+`/api/get-upload-url`, uploads the selected file and then calls
+`/api/parse-gcs-demo` to trigger the Cloud Run parser. Make sure the server
+can authenticate with Google Cloud (via `GOOGLE_APPLICATION_CREDENTIALS`) so
+signed URLs can be generated.
