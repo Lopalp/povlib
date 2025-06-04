@@ -61,6 +61,47 @@ const VideoPlayerPage = ({
   const [menuOpen, setMenuOpen] = useState(false); // für das Ellipsis-Dropdown
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
 
+  // Upload/Cloud Run state
+  const [demoFile, setDemoFile] = useState(null);
+  const [analysisStatus, setAnalysisStatus] = useState(null);
+  const [analysisMessage, setAnalysisMessage] = useState('');
+
+  // Cloud Run Konfiguration direkt im Code
+  const [cloudRunServiceUrl, setCloudRunServiceUrl] = useState(
+    "https://demo-parser-api-290911430119.europe-west1.run.app"
+  );
+  const [gcsBucketName, setGcsBucketName] = useState("povlib-demobucket");
+
+  const handleAnalyzeDemo = async () => {
+    if (!demoFile) return;
+    try {
+      const form = new FormData();
+      form.append('file', demoFile);
+      form.append('cloud_run_service_url', cloudRunServiceUrl);
+      form.append('gcs_bucket_name', gcsBucketName);
+
+      setAnalysisStatus('pending');
+      setAnalysisMessage('Analyse gestartet...');
+
+      const response = await fetch('/api/parse-demo', {
+        method: 'POST',
+        body: form
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setAnalysisStatus('success');
+        setAnalysisMessage(JSON.stringify(result, null, 2));
+      } else {
+        setAnalysisStatus('error');
+        setAnalysisMessage(result.error || 'Unbekannter Fehler');
+      }
+    } catch (err) {
+      setAnalysisStatus('error');
+      setAnalysisMessage(err.message);
+    }
+  };
+
   if (!selectedDemo) return null;
 
   const generateDescription = () => {
@@ -276,6 +317,46 @@ const VideoPlayerPage = ({
                   >
                     weiterlesen <ChevronDown className="ml-1 h-4 w-4" />
                   </button>
+                )}
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <input
+                  type="file"
+                  accept=".dem"
+                  onChange={(e) => setDemoFile(e.target.files[0])}
+                  className="block w-full text-sm text-gray-300 file:bg-gray-700 file:border-0 file:rounded file:px-3 file:py-2 file:text-gray-200 file:mr-2"
+                />
+                <input
+                  type="text"
+                  value={cloudRunServiceUrl}
+                  onChange={(e) => setCloudRunServiceUrl(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 rounded text-gray-200"
+                  placeholder="Cloud Run URL"
+                />
+                <input
+                  type="text"
+                  value={gcsBucketName}
+                  onChange={(e) => setGcsBucketName(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 rounded text-gray-200"
+                  placeholder="GCS Bucket"
+                />
+                <button
+                  onClick={handleAnalyzeDemo}
+                  className="w-full px-4 py-2 bg-yellow-400 text-gray-900 rounded hover:bg-yellow-300 transition-colors"
+                >
+                  Demo analysieren
+                </button>
+                {analysisStatus === 'pending' && (
+                  <p className="text-sm text-gray-300 mt-2">{analysisMessage}</p>
+                )}
+                {analysisStatus === 'success' && (
+                  <pre className="text-sm text-green-400 whitespace-pre-wrap mt-2">
+                    {analysisMessage}
+                  </pre>
+                )}
+                {analysisStatus === 'error' && (
+                  <p className="text-sm text-red-500 mt-2">Fehler: {analysisMessage}</p>
                 )}
               </div>
 
