@@ -17,6 +17,7 @@ import {
   updateDemoPositions
 } from '@/lib/supabase';
 
+// --- HeroHeader, FilterTags, MapQuickFilters bleiben gleich wie zuvor ---
 const HeroHeader = ({ searchQuery, handleSearchChange, handleSearchSubmit, setIsFilterModalOpen }) => (
   <div className="relative py-24 bg-gradient-to-b from-gray-800 to-gray-900">
     <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
@@ -477,7 +478,9 @@ const DemosIndex = () => {
         setIsFilterModalOpen={setIsFilterModalOpen}
       />
 
+      {/* Container mit Sidebar (Tools) und Grid */}
       <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row gap-8">
+        {/* Linke Spalte: "Tools"-Bereich */}
         <aside className="md:w-1/4 w-full">
           <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
             <h3 className="text-xl font-bold text-white mb-4">Tools</h3>
@@ -497,6 +500,7 @@ const DemosIndex = () => {
           </div>
         </aside>
 
+        {/* Rechte Spalte: Haupt-Content */}
         <main className="md:w-3/4 w-full flex-1 min-w-0">
           <FilterTags
             filtersApplied={filtersApplied}
