@@ -18,9 +18,9 @@ import {
   updateDemoPositions
 } from '@/lib/supabase';
 
-// Subkomponente: Header mit Suchleiste
+// Subkomponente: Header mit mehr Platz oben (py-24 statt py-16)
 const HeroHeader = ({ searchQuery, handleSearchChange, handleSearchSubmit, setIsFilterModalOpen }) => (
-  <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
+  <div className="relative py-24 bg-gradient-to-b from-gray-800 to-gray-900">
     <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
     <div className="container mx-auto px-6 text-center">
       <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">CS2 Pro POVs Library</h1>
@@ -37,7 +37,7 @@ const HeroHeader = ({ searchQuery, handleSearchChange, handleSearchSubmit, setIs
             className="w-full p-4 pl-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-400"
           />
           <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
-          <button 
+          <button
             type="button"
             onClick={() => setIsFilterModalOpen(true)}
             className="absolute right-3 top-3 p-1 bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 rounded-lg transition-colors"
@@ -63,7 +63,7 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
           <div key={key} className="flex items-center bg-gray-700 text-xs rounded-full px-3 py-2 group hover:bg-gray-600 transition-colors">
             <span className="capitalize mr-1 text-gray-400">{key}:</span>
             <span className="font-bold text-yellow-400">{value}</span>
-            <button 
+            <button
               onClick={() => {
                 setFiltersApplied(prev => ({
                   ...prev,
@@ -77,7 +77,7 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
           </div>
         );
       })}
-      <button 
+      <button
         onClick={handleResetFilters}
         className="text-xs text-gray-400 hover:text-yellow-400 ml-2 font-bold transition-colors"
       >
@@ -100,7 +100,6 @@ const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
           demo={demo}
           onSelect={handleSelectDemo}
         />
-
       );
     })}
   </div>
@@ -144,15 +143,15 @@ const DemosIndex = () => {
   const [relatedDemos, setRelatedDemos] = useState([]);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  
+
   const [searchActive, setSearchActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  
+
   const [demoType, setDemoType] = useState('pro');
   const [filtersApplied, setFiltersApplied] = useState({
     map: '',
@@ -173,7 +172,7 @@ const DemosIndex = () => {
     results: [],
     players: []
   });
-  
+
   // Ref für Infinite Scroll
   const observer = useRef();
   const lastDemoElementRef = useCallback(node => {
@@ -186,7 +185,7 @@ const DemosIndex = () => {
     });
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore]);
-  
+
   // Initiales Laden der Daten
   useEffect(() => {
     const loadInitialData = async () => {
@@ -215,7 +214,7 @@ const DemosIndex = () => {
     };
     loadInitialData();
   }, [demoType, filtersApplied]);
-  
+
   // Hilfsfunktion zum Mappen der Demo-Daten
   const mapDemoData = (demo) => ({
     id: demo.id,
@@ -234,7 +233,7 @@ const DemosIndex = () => {
     likes: demo.likes || 0,
     isPro: demo.is_pro
   });
-  
+
   // Filterung der Demos anhand der Suchanfrage
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -242,8 +241,8 @@ const DemosIndex = () => {
       return;
     }
     const query = searchQuery.toLowerCase();
-    const filtered = demos.filter(demo => 
-      demo.title.toLowerCase().includes(query) || 
+    const filtered = demos.filter(demo =>
+      demo.title.toLowerCase().includes(query) ||
       demo.map.toLowerCase().includes(query) ||
       demo.players.some(player => player.toLowerCase().includes(query)) ||
       (demo.team && demo.team.toLowerCase().includes(query)) ||
@@ -252,7 +251,7 @@ const DemosIndex = () => {
     );
     setFilteredDemos(filtered);
   }, [searchQuery, demos]);
-  
+
   // Laden weiterer Demos beim Scrollen
   const loadMoreDemos = async () => {
     if (!hasMore || isLoading) return;
@@ -274,8 +273,8 @@ const DemosIndex = () => {
         setFilteredDemos(prev => [...prev, ...newDemos]);
       } else {
         const query = searchQuery.toLowerCase();
-        const filteredNewDemos = newDemos.filter(demo => 
-          demo.title.toLowerCase().includes(query) || 
+        const filteredNewDemos = newDemos.filter(demo =>
+          demo.title.toLowerCase().includes(query) ||
           demo.map.toLowerCase().includes(query) ||
           demo.players.some(player => player.toLowerCase().includes(query)) ||
           (demo.team && demo.team.toLowerCase().includes(query)) ||
@@ -292,41 +291,41 @@ const DemosIndex = () => {
       setIsLoading(false);
     }
   };
-  
+
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
   const handleSearchSubmit = (e) => { e.preventDefault(); };
-  
+
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
     findRelatedDemos(demo);
     updateDemoStats(demo.id, 'views', 1).catch(err => console.error('Error updating views:', err));
   };
-  
+
   const findRelatedDemos = (demo) => {
-    const related = demos.filter(d => 
+    const related = demos.filter(d =>
       d.id !== demo.id && (
-        d.map === demo.map || 
+        d.map === demo.map ||
         d.players.some(p => demo.players.includes(p)) ||
         d.positions.some(p => demo.positions.includes(p))
       )
     );
     setRelatedDemos(related.slice(0, 10));
   };
-  
+
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
     setRelatedDemos([]);
   };
-  
+
   const handleLikeDemo = async (demoId) => {
     try {
       const result = await updateDemoStats(demoId, 'likes', 1);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setDemos(prev => 
+        setDemos(prev =>
           prev.map(demo => demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo)
         );
-        setFilteredDemos(prev => 
+        setFilteredDemos(prev =>
           prev.map(demo => demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
@@ -337,16 +336,16 @@ const DemosIndex = () => {
       console.error('Error liking demo:', err);
     }
   };
-  
+
   const handleUpdateTags = async (demoId, tags) => {
     try {
       const result = await updateDemoTags(demoId, tags);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setDemos(prev => 
+        setDemos(prev =>
           prev.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo)
         );
-        setFilteredDemos(prev => 
+        setFilteredDemos(prev =>
           prev.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
@@ -358,16 +357,16 @@ const DemosIndex = () => {
       console.error('Error updating tags:', err);
     }
   };
-  
+
   const handleUpdatePositions = async (demoId, positions) => {
     try {
       const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setDemos(prev => 
+        setDemos(prev =>
           prev.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo)
         );
-        setFilteredDemos(prev => 
+        setFilteredDemos(prev =>
           prev.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
@@ -378,9 +377,9 @@ const DemosIndex = () => {
       console.error('Error updating positions:', err);
     }
   };
-  
+
   const handleSwitchDemoType = (type) => setDemoType(type);
-  
+
   const handleResetFilters = () => setFiltersApplied({
     map: '',
     position: '',
@@ -391,13 +390,13 @@ const DemosIndex = () => {
     result: '',
     search: searchQuery
   });
-  
+
   const handleApplyFilters = () => setIsFilterModalOpen(false);
-  
+
   if (selectedDemo) {
     return (
       <>
-        <VideoPlayerPage 
+        <VideoPlayerPage
           selectedDemo={selectedDemo}
           relatedDemos={relatedDemos}
           onClose={handleCloseVideoPlayer}
@@ -412,7 +411,7 @@ const DemosIndex = () => {
           setIsMenuOpen={setIsMenuOpen}
         />
         {isTaggingModalOpen && (
-          <TaggingModal 
+          <TaggingModal
             selectedDemo={selectedDemo}
             filterOptions={filterOptions}
             onClose={() => setIsTaggingModalOpen(false)}
@@ -423,7 +422,7 @@ const DemosIndex = () => {
       </>
     );
   }
-  
+
   if (isLoading && !demos.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -434,7 +433,7 @@ const DemosIndex = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -442,7 +441,7 @@ const DemosIndex = () => {
           <div className="text-red-500 text-5xl mb-4">!</div>
           <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
           <p className="text-gray-300 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
           >
@@ -452,10 +451,10 @@ const DemosIndex = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <Navbar 
+      <Navbar
         demoType={demoType}
         onSwitchDemoType={handleSwitchDemoType}
         searchActive={searchActive}
@@ -463,65 +462,102 @@ const DemosIndex = () => {
         setIsMenuOpen={setIsMenuOpen}
         isMenuOpen={isMenuOpen}
       />
-      <HeroHeader 
+
+      <HeroHeader
         searchQuery={searchQuery}
         handleSearchChange={handleSearchChange}
         handleSearchSubmit={handleSearchSubmit}
         setIsFilterModalOpen={setIsFilterModalOpen}
       />
-      <main className="container mx-auto px-6 py-12">
-        <FilterTags 
-          filtersApplied={filtersApplied}
-          setFiltersApplied={setFiltersApplied}
-          handleResetFilters={handleResetFilters}
-        />
-        {filteredDemos.length > 0 ? (
-          <DemoGrid 
-            demos={filteredDemos} 
-            lastDemoElementRef={lastDemoElementRef}
-            handleSelectDemo={handleSelectDemo}
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center h-64 bg-gray-800/50 rounded-xl border border-gray-700">
-            <div className="text-yellow-400 text-6xl mb-4">
-              <FileVideo />
-            </div>
-            <h3 className="text-white text-xl font-bold mb-2">No demos found</h3>
-            <p className="text-gray-400">Try changing your search or filters</p>
-            {(searchQuery || Object.values(filtersApplied).some(v => v)) && (
-              <button 
-                onClick={handleResetFilters}
-                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
-              >
-                Reset Filters
-              </button>
-            )}
+
+      {/* Hauptbereich mit Sidebar und Content */}
+      <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row gap-8">
+        {/* Linke Spalte: Tool-Bereich */}
+        <aside className="md:w-1/4 w-full">
+          <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+            <h3 className="text-xl font-bold text-white mb-4">Tools</h3>
+            {/* Hier können Buttons, Filter, oder andere Steuerelemente eingefügt werden */}
+            <button
+              onClick={() => setIsFilterModalOpen(true)}
+              className="w-full mb-3 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition-colors"
+            >
+              Öffne Filter
+            </button>
+            <button
+              onClick={() => setFiltersApplied({
+                map: '',
+                position: '',
+                player: '',
+                team: '',
+                year: '',
+                event: '',
+                result: '',
+                search: searchQuery
+              })}
+              className="w-full px-4 py-2 bg-gray-700 text-gray-200 font-semibold rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Filter zurücksetzen
+            </button>
+            {/* Weitere Tools können hier ergänzt werden */}
           </div>
-        )}
-        
-        {isLoading && (
-          <div className="flex justify-center mt-8">
-            <div className="w-10 h-10 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin"></div>
-          </div>
-        )}
-        
-        {!hasMore && demos.length > 0 && (
-          <div className="text-center my-12 py-6 border-t border-gray-800">
-            <p className="text-gray-400">You've reached the end of the demos list</p>
-          </div>
-        )}
-        
-        {!Object.values(filtersApplied).some(v => v) && filterOptions.maps && filterOptions.maps.length > 0 && (
-          <MapQuickFilters 
-            filterOptions={filterOptions}
-            demos={demos}
+        </aside>
+
+        {/* Rechte Spalte: Haupt-Content */}
+        <main className="md:w-3/4 w-full">
+          <FilterTags
+            filtersApplied={filtersApplied}
             setFiltersApplied={setFiltersApplied}
+            handleResetFilters={handleResetFilters}
           />
-        )}
-      </main>
-      
+
+          {filteredDemos.length > 0 ? (
+            <DemoGrid
+              demos={filteredDemos}
+              lastDemoElementRef={lastDemoElementRef}
+              handleSelectDemo={handleSelectDemo}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-64 bg-gray-800/50 rounded-xl border border-gray-700">
+              <div className="text-yellow-400 text-6xl mb-4">
+                <FileVideo />
+              </div>
+              <h3 className="text-white text-xl font-bold mb-2">No demos found</h3>
+              <p className="text-gray-400">Try changing your search or filters</p>
+              {(searchQuery || Object.values(filtersApplied).some(v => v)) && (
+                <button
+                  onClick={handleResetFilters}
+                  className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
+                >
+                  Reset Filters
+                </button>
+              )}
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="flex justify-center mt-8">
+              <div className="w-10 h-10 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {!hasMore && demos.length > 0 && (
+            <div className="text-center my-12 py-6 border-t border-gray-800">
+              <p className="text-gray-400">You've reached the end of the demos list</p>
+            </div>
+          )}
+
+          {!Object.values(filtersApplied).some(v => v) && filterOptions.maps && filterOptions.maps.length > 0 && (
+            <MapQuickFilters
+              filterOptions={filterOptions}
+              demos={demos}
+              setFiltersApplied={setFiltersApplied}
+            />
+          )}
+        </main>
+      </div>
+
       {isFilterModalOpen && (
-        <FilterModal 
+        <FilterModal
           demoType={demoType}
           filterOptions={filterOptions}
           filtersApplied={filtersApplied}
@@ -531,7 +567,7 @@ const DemosIndex = () => {
           onApplyFilters={handleApplyFilters}
         />
       )}
-      
+
       <Footer />
     </div>
   );
