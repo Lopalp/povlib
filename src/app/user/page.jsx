@@ -1,7 +1,6 @@
 // src/app/user/page.jsx
 'use client';
-
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Settings } from 'lucide-react';
 import Navbar from '../../components/POVlib/Navbar';
@@ -11,6 +10,7 @@ import CreateDemoModal from '../../components/POVlib/CreateDemoModal';
 import { CategorySection } from '../../components/containers/CategorySection';
 import UtilityBook from '../../components/POVlib/UtilityBook';
 import { getFilteredDemos } from '@/lib/supabase';
+import { UserContext } from '../../../context/UserContext';
 
 const mapDemo = demo => ({
   id: demo.id,
@@ -34,7 +34,7 @@ export default function UserPage() {
   const router = useRouter();
 
   // user & loading
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
 
   // demo lists
@@ -63,24 +63,10 @@ export default function UserPage() {
   const totalViews = useMemo(() => allDemos.reduce((sum, d) => sum + d.views, 0), [allDemos]);
   const followerCount = 1234; // placeholder
 
-  // simulate user fetch
-  useEffect(() => {
-    setTimeout(() => {
-      setUser({
-        name: 'Jane Doe',
-        email: 'jane.doe@example.com',
-        joinDate: '2024-01-15',
-        credits: 5,
-        plan: 'Standard',
-        nextBilling: '2025-06-01'
-      });
-      setLoading(false);
-    }, 500);
-  }, []);
-
   // fetch demos
   useEffect(() => {
-    if (!loading && user) {
+    console.log(user)
+    if (user) {
       (async () => {
         const demos = await getFilteredDemos({}, 'all');
         const mapped = demos.map(mapDemo);
@@ -98,6 +84,7 @@ export default function UserPage() {
 
         setTrendingDemos([...mapped].sort((a,b)=>b.views-a.views).slice(0,6));
         setLatestDemos([...mapped].sort((a,b)=>b.year-b.year).slice(0,6));
+        setLoading(false);
       })();
     }
   }, [loading, user]);
@@ -140,9 +127,7 @@ export default function UserPage() {
           <section className="bg-gray-800 rounded-xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold text-yellow-400">
-                {user.name.charAt(0)}
-              </div>
+              <img src={user.avatar_url} className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold text-yellow-400" />
               <button
                 onClick={() => setActiveTab('Settings')}
                 className="absolute top-0 right-0 p-1 bg-gray-700 rounded-full hover:bg-gray-600"

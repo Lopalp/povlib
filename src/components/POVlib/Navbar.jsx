@@ -152,7 +152,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
             {user ? (
               <div className="relative">
-                <button onClick={() => setUserMenuOpen(o => !o)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer">
+                <button onClick={() => router.push('/user')} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
                     {user.avatar_url ? <img src={user.avatar_url} alt={user.name.slice(0,1)} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-gray-400">{user.name.slice(0,1)}</div>}
                   </div>

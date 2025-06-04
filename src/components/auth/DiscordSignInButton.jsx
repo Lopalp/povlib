@@ -41,7 +41,7 @@ export default function DiscordLoginButton() {
       </div>
       {/* Use a utility class for spacing instead of an empty div */}
       <div className="w-3"></div> {/* Equivalent to width: 13px */}
-      <span className="text-base font-thin text-white text-[14px]" style={{fontWeight: 500}}>Sign in with Discord</span>
+      <span className="text-base font-thin text-white text-[13px]" style={{fontWeight: 300}}>Sign in with Discord</span>
     </button>
   );
 }
