@@ -501,7 +501,7 @@ const PlayerPage = ({ playerName }) => {
               </div>
             </div>
             
-            <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-6">
+            <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-8">
               {trendingDemos.map(demo => (
                 <DemoCard 
                   key={`trending-${demo.id}`} 
@@ -538,7 +538,7 @@ const PlayerPage = ({ playerName }) => {
               )}
             </div>
             
-            <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-6">
+            <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-8">
               {demos.map(demo => (
                 <DemoCard 
                   key={`map-${map}-${demo.id}`} 
@@ -577,7 +577,7 @@ const PlayerPage = ({ playerName }) => {
                 )}
               </div>
               
-              <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-6">
+              <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-8">
                 {demos.map(demo => (
                   <DemoCard 
                     key={`event-${event}-${demo.id}`} 
@@ -616,7 +616,7 @@ const PlayerPage = ({ playerName }) => {
                 )}
               </div>
               
-              <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-6">
+              <div className="flex overflow-x-auto pb-4 custom-scrollbar gap-8">
                 {demos.map(demo => (
                   <DemoCard 
                     key={`year-${year}-${demo.id}`} 
@@ -634,7 +634,7 @@ const PlayerPage = ({ playerName }) => {
             <span className="border-l-4 border-yellow-400 pl-3 py-1">All POVs</span>
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {allDemos.map((demo, index) => {
               // If this is the last item, attach the ref for intersection observer
               if (index === allDemos.length - 1) {
