@@ -675,7 +675,7 @@ const MapPage = ({ mapName }) => {
             <h2 className="text-2xl font-bold text-white mb-6">
               <span className="border-l-4 border-yellow-400 pl-3 py-1">All POV Demos</span>
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {allDemos.map(demo => (
                 <DemoCard key={demo.id} demo={demo} onSelectDemo={handleSelectDemo} onLike={handleLikeDemo} />
               ))}

@@ -89,7 +89,7 @@ const FilterTags = ({ filtersApplied, setFiltersApplied, handleResetFilters }) =
 
 // Subkomponente: Grid zur Anzeige der Demos
 const DemoGrid = ({ demos, lastDemoElementRef, handleSelectDemo }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6 youtube-like-grid">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 p-6 youtube-like-grid">
     {demos.map((demo, index) => {
       const isLastElement = index === demos.length - 1;
 

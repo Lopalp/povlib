@@ -16,62 +16,45 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
   return (
     <article
-      className={`
-        relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md transition-all duration-200
-        hover:shadow-xl hover:border-yellow-500 cursor-pointer overflow-hidden
-        ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
-      `}
+      className={`relative flex flex-col rounded-2xl bg-gray-800 border border-gray-700 shadow-md hover:shadow-lg hover:border-yellow-500 cursor-pointer overflow-hidden transition-all duration-200 ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}`}
       onClick={() => onSelect(demo)}
     >
-      {/* ======= Thumbnail Section ======= */}
-      <div className="relative w-full aspect-video overflow-hidden group">
+      {/* === Thumbnail === */}
+      <figure className="relative aspect-video group">
         <img
           src={demo.thumbnail}
           alt={demo.title}
-          className="w-full h-full object-cover brightness-90 transition-all duration-200 group-hover:brightness-75"
+          className="absolute inset-0 w-full h-full object-cover brightness-90 transition-all group-hover:brightness-75"
           loading="lazy"
         />
-
-        {/* Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
-              hover:bg-black/80 hover:scale-105 transition-all duration-200"
-          >
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <button className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 hover:bg-black/80 hover:scale-105 transition-all">
             <Play className="h-5 w-5" fill="currentColor" />
           </button>
         </div>
-      </div>
+      </figure>
 
-      {/* ======= Content Section ======= */}
-      <div className="flex flex-col flex-grow p-4 space-y-3">
-        {/* ----- Header (Title + Meta) ----- */}
+      {/* === Content === */}
+      <div className="flex flex-col flex-grow p-4 space-y-4">
         <header className="space-y-2">
-          <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
-            group-hover:text-yellow-400 transition-colors duration-200">
+          <h3 className="text-lg font-bold leading-tight text-white line-clamp-2 group-hover:text-yellow-400 transition-colors">
             {demo.title}
           </h3>
-
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
-            {demo.team && (
-              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
-            )}
-            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
-          </div>
+          <ul className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
+            <li className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</li>
+            {demo.team && <li className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</li>}
+            <li className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</li>
+          </ul>
         </header>
 
-        <div className="border-t border-gray-700"></div>
-
-        {/* ----- Player + KDA ----- */}
-        <section className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between border-t border-gray-700 pt-3">
+          <div className="flex items-center gap-2">
             <User className="h-5 w-5 text-gray-400" />
             {demo.players.slice(0, 1).map((player, idx) => (
               <Link
                 key={idx}
                 href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
-                className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
+                className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors"
                 onClick={(e) => handlePlayerClick(e, player)}
               >
                 {player}
@@ -81,40 +64,29 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
           <div className="text-xs font-semibold text-gray-400 tracking-wide bg-gray-700 px-2 py-1 rounded-md">
             {mockKDA}
           </div>
-        </section>
+        </div>
 
-        {/* ----- Tags + Positions ----- */}
-        <section className="flex flex-wrap gap-2">
+        <ul className="flex flex-wrap gap-2 border-t border-gray-700 pt-3">
           {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-            <span
+            <li
               key={i}
-              className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
-                hover:bg-gray-600 transition-colors duration-150"
+              className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full hover:bg-gray-600 transition-colors"
             >
               {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
               {item}
-            </span>
+            </li>
           ))}
           {(demo.positions.length + demo.tags.length) > 4 && (
-            <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
+            <li className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
               +{demo.positions.length + demo.tags.length - 4} more
-            </span>
+            </li>
           )}
-        </section>
+        </ul>
 
-        <div className="border-t border-gray-700"></div>
-
-        {/* ----- CT/T Rounds Bar ----- */}
-        <footer className="mt-2">
+        <footer className="pt-3 border-t border-gray-700">
           <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
-            <div
-              className="bg-blue-500/60 h-full transition-all duration-300"
-              style={{ width: `${ctPercentage}%` }}
-            />
-            <div
-              className="bg-yellow-500/60 h-full transition-all duration-300"
-              style={{ width: `${100 - ctPercentage}%` }}
-            />
+            <div className="bg-blue-500/60 h-full transition-all duration-300" style={{ width: `${ctPercentage}%` }} />
+            <div className="bg-yellow-500/60 h-full transition-all duration-300" style={{ width: `${100 - ctPercentage}%` }} />
           </div>
           <div className="mt-1 flex justify-between text-[10px] text-gray-500 font-medium">
             <span>CT: {ctRounds}</span>

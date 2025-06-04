@@ -78,7 +78,7 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
     e.stopPropagation();
     const card = carouselRef.current.querySelector('div');
     const cardWidth = card ? card.offsetWidth : 300;
-    const gap = 24;
+    const gap = 32;
     scrollByAmount(-(cardWidth + gap));
   };
 
@@ -87,7 +87,7 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
     e.stopPropagation();
     const card = carouselRef.current.querySelector('div');
     const cardWidth = card ? card.offsetWidth : 300;
-    const gap = 24;
+    const gap = 32;
     scrollByAmount(cardWidth + gap);
   };
 
@@ -172,7 +172,7 @@ const ImprovedDemoCarousel = ({ title, demos, description, onSelectDemo }) => {
 
         <div
           ref={carouselRef}
-          className="flex overflow-x-auto pb-4 gap-6 relative scroll-smooth"
+          className="flex overflow-x-auto pb-4 gap-8 relative scroll-smooth"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',

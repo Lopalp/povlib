@@ -2,7 +2,7 @@
 // CategorySection
 // ────────────────
 // Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
+// Der feste Abstand (gap) wird in die Berechnung der Kartenbreite einbezogen,
 // sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
 // Mit "View More" wird eine weitere Zeile freigeschaltet.
 // ────────────────
@@ -14,7 +14,7 @@
 import { useRef, useState, useEffect } from "react";
 import DemoCard from "../POVlib/DemoCard";
 
-export const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
+export const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 32 }) => {
   const containerRef = useRef(null);
   const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
   const [visibleRows, setVisibleRows] = useState(1);
