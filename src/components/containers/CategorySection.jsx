@@ -65,7 +65,7 @@ export const CategorySection = ({
           ))}
         </div>
       </div>
-
+ 
       {canViewMore && (
         <div className="mt-2 text-center">
           <button
