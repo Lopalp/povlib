@@ -130,6 +130,13 @@ const PlanComparisonModule = ({ currentPlan }) => {
   return (
     <>
       <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
+ <style jsx>{`
+ .bg-pattern-fade {
+ background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+ background-size: 20px 20px;
+ mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+ }
+ `}</style>
         {/* Header */}
         <div>
           <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
