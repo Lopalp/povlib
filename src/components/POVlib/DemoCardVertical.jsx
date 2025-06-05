@@ -13,7 +13,7 @@ const DemoCardVertical = ({ demo, onSelect }) => {
       <div className="relative w-full pb-[133%] bg-black">
         <video
           src={demo.videoUrl}
-          poster={demo.thumbnail}
+          poster={"/img/v1.png"}
           muted
           loop
           playsInline
