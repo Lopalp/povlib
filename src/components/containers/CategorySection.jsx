@@ -10,7 +10,7 @@ export const CategorySection = ({
 }) => {
   const [visibleRows, setVisibleRows] = useState(1);
 
-  // Pro Klick laden wir 4 weitere Elemente (1 Reihe × 4 Spalten).
+  // Pro Klick kommen 4 neue Elemente (1 Reihe × 4 Spalten)
   const baseLoad = 4;
   const visibleCount = visibleRows * baseLoad;
   const visibleDemos = demos.slice(0, visibleCount);
@@ -30,7 +30,7 @@ export const CategorySection = ({
           margin: 0,
         }}
       >
-        {/* === Hier das Grid-Layout === */}
+        {/* === Grid-Layout === */}
         <div
           className="grid"
           style={{
@@ -48,21 +48,53 @@ export const CategorySection = ({
 
       {canViewMore && (
         <div className="mt-4">
-          <button
-            onClick={() => setVisibleRows(visibleRows + 1)}
-            className="
-              w-full
-              flex justify-center items-center gap-2
-              px-4 py-2
-              rounded-md
-              border border-gray-600
-              text-white text-sm font-semibold
-              hover:border-yellow-400
-              transition-colors
-            "
-          >
-            View More
-          </button>
+          {/* 
+            Hier: Container mit 'group', damit wir per group-hover
+            die Linien animieren können. 
+          */}
+          <div className="flex items-center group">
+            {/* Linke Linie */}
+            <span
+              className="
+                flex-1            /* füllt den zur Verfügung stehenden Platz links */
+                h-px              /* Höhe = 1px (gleich dick wie border: 1px) */
+                bg-gray-600       /* gleiche Farbe wie button-border */
+                scale-x-0         /* initial: auf 0 skaliert */
+                group-hover:scale-x-100   /* beim Hover auf group: volle Breite */
+                transition-transform duration-300  /* sanfte Animation (300ms) */
+                origin-left       /* Skalierung beginnt links */
+              "
+            ></span>
+
+            {/* Button selbst */}
+            <button
+              onClick={() => setVisibleRows(visibleRows + 1)}
+              className="
+                mx-4               /* Abstand zu den Linien: 1rem (Tailwind) links & rechts */
+                px-4 py-2          /* horizontales/vertikales Padding */
+                rounded-md         /* abgerundete Ecken */
+                border border-gray-600  /* 1px Border, grau */
+                text-white text-sm font-semibold
+                transition-colors
+                hover:border-yellow-400   /* beim Hover: Border wird gelb */
+              "
+            >
+              View More
+            </button>
+
+            {/* Rechte Linie */}
+            <span
+              className="
+                flex-1
+                h-px
+                bg-gray-600
+                scale-x-0
+                group-hover:scale-x-100
+                transition-transform duration-300
+                origin-right      /* Skalierung beginnt rechts */
+              "
+            ></span>
+          </div>
         </div>
       )}
     </section>
