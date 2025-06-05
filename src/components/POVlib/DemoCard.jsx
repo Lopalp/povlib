@@ -26,7 +26,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const tRounds = (demo.id % 5) + 8;
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
-  const mockKDA = "23/5/2"; // Platzhalter
+  const mockKDA = "23/5/2";
 
   return (
     <article

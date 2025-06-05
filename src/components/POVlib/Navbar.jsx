@@ -210,63 +210,23 @@ export default function Navbar({
 
             {user ? (
               <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen((prev) => !prev)}
-                  className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer"
-                >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    {user.avatar_url ? (
-                      <img
-                        src={user.avatar_url}
-                        alt={user.name.slice(0, 1)}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        {user.name.slice(0, 1)}
-                      </div>
-                    )}
+                <Link href="/user" className="block">
+                  <div className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
+                      {user.avatar_url ? (
+                        <img
+                          src={user.avatar_url}
+                          alt={user.name.slice(0, 1)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          {user.name.slice(0, 1)}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </button>
-                {userMenuOpen && (
-                  <ul
-                    className={`absolute right-0 mt-2 w-48 rounded-lg py-2 shadow-lg ${glassBg} z-50`}
-                  >
-                    <li>
-                      <Link
-                        href="/user"
-                        className="block px-4 py-2 text-sm text-white hover:text-yellow-400"
-                      >
-                        Your Profile
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/favorites"
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400"
-                      >
-                        Favorites
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/settings"
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400"
-                      >
-                        Settings
-                      </Link>
-                    </li>
-                    <li className="border-t border-gray-600 my-1"></li>
-                    <li>
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-500 cursor-pointer"
-                      >
-                        Sign Out
-                      </button>
-                    </li>
-                  </ul>
-                )}
+                </Link>
               </div>
             ) : (
               <Link
