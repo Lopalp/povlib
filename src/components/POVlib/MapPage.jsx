@@ -23,9 +23,9 @@ import TaggingModal from "./TaggingModal";
 import FilterModal from "./FilterModal";
 
 // Die drei neuen Container‐Komponenten:
-import CategorySectionFeatured from "../components/containers/CategorySectionFeatured";
-import CategoryCarousel from "../components/containers/CategoryCarousel";
-import CategorySection from "../components/containers/CategorySection";
+import CategorySectionFeatured from "../../components/containers/CategorySectionFeatured";
+import CategoryCarousel from "../../components/containers/CategoryCarousel";
+import CategorySection from "../../components/containers/CategorySection";
 
 import {
   getDemosByMap,
