@@ -4,14 +4,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Filter, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-import Navbar from './Navbar';
-import Footer from './Footer';
-import DemoCard from './DemoCard';
-import VideoPlayerPage from './VideoPlayerPage';
-import TaggingModal from './TaggingModal';
-import FilterModal from './FilterModal';
+import Navbar from '../Navbar';
+import Footer from '../Footer';
+import DemoCard from '../DemoCard';
+import VideoPlayerPage from '../VideoPlayerPage';
+import TaggingModal from '../TaggingModal';
+import FilterModal from '../FilterModal';
 
-// Angepasste Imports für die drei neuen Komponenten:
+// NEUE Imports für die drei Container-Komponenten:
 import CategorySection from '../../components/containers/CategorySection';
 import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
 import CategoryCarousel from '../../components/containers/CategoryCarousel';
@@ -121,7 +121,7 @@ const PlayerPage = ({ playerName }) => {
     loadPlayerData();
   }, [playerName, demoType, filtersApplied]);
 
-  // Hilfsfunktion: Rohdaten in gewünschtes Objekt umwandeln
+  // Mappt Rohdaten in das interne Demo-Format
   const mapDemoData = (demo) => ({
     id: demo.id,
     title: demo.title,
@@ -140,7 +140,7 @@ const PlayerPage = ({ playerName }) => {
     isPro: demo.is_pro
   });
 
-  // Weitere Demos laden (Infinite Scroll)
+  // Lädt weitere Demos (Infinite Scroll)
   const loadMoreDemos = async () => {
     if (!hasMore || isLoading) return;
     try {
@@ -155,20 +155,18 @@ const PlayerPage = ({ playerName }) => {
       const mappedDemos = demosData.map(mapDemoData);
       setAllDemos(prev => [...prev, ...mappedDemos]);
 
-      // Aktualisiere Gruppierungen
+      // Aktualisiere Gruppen
       const updatedByMap = { ...demosByMap };
       const updatedByEvent = { ...demosByEvent };
       const updatedByYear = { ...demosByYear };
       mappedDemos.forEach(demo => {
-        // Map
         if (!updatedByMap[demo.map]) updatedByMap[demo.map] = [];
         updatedByMap[demo.map].push(demo);
-        // Event
+
         if (demo.event) {
           if (!updatedByEvent[demo.event]) updatedByEvent[demo.event] = [];
           updatedByEvent[demo.event].push(demo);
         }
-        // Year
         if (!updatedByYear[demo.year]) updatedByYear[demo.year] = [];
         updatedByYear[demo.year].push(demo);
       });
@@ -201,13 +199,13 @@ const PlayerPage = ({ playerName }) => {
     [isLoading, hasMore]
   );
 
-  // Handler: Demo auswählen (startet VideoPlayer)
+  // Demo auswählen – öffnet den VideoPlayer
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
     setIsFullScreenPlayer(true);
     findRelatedDemos(demo);
-    updateDemoStats(demo.id, 'views', 1).catch((err) =>
+    updateDemoStats(demo.id, 'views', 1).catch(err =>
       console.error('Error updating views:', err)
     );
     window.scrollTo(0, 0);
@@ -215,12 +213,13 @@ const PlayerPage = ({ playerName }) => {
 
   // Verwandte Demos finden
   const findRelatedDemos = (demo) => {
-    const related = allDemos.filter(
-      (d) =>
-        d.id !== demo.id &&
-        (d.map === demo.map ||
-          d.players.some((p) => demo.players.includes(p)) ||
-          d.positions.some((pos) => demo.positions.includes(pos)))
+    const related = allDemos.filter(d =>
+      d.id !== demo.id &&
+      (
+        d.map === demo.map ||
+        d.players.some(p => demo.players.includes(p)) ||
+        d.positions.some(pos => demo.positions.includes(pos))
+      )
     );
     setRelatedDemos(related.slice(0, 10));
   };
@@ -239,11 +238,10 @@ const PlayerPage = ({ playerName }) => {
       const result = await updateDemoStats(demoId, 'likes', 1);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        // allDemos aktualisieren
-        setAllDemos((prev) =>
-          prev.map((d) => (d.id === demoId ? { ...d, likes: updatedDemo.likes } : d))
+        // allDemos updaten
+        setAllDemos(prev =>
+          prev.map(d => d.id === demoId ? { ...d, likes: updatedDemo.likes } : d)
         );
-        // Falls aktuell ausgewählt, ebenfalls updaten
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
@@ -253,14 +251,14 @@ const PlayerPage = ({ playerName }) => {
     }
   };
 
-  // Tags aktualisieren
+  // Tags updaten
   const handleUpdateTags = async (demoId, tags) => {
     try {
       const result = await updateDemoTags(demoId, tags);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setAllDemos((prev) =>
-          prev.map((d) => (d.id === demoId ? { ...d, tags: updatedDemo.tags } : d))
+        setAllDemos(prev =>
+          prev.map(d => d.id === demoId ? { ...d, tags: updatedDemo.tags } : d)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
@@ -272,14 +270,14 @@ const PlayerPage = ({ playerName }) => {
     }
   };
 
-  // Positionen aktualisieren
+  // Positionen updaten
   const handleUpdatePositions = async (demoId, positions) => {
     try {
       const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setAllDemos((prev) =>
-          prev.map((d) => (d.id === demoId ? { ...d, positions: updatedDemo.positions } : d))
+        setAllDemos(prev =>
+          prev.map(d => d.id === demoId ? { ...d, positions: updatedDemo.positions } : d)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
@@ -293,27 +291,20 @@ const PlayerPage = ({ playerName }) => {
   const handleSwitchDemoType = (type) => setDemoType(type);
 
   const handleResetFilters = () =>
-    setFiltersApplied({
-      map: '',
-      position: '',
-      team: '',
-      year: '',
-      event: '',
-      result: '',
-    });
+    setFiltersApplied({ map: '', position: '', team: '', year: '', event: '', result: '' });
   const handleApplyFilters = () => setIsFilterModalOpen(false);
 
   const handleSelectRelatedDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
     findRelatedDemos(demo);
-    updateDemoStats(demo.id, 'views', 1).catch((err) =>
+    updateDemoStats(demo.id, 'views', 1).catch(err =>
       console.error('Error updating views:', err)
     );
     window.scrollTo(0, 0);
   };
 
-  // Lade-Zustand (fullscreen, bevor Content da ist)
+  // Lade-Zustand (fullscreen, bevor Content geladen)
   if (isLoading && !allDemos.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -377,7 +368,8 @@ const PlayerPage = ({ playerName }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
+    // Hier: pt-20 gibt der Navbar oben Platz
+    <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           display: none;
@@ -403,8 +395,8 @@ const PlayerPage = ({ playerName }) => {
 
       {/* Player Header */}
       <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10" />
 
         <div className="container mx-auto px-6 pt-12 pb-16 relative z-20">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
@@ -432,7 +424,7 @@ const PlayerPage = ({ playerName }) => {
 
               <p className="text-gray-300 mb-6 max-w-2xl">
                 {player?.bio ||
-                  `Watch the best POV demos from ${playerName}. Analyze positioning, setups, and gameplay to improve your own CS2 skills.`}
+                  `Watch the best POV demos from ${playerName}. Analyze positioning, setups, and gameplay to improve your own skills.`}
               </p>
 
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
@@ -480,7 +472,7 @@ const PlayerPage = ({ playerName }) => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 bg-pattern">
-        {/* === 1. Most Popular POVs als Featured-Section === */}
+        {/* == 1. Most Popular POVs (Trending) == */}
         {trendingDemos.length > 0 && (
           <CategorySectionFeatured
             title="Most Popular POVs"
@@ -490,47 +482,134 @@ const PlayerPage = ({ playerName }) => {
           />
         )}
 
-        {/* === 2. Demos nach Map als Carousel === */}
-        {Object.entries(demosByMap).map(([map, demos]) => (
-          <div className="mb-16" key={`map-${map}`}>
-            <CategoryCarousel
-              title={`${map} Demos`}
-              demos={demos}
-              onSelectDemo={handleSelectDemo}
-              gap={24}
-            />
-          </div>
-        ))}
+        {/* == 2. Demos nach Map == */}
+        {Object.entries(demosByMap).map(([map, demos]) => {
+          const len = demos.length;
+          // ≤ 3 → Featured
+          // 4–5 → Carousel
+          // ≥ 6 → Grid (CategorySection)
+          if (len <= 3) {
+            return (
+              <div className="mb-16" key={`map-featured-${map}`}>
+                <CategorySectionFeatured
+                  title={`${map} Demos`}
+                  demos={demos}
+                  onSelectDemo={handleSelectDemo}
+                  gap={24}
+                />
+              </div>
+            );
+          } else if (len <= 5) {
+            return (
+              <div className="mb-16" key={`map-carousel-${map}`}>
+                <CategoryCarousel
+                  title={`${map} Demos`}
+                  demos={demos}
+                  onSelectDemo={handleSelectDemo}
+                  gap={24}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div className="mb-16" key={`map-grid-${map}`}>
+                <CategorySection
+                  title={`${map} Demos`}
+                  demos={demos}
+                  onSelectDemo={handleSelectDemo}
+                  minCardWidth={280}
+                  gap={24}
+                />
+              </div>
+            );
+          }
+        })}
 
-        {/* === 3. Demos nach Event als Carousel === */}
+        {/* == 3. Demos nach Event == */}
         {Object.entries(demosByEvent)
           .filter(([event]) => event)
-          .map(([event, demos]) => (
-            <div className="mb-16" key={`event-${event}`}>
-              <CategoryCarousel
-                title={event}
-                demos={demos}
-                onSelectDemo={handleSelectDemo}
-                gap={24}
-              />
-            </div>
-          ))}
+          .map(([event, demos]) => {
+            const len = demos.length;
+            if (len <= 3) {
+              return (
+                <div className="mb-16" key={`event-featured-${event}`}>
+                  <CategorySectionFeatured
+                    title={event}
+                    demos={demos}
+                    onSelectDemo={handleSelectDemo}
+                    gap={24}
+                  />
+                </div>
+              );
+            } else if (len <= 5) {
+              return (
+                <div className="mb-16" key={`event-carousel-${event}`}>
+                  <CategoryCarousel
+                    title={event}
+                    demos={demos}
+                    onSelectDemo={handleSelectDemo}
+                    gap={24}
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div className="mb-16" key={`event-grid-${event}`}>
+                  <CategorySection
+                    title={event}
+                    demos={demos}
+                    onSelectDemo={handleSelectDemo}
+                    minCardWidth={280}
+                    gap={24}
+                  />
+                </div>
+              );
+            }
+          })}
 
-        {/* === 4. Demos nach Year als Carousel === */}
+        {/* == 4. Demos nach Jahr == */}
         {Object.entries(demosByYear)
           .sort(([yearA], [yearB]) => parseInt(yearB) - parseInt(yearA))
-          .map(([year, demos]) => (
-            <div className="mb-16" key={`year-${year}`}>
-              <CategoryCarousel
-                title={`${year} POVs`}
-                demos={demos}
-                onSelectDemo={handleSelectDemo}
-                gap={24}
-              />
-            </div>
-          ))}
+          .map(([year, demos]) => {
+            const len = demos.length;
+            if (len <= 3) {
+              return (
+                <div className="mb-16" key={`year-featured-${year}`}>
+                  <CategorySectionFeatured
+                    title={`${year} POVs`}
+                    demos={demos}
+                    onSelectDemo={handleSelectDemo}
+                    gap={24}
+                  />
+                </div>
+              );
+            } else if (len <= 5) {
+              return (
+                <div className="mb-16" key={`year-carousel-${year}`}>
+                  <CategoryCarousel
+                    title={`${year} POVs`}
+                    demos={demos}
+                    onSelectDemo={handleSelectDemo}
+                    gap={24}
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div className="mb-16" key={`year-grid-${year}`}>
+                  <CategorySection
+                    title={`${year} POVs`}
+                    demos={demos}
+                    onSelectDemo={handleSelectDemo}
+                    minCardWidth={280}
+                    gap={24}
+                  />
+                </div>
+              );
+            }
+          })}
 
-        {/* === 5. All POVs als Grid mit Load More === */}
+        {/* == 5. All POVs (Grid mit „View More“) == */}
         <div className="mb-16">
           <CategorySection
             title="All POVs"

@@ -1,16 +1,27 @@
-// src/components/containers/CategorySectionFeatured.jsx
-
-import React, { useRef, useState, useEffect } from "react";
+import React from "react";
 import DemoCard from "../POVlib/DemoCard";
 
-export const CategorySectionFeatured = ({
-  title,
-  demos,
-  onSelectDemo,
-  gap = 24,
-}) => {
+/**
+ * Zeigt bis zu 3 Demos in einer gleichmäßigen Zeile an.
+ * Je nachdem, ob 1, 2 oder 3 Demos vorhanden sind, nimmt jede Karte
+ * 100 %, 50 % oder 33 % der Breite ein und ist „kleiner“ gehalten.
+ */
+export const CategorySectionFeatured = ({ title, demos, onSelectDemo, gap = 24 }) => {
   const displayedDemos = demos.slice(0, 3);
   const count = displayedDemos.length;
+
+  // Tailwind-Klassen dafür, wie breit jede Karte ist:
+  // - 1 Demo: mx-auto 50 % Breite
+  // - 2 Demos: je 1/2 Breite
+  // - 3 Demos: je 1/3 Breite
+  let widthClass;
+  if (count === 1) {
+    widthClass = "w-1/2 mx-auto";
+  } else if (count === 2) {
+    widthClass = "w-1/2";
+  } else {
+    widthClass = "w-1/3";
+  }
 
   return (
     <section className="mt-8 mb-6">
@@ -18,51 +29,15 @@ export const CategorySectionFeatured = ({
         <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
       </h2>
 
-      <div ref={useRef()} className="overflow-hidden" style={{ boxSizing: "border-box", padding: 0, margin: 0 }}>
-        {count === 1 && (
-          <div className="w-full">
-            <DemoCard demo={displayedDemos[0]} onSelect={onSelectDemo} />
+      <div className="flex flex-wrap" style={{ gap: `${gap}px` }}>
+        {displayedDemos.map((demo) => (
+          <div key={demo.id} className={`${widthClass} flex-shrink-0`}>
+            <DemoCard demo={demo} onSelect={onSelectDemo} />
           </div>
-        )}
-        {count === 2 && (
-          <div
-            className="grid"
-            style={{
-              gap: `${gap}px`,
-              gridTemplateColumns: `repeat(2, minmax(0, 1fr))`,
-            }}
-          >
-            {displayedDemos.map((demo) => (
-              <div key={demo.id} className="w-full">
-                <DemoCard demo={demo} onSelect={onSelectDemo} />
-              </div>
-            ))}
-          </div>
-        )}
-        {count === 3 && (
-          <div
-            className="grid"
-            style={{
-              gap: `${gap}px`,
-              gridTemplateColumns: `repeat(2, minmax(0, 1fr))`,
-              gridTemplateRows: `auto auto`,
-            }}
-          >
-            <div key={displayedDemos[0].id} className="col-span-2 w-full">
-              <DemoCard demo={displayedDemos[0]} onSelect={onSelectDemo} />
-            </div>
-            <div key={displayedDemos[1].id} className="w-full">
-              <DemoCard demo={displayedDemos[1]} onSelect={onSelectDemo} />
-            </div>
-            <div key={displayedDemos[2].id} className="w-full">
-              <DemoCard demo={displayedDemos[2]} onSelect={onSelectDemo} />
-            </div>
-          </div>
-        )}
+        ))}
       </div>
     </section>
   );
 };
 
-// Default-Export hinzufügen
 export default CategorySectionFeatured;

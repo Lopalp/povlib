@@ -1,5 +1,3 @@
-// src/components/containers/CategorySection.jsx
-
 import React, { useRef, useState, useEffect } from "react";
 import DemoCard from "../POVlib/DemoCard";
 
@@ -82,5 +80,4 @@ export const CategorySection = ({
   );
 };
 
-// Ganz unten: Default-Export hinzufügen, falls Ihr das per Default-Import holen wollt
 export default CategorySection;
