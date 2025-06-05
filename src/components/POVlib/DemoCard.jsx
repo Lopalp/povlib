@@ -2,6 +2,20 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Play, Tag as TagIcon, User } from "lucide-react";
 
+const getRandomImage = () => {
+  const images = [
+    "/img/1.png",
+    "/img/2.png",
+    "/img/3.png",
+    "/img/4.png",
+    "/img/5.png",
+    "/img/6.png",
+    "/img/7.png",
+    "/img/8.png",
+  ];
+  return images[Math.floor(Math.random() * images.length)];
+};
+
 const DemoCard = ({ demo, onSelect, className = "" }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -22,7 +36,7 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
       {/** ─── Thumbnail mit leichten Rundungen ─── */}
       <div className="overflow-hidden rounded-lg">
         <img
-          src={demo.thumbnail}
+          src={getRandomImage()}
           alt={demo.title}
           className="w-full aspect-video object-cover transition-transform duration-200 
                      group-hover:scale-105"
