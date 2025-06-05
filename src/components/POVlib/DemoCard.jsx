@@ -8,7 +8,16 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   };
 
   const getRandomImage = () => {
-    const images = ["/img/1.png", "/img/2.png", "/img/3.png"];
+    const images = [
+      "/img/1.png",
+      "/img/2.png",
+      "/img/3.png",
+      "/img/4.png",
+      "/img/5.png",
+      "/img/6.png",
+      "/img/7.png",
+      "/img/8.png",
+    ];
     return images[Math.floor(Math.random() * images.length)];
   };
 

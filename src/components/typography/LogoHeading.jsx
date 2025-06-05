@@ -23,10 +23,11 @@ const LogoHeading = ({ size }) => {
           fontSize: `${size}rem`,
           lineHeight: `${size * 1.2}rem`,
           marginTop: 4,
+          fontFamily: "Arial, sans-serif",
         }}
       >
         <span className="text-yellow-400">POV</span>
-        <span className="text-white" style={{ fontWeight: 500 }}>
+        <span className="text-white" style={{ fontWeight: 900 }}>
           lib
         </span>
         <span

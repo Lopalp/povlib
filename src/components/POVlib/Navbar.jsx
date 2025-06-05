@@ -48,7 +48,7 @@ export default function Navbar({
   const router = useRouter();
 
   // Glas-Hintergrund für Desktop-Navbar
-  const glassBg = 'bg-black/50 backdrop-blur-lg border border-gray-700';
+  const glassBg = "bg-black/50 backdrop-blur-lg border border-gray-700";
 
   useEffect(() => {
     const onScroll = () => {
@@ -81,22 +81,26 @@ export default function Navbar({
     const { error } = await supabase.auth.signOut();
     if (!error) {
       setUser(null);
-      router.push('/');
+      router.push("/");
     }
   };
 
   // Jetzt mit font-light statt font-normal
-  const linkClasses = 'text-sm font-light transition-colors duration-200 hover:text-yellow-400';
+  const linkClasses =
+    "text-sm font-light transition-colors duration-200 hover:text-yellow-400";
 
   // Fullscreen-Overlay für das mobile Menü – höherer z-index als die Navbar
-  const mobileOverlayBg = 'fixed inset-0 z-60 bg-black/90 backdrop-blur-lg border-t border-gray-800 overflow-y-auto';
+  const mobileOverlayBg =
+    "fixed inset-0 z-60 bg-black/90 backdrop-blur-lg border-t border-gray-800 overflow-y-auto";
 
   return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}>
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
+    >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center gap-2">
-            <LogoHeading size={1.5} />
+            <LogoHeading size={2} />
           </Link>
 
           {/* Desktop-Navigation */}
@@ -128,7 +132,7 @@ export default function Navbar({
                     <li key={m.slug}>
                       <Link
                         href={`/maps/${m.slug}`}
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-white"
+                        className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400"
                       >
                         {m.label}
                       </Link>
@@ -137,12 +141,25 @@ export default function Navbar({
                 </ul>
               )}
             </div>
-            <Link href="/demos" className={`${linkClasses} text-gray-200`}>Demos</Link>
-            <Link href="/players" className={`${linkClasses} text-gray-200`}>Players</Link>
-            <Link href="/utility-book" className={`${linkClasses} text-gray-200`}>Utility Book</Link>
+            <Link href="/demos" className={`${linkClasses} text-gray-200`}>
+              Demos
+            </Link>
+            <Link href="/players" className={`${linkClasses} text-gray-200`}>
+              Players
+            </Link>
+            <Link
+              href="/utility-book"
+              className={`${linkClasses} text-gray-200`}
+            >
+              Utility Book
+            </Link>
             <div className="relative group">
-              <span className={`${linkClasses} text-gray-200 cursor-default`}>Community</span>
-              <div className={`absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 rounded-lg py-2 text-center text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity ${glassBg}`}>
+              <span className={`${linkClasses} text-gray-200 cursor-default`}>
+                Community
+              </span>
+              <div
+                className={`absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 rounded-lg py-2 text-center text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity ${glassBg}`}
+              >
                 Coming Soon
               </div>
             </div>
@@ -150,7 +167,10 @@ export default function Navbar({
 
           <div className="flex items-center space-x-4">
             {/* Such-Icon */}
-            <button onClick={toggleSearch} className="p-2 text-gray-300 hover:text-yellow-400 cursor-pointer">
+            <button
+              onClick={toggleSearch}
+              className="p-2 text-gray-300 hover:text-yellow-400 cursor-pointer"
+            >
               <Search className="h-5 w-5" />
             </button>
             {searchActive && (
@@ -190,12 +210,22 @@ export default function Navbar({
 
             {user ? (
               <div className="relative">
-                <button onClick={() => setUserMenuOpen(prev => !prev)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer">
+                <button
+                  onClick={() => setUserMenuOpen((prev) => !prev)}
+                  className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer"
+                >
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    {user.avatar_url
-                      ? <img src={user.avatar_url} alt={user.name.slice(0,1)} className="w-full h-full object-cover"/>
-                      : <div className="w-full h-full flex items-center justify-center text-gray-400">{user.name.slice(0,1)}</div>
-                    }
+                    {user.avatar_url ? (
+                      <img
+                        src={user.avatar_url}
+                        alt={user.name.slice(0, 1)}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        {user.name.slice(0, 1)}
+                      </div>
+                    )}
                   </div>
                 </button>
                 {userMenuOpen && (
@@ -246,10 +276,17 @@ export default function Navbar({
                 <LogIn className="h-4 w-4 mr-2" /> Sign In
               </Link>
             )}
-            
+
             {/* Burger-Icon für Mobile */}
-            <button onClick={() => setIsMenuOpen(o => !o)} className="md:hidden p-2 text-gray-300 hover:text-yellow-400">
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button
+              onClick={() => setIsMenuOpen((o) => !o)}
+              className="md:hidden p-2 text-gray-300 hover:text-yellow-400"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
