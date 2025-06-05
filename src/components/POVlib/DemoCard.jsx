@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Play, Tag as TagIcon, User } from "lucide-react";
 
+// ─── Hilfsfunktion: Zufälliges Bild aus einer Liste auswählen ───
 const getRandomImage = () => {
   const images = [
     "/img/1.png",
@@ -26,6 +27,9 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
   const ctPercentage = (ctRounds / totalRounds) * 100;
   const mockKDA = "23/5/2"; // Platzhalter für K/D/A
 
+  // Zufälliges Bild für dieses Demo-Element
+  const thumbnailSrc = getRandomImage();
+
   return (
     <div
       className={`relative w-full cursor-pointer ${className}`}
@@ -33,37 +37,46 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onSelect(demo)}
     >
-      {/** ─── Thumbnail mit leichten Rundungen ─── */}
+      {/** ─── Thumbnail (gerundet) ─── */}
       <div className="overflow-hidden rounded-lg">
         <img
-          src={getRandomImage()}
-          alt={demo.title}
-          className="w-full aspect-video object-cover transition-transform duration-200 
-                     group-hover:scale-105"
+          src={thumbnailSrc}
+          alt={`${demo.title} Thumbnail`}
+          className="w-full aspect-video object-cover transition-transform duration-200 hover:scale-105"
           loading="lazy"
         />
+      </div>
+
+      {/** ─── Unter dem Thumbnail: Titel │ Datum │ Event ─── */}
+      <div className="mt-2 px-1">
+        <h3 className="text-sm font-semibold text-white truncate" title={demo.title}>
+          {demo.title}
+        </h3>
+        <div className="flex items-center justify-between text-xs text-gray-400 mt-1">
+          <span className="truncate">{demo.date}</span>
+          <span className="truncate">{demo.event}</span>
+        </div>
       </div>
 
       {/** ─── Hover-Modal ─── */}
       {isHovered && (
         <div
           className="
-            absolute top-0 left-0 z-10 
-            w-72 md:w-80 
+            absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 
+            z-10 
+            w-80 
             bg-gray-800 border border-gray-700 rounded-2xl shadow-xl 
-            transform -translate-y-4 
-            overflow-hidden
+            overflow-visible
           "
         >
-          {/* Thumbnail oben */}
+          {/** ===== Header: Großes Thumbnail + Play-Button ===== */}
           <div className="relative w-full aspect-video overflow-hidden">
             <img
-              src={demo.thumbnail}
-              alt={demo.title}
+              src={thumbnailSrc}
+              alt={`${demo.title} Preview`}
               className="w-full h-full object-cover brightness-75"
               loading="lazy"
             />
-            {/* Play-Button Overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
               <button
                 className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
@@ -74,20 +87,26 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
             </div>
           </div>
 
-          {/* Inhalt des Modals */}
+          {/** ===== Body: Titel, Meta & Spieler/KDA ===== */}
           <div className="p-4 flex flex-col space-y-3">
             {/* Titel */}
             <h3 className="text-white font-bold text-lg leading-tight">
               {demo.title}
             </h3>
 
-            {/* Meta (Map, Team, Year) */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
-              {demo.team && (
-                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
-              )}
-              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
+            {/* Meta-Infos in zwei Zeilen */}
+            <div className="flex flex-col gap-1 text-xs text-gray-300">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
+                {demo.team && (
+                  <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
+                )}
+                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.date}</span>
+                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.event}</span>
+              </div>
             </div>
 
             <div className="border-t border-gray-700"></div>
@@ -103,7 +122,6 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
                     className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
-                      /* Link-Klick event darf nicht das onSelect triggern */
                     }}
                   >
                     {player}
@@ -114,9 +132,10 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
                 {mockKDA}
               </div>
             </section>
+          </div>
 
-            <div className="border-t border-gray-700"></div>
-
+          {/** ===== Footer: Tags/Positionen & CT/T-Rounds-Bar ===== */}
+          <div className="px-4 pb-4 flex flex-col space-y-3">
             {/* Tags & Positionen */}
             <section className="flex flex-wrap gap-2">
               {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
@@ -136,10 +155,8 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
               )}
             </section>
 
-            <div className="border-t border-gray-700"></div>
-
-            {/* CT/T Rounds Bar */}
-            <footer className="mt-2">
+            {/* CT/T-Rounds-Bar */}
+            <footer>
               <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
                 <div
                   className="bg-blue-500/60 h-full transition-all duration-300"
