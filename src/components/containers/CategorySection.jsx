@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import DemoCard from "../POVlib/DemoCard";
+import DemoCard from "./POVlib/DemoCard";
 
 export const CategorySection = ({
   title,

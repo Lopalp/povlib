@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import DemoCard from "../POVlib/DemoCard";
+import DemoCard from "./POVlib/DemoCard";
 
 /**
  * Ein horizontal scrollbares Carousel. 
