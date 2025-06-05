@@ -88,7 +88,7 @@ export default function CompetitionModule({
                   <div className="relative w-full pb-[133%] bg-black">
                     <video
                       src={clip.videoUrl || clip.video_id}
-                      poster={"/img/1.png"}
+                      poster={"/img/v1.png"}
                       muted
                       loop
                       playsInline
