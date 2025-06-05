@@ -135,11 +135,12 @@ const PlanComparisonModule = ({ currentPlan }) => {
         <div className="absolute inset-0 bg-pattern-fade pointer-events-none"></div>
         <style jsx>{`
           .bg-pattern-fade {
+            /* Größere, sichtbarere Punkte: */
             background-image: radial-gradient(
-              rgba(255, 255, 255, 0.05) 1px,
-              transparent 1px
+              rgba(255, 255, 255, 0.15) 3px,
+              transparent 3px
             );
-            background-size: 20px 20px;
+            background-size: 30px 30px;
             mask-image: linear-gradient(
               to right,
               rgba(0, 0, 0, 1) 0%,
@@ -163,11 +164,10 @@ const PlanComparisonModule = ({ currentPlan }) => {
             <p className="text-3xl font-extrabold text-yellow-400 mb-4">
               {currentPlanData.priceLabel}
             </p>
-            <ul className="space-y-2 text-gray-400 flex-grow text-base">
+            <ul className="space-y-2 text-gray-400 flex-grow text-sm">
               {currentPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-start">
-                  {/* Größere Bullets */}
-                  <span className="mr-2 text-lg">•</span>
+                  <span className="mr-2 text-xs">•</span>
                   <span>{feat}</span>
                 </li>
               ))}
@@ -193,11 +193,10 @@ const PlanComparisonModule = ({ currentPlan }) => {
             <p className="text-3xl font-extrabold text-white mb-4">
               {nextPlanData.priceLabel}
             </p>
-            <ul className="space-y-2 text-gray-200 flex-grow text-base">
+            <ul className="space-y-2 text-gray-200 flex-grow text-sm">
               {nextPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-start">
-                  {/* Größere Sterne-Bullets */}
-                  <span className="mr-2 text-lg text-yellow-400">★</span>
+                  <span className="mr-2 text-xs text-yellow-400">★</span>
                   <span>{feat}</span>
                 </li>
               ))}
