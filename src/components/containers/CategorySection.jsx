@@ -10,28 +10,8 @@ export const CategorySection = ({
 }) => {
   const [visibleRows, setVisibleRows] = useState(1);
 
-  // Wie viele Items zeigen wir maximal an?
-  // Pro "Reihe" passen dynamisch so viele Cards in's Grid, wie Platz ist.
-  // Da wir nicht mehr per JS rechnen, ziehen wir einzig nach Reihen ab:
-  // visibleCount = visibleRows * columns; doch columns bestimmen wir im CSS.
-  // Deshalb beschränken wir einfach auf visibleRows * maxColumns (falls du ein Maximum möchtest)
-  // oder lassen es unbeschränkt. Hier nehmen wir an, pro Zeile können
-  // theoretisch sehr viele Spalten sein, aber wir wollen höchstens visibleRows Reihen anzeigen.
-  //
-  // Trick: Wir können das Teilen in Reihen vornehmen, wenn wir das CSS-Grid "auto-fill" einsetzen:
-  // Dann kann man nicht exakt per JS sagen: „Zeige 2 Reihen à 4 Spalten“ –
-  // stattdessen slicen wir nach visibleRows * maximaler Spaltenzahl, die du möchtest.
-  // Für ein echtes „View More“, das zeilenweise öffnet, müssten wir aber doch in JS abschätzen,
-  // wie viele Spalten aktuell sichtbar sind. Alternativ lässt man einfach immer z. B. 8 Cards
-  // pro Klick laden (zwei Reihen a 4), ohne dynamisch zu messen. Das ist pragmatisch und wirkt responsiv.
-  //
-  // Unten verwenden wir also: pro "View More" kommen n weitere Cards, z. B. 8 (2 Reihen × 4).
-  // Da wir aber nicht wissen, ob wirklich 4 Spalten nebeneinander passen,
-  // kann man das auch per CSS „max-height: rows × (minCardHeight + gap)“ tricksen. 
-  // Wir wählen hier die pragmatische Variante: pro „View More“ kommen 8 neue Elemente.
-  
-  // Anzahl an Elementen, die derzeit gerendert werden:
-  const baseLoad = 4; // z. B. 8 pro Klick (2 Reihen á 4)
+  // Pro Klick laden wir 4 weitere Elemente (1 Reihe × 4 Spalten).
+  const baseLoad = 4;
   const visibleCount = visibleRows * baseLoad;
   const visibleDemos = demos.slice(0, visibleCount);
   const canViewMore = demos.length > visibleCount;
@@ -67,10 +47,19 @@ export const CategorySection = ({
       </div>
 
       {canViewMore && (
-        <div className="mt-2 text-center">
+        <div className="mt-4">
           <button
             onClick={() => setVisibleRows(visibleRows + 1)}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-yellow-400 text-sm rounded-lg border border-gray-700 transition-colors"
+            className="
+              w-full
+              flex justify-center items-center gap-2
+              px-4 py-2
+              rounded-md
+              border border-gray-600
+              text-white text-sm font-semibold
+              hover:border-yellow-400
+              transition-colors
+            "
           >
             View More
           </button>
