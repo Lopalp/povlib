@@ -40,7 +40,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > 0);
-      // Alle geöffneten Untermenüs schließen
+      // Bei Scroll alle Untermenüs schließen
       setMapMenuOpen(false);
       setUserMenuOpen(false);
       setSearchActive(false);
@@ -61,7 +61,7 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
 
   const handleSearchSubmit = e => {
     e.preventDefault();
-    // Hier könnte eine Suchfunktion aufgerufen werden
+    // Such-Logik hier
     setSearchActive(false);
   };
   const handleSignOut = async () => {
@@ -72,16 +72,14 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
     }
   };
 
-  // Dünnere Link-Klassen
-  const linkClasses = 'text-sm font-normal transition-colors duration-200 hover:text-yellow-400';
+  // Jetzt mit font-light statt font-normal
+  const linkClasses = 'text-sm font-light transition-colors duration-200 hover:text-yellow-400';
 
-  // Einfacher Hintergrund für das mobile Overlay
-  const mobileOverlayBg = 'bg-black/90 backdrop-blur-lg border-t border-gray-800';
+  // Fullscreen-Overlay für das mobile Menü – höherer z-index als die Navbar
+  const mobileOverlayBg = 'fixed inset-0 z-60 bg-black/90 backdrop-blur-lg border-t border-gray-800 overflow-y-auto';
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
-    >
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}>
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center gap-2">
@@ -207,17 +205,21 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
         </div>
       </div>
 
-      {/* Mobile Overlay-Menü */}
+      {/* Mobile Fullscreen-Overlay-Menü */}
       {isMenuOpen && (
-        <div className={`fixed inset-0 z-50 ${mobileOverlayBg} overflow-y-auto`}>
+        <div className={mobileOverlayBg}>
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
-              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white font-normal hover:text-yellow-400">
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white text-lg font-light hover:text-yellow-400"
+              >
                 Home
               </Link>
 
               <div className="border-t border-gray-700 pt-4">
-                <div className="flex items-center mb-3 text-lg font-normal text-white">
+                <div className="flex items-center mb-3 text-lg font-light text-white">
                   <MapPin className="h-5 w-5 text-yellow-400 mr-2" /> Maps
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -226,30 +228,50 @@ export default function Navbar({ searchActive, setSearchActive, setIsMenuOpen, i
                       key={m.slug}
                       href={`/maps/${m.slug}`}
                       onClick={() => setIsMenuOpen(false)}
-                      className="py-2 text-center text-gray-200 border border-gray-700 rounded-md hover:text-yellow-400"
+                      className="py-2 text-center text-gray-200 border border-gray-700 rounded-md hover:text-yellow-400 font-light"
                     >
                       {m.label}
                     </Link>
                   ))}
                 </div>
-                <Link href="/maps" onClick={() => setIsMenuOpen(false)} className="mt-3 block text-sm text-yellow-400 hover:underline">
+                <Link
+                  href="/maps"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="mt-3 block text-sm text-yellow-400 hover:underline font-light"
+                >
                   All Maps →
                 </Link>
               </div>
 
-              <Link href="/demos" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-200 hover:text-yellow-400">
+              <Link
+                href="/demos"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
+              >
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Demos
               </Link>
 
-              <Link href="/players" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-200 hover:text-yellow-400">
+              <Link
+                href="/players"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
+              >
                 <User className="h-5 w-5 text-yellow-400" /> Players
               </Link>
 
-              <Link href="/utility-book" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-200 hover:text-yellow-400">
+              <Link
+                href="/utility-book"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
+              >
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Utility Book
               </Link>
 
-              <Link href="/signin" onClick={() => setIsMenuOpen(false)} className="block w-full py-3 rounded-full bg-yellow-400 text-gray-900 text-center font-bold hover:bg-yellow-300 transition-colors">
+              <Link
+                href="/signin"
+                onClick={() => setIsMenuOpen(false)}
+                className="block w-full py-3 rounded-full bg-yellow-400 text-gray-900 text-center font-bold hover:bg-yellow-300 transition-colors"
+              >
                 Sign In
               </Link>
             </nav>
