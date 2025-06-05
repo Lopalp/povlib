@@ -27,7 +27,7 @@ export default function DiscordLoginButton() {
         bg-[#202124] hover:bg-[#7F7F7F]
         cursor-pointer rounded-sm h-10 w-[187px]
         flex items-center
-        transition-colors ease-in-out duration-300 // Added transition classes
+        transition-colors ease-in-out duration-300
       '
     >
       <div

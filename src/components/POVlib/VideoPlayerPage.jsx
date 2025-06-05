@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useState } from "react";
+import Link from "next/link";
 import {
   ArrowLeft,
   Eye,
@@ -15,28 +15,28 @@ import {
   ChevronDown,
   ChevronRight,
   Shield,
-  Play
-} from 'lucide-react';
-import YouTubeEmbed from './YouTubeEmbed';
-import Navbar from './Navbar';
-import Footer from './Footer';
+  Play,
+} from "lucide-react";
+import YouTubeEmbed from "./YouTubeEmbed";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 const demoMatchData = {
   rounds: [
     {
       roundNumber: 1,
       events: [
-        { type: 'utility', time: 10, player: 'PlayerA' },
-        { type: 'kill', time: 45, player: 'PlayerB' },
-        { type: 'death', time: 46, player: 'PlayerA' },
+        { type: "utility", time: 10, player: "PlayerA" },
+        { type: "kill", time: 45, player: "PlayerB" },
+        { type: "death", time: 46, player: "PlayerA" },
       ],
     },
     {
       roundNumber: 2,
       events: [
-        { type: 'utility', time: 5, player: 'PlayerC' },
-        { type: 'kill', time: 30, player: 'PlayerA' },
-        { type: 'death', time: 30, player: 'PlayerB' },
+        { type: "utility", time: 5, player: "PlayerC" },
+        { type: "kill", time: 30, player: "PlayerA" },
+        { type: "death", time: 30, player: "PlayerB" },
       ],
     },
     // … weitere Runden
@@ -50,12 +50,12 @@ const VideoPlayerPage = ({
   onLike,
   onOpenTagModal,
   onSelectRelatedDemo,
-  demoType = 'pro',
+  demoType = "pro",
   setDemoType = () => {},
   searchActive = false,
   setSearchActive = () => {},
   isMenuOpen = false,
-  setIsMenuOpen = () => {}
+  setIsMenuOpen = () => {},
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // für das Ellipsis-Dropdown
@@ -64,13 +64,20 @@ const VideoPlayerPage = ({
   if (!selectedDemo) return null;
 
   const generateDescription = () => {
-    let desc = `Erlebe Top-CS2-Gameplay mit ${selectedDemo.players.join(', ')} auf ${selectedDemo.map}. `;
-    if (selectedDemo.team) desc += `Sieh zu, wie ${selectedDemo.team}-Spieler professionelle `;
-    else desc += 'Sieh dir professionelle ';
-    if (selectedDemo.positions?.length) desc += `Positionierung für ${selectedDemo.positions.join(' und ')}. `;
-    else desc += 'Positionierung und Game Sense. ';
-    if (selectedDemo.tags?.length) desc += `Dieses POV-Video hebt Techniken wie ${selectedDemo.tags.join(', ')} hervor.`;
-    else desc += 'Lerne Strategien und Techniken direkt von den Profis.';
+    let desc = `Erlebe Top-CS2-Gameplay mit ${selectedDemo.players.join(
+      ", "
+    )} auf ${selectedDemo.map}. `;
+    if (selectedDemo.team)
+      desc += `Sieh zu, wie ${selectedDemo.team}-Spieler professionelle `;
+    else desc += "Sieh dir professionelle ";
+    if (selectedDemo.positions?.length)
+      desc += `Positionierung für ${selectedDemo.positions.join(" und ")}. `;
+    else desc += "Positionierung und Game Sense. ";
+    if (selectedDemo.tags?.length)
+      desc += `Dieses POV-Video hebt Techniken wie ${selectedDemo.tags.join(
+        ", "
+      )} hervor.`;
+    else desc += "Lerne Strategien und Techniken direkt von den Profis.";
     return desc;
   };
   const description = generateDescription();
@@ -88,7 +95,6 @@ const VideoPlayerPage = ({
 
       <main className="pt-16 pb-12">
         <div className="container mx-auto px-4">
-
           {/* ───────────── Back-Link ───────────── */}
           <div className="flex items-center gap-4 mb-8 flex-wrap">
             <button
@@ -97,17 +103,17 @@ const VideoPlayerPage = ({
             >
               <ArrowLeft className="h-5 w-5 mr-2" /> Zurück zur Übersicht
             </button>
-            <Link href="/videoplaypagecopy">
-              <a className="text-gray-400 hover:text-yellow-400 transition-colors">
-                Kopie der Seite öffnen
-              </a>
+            <Link
+              href="/videoplaypagecopy"
+              className="text-gray-400 hover:text-yellow-400 transition-colors"
+            >
+              Kopie der Seite öffnen
             </Link>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
             {/* ───────────── Linke Spalte: Video + Infos ───────────── */}
             <div className="w-full lg:w-8/12 space-y-6">
-
               {/* ─── Video-Embed (ohne zusätzlichen Card-Hintergrund) ─── */}
               <div className="w-full rounded-lg overflow-hidden bg-black shadow-lg">
                 <YouTubeEmbed
@@ -116,7 +122,7 @@ const VideoPlayerPage = ({
                   autoplay
                   controls
                   showInfo={false}
-                  style={{ width: '100%', height: 'auto', minHeight: '420px' }}
+                  style={{ width: "100%", height: "auto", minHeight: "420px" }}
                 />
               </div>
 
@@ -124,15 +130,21 @@ const VideoPlayerPage = ({
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 {/* Titel & Statistik */}
                 <div className="space-y-2">
-                  <h1 className="text-2xl font-bold text-white">{selectedDemo.title}</h1>
+                  <h1 className="text-2xl font-bold text-white">
+                    {selectedDemo.title}
+                  </h1>
                   <div className="flex flex-wrap items-center space-x-6 text-gray-400 text-sm">
                     <div className="flex items-center">
                       <Eye className="h-5 w-5 mr-1" />
-                      <span>{selectedDemo.views?.toLocaleString()} Aufrufe</span>
+                      <span>
+                        {selectedDemo.views?.toLocaleString()} Aufrufe
+                      </span>
                     </div>
                     <div>{selectedDemo.year}</div>
                     {selectedDemo.event && (
-                      <div className="text-yellow-400">{selectedDemo.event}</div>
+                      <div className="text-yellow-400">
+                        {selectedDemo.event}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -213,7 +225,7 @@ const VideoPlayerPage = ({
                         </button>
                         <button
                           onClick={() => {
-                            window.open(selectedDemo.matchroom_url, '_blank');
+                            window.open(selectedDemo.matchroom_url, "_blank");
                             setMenuOpen(false);
                           }}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
@@ -228,10 +240,11 @@ const VideoPlayerPage = ({
               </div>
 
               {/* ─── Matchroom Alert-Leiste (unaufdringlich) ─── */}
-              { !matchroomSubmitted && (
+              {!matchroomSubmitted && (
                 <div className="flex items-center justify-between bg-yellow-400 text-gray-900 px-4 py-2 rounded-md">
                   <span className="text-sm">
-                    Hilf uns, das Matchroom zu vervollständigen! Füge hier deinen Link ein.
+                    Hilf uns, das Matchroom zu vervollständigen! Füge hier
+                    deinen Link ein.
                   </span>
                   <button
                     onClick={() => setMatchroomSubmitted(true)}
@@ -241,12 +254,12 @@ const VideoPlayerPage = ({
                   </button>
                 </div>
               )}
-              { matchroomSubmitted && (
+              {matchroomSubmitted && (
                 <div className="bg-gray-700 text-gray-300 px-4 py-2 rounded-md text-sm">
-                  Vielen Dank! Dein Link wird geprüft, du erhältst bald Feedback.
+                  Vielen Dank! Dein Link wird geprüft, du erhältst bald
+                  Feedback.
                 </div>
               )}
-
 
               {/* ─── Beschreibung (als einziger Block mit Hintergrund) ─── */}
               <div className="bg-gray-800 rounded-lg p-6">
@@ -266,7 +279,11 @@ const VideoPlayerPage = ({
                     ))}
                   </div>
                 )}
-                <p className={`${showFullDescription ? '' : 'line-clamp-4'} text-gray-300 text-lg leading-relaxed`}>
+                <p
+                  className={`${
+                    showFullDescription ? "" : "line-clamp-4"
+                  } text-gray-300 text-lg leading-relaxed`}
+                >
                   {description}
                 </p>
                 {description.length > 240 && !showFullDescription && (
@@ -285,16 +302,22 @@ const VideoPlayerPage = ({
                   {selectedDemo.players.map((player, idx) => (
                     <Link
                       key={idx}
-                      href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                      href={`/players/${player
+                        .replace(/\s+/g, "-")
+                        .toLowerCase()}`}
                     >
                       <a className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors">
                         <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
                           {player.charAt(0)}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-white font-medium">{player}</span>
+                          <span className="text-white font-medium">
+                            {player}
+                          </span>
                           {selectedDemo.team && (
-                            <span className="text-gray-400 text-sm">{selectedDemo.team}</span>
+                            <span className="text-gray-400 text-sm">
+                              {selectedDemo.team}
+                            </span>
                           )}
                         </div>
                       </a>
@@ -303,13 +326,16 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-
               {/* ─── Match Timeline (ohne extra Hintergrund-Box) ─── */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">Match Timeline</h2>
+                <h2 className="text-xl font-semibold text-white">
+                  Match Timeline
+                </h2>
                 {demoMatchData.rounds.map((round) => (
                   <div key={round.roundNumber}>
-                    <div className="mb-2 text-gray-300 text-sm">Runde {round.roundNumber}</div>
+                    <div className="mb-2 text-gray-300 text-sm">
+                      Runde {round.roundNumber}
+                    </div>
                     <div className="relative h-3 bg-gray-700 rounded">
                       {round.events.map((event, idx) => {
                         const percent = Math.min((event.time / 60) * 100, 100);
@@ -347,13 +373,20 @@ const VideoPlayerPage = ({
                         />
                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                           <div className="rounded-full bg-yellow-400/80 p-2">
-                            <Play className="h-4 w-4 text-gray-900" fill="currentColor" />
+                            <Play
+                              className="h-4 w-4 text-gray-900"
+                              fill="currentColor"
+                            />
                           </div>
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-medium text-sm line-clamp-2">{d.title}</h3>
-                        <p className="text-gray-400 text-xs mt-1">{d.players.join(', ')}</p>
+                        <h3 className="text-white font-medium text-sm line-clamp-2">
+                          {d.title}
+                        </h3>
+                        <p className="text-gray-400 text-xs mt-1">
+                          {d.players.join(", ")}
+                        </p>
                         <div className="flex items-center text-gray-500 text-xs mt-2">
                           <span>{d.views.toLocaleString()} Aufrufe</span>
                           <span className="mx-1">•</span>

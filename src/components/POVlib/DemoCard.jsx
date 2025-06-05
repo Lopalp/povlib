@@ -1,15 +1,20 @@
-import React from 'react';
-import Link from 'next/link';
-import { Play, Tag as TagIcon, User } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import { Play, Tag as TagIcon, User } from "lucide-react";
 
 const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
   const handlePlayerClick = (e, player) => {
     e.stopPropagation();
   };
 
+  const getRandomImage = () => {
+    const images = ["/img/1.png", "/img/2.png", "/img/3.png"];
+    return images[Math.floor(Math.random() * images.length)];
+  };
+
   // Example CT vs. T rounds calculation
-  const ctRounds = demo.id % 7 + 6;
-  const tRounds = demo.id % 5 + 8;
+  const ctRounds = (demo.id % 7) + 6;
+  const tRounds = (demo.id % 5) + 8;
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
   const mockKDA = "23/5/2"; // Placeholder for K/D/A
@@ -19,14 +24,14 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       className={`
         relative flex flex-col bg-gray-800 border border-gray-700 rounded-2xl shadow-md transition-all duration-200
         hover:shadow-xl hover:border-yellow-500 cursor-pointer overflow-hidden
-        ${featured ? 'w-full' : 'w-80 md:w-72'} ${className}
+        ${featured ? "w-full" : "w-80 md:w-72"} ${className}
       `}
       onClick={() => onSelect(demo)}
     >
       {/* ======= Thumbnail Section ======= */}
       <div className="relative w-full aspect-video overflow-hidden group">
         <img
-          src={demo.thumbnail}
+          src={getRandomImage()}
           alt={demo.title}
           className="w-full h-full object-cover brightness-90 transition-all duration-200 group-hover:brightness-75"
           loading="lazy"
@@ -47,17 +52,25 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
       <div className="flex flex-col flex-grow p-4 space-y-3">
         {/* ----- Header (Title + Meta) ----- */}
         <header className="space-y-2">
-          <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 
-            group-hover:text-yellow-400 transition-colors duration-200">
+          <h3
+            className="text-white font-bold text-lg leading-tight line-clamp-2 
+            group-hover:text-yellow-400 transition-colors duration-200"
+          >
             {demo.title}
           </h3>
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-gray-300">
-            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
+            <span className="px-2 py-1 bg-gray-700 rounded-full">
+              {demo.map}
+            </span>
             {demo.team && (
-              <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.team}</span>
+              <span className="px-2 py-1 bg-gray-700 rounded-full">
+                {demo.team}
+              </span>
             )}
-            <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
+            <span className="px-2 py-1 bg-gray-700 rounded-full">
+              {demo.year}
+            </span>
           </div>
         </header>
 
@@ -70,7 +83,7 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
             {demo.players.slice(0, 1).map((player, idx) => (
               <Link
                 key={idx}
-                href={`/players/${player.replace(/\s+/g, '-').toLowerCase()}`}
+                href={`/players/${player.replace(/\s+/g, "-").toLowerCase()}`}
                 className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
                 onClick={(e) => handlePlayerClick(e, player)}
               >
@@ -85,17 +98,21 @@ const DemoCard = ({ demo, featured = false, onSelect, className = "" }) => {
 
         {/* ----- Tags + Positions ----- */}
         <section className="flex flex-wrap gap-2">
-          {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-            <span
-              key={i}
-              className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
+          {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map(
+            (item, i) => (
+              <span
+                key={i}
+                className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
                 hover:bg-gray-600 transition-colors duration-150"
-            >
-              {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
-              {item}
-            </span>
-          ))}
-          {(demo.positions.length + demo.tags.length) > 4 && (
+              >
+                {demo.tags.includes(item) && (
+                  <TagIcon className="h-4 w-4 text-gray-400" />
+                )}
+                {item}
+              </span>
+            )
+          )}
+          {demo.positions.length + demo.tags.length > 4 && (
             <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
               +{demo.positions.length + demo.tags.length - 4} more
             </span>
