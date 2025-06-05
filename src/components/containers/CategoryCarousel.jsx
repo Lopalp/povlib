@@ -1,7 +1,8 @@
 // src/components/containers/CategoryCarousel.jsx
-import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import DemoCard from '../POVlib/DemoCard';
+
+import React, { useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import DemoCard from "../POVlib/DemoCard";
 
 export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
   const containerRef = useRef(null);
@@ -10,7 +11,7 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
     if (!containerRef.current) return;
     containerRef.current.scrollBy({
       left: -containerRef.current.offsetWidth,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
@@ -18,7 +19,7 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
     if (!containerRef.current) return;
     containerRef.current.scrollBy({
       left: containerRef.current.offsetWidth,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
@@ -59,15 +60,13 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
         <div
           ref={containerRef}
           className="flex overflow-x-auto custom-scrollbar space-x-6 px-4"
-          style={{ scrollBehavior: 'smooth', gap: `${gap}px` }}
+          style={{ scrollBehavior: "smooth", gap: `${gap}px` }}
         >
           {demos.map((demo) => (
             <div key={demo.id} className="flex-shrink-0 w-[280px]">
               <DemoCard demo={demo} onSelect={onSelectDemo} />
             </div>
           ))}
-
-          {/* Optional: etwas Abstand am Ende */}
           <div className="flex-shrink-0 w-4" />
         </div>
       </div>
@@ -75,4 +74,5 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
   );
 };
 
+// Default-Export hinzufügen
 export default CategoryCarousel;

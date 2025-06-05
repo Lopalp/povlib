@@ -1,4 +1,6 @@
-import { useRef } from "react";
+// src/components/containers/CategorySectionFeatured.jsx
+
+import React, { useRef, useState, useEffect } from "react";
 import DemoCard from "../POVlib/DemoCard";
 
 export const CategorySectionFeatured = ({
@@ -7,7 +9,6 @@ export const CategorySectionFeatured = ({
   onSelectDemo,
   gap = 24,
 }) => {
-  // Wir nehmen nur die maximal ersten 3 Demos
   const displayedDemos = demos.slice(0, 3);
   const count = displayedDemos.length;
 
@@ -17,28 +18,13 @@ export const CategorySectionFeatured = ({
         <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
       </h2>
 
-      <div
-        ref={useRef()}
-        className="overflow-hidden"
-        style={{
-          boxSizing: "border-box",
-          padding: 0,
-          margin: 0,
-        }}
-      >
-        {/* Layout, je nach Anzahl der Demos */}
+      <div ref={useRef()} className="overflow-hidden" style={{ boxSizing: "border-box", padding: 0, margin: 0 }}>
         {count === 1 && (
-          // 1 Ergebnis → eine Karte in voller Breite
           <div className="w-full">
-            <DemoCard
-              demo={displayedDemos[0]}
-              onSelect={onSelectDemo}
-            />
+            <DemoCard demo={displayedDemos[0]} onSelect={onSelectDemo} />
           </div>
         )}
-
         {count === 2 && (
-          // 2 Ergebnisse → zwei gleiche Spalten nebeneinander
           <div
             className="grid"
             style={{
@@ -53,11 +39,7 @@ export const CategorySectionFeatured = ({
             ))}
           </div>
         )}
-
         {count === 3 && (
-          // 3 Ergebnisse → Grid mit 2 Spalten und 2 Reihen:
-          // - Erste Karte: col-span-2 (volle Breite, oben)
-          // - Karte 2 und 3: je 1 Spalte in 2. Reihe
           <div
             className="grid"
             style={{
@@ -66,11 +48,9 @@ export const CategorySectionFeatured = ({
               gridTemplateRows: `auto auto`,
             }}
           >
-            {/* Erste Karte: groß, über beide Spalten */}
             <div key={displayedDemos[0].id} className="col-span-2 w-full">
               <DemoCard demo={displayedDemos[0]} onSelect={onSelectDemo} />
             </div>
-            {/* Die beiden kleineren Karten direkt darunter */}
             <div key={displayedDemos[1].id} className="w-full">
               <DemoCard demo={displayedDemos[1]} onSelect={onSelectDemo} />
             </div>
@@ -83,3 +63,6 @@ export const CategorySectionFeatured = ({
     </section>
   );
 };
+
+// Default-Export hinzufügen
+export default CategorySectionFeatured;
