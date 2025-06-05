@@ -496,7 +496,7 @@ const POVlib = () => {
             </Link>
             <Link href="/maps" className="relative block rounded-2xl overflow-hidden shadow-lg group">
               <img
-                src="/images/maps-example.png"
+                src="/images/maps.png"
                 alt="Maps"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
