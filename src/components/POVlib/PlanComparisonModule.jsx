@@ -129,7 +129,14 @@ const PlanComparisonModule = ({ currentPlan }) => {
   // 4) Anzeige der aktuellen Plan-Karte und des nächsten Plankarte
   return (
     <>
-      <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
+      <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg relative overflow-hidden">
+ {/* Hintergrund-Punktmuster mit Fade */}
+ <div className="absolute inset-0 bg-pattern-fade pointer-events-none"></div>
+ {/* Header */}
+        <div className="relative z-10">
+ <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
+ </div>
+
  <style jsx>{`
  .bg-pattern-fade {
  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
@@ -137,8 +144,8 @@ const PlanComparisonModule = ({ currentPlan }) => {
  mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
  }
  `}</style>
-        {/* Header */}
-        <div>
+
+        <div className="relative z-10">
           <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
         </div>
 
@@ -146,7 +153,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Aktueller Plan */}
           <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-800">
-            <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200">{currentPlanData.name}</h3>
+ <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200 relative z-10">{currentPlanData.name}</h3>
             <p className="text-3xl font-extrabold text-yellow-400 mb-4">{currentPlanData.priceLabel}</p>
             <ul className="space-y-2 text-gray-400 flex-grow text-sm">
               {currentPlanData.features.map((feat, i) => (
@@ -167,7 +174,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
           {/* Nächster Plan */}
           <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-900 shadow-md">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg md:text-xl font-bold text-white">{nextPlanData.name}</h3>
+ <h3 className="text-lg md:text-xl font-bold text-white relative z-10">{nextPlanData.name}</h3>
               <span className="text-sm text-yellow-400 font-semibold">Upgrade</span>
             </div>
             <p className="text-3xl font-extrabold text-white mb-4">{nextPlanData.priceLabel}</p>
@@ -188,7 +195,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
           </div>
         </div>
 
-        <div>
+        <div className="relative z-10">
           <button
             onClick={() => setIsCompareOpen(true)}
             className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors"
