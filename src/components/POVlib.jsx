@@ -552,11 +552,7 @@ const POVlib = () => {
               <button
                 key={tag}
                 onClick={() => setActiveTag(tag)}
-                className="
-                  text-xs px-3 py-1 rounded-full
-                  bg-white/10 text-white border border-white/20
-                  hover:border-yellow-400 transition-colors
-                "
+                className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 hover:border-yellow-400 transition-colors"
               >
                 {tag}
               </button>
