@@ -1,5 +1,5 @@
 import React from "react";
-import DemoCard from "/home/user/povlib/src/components/POVlib/DemoCard";
+import DemoCard from ".././POVlib/DemoCard"
 
 /**
  * Zeigt bis zu 3 Demos in einer gleichmäßigen Zeile an.
