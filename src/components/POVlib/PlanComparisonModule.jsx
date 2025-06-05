@@ -135,14 +135,14 @@ const PlanComparisonModule = ({ currentPlan }) => {
         <div className="absolute inset-0 bg-pattern-fade pointer-events-none"></div>
         <style jsx>{`
           .bg-pattern-fade {
-            /* Leicht subtilere Punkte: */
+            /* Von rechts nach links verlaufende, subtilere Punkte: */
             background-image: radial-gradient(
-              rgba(255, 255, 255, 0.08) 2px,
-              transparent 2px
+              rgba(255, 255, 255, 0.05) 1.5px,
+              transparent 1.5px
             );
-            background-size: 25px 25px;
+            background-size: 28px 28px;
             mask-image: linear-gradient(
-              to right,
+              to left,
               rgba(0, 0, 0, 1) 0%,
               rgba(0, 0, 0, 0) 100%
             );
