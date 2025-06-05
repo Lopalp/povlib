@@ -1,25 +1,24 @@
-import { useRef } from "react";
-import DemoCard from "../POVlib/DemoCard";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
+// src/components/containers/CategoryCarousel.jsx
+import React, { useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import DemoCard from '../POVlib/DemoCard';
 
 export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
   const containerRef = useRef(null);
 
   const scrollLeft = () => {
     if (!containerRef.current) return;
-    // Scrollt um die Breite des Containers nach links
     containerRef.current.scrollBy({
       left: -containerRef.current.offsetWidth,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   };
 
   const scrollRight = () => {
     if (!containerRef.current) return;
-    // Scrollt um die Breite des Containers nach rechts
     containerRef.current.scrollBy({
       left: containerRef.current.offsetWidth,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   };
 
@@ -30,7 +29,7 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
       </h2>
 
       <div className="relative">
-        {/* Linke Pfeiltaste */}
+        {/* Linker Pfeil */}
         <button
           onClick={scrollLeft}
           className="
@@ -40,10 +39,10 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
           "
           aria-label="Scroll Left"
         >
-          <ChevronLeftIcon className="h-6 w-6 text-white" />
+          <ChevronLeft className="h-6 w-6 text-white" />
         </button>
 
-        {/* Rechte Pfeiltaste */}
+        {/* Rechter Pfeil */}
         <button
           onClick={scrollRight}
           className="
@@ -53,14 +52,14 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
           "
           aria-label="Scroll Right"
         >
-          <ChevronRightIcon className="h-6 w-6 text-white" />
+          <ChevronRight className="h-6 w-6 text-white" />
         </button>
 
         {/* Scroll-Container */}
         <div
           ref={containerRef}
-          className="flex overflow-x-auto scrollbar-hide space-x-6 px-4"
-          style={{ scrollBehavior: "smooth" }}
+          className="flex overflow-x-auto custom-scrollbar space-x-6 px-4"
+          style={{ scrollBehavior: 'smooth', gap: `${gap}px` }}
         >
           {demos.map((demo) => (
             <div key={demo.id} className="flex-shrink-0 w-[280px]">
@@ -68,10 +67,12 @@ export const CategoryCarousel = ({ title, demos, onSelectDemo, gap = 24 }) => {
             </div>
           ))}
 
-          {/* Wenn Du möchtest, dass der Container am Ende etwas "Abstand" hat */}
+          {/* Optional: etwas Abstand am Ende */}
           <div className="flex-shrink-0 w-4" />
         </div>
       </div>
     </section>
   );
 };
+
+export default CategoryCarousel;
