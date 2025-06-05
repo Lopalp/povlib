@@ -24,51 +24,51 @@ const PlanComparisonModule = ({ currentPlan }) => {
           'Risk-free entry into POVLib',
           'Community support',
         ],
-        highlight: 'Start for free and explore all basics.',
+        highlight: 'Start for free und erkunde alle Grundlagen.',
       },
       {
         key: 'basic',
         name: 'Basic',
         priceLabel: '$6.99/mo',
         features: [
-          '10 full demos per month',
-          'Up to 1080p @ 30fps',
-          'Access to the Pro Utility Book',
-          'Standard processing queue',
+          '10 Full-Demos pro Monat',
+          'Bis zu 1080p @ 30fps',
+          'Zugriff auf das Pro Utility Book',
+          'Standard-Verarbeitungs-Queue',
         ],
-        highlight: 'Most popular entry-level pack.',
+        highlight: 'Beliebter Einstiegspack.',
       },
       {
         key: 'advanced',
         name: 'Advanced',
         priceLabel: '$12.99/mo',
         features: [
-          'Create highlight clips',
-          'Up to 30 demos per month',
-          'Build your own Utility Book',
-          '2D views & multiple POVs',
-          'Custom quizzes while watching demos',
-          'Generate demos for any player',
-          'Get your own keystrokes in your games',
+          'Highlight-Clips erstellen',
+          'Bis zu 30 Demos pro Monat',
+          'Baue dein eigenes Utility Book',
+          '2D-Views & mehrere POVs',
+          'Custom-Quizzes beim Anschauen der Demos',
+          'Demos für jeden Spieler generieren',
+          'Eigene Tastenanschläge in Spielen sehen',
         ],
-        highlight: 'Everything you need to level up.',
+        highlight: 'Alles, um auf das nächste Level zu kommen.',
       },
       {
         key: 'pro',
         name: 'Pro',
         priceLabel: '$25.99/mo',
         features: [
-          'Up to 4K demo exports',
-          'Customized death screens',
-          'Early access to new features',
-          'Dedicated support',
-          'Professional analytics video view',
-          'Customizable videos',
-          'Connect multiple games',
-          'Select specific rounds',
-          'Fastest generation times',
+          'Bis zu 4K Demo-Exporte',
+          'Individualisierte Death-Screens',
+          'Früher Zugriff auf neue Features',
+          'Dedizierter Support',
+          'Professionelle Analytics-Video-Ansicht',
+          'Anpassbare Videos',
+          'Mehrere Spiele verbinden',
+          'Bestimmte Runden auswählen',
+          'Schnellste Generierungszeiten',
         ],
-        highlight: 'For serious players and teams.',
+        highlight: 'Für ernste Spieler und Teams.',
       },
     ],
     []
@@ -85,7 +85,9 @@ const PlanComparisonModule = ({ currentPlan }) => {
   if (!currentPlanData) {
     return (
       <div className="bg-red-800 text-red-200 rounded-2xl p-6">
-        <p className="text-sm font-semibold">Error: Unknown plan "{currentPlan}".</p>
+        <p className="text-sm font-semibold">
+          Error: Unbekannter Plan „{currentPlan}“.
+        </p>
       </div>
     );
   }
@@ -99,11 +101,11 @@ const PlanComparisonModule = ({ currentPlan }) => {
             You’re on the highest plan!
           </h2>
           <p className="text-sm text-gray-300 mb-6">
-            You already have the <span className="font-semibold text-yellow-400">{currentPlanData.name}</span> plan, which offers all available features.
+            Du hast bereits den <span className="font-semibold text-yellow-400">{currentPlanData.name}</span>-Plan, der alle Features enthält.
           </p>
           <button
             onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-md bg-gray-700 text-gray-500 font-semibold cursor-pointer hover:bg-gray-600 transition"
           >
             <X className="w-5 h-5" />
             <span className="text-sm">Manage Subscription</span>
@@ -130,35 +132,50 @@ const PlanComparisonModule = ({ currentPlan }) => {
   return (
     <>
       <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg relative overflow-hidden">
- <div className="absolute inset-0 bg-pattern-fade pointer-events-none"></div>
- <style jsx>{`
- .bg-pattern-fade {
- background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
- background-size: 20px 20px;
- mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
- }
- `}</style>
+        <div className="absolute inset-0 bg-pattern-fade pointer-events-none"></div>
+        <style jsx>{`
+          .bg-pattern-fade {
+            background-image: radial-gradient(
+              rgba(255, 255, 255, 0.05) 1px,
+              transparent 1px
+            );
+            background-size: 20px 20px;
+            mask-image: linear-gradient(
+              to right,
+              rgba(0, 0, 0, 1) 0%,
+              rgba(0, 0, 0, 0) 100%
+            );
+          }
+        `}</style>
 
- <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
+        {/* Nur eine Überschrift */}
+        <h2 className="text-2xl md:text-3xl font-bold text-white">
+          Compare Your Plan
+        </h2>
 
         {/* Vergleichsgitter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Aktueller Plan */}
           <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-800">
- <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200 relative z-10">{currentPlanData.name}</h3>
-            <p className="text-3xl font-extrabold text-yellow-400 mb-4">{currentPlanData.priceLabel}</p>
-            <ul className="space-y-2 text-gray-400 flex-grow text-sm">
+            <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-200 relative z-10">
+              {currentPlanData.name}
+            </h3>
+            <p className="text-3xl font-extrabold text-yellow-400 mb-4">
+              {currentPlanData.priceLabel}
+            </p>
+            <ul className="space-y-2 text-gray-400 flex-grow text-base">
               {currentPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-start">
-                  <span className="mr-2 text-xs">•</span>
+                  {/* Größere Bullets */}
+                  <span className="mr-2 text-lg">•</span>
                   <span>{feat}</span>
                 </li>
               ))}
             </ul>
             <button
               disabled
-              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 bg-gray-700 text-gray-500 cursor-not-allowed"
- className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md bg-gray-700 text-gray-500 cursor-not-allowed"
+              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md bg-gray-700 text-gray-500 cursor-not-allowed"
+            >
               <span className="text-sm">Current Plan</span>
             </button>
           </div>
@@ -166,14 +183,21 @@ const PlanComparisonModule = ({ currentPlan }) => {
           {/* Nächster Plan */}
           <div className="border border-gray-700 rounded-2xl p-6 flex flex-col bg-gray-900 shadow-md">
             <div className="flex justify-between items-center mb-2">
- <h3 className="text-lg md:text-xl font-bold text-white relative z-10">{nextPlanData.name}</h3>
-              <span className="text-sm text-yellow-400 font-semibold">Upgrade</span>
+              <h3 className="text-lg md:text-xl font-bold text-white relative z-10">
+                {nextPlanData.name}
+              </h3>
+              <span className="text-sm text-yellow-400 font-semibold">
+                Upgrade
+              </span>
             </div>
-            <p className="text-3xl font-extrabold text-white mb-4">{nextPlanData.priceLabel}</p>
-            <ul className="space-y-2 text-gray-200 flex-grow text-sm">
+            <p className="text-3xl font-extrabold text-white mb-4">
+              {nextPlanData.priceLabel}
+            </p>
+            <ul className="space-y-2 text-gray-200 flex-grow text-base">
               {nextPlanData.features.map((feat, i) => (
                 <li key={i} className="flex items-start">
-                  <span className="mr-2 text-xs text-yellow-400">★</span>
+                  {/* Größere Sterne-Bullets */}
+                  <span className="mr-2 text-lg text-yellow-400">★</span>
                   <span>{feat}</span>
                 </li>
               ))}
