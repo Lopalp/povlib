@@ -5,6 +5,15 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { PlayCircle, Info, X } from 'lucide-react';
 import { getFilteredDemos } from '@/lib/supabase';
 
+const getRandomImage = () => {
+  const images = [
+    "/img/v2.png",
+    "/img/v3.png",
+    "/img/v4.png",
+  ];
+  return images[Math.floor(Math.random() * images.length)];
+};
+
 export default function CompetitionModule({
   title = 'Clip of the Week',
   durationDays = 7,
@@ -88,7 +97,7 @@ export default function CompetitionModule({
                   <div className="relative w-full pb-[133%] bg-black">
                     <video
                       src={clip.videoUrl || clip.video_id}
-                      poster={"/img/v1.png"}
+                      poster={getRandomImage()}
                       muted
                       loop
                       playsInline
