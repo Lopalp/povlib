@@ -4,12 +4,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Filter, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-import Navbar from '../Navbar';
-import Footer from '../Footer';
-import DemoCard from '../DemoCard';
-import VideoPlayerPage from '../VideoPlayerPage';
-import TaggingModal from '../TaggingModal';
-import FilterModal from '../FilterModal';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import DemoCard from './DemoCard';
+import VideoPlayerPage from './VideoPlayerPage';
+import TaggingModal from './TaggingModal';
+import FilterModal from './FilterModal';
 
 // Angepasste Imports für die drei neuen Komponenten:
 import CategorySection from '../../components/containers/CategorySection';
