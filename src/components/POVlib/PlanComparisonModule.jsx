@@ -132,11 +132,6 @@ const PlanComparisonModule = ({ currentPlan }) => {
       <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg relative overflow-hidden">
  {/* Hintergrund-Punktmuster mit Fade */}
  <div className="absolute inset-0 bg-pattern-fade pointer-events-none"></div>
- {/* Header */}
-        <div className="relative z-10">
- <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
- </div>
-
  <style jsx>{`
  .bg-pattern-fade {
  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
@@ -146,7 +141,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
  `}</style>
 
         <div className="relative z-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
+ <h2 className="text-2xl md:text-3xl font-bold text-white">Compare Your Plan</h2>
         </div>
 
         {/* Vergleichsgitter */}
@@ -166,7 +161,7 @@ const PlanComparisonModule = ({ currentPlan }) => {
             <button
               disabled
               className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 bg-gray-700 text-gray-500 cursor-not-allowed"
-            >
+ >
               <span className="text-sm">Current Plan</span>
             </button>
           </div>
