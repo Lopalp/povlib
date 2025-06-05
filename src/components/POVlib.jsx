@@ -1,4 +1,3 @@
-// components/POVlib/POVlib.jsx
 'use client';
 import React, {
   useState,
@@ -37,14 +36,11 @@ import SelectedFilters from './POVlib/SelectedFilters';
 import PlanComparisonModule from './POVlib/PlanComparisonModule';
 import UnderConstructionModal from './POVlib/UnderConstructionModal';
 
-// --------------------------------------------------
-// Statt DemoCard importieren wir jetzt ModalDemoCard
-// --------------------------------------------------
+// <- HIER FEHLTE DER IMPORT VON LoadingFullscreen. BITTE EINFÜGEN:
+import { LoadingFullscreen } from './loading/LoadingFullscreen';
+
 import ModalDemoCard from './POVlib/ModalDemoCard';
 
-// --------------------------------------------------
-// Hilfsfunktion: Mapping der Roh‐Daten aus Supabase
-// --------------------------------------------------
 const mapDemo = (demo) => ({
   id: demo.id,
   title: demo.title,
