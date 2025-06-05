@@ -47,13 +47,13 @@ export default function Navbar({
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
-  // Glassmorphism background utility
-  const glassBg = "bg-black/50 backdrop-blur-lg border border-gray-700";
+  // Glas-Hintergrund für Desktop-Navbar
+  const glassBg = 'bg-black/50 backdrop-blur-lg border border-gray-700';
 
   useEffect(() => {
     const onScroll = () => {
       setIsScrolled(window.scrollY > 0);
-      // Close any open menus/modals on scroll
+      // Bei Scroll alle Untermenüs schließen
       setMapMenuOpen(false);
       setUserMenuOpen(false);
       setSearchActive(false);
@@ -74,30 +74,32 @@ export default function Navbar({
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // perform search
+    // Such-Logik hier
     setSearchActive(false);
   };
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
       setUser(null);
-      router.push("/");
+      router.push('/');
     }
   };
 
-  const linkClasses =
-    "text-sm font-medium transition-colors duration-200 hover:text-yellow-400";
+  // Jetzt mit font-light statt font-normal
+  const linkClasses = 'text-sm font-light transition-colors duration-200 hover:text-yellow-400';
+
+  // Fullscreen-Overlay für das mobile Menü – höherer z-index als die Navbar
+  const mobileOverlayBg = 'fixed inset-0 z-60 bg-black/90 backdrop-blur-lg border-t border-gray-800 overflow-y-auto';
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}
-    >
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${glassBg}`}>
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center gap-2">
             <LogoHeading size={1.5} />
           </Link>
 
+          {/* Desktop-Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link href="/" className={`${linkClasses} text-white`}>
               Home
@@ -135,36 +137,20 @@ export default function Navbar({
                 </ul>
               )}
             </div>
-            <Link href="/demos" className={`${linkClasses} text-gray-200`}>
-              Demos
-            </Link>
-            <Link href="/players" className={`${linkClasses} text-gray-200`}>
-              Players
-            </Link>
-            {/* Neuer Link zur Utility Book Seite */}
-            <Link
-              href="/utility-book"
-              className={`${linkClasses} text-gray-200`}
-            >
-              Utility Book
-            </Link>
+            <Link href="/demos" className={`${linkClasses} text-gray-200`}>Demos</Link>
+            <Link href="/players" className={`${linkClasses} text-gray-200`}>Players</Link>
+            <Link href="/utility-book" className={`${linkClasses} text-gray-200`}>Utility Book</Link>
             <div className="relative group">
-              <span className={`${linkClasses} text-gray-200 cursor-default`}>
-                Community
-              </span>
-              <div
-                className={`absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 rounded-lg py-2 text-center text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity ${glassBg}`}
-              >
-                To be continued
+              <span className={`${linkClasses} text-gray-200 cursor-default`}>Community</span>
+              <div className={`absolute left-1/2 top-full mt-2 w-44 -translate-x-1/2 rounded-lg py-2 text-center text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity ${glassBg}`}>
+                Coming Soon
               </div>
             </div>
           </nav>
 
           <div className="flex items-center space-x-4">
-            <button
-              onClick={toggleSearch}
-              className="p-2 text-gray-300 hover:text-yellow-400 cursor-pointer"
-            >
+            {/* Such-Icon */}
+            <button onClick={toggleSearch} className="p-2 text-gray-300 hover:text-yellow-400 cursor-pointer">
               <Search className="h-5 w-5" />
             </button>
             {searchActive && (
@@ -177,7 +163,7 @@ export default function Navbar({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search POVs, maps, players or teams..."
-                  className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white"
+                  className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white focus:outline-none"
                 />
                 {searchQuery && (
                   <button
@@ -194,6 +180,7 @@ export default function Navbar({
               </form>
             )}
 
+            {/* Glocken-Symbol (Notifications) */}
             <Link href="/user">
               <button className="hidden md:block p-2 relative text-gray-300 hover:text-yellow-400 cursor-pointer">
                 <BellRing className="h-5 w-5" />
@@ -201,26 +188,14 @@ export default function Navbar({
               </button>
             </Link>
 
-            <div style={{ width: 0 }}></div>
-
             {user ? (
               <div className="relative">
-                <button
-                  onClick={() => router.push("/user")}
-                  className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer"
-                >
+                <button onClick={() => setUserMenuOpen(prev => !prev)} className="p-1 border border-yellow-400 rounded-full text-gray-300 hover:text-yellow-400 cursor-pointer">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    {user.avatar_url ? (
-                      <img
-                        src={user.avatar_url}
-                        alt={user.name.slice(0, 1)}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        {user.name.slice(0, 1)}
-                      </div>
-                    )}
+                    {user.avatar_url
+                      ? <img src={user.avatar_url} alt={user.name.slice(0,1)} className="w-full h-full object-cover"/>
+                      : <div className="w-full h-full flex items-center justify-center text-gray-400">{user.name.slice(0,1)}</div>
+                    }
                   </div>
                 </button>
                 {userMenuOpen && (
@@ -271,39 +246,30 @@ export default function Navbar({
                 <LogIn className="h-4 w-4 mr-2" /> Sign In
               </Link>
             )}
-
-            <button
-              onClick={() => setIsMenuOpen((o) => !o)}
-              className="md:hidden p-2 text-gray-300 hover:text-yellow-400"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+            
+            {/* Burger-Icon für Mobile */}
+            <button onClick={() => setIsMenuOpen(o => !o)} className="md:hidden p-2 text-gray-300 hover:text-yellow-400">
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Mobile Fullscreen-Overlay-Menü */}
       {isMenuOpen && (
-        <div
-          className={`fixed inset-0 z-50 ${glassBg.replace(
-            "border border-gray-700",
-            "bg-black/90 border border-gray-800"
-          )} overflow-y-auto`}
-        >
+        <div className={mobileOverlayBg}>
           <div className="container mx-auto px-4 py-6">
             <nav className="flex flex-col space-y-6">
               <Link
                 href="/"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-white font-medium hover:text-yellow-400"
+                className="text-white text-lg font-light hover:text-yellow-400"
               >
                 Home
               </Link>
+
               <div className="border-t border-gray-700 pt-4">
-                <div className="flex items-center mb-3 text-lg font-medium text-white">
+                <div className="flex items-center mb-3 text-lg font-light text-white">
                   <MapPin className="h-5 w-5 text-yellow-400 mr-2" /> Maps
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -312,7 +278,7 @@ export default function Navbar({
                       key={m.slug}
                       href={`/maps/${m.slug}`}
                       onClick={() => setIsMenuOpen(false)}
-                      className="py-2 text-center text-gray-200 border border-gray-700 rounded-md hover:text-yellow-400"
+                      className="py-2 text-center text-gray-200 border border-gray-700 rounded-md hover:text-yellow-400 font-light"
                     >
                       {m.label}
                     </Link>
@@ -321,35 +287,38 @@ export default function Navbar({
                 <Link
                   href="/maps"
                   onClick={() => setIsMenuOpen(false)}
-                  className="mt-3 block text-sm text-yellow-400 hover:underline"
+                  className="mt-3 block text-sm text-yellow-400 hover:underline font-light"
                 >
                   All Maps →
                 </Link>
               </div>
+
               <Link
                 href="/demos"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400"
+                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
               >
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Demos
               </Link>
+
               <Link
                 href="/players"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400"
+                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
               >
                 <User className="h-5 w-5 text-yellow-400" /> Players
               </Link>
-              {/* Neuer Mobile-Link zur Utility Book Seite */}
+
               <Link
                 href="/utility-book"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400"
+                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
               >
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Utility Book
               </Link>
+
               <Link
-                href="/login"
+                href="/signin"
                 onClick={() => setIsMenuOpen(false)}
                 className="block w-full py-3 rounded-full bg-yellow-400 text-gray-900 text-center font-bold hover:bg-yellow-300 transition-colors"
               >
