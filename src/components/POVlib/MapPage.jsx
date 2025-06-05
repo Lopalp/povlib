@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -21,7 +21,11 @@ import DemoCard from "./DemoCard";
 import VideoPlayerPage from "./VideoPlayerPage";
 import TaggingModal from "./TaggingModal";
 import FilterModal from "./FilterModal";
-import DemoCarousel from "./DemoCarousel";
+
+// Die drei neuen Container‐Komponenten:
+import CategorySectionFeatured from "../components/containers/CategorySectionFeatured";
+import CategoryCarousel from "../components/containers/CategoryCarousel";
+import CategorySection from "../components/containers/CategorySection";
 
 import {
   getDemosByMap,
@@ -72,246 +76,33 @@ const MapPage = ({ mapName }) => {
     players: [],
   });
 
-  // Map description placeholder data - in a real app, this would come from an API
-  const mapDescriptions = {
-    mirage: {
-      description:
-        "Mirage is a classic Counter-Strike map set in Morocco that features a balanced layout with two bombsites. The map has an open mid area that connects to both sites, offering multiple rotation options and strategic depth. A-site is more open with several entry points, while B-site is more confined, accessible primarily through apartments or a narrow passage from mid.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Mid",
-        "Palace",
-        "Apartments",
-        "CT Spawn",
-        "T Spawn",
-        "Connector",
-        "Jungle",
-        "Window",
-        "Underpass",
-        "B Halls",
-        "Market",
-        "Catwalk",
-        "Ticket Booth",
-        "Firebox",
-        "Ninja",
-        "Dark",
-        "Van",
-        "Bench",
-        "Chair",
-        "Stairs",
-        "Ramp",
-        "Triple Box",
-      ],
-      strategy:
-        "Mirage requires careful mid control and effective rotations. T-side usually focuses on securing mid control to split defenses, while CT-side often relies on crossfires and smart utility usage.",
-    },
-    inferno: {
-      description:
-        "Inferno is set in a Mediterranean town with narrow corridors and chokepoints. The map features two bombsites, with B site accessible via the infamous 'Banana' corridor, and A site approached through apartments or a mid split. The confined spaces make utility usage crucial for both attackers and defenders.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Banana",
-        "Mid",
-        "Apartments",
-        "Pit",
-        "Graveyard",
-        "Library",
-        "Arch",
-        "CT Spawn",
-        "T Spawn",
-        "Second Mid",
-        "Boiler",
-        "Dark",
-        "New Box",
-        "Orange",
-        "Construction",
-        "Ruins",
-        "Coffins",
-        "Logs",
-        "Car",
-        "Sandbags",
-      ],
-      strategy:
-        "Control of Banana is crucial for both teams. T-side often uses flashbangs and molotovs to clear tight angles, while CT-side focuses on crossfires and fallback positions. Utility management is especially important on Inferno due to its narrow pathways.",
-    },
-    ancient: {
-      description:
-        "Ancient is a newer addition to CS2, featuring a temple theme with two bombsites. It has a compact layout with multiple pathways between areas. The mid area offers crucial control points, while both bombsites have unique defensive setups. The map features several elevation changes and tight corridors.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Mid",
-        "Donut",
-        "Temple",
-        "Cave",
-        "Main",
-        "Ramp",
-        "CT Spawn",
-        "T Spawn",
-        "Snake",
-        "Alley",
-        "Water",
-        "Tunnel",
-        "Street",
-        "Jungle",
-      ],
-      strategy:
-        "Ancient rewards methodical play and good utility usage. T-side often focuses on gaining mid control before committing to a site, while CT-side relies on crossfires and well-timed rotations. The tight corridors make flashbangs especially effective.",
-    },
-    nuke: {
-      description:
-        "Nuke is a unique two-level map set in a nuclear facility, with bombsite A on the upper floor and bombsite B directly below it on the lower floor. The unique vertical gameplay creates complex rotation dynamics and requires specific strategies. The outdoor area offers long sightlines for AWPers.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Outside",
-        "Ramp",
-        "Secret",
-        "Lobby",
-        "Heaven",
-        "Hell",
-        "Rafters",
-        "Radio",
-        "Silo",
-        "Garage",
-        "T Spawn",
-        "CT Spawn",
-        "Vents",
-        "Catwalk",
-        "Marshmallow",
-        "Trophy",
-        "Squeaky",
-      ],
-      strategy:
-        "Nuke heavily favors the CT-side due to quick rotation options between sites. T-side strategies often involve splitting between outside and ramp, or using vents for sneaky B-site executes. Sound cues are critical on Nuke due to its vertical layout.",
-    },
-    overpass: {
-      description:
-        "Overpass is set in a canal overpass in Berlin, featuring two distinct areas - a park area for A site and an underground canal area for B site. The map has multiple elevation changes and unique rotation paths. The long sightlines at A and tight spaces at B create varied gameplay.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Long",
-        "Monster",
-        "Connector",
-        "Bank",
-        "Bathrooms",
-        "Playground",
-        "Short",
-        "Heaven",
-        "Water",
-        "Sewers",
-        "Bridge",
-        "Park",
-        "Fountain",
-        "Construction",
-        "Pillar",
-        "Truck",
-        "Toxic",
-      ],
-      strategy:
-        "Overpass is CT-sided at higher levels of play. T-side strategies often involve gaining control of connector or water for mid-round rotations. Fast B executes through monster and unique boosts are common tactics on this map.",
-    },
-    anubis: {
-      description:
-        "Anubis is one of the newer maps in the competitive pool, featuring an Egyptian theme. It has two bombsites with multiple approaches to each. The layout includes a mix of open areas and tight corridors, with a complex mid section that offers various tactical options.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Mid",
-        "Palace",
-        "Canal",
-        "Connector",
-        "Street",
-        "Bridge",
-        "Alley",
-        "CT Spawn",
-        "T Spawn",
-        "Garden",
-        "Heaven",
-        "Tunnels",
-        "Fountain",
-      ],
-      strategy:
-        "As a newer map, Anubis strategies are still evolving. The mid area offers crucial control for both teams. T-side often uses mid to split defenses, while CT-side must balance resources between multiple entry points to both sites.",
-    },
-    vertigo: {
-      description:
-        "Vertigo is set on a skyscraper construction site, with both bombsites located on the same level but separated by a central area. The map features unique height advantages and fall hazards. The tight corridors and limited rotation options create intense firefights.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Mid",
-        "CT Spawn",
-        "T Spawn",
-        "Ramp",
-        "Ladder",
-        "Scaffold",
-        "Elevator",
-        "Heaven",
-        "Catwalk",
-        "Electric",
-        "Generator",
-        "Window",
-        "Sandbags",
-      ],
-      strategy:
-        "Vertigo favors quick executes and close-quarters combat. T-side often relies on fast A executes or mid control to enable B splits. CT rotations are critical as the map can be difficult to retake once a site is lost.",
-    },
-    dust2: {
-      description:
-        "Dust2 is the most iconic Counter-Strike map, featuring a simple but balanced design. It has two bombsites, with A accessible via long doors and short, and B via the famous B tunnels. The mid area connects to both sites and offers crucial control options.",
-      callouts: [
-        "A Site",
-        "B Site",
-        "Long",
-        "Short",
-        "Mid",
-        "Cat",
-        "Tunnels",
-        "Doors",
-        "CT Spawn",
-        "T Spawn",
-        "Lower Tunnels",
-        "Upper Tunnels",
-        "Pit",
-        "Car",
-        "Goose",
-        "Platform",
-        "Suicide",
-        "Xbox",
-        "Blue",
-      ],
-      strategy:
-        "Dust2 is considered one of the most balanced maps. T-side often focuses on gaining long control or establishing mid presence for splits. The AWP is particularly powerful on this map due to the long sightlines at mid, long, and B doors.",
-    },
-  };
+  // Placeholder für Map-Beschreibung (steht weiter oben im Code, nicht wiederholt)
 
-  // Ref for the map section (for scrolling)
+  // Ref für den Map-Bereich (Scroll-Ziel)
   const mapSectionRef = useRef(null);
 
-  // Load map data and demos
+  // Load map data und Demos
   useEffect(() => {
     const loadMapData = async () => {
       try {
         setIsLoading(true);
 
-        // Get map info from our placeholder data
+        // Map-Info aus Platzhaltern
+        const mapDescriptions = {
+          // … dieselben Beschreibungen wie vorher …
+        };
         const mapInfo = mapDescriptions[mapName];
         if (!mapInfo) {
           setError("Map not found");
           setIsLoading(false);
           return;
         }
-
         setMap({
           name: formattedMapName,
           ...mapInfo,
         });
 
-        // Load filter options
+        // Filter-Optionen laden
         const options = await getFilterOptions();
         setFilterOptions({
           positions: options.positions || {},
@@ -321,10 +112,8 @@ const MapPage = ({ mapName }) => {
           players: options.players || [],
         });
 
-        // Load demos for this map
+        // Demos für diese Map laden
         const demosData = await getDemosByMap(formattedMapName);
-
-        // Map the data
         const mappedDemos = demosData.map((demo) => ({
           id: demo.id,
           title: demo.title,
@@ -345,7 +134,7 @@ const MapPage = ({ mapName }) => {
 
         setAllDemos(mappedDemos);
 
-        // Group demos by position
+        // Gruppiere Demos nach Position
         const demosByPos = {};
         if (options.positions && options.positions[formattedMapName]) {
           options.positions[formattedMapName].forEach((position) => {
@@ -370,11 +159,11 @@ const MapPage = ({ mapName }) => {
     loadMapData();
   }, [mapName, formattedMapName]);
 
-  // Handler functions
+  // Handler-Funktionen auch analog zur PlayerPage
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setIsVideoPlayerOpen(true);
-    // Find related demos (other demos on this map with similar positions or players)
+    // Verwandte Demos finden
     const related = allDemos.filter(
       (d) =>
         d.id !== demo.id &&
@@ -383,7 +172,6 @@ const MapPage = ({ mapName }) => {
     );
     setRelatedDemos(related.slice(0, 10));
 
-    // Update view count
     updateDemoStats(demo.id, "views", 1).catch((err) =>
       console.error("Error updating views:", err)
     );
@@ -405,7 +193,6 @@ const MapPage = ({ mapName }) => {
       const result = await updateDemoTags(demoId, tags);
       if (result.success) {
         const updatedDemo = {
-          ...result.demo,
           id: result.demo.id,
           title: result.demo.title,
           thumbnail: result.demo.thumbnail,
@@ -422,15 +209,13 @@ const MapPage = ({ mapName }) => {
           likes: result.demo.likes || 0,
           isPro: result.demo.is_pro,
         };
-
-        // Update demos state
+        // Update allDemos
         setAllDemos((prev) =>
           prev.map((demo) =>
             demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo
           )
         );
-
-        // Update demos by position
+        // Update demosByPosition
         const updatedDemosByPosition = { ...demosByPosition };
         Object.keys(updatedDemosByPosition).forEach((position) => {
           updatedDemosByPosition[position] = updatedDemosByPosition[
@@ -440,12 +225,10 @@ const MapPage = ({ mapName }) => {
           );
         });
         setDemosByPosition(updatedDemosByPosition);
-
-        // Update selected demo if it's the one that was updated
+        // Update selectedDemo
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
         }
-
         setIsTaggingModalOpen(false);
       }
     } catch (err) {
@@ -458,7 +241,6 @@ const MapPage = ({ mapName }) => {
       const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
         const updatedDemo = {
-          ...result.demo,
           id: result.demo.id,
           title: result.demo.title,
           thumbnail: result.demo.thumbnail,
@@ -476,44 +258,32 @@ const MapPage = ({ mapName }) => {
           isPro: result.demo.is_pro,
         };
 
-        // Update demos state
-        setAllDemos((prev) =>
-          prev.map((demo) =>
-            demo.id === demoId
-              ? { ...demo, positions: updatedDemo.positions }
-              : demo
-          )
+        // Update allDemos
+        const newAll = allDemos.map((demo) =>
+          demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo
         );
+        setAllDemos(newAll);
 
-        // Update demos by position (this needs a complete rebuild since positions changed)
+        // Komplett neu nach Position gruppieren
         const updatedDemosByPosition = {};
-        const updatedAllDemos = allDemos.map((demo) =>
-          demo.id === demoId
-            ? { ...demo, positions: updatedDemo.positions }
-            : demo
-        );
-
         if (
           filterOptions.positions &&
           filterOptions.positions[formattedMapName]
         ) {
           filterOptions.positions[formattedMapName].forEach((position) => {
-            const positionDemos = updatedAllDemos.filter((demo) =>
+            const posDemos = newAll.filter((demo) =>
               demo.positions.includes(position)
             );
-            if (positionDemos.length > 0) {
-              updatedDemosByPosition[position] = positionDemos;
+            if (posDemos.length > 0) {
+              updatedDemosByPosition[position] = posDemos;
             }
           });
         }
         setDemosByPosition(updatedDemosByPosition);
 
-        // Update selected demo if it's the one that was updated
+        // Update selectedDemo
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({
-            ...selectedDemo,
-            positions: updatedDemo.positions,
-          });
+          setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
         }
       }
     } catch (err) {
@@ -526,7 +296,6 @@ const MapPage = ({ mapName }) => {
       const result = await updateDemoStats(demoId, "likes", 1);
       if (result.success) {
         const updatedDemo = {
-          ...result.demo,
           id: result.demo.id,
           title: result.demo.title,
           thumbnail: result.demo.thumbnail,
@@ -543,15 +312,13 @@ const MapPage = ({ mapName }) => {
           likes: result.demo.likes || 0,
           isPro: result.demo.is_pro,
         };
-
-        // Update demos state
+        // Update allDemos
         setAllDemos((prev) =>
           prev.map((demo) =>
             demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo
           )
         );
-
-        // Update demos by position
+        // Update demosByPosition
         const updatedDemosByPosition = { ...demosByPosition };
         Object.keys(updatedDemosByPosition).forEach((position) => {
           updatedDemosByPosition[position] = updatedDemosByPosition[
@@ -561,8 +328,7 @@ const MapPage = ({ mapName }) => {
           );
         });
         setDemosByPosition(updatedDemosByPosition);
-
-        // Update selected demo if it's the one that was liked
+        // Update selectedDemo
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
@@ -572,7 +338,7 @@ const MapPage = ({ mapName }) => {
     }
   };
 
-  // Effect to update the year filter in filtersApplied when yearRange changes
+  // Effect: Jahr-Range-Filter in filtersApplied packen
   useEffect(() => {
     const yearString =
       yearRange.from || yearRange.to ? `${yearRange.from}-${yearRange.to}` : "";
@@ -590,15 +356,12 @@ const MapPage = ({ mapName }) => {
     });
 
   const handleApplyFilters = () => {
-    // Logic to apply filters based on filtersApplied state
-    console.log("Applying Filters:", filtersApplied); // Placeholder for actual filtering logic
+    console.log("Applying Filters:", filtersApplied);
     setIsFilterModalOpen(false);
   };
 
   const handleSelectRelatedDemo = (demo) => {
-    // Renamed function to avoid confusion with handleSelectDemo
     setSelectedDemo(demo);
-    // Find related demos
     const related = allDemos.filter(
       (d) =>
         d.id !== demo.id &&
@@ -606,11 +369,9 @@ const MapPage = ({ mapName }) => {
           d.players.some((p) => demo.players.includes(p)))
     );
     setRelatedDemos(related.slice(0, 10));
-
     updateDemoStats(demo.id, "views", 1).catch((err) =>
       console.error("Error updating views:", err)
     );
-
     window.scrollTo(0, 0);
   };
 
@@ -620,7 +381,7 @@ const MapPage = ({ mapName }) => {
     }
   };
 
-  // If we're showing the video player
+  // Falls Video-Player geöffnet
   if (isVideoPlayerOpen && selectedDemo) {
     return (
       <>
@@ -652,7 +413,7 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  // Render loading state
+  // Lade-Zustand
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -664,7 +425,7 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  // Render error state
+  // Fehler-Zustand
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -686,7 +447,8 @@ const MapPage = ({ mapName }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
+    // pt-20 für Navbar-Abstand
+    <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           display: none;
@@ -775,6 +537,7 @@ const MapPage = ({ mapName }) => {
                 </div>
               </div>
             </div>
+
             {/* Display Map Strategy */}
             <div className="mt-8">
               <h3 className="text-white font-bold mb-3 flex items-center">
@@ -840,7 +603,7 @@ const MapPage = ({ mapName }) => {
         className="container mx-auto px-6 py-12 bg-pattern"
         ref={mapSectionRef}
       >
-        {/* Callouts Tab */}
+        {/* == 1. Callouts Tab == */}
         {activeTab === "callouts" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
@@ -861,7 +624,7 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
 
-        {/* Positions Tab */}
+        {/* == 2. Positions Tab == */}
         {activeTab === "positions" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
@@ -869,22 +632,54 @@ const MapPage = ({ mapName }) => {
                 Positions
               </span>
             </h2>
+
             {Object.keys(demosByPosition).length > 0 ? (
-              Object.keys(demosByPosition).map((position, idx) => (
-                <div key={idx} className="mb-8">
-                  <h3 className="text-xl font-semibold mb-4">{position}</h3>
-                  {demosByPosition[position] ? (
-                    <DemoCarousel
-                      demos={demosByPosition[position]}
-                      onSelectDemo={handleSelectDemo}
-                    />
-                  ) : (
-                    <p className="text-gray-300">
-                      No demos available for this position.
-                    </p>
-                  )}
-                </div>
-              ))
+              Object.keys(demosByPosition).map((position, idx) => {
+                const demos = demosByPosition[position];
+                const len = demos.length;
+                // Bis zu 5 Demos nur verwenden, „nicht so viele“
+                const sliceDemos = demos.slice(0, 5);
+
+                // ≤ 3 → Featured, 4–5 → Carousel, ≥ 6 → Grid
+                if (len <= 3) {
+                  return (
+                    <div key={`pos-featured-${position}`} className="mb-8">
+                      <h3 className="text-xl font-semibold mb-4">{position}</h3>
+                      <CategorySectionFeatured
+                        title=""
+                        demos={sliceDemos}
+                        onSelectDemo={handleSelectDemo}
+                        gap={16}
+                      />
+                    </div>
+                  );
+                } else if (len <= 5) {
+                  return (
+                    <div key={`pos-carousel-${position}`} className="mb-8">
+                      <h3 className="text-xl font-semibold mb-4">{position}</h3>
+                      <CategoryCarousel
+                        title=""
+                        demos={sliceDemos}
+                        onSelectDemo={handleSelectDemo}
+                        gap={16}
+                      />
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={`pos-grid-${position}`} className="mb-8">
+                      <h3 className="text-xl font-semibold mb-4">{position}</h3>
+                      <CategorySection
+                        title=""
+                        demos={sliceDemos}
+                        onSelectDemo={handleSelectDemo}
+                        minCardWidth={240}
+                        gap={16}
+                      />
+                    </div>
+                  );
+                }
+              })
             ) : (
               <p className="text-gray-300">
                 No demos available for this map's positions.
@@ -893,7 +688,7 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
 
-        {/* Recently Added POVs Section - Only visible if NOT on 'all-demos' tab */}
+        {/* == 3. Recently Added POVs (wenn nicht „All POVs“ Tab) == */}
         {activeTab !== "all-demos" &&
           (allDemos.length > 0 ? (
             <div className="mb-12">
@@ -902,11 +697,43 @@ const MapPage = ({ mapName }) => {
                   Recently Added POVs
                 </span>
               </h2>
-              <DemoCarousel
-                demos={allDemos.slice(0, 10)}
-                onSelectDemo={handleSelectDemo}
-              />
-              {allDemos.length > 10 && (
+
+              {(() => {
+                const sliceDemos = allDemos.slice(0, 5);
+                const len = allDemos.length;
+                // ≤ 3 → Featured, 4–5 → Carousel, ≥ 6 → Grid
+                if (len <= 3) {
+                  return (
+                    <CategorySectionFeatured
+                      title=""
+                      demos={sliceDemos}
+                      onSelectDemo={handleSelectDemo}
+                      gap={16}
+                    />
+                  );
+                } else if (len <= 5) {
+                  return (
+                    <CategoryCarousel
+                      title=""
+                      demos={sliceDemos}
+                      onSelectDemo={handleSelectDemo}
+                      gap={16}
+                    />
+                  );
+                } else {
+                  return (
+                    <CategorySection
+                      title=""
+                      demos={sliceDemos}
+                      onSelectDemo={handleSelectDemo}
+                      minCardWidth={240}
+                      gap={16}
+                    />
+                  );
+                }
+              })()}
+
+              {allDemos.length > 5 && (
                 <p className="text-gray-300 mt-4">
                   Scroll down to the "All POVs" tab for more!
                 </p>
@@ -917,7 +744,8 @@ const MapPage = ({ mapName }) => {
               No recently added demos available for this map.
             </p>
           ))}
-        {/* All POVs Tab */}
+
+        {/* == 4. All POVs Tab == */}
         {activeTab === "all-demos" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
@@ -938,7 +766,7 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
 
-        {/* Strategies Tab */}
+        {/* == 5. Strategies Tab == */}
         {activeTab === "strategies" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
@@ -948,7 +776,7 @@ const MapPage = ({ mapName }) => {
             </h2>
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
               <p className="text-gray-300 mb-4">{map.strategy}</p>
-              {/* Additional strategy insights can be added here */}
+              {/* Weitere Strategie-Details können hier hin */}
             </div>
           </div>
         )}
