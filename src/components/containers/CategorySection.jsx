@@ -1,55 +1,39 @@
-// ────────────────
-// CategorySection
-// ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Hier wird ein fixer Abstand (fixedGap, hier 16px) in die Berechnung der Kartenbreite einbezogen,
-// sodass sich die Karten niemals berühren und stets bündig am linken und rechten Rand abschließen.
-// Mit "View More" wird eine weitere Zeile freigeschaltet.
-// ────────────────
-// CategorySection
-// ────────────────
-// Rendert eine Kategorie (z. B. "Recently Added") und zeigt standardmäßig eine Zeile.
-// Mit verbesserten Abständen zwischen den Karten für ein besseres visuelles Layout.
-// Mit "View More" wird eine weitere Zeile freigeschaltet.
 import { useRef, useState, useEffect } from "react";
 import DemoCard from "../POVlib/DemoCard";
 
-export const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280, maxColumns = 4, gap = 24 }) => {
-  const containerRef = useRef(null);
-  const [itemsPerRow, setItemsPerRow] = useState(maxColumns);
+export const CategorySection = ({
+  title,
+  demos,
+  onSelectDemo,
+  minCardWidth = 280,
+  gap = 24,
+}) => {
   const [visibleRows, setVisibleRows] = useState(1);
-  const [cardWidth, setCardWidth] = useState(minCardWidth);
 
-  useEffect(() => {
-    const updateItemsPerRow = () => {
-      if (containerRef.current) {
-        // Sicherstellen, dass der Container box-sizing: border-box hat und kein Padding/Margin
-        const containerWidth = containerRef.current.offsetWidth;
-        // Berechne, wie viele Cards (inkl. fester Lücke) in die Container-Breite passen
-        const calculated = Math.floor((containerWidth + gap) / (minCardWidth + gap)) || 1;
-        const finalItems = Math.min(calculated, maxColumns);
-        setItemsPerRow(finalItems);
-        // Berechne die exakte Breite so, dass:
-        // (finalItems * cardWidth) + ((finalItems - 1) * gap) = containerWidth
-        const newCardWidth = (containerWidth - (finalItems - 1) * gap) / finalItems;
-        setCardWidth(Math.floor(newCardWidth));
-      }
-    };
-
-    updateItemsPerRow();
-    window.addEventListener("resize", updateItemsPerRow);
-    return () => window.removeEventListener("resize", updateItemsPerRow);
-  }, [minCardWidth, maxColumns, gap]);
-
-  const visibleCount = itemsPerRow * visibleRows;
+  // Wie viele Items zeigen wir maximal an?
+  // Pro "Reihe" passen dynamisch so viele Cards in's Grid, wie Platz ist.
+  // Da wir nicht mehr per JS rechnen, ziehen wir einzig nach Reihen ab:
+  // visibleCount = visibleRows * columns; doch columns bestimmen wir im CSS.
+  // Deshalb beschränken wir einfach auf visibleRows * maxColumns (falls du ein Maximum möchtest)
+  // oder lassen es unbeschränkt. Hier nehmen wir an, pro Zeile können
+  // theoretisch sehr viele Spalten sein, aber wir wollen höchstens visibleRows Reihen anzeigen.
+  //
+  // Trick: Wir können das Teilen in Reihen vornehmen, wenn wir das CSS-Grid "auto-fill" einsetzen:
+  // Dann kann man nicht exakt per JS sagen: „Zeige 2 Reihen à 4 Spalten“ –
+  // stattdessen slicen wir nach visibleRows * maximaler Spaltenzahl, die du möchtest.
+  // Für ein echtes „View More“, das zeilenweise öffnet, müssten wir aber doch in JS abschätzen,
+  // wie viele Spalten aktuell sichtbar sind. Alternativ lässt man einfach immer z. B. 8 Cards
+  // pro Klick laden (zwei Reihen a 4), ohne dynamisch zu messen. Das ist pragmatisch und wirkt responsiv.
+  //
+  // Unten verwenden wir also: pro "View More" kommen n weitere Cards, z. B. 8 (2 Reihen × 4).
+  // Da wir aber nicht wissen, ob wirklich 4 Spalten nebeneinander passen,
+  // kann man das auch per CSS „max-height: rows × (minCardHeight + gap)“ tricksen. 
+  // Wir wählen hier die pragmatische Variante: pro „View More“ kommen 8 neue Elemente.
+  
+  // Anzahl an Elementen, die derzeit gerendert werden:
+  const baseLoad = 8; // z. B. 8 pro Klick (2 Reihen á 4)
+  const visibleCount = visibleRows * baseLoad;
   const visibleDemos = demos.slice(0, visibleCount);
-
-  // Aufteilen in Zeilen
-  const rows = [];
-  for (let i = 0; i < visibleDemos.length; i += itemsPerRow) {
-    rows.push(visibleDemos.slice(i, i + itemsPerRow));
-  }
-
   const canViewMore = demos.length > visibleCount;
 
   return (
@@ -58,28 +42,30 @@ export const CategorySection = ({ title, demos, onSelectDemo, minCardWidth = 280
         <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
       </h2>
       <div
-        ref={containerRef}
+        ref={useRef()}
         className="overflow-hidden"
-        style={{ boxSizing: 'border-box', padding: 0, margin: 0 }}
+        style={{
+          boxSizing: "border-box",
+          padding: 0,
+          margin: 0,
+        }}
       >
-        {rows.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            className="flex mb-6"
-            style={{ gap: `${gap}px` }}
-          >
-            {row.map(demo => (
-              <div key={demo.id} style={{ width: cardWidth }} className="flex-shrink-0">
-                <DemoCard demo={demo} onSelect={onSelectDemo} />
-              </div>
-            ))}
-            {/* Fülle leere Slots für gleichmäßiges Layout */}
-            {row.length < itemsPerRow && Array(itemsPerRow - row.length).fill().map((_, i) => (
-              <div key={`empty-${i}`} style={{ width: cardWidth }} className="flex-shrink-0"></div>
-            ))}
-          </div>
-        ))}
+        {/* === Hier das Grid-Layout === */}
+        <div
+          className="grid"
+          style={{
+            gap: `${gap}px`,
+            gridTemplateColumns: `repeat(auto-fill, minmax(${minCardWidth}px, 1fr))`,
+          }}
+        >
+          {visibleDemos.map((demo) => (
+            <div key={demo.id} className="w-full">
+              <DemoCard demo={demo} onSelect={onSelectDemo} />
+            </div>
+          ))}
+        </div>
       </div>
+
       {canViewMore && (
         <div className="mt-2 text-center">
           <button
