@@ -31,7 +31,7 @@ export const CategorySection = ({
   // Wir wählen hier die pragmatische Variante: pro „View More“ kommen 8 neue Elemente.
   
   // Anzahl an Elementen, die derzeit gerendert werden:
-  const baseLoad = 8; // z. B. 8 pro Klick (2 Reihen á 4)
+  const baseLoad = 4; // z. B. 8 pro Klick (2 Reihen á 4)
   const visibleCount = visibleRows * baseLoad;
   const visibleDemos = demos.slice(0, visibleCount);
   const canViewMore = demos.length > visibleCount;
