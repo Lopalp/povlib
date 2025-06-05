@@ -1,8 +1,18 @@
 // components/POVlib/POVlib.jsx
 'use client';
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback
+} from 'react';
 import Link from 'next/link';
-import { Search, Filter, X, Menu } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  X,
+  Menu
+} from 'lucide-react';
 import {
   getFilteredDemos,
   getTrendingDemos,
@@ -26,9 +36,12 @@ import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
 import { CategorySection } from './containers/CategorySection';
 import { LoadingFullscreen } from './loading/LoadingFullscreen';
-import DemoCard from './POVlib/DemoCard'; // Import DemoCard to pass handleTagClick
+import DemoCard from './POVlib/DemoCard';
 import PlanComparisonModule from './POVlib/PlanComparisonModule';
 import UnderConstructionModal from './POVlib/UnderConstructionModal';
+
+// Import des neuen UserQuestionModule
+import UserQuestionModule from './POVlib/UserQuestionModule';
 
 const mapDemo = (demo) => ({
   id: demo.id,
@@ -59,17 +72,15 @@ const POVlib = () => {
   // -------------------------------------
   // Plan state for comparison module
   // -------------------------------------
-  const [currentPlan, setCurrentPlan] = useState('free'); // default—could come from user profile/API
+  const [currentPlan, setCurrentPlan] = useState('free'); // default—kann aus Profil/API kommen
   const handleUpgrade = (nextPlanKey) => {
     if (!nextPlanKey) {
-      // User is already on the highest tier or clicked "Manage Subscription"
       console.log('Manage subscription clicked');
       return;
     }
-    // Example API call to upgrade plan, then update local state:
     fetch('/api/upgrade-plan', {
       method: 'POST',
-      body: JSON.stringify({ newPlan: nextPlanKey }),
+      body: JSON.stringify({ newPlan: nextPlanKey })
     })
       .then((res) => {
         if (!res.ok) throw new Error('Upgrade failed');
@@ -82,6 +93,16 @@ const POVlib = () => {
         console.error(err);
         alert('Upgrade failed. Please try again.');
       });
+  };
+
+  // -------------------------------------
+  // UserQuestionModule: onSubmit-Handler
+  // -------------------------------------
+  const handleUserQuestionSubmit = ({ useCase, surveyData, answer }) => {
+    // Die übermittelten Daten können hier weiterverarbeitet werden.
+    // Beispiel: Konsolenausgabe oder API-Call
+    console.log(`UserQuestion (${useCase}) eingegangen:`, surveyData ?? answer);
+    // z.B.: fetch('/api/user-questions', { method: 'POST', body: JSON.stringify({ useCase, ...surveyData ? { surveyData } : { answer } }) })
   };
 
   // -------------------------------------
@@ -136,24 +157,23 @@ const POVlib = () => {
   // Dynamische Tags
   const dynamicTags = useMemo(() => {
     const tagsSet = new Set();
-    filteredDemos.forEach(demo => {
-      demo.tags.forEach(tag => tagsSet.add(tag));
+    filteredDemos.forEach((demo) => {
+      demo.tags.forEach((tag) => tagsSet.add(tag));
     });
-    tagsSet.add("Maps");
-    tagsSet.add("Players");
-    tagsSet.add("Teams");
-    tagsSet.add("Map + CT Position");
+    tagsSet.add('Maps');
+    tagsSet.add('Players');
+    tagsSet.add('Teams');
+    tagsSet.add('Map + CT Position');
     const allTags = Array.from(tagsSet);
 
-    // Shuffle the array randomly
     for (let i = allTags.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [allTags[i], allTags[j]] = [allTags[j], allTags[i]];
     }
-    return allTags.slice(0, 5); // Take only the first 5 elements
+    return allTags.slice(0, 5);
   }, [filteredDemos]);
 
-  // Helper functions for Map/Positions filters
+  // Helper für Map/Position-Filter
   const getFilteredDemosByMap = useCallback(
     (map) => mapDemos[map] || [],
     [mapDemos]
@@ -198,7 +218,10 @@ const POVlib = () => {
     const updateFilteredDemos = async () => {
       try {
         setIsLoading(true);
-        const demos = await getFilteredDemos({ ...filtersApplied, search: searchQuery }, demoType);
+        const demos = await getFilteredDemos(
+          { ...filtersApplied, search: searchQuery },
+          demoType
+        );
         setFilteredDemos(demos.map(mapDemo));
         setIsLoading(false);
       } catch (err) {
@@ -216,7 +239,10 @@ const POVlib = () => {
       if (!mapDemos[map]) {
         try {
           const demos = await getDemosByMap(map);
-          setMapDemos(prev => ({ ...prev, [map]: demos.map(mapDemo) }));
+          setMapDemos((prev) => ({
+            ...prev,
+            [map]: demos.map(mapDemo)
+          }));
         } catch (err) {
           console.error(`Error loading demos for map ${map}:`, err);
         }
@@ -234,9 +260,15 @@ const POVlib = () => {
       if (!positionDemos[position]) {
         try {
           const demos = await getDemosByPosition(position);
-          setPositionDemos(prev => ({ ...prev, [position]: demos.map(mapDemo) }));
+          setPositionDemos((prev) => ({
+            ...prev,
+            [position]: demos.map(mapDemo)
+          }));
         } catch (err) {
-          console.error(`Error loading demos for position ${position}:`, err);
+          console.error(
+            `Error loading demos for position ${position}:`,
+            err
+          );
         }
       }
     };
@@ -250,13 +282,19 @@ const POVlib = () => {
     if (selectedDemo) {
       const updateViews = async () => {
         try {
-          const result = await updateDemoStats(selectedDemo.id, 'views', 1);
+          const result = await updateDemoStats(
+            selectedDemo.id,
+            'views',
+            1
+          );
           if (result.success) {
             const updateList = (list) =>
-              list.map(demo =>
-                demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo
+              list.map((demo) =>
+                demo.id === selectedDemo.id
+                  ? { ...demo, views: demo.views + 1 }
+                  : demo
               );
-            setFilteredDemos(prev => updateList(prev));
+            setFilteredDemos((prev) => updateList(prev));
           }
         } catch (err) {
           console.error('Error updating views:', err);
@@ -272,10 +310,18 @@ const POVlib = () => {
       if (result.success) {
         const updatedDemo = mapDemo(result.demo);
         const updateList = (list) =>
-          list.map(demo => demo.id === demoId ? { ...demo, ...updatedDemo } : demo);
-        setFilteredDemos(prev => updateList(prev));
-        if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({ ...selectedDemo, ...updatedDemo });
+          list.map((demo) =>
+            demo.id === demoId ? { ...demo, ...updatedDemo } : demo
+          );
+        setFilteredDemos((prev) => updateList(prev));
+        if (
+          selectedDemo &&
+          selectedDemo.id === demoId
+        ) {
+          setSelectedDemo({
+            ...selectedDemo,
+            ...updatedDemo
+          });
         }
       }
     } catch (err) {
@@ -284,7 +330,10 @@ const POVlib = () => {
   };
 
   const handleLikeDemo = async (demoId) => {
-    await handleDemoUpdate(demoId, updateDemoStats, { field: 'likes', increment: 1 });
+    await handleDemoUpdate(demoId, updateDemoStats, {
+      field: 'likes',
+      increment: 1
+    });
   };
 
   const handleUpdateTags = async (demoId, tags) => {
@@ -293,10 +342,20 @@ const POVlib = () => {
       if (result.success) {
         const updatedDemo = mapDemo(result.demo);
         const updateList = (list) =>
-          list.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo);
-        setFilteredDemos(prev => updateList(prev));
-        if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
+          list.map((demo) =>
+            demo.id === demoId
+              ? { ...demo, tags: updatedDemo.tags }
+              : demo
+          );
+        setFilteredDemos((prev) => updateList(prev));
+        if (
+          selectedDemo &&
+          selectedDemo.id === demoId
+        ) {
+          setSelectedDemo({
+            ...selectedDemo,
+            tags: updatedDemo.tags
+          });
         }
         setIsTaggingModalOpen(false);
       }
@@ -307,14 +366,27 @@ const POVlib = () => {
 
   const handleUpdatePositions = async (demoId, positions) => {
     try {
-      const result = await updateDemoPositions(demoId, positions);
+      const result = await updateDemoPositions(
+        demoId,
+        positions
+      );
       if (result.success) {
         const updatedDemo = mapDemo(result.demo);
         const updateList = (list) =>
-          list.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo);
-        setFilteredDemos(prev => updateList(prev));
-        if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
+          list.map((demo) =>
+            demo.id === demoId
+              ? { ...demo, positions: updatedDemo.positions }
+              : demo
+          );
+        setFilteredDemos((prev) => updateList(prev));
+        if (
+          selectedDemo &&
+          selectedDemo.id === demoId
+        ) {
+          setSelectedDemo({
+            ...selectedDemo,
+            positions: updatedDemo.positions
+          });
         }
       }
     } catch (err) {
@@ -326,7 +398,9 @@ const POVlib = () => {
     if (activeTag === null) {
       return filteredDemos.slice(0, 12);
     } else {
-      return filteredDemos.filter(demo => demo.tags.includes(activeTag));
+      return filteredDemos.filter((demo) =>
+        demo.tags.includes(activeTag)
+      );
     }
   }, [activeTag, filteredDemos]);
 
@@ -350,7 +424,9 @@ const POVlib = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6 bg-gray-800 rounded-xl shadow-lg">
           <div className="text-red-500 text-5xl mb-4">!</div>
-          <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
+          <h2 className="text-white text-2xl font-bold mb-2">
+            Error Loading Data
+          </h2>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -370,13 +446,17 @@ const POVlib = () => {
           selectedDemo={selectedDemo}
           onClose={onCloseVideoPlayer}
           onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
+          onOpenTagModal={() =>
+            setIsTaggingModalOpen(true)
+          }
         />
         {isTaggingModalOpen && selectedDemo && (
           <TaggingModal
             selectedDemo={selectedDemo}
             filterOptions={filterOptions}
-            onClose={() => setIsTaggingModalOpen(false)}
+            onClose={() =>
+              setIsTaggingModalOpen(false)
+            }
             onUpdateTags={handleUpdateTags}
             onUpdatePositions={handleUpdatePositions}
           />
@@ -389,14 +469,19 @@ const POVlib = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white">
       <style jsx>{`
         .bg-pattern {
-          background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+          background-image: radial-gradient(
+            rgba(255, 255, 255, 0.05) 1px,
+            transparent 1px
+          );
           background-size: 20px 20px;
         }
       `}</style>
 
       <UnderConstructionModal
         isOpen={isUnderConstructionOpen}
-        onClose={() => setIsUnderConstructionOpen(false)}
+        onClose={() =>
+          setIsUnderConstructionOpen(false)
+        }
       />
 
       <Navbar
@@ -428,11 +513,13 @@ const POVlib = () => {
         {/* Filter Icon + Tag Bar */}
         <div className="flex items-center gap-2 mb-4">
           <Filter
-            onClick={() => setIsFilterModalOpen(true)}
+            onClick={() =>
+              setIsFilterModalOpen(true)
+            }
             className="text-yellow-400 cursor-pointer"
           />
           <div className="flex flex-wrap items-center gap-2">
-            {dynamicTags.map(tag => (
+            {dynamicTags.map((tag) => (
               <button
                 key={tag}
                 onClick={() => handleTagClick(tag)}
@@ -441,7 +528,10 @@ const POVlib = () => {
                 {tag}
               </button>
             ))}
-            <Link href="/demos" className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors">
+            <Link
+              href="/demos"
+              className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors"
+            >
               View All Demos
             </Link>
           </div>
@@ -449,7 +539,11 @@ const POVlib = () => {
 
         {/* Category Sections */}
         <CategorySection
-          title={activeTag === null ? 'Recently Added' : activeTag}
+          title={
+            activeTag === null
+              ? 'Recently Added'
+              : activeTag
+          }
           demos={recentlyAddedDemos}
           onSelectDemo={onSelectDemo}
           onTagClick={handleTagClick}
@@ -460,49 +554,77 @@ const POVlib = () => {
           <CompetitionModule />
         </div>
 
-        {/* Plan Comparison Module inserted directly under CompetitionModule */}
+        {/* Plan Comparison Module */}
         <div className="mt-8">
-          <PlanComparisonModule currentPlan={currentPlan} onUpgrade={handleUpgrade} />
+          <PlanComparisonModule
+            currentPlan={currentPlan}
+            onUpgrade={handleUpgrade}
+          />
+        </div>
+
+        {/* UserQuestionModule-Platzierung */}
+        <div className="mt-8">
+          <UserQuestionModule
+            mode="survey"
+            useCase="feedback"
+            onSubmit={handleUserQuestionSubmit}
+          />
         </div>
 
         {!filtersApplied.map && (
           <>
             <CategorySection
               title="Mirage POVs"
-              demos={getFilteredDemosByMap("Mirage")}
+              demos={getFilteredDemosByMap(
+                'Mirage'
+              )}
               onSelectDemo={onSelectDemo}
             />
             <CategorySection
               title="Inferno POVs"
-              demos={getFilteredDemosByMap("Inferno")}
+              demos={getFilteredDemosByMap(
+                'Inferno'
+              )}
               onSelectDemo={onSelectDemo}
             />
           </>
         )}
 
-        {/* Revised Navigation Cards Below */}
+        {/* Navigation Cards */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Link href="/players" className="relative block rounded-2xl overflow-hidden shadow-lg group">
+            <Link
+              href="/players"
+              className="relative block rounded-2xl overflow-hidden shadow-lg group"
+            >
               <img
                 src="/images/players-example.png"
                 alt="Players"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold group-hover:underline">Players</h3>
+                <h3 className="text-white text-2xl font-bold group-hover:underline">
+                  Players
+                </h3>
                 <p className="text-gray-300">View all players</p>
               </div>
             </Link>
-            <Link href="/maps" className="relative block rounded-2xl overflow-hidden shadow-lg group">
+            <Link
+              href="/maps"
+              className="relative block rounded-2xl overflow-hidden shadow-lg group"
+            >
               <img
                 src="/images/maps-example.png"
                 alt="Maps"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold group-hover:underline">Maps</h3>
-                <p className="text-gray-300 text-center">View all maps</p>
+                <h3 className="text-white text-2xl font-bold group-hover:underline">
+                  Maps
+                </h3>
+                <p className="text-gray-300 text-center">
+                  View all maps
+                </p>
               </div>
             </Link>
           </div>
@@ -514,9 +636,17 @@ const POVlib = () => {
           demoType={demoType}
           filterOptions={filterOptions}
           filtersApplied={filtersApplied}
-          onClose={() => setIsFilterModalOpen(false)}
-          onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
-          onResetFilters={() => setFiltersApplied({
+          onClose={() =>
+            setIsFilterModalOpen(false)
+          }
+          onFilterChange={(changed) =>
+            setFiltersApplied((prev) => ({
+              ...prev,
+              ...changed
+            }))
+          }
+          onResetFilters={() =>
+            setFiltersApplied({
               map: '',
               position: '',
               player: '',
@@ -525,8 +655,11 @@ const POVlib = () => {
               event: '',
               result: '',
               search: searchQuery
-            })}
-          onApplyFilters={() => setIsFilterModalOpen(false)}
+            })
+          }
+          onApplyFilters={() =>
+            setIsFilterModalOpen(false)
+          }
         />
       )}
 
@@ -534,7 +667,9 @@ const POVlib = () => {
         <TaggingModal
           selectedDemo={selectedDemo}
           filterOptions={filterOptions}
-          onClose={() => setIsTaggingModalOpen(false)}
+          onClose={() =>
+            setIsTaggingModalOpen(false)
+          }
           onUpdateTags={handleUpdateTags}
           onUpdatePositions={handleUpdatePositions}
         />
