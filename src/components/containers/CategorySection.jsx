@@ -9,8 +9,15 @@ export const CategorySection = ({
   gap = 24,
 }) => {
   const [visibleRows, setVisibleRows] = useState(1);
+  // State, um nach dem ersten Render zu triggern, dass die Linien animiert „hineinwachsen“.
+  const [mounted, setMounted] = useState(false);
 
-  // Pro Klick kommen 4 neue Elemente (1 Reihe × 4 Spalten)
+  useEffect(() => {
+    // Nach dem ersten Render sofort »mounted = true« setzen, sodass die Linien von scale-x-0 auf scale-x-100 gehen.
+    setMounted(true);
+  }, []);
+
+  // Pro Klick laden wir 4 weitere Elemente (1 Reihe × 4 Spalten)
   const baseLoad = 4;
   const visibleCount = visibleRows * baseLoad;
   const visibleDemos = demos.slice(0, visibleCount);
@@ -21,6 +28,7 @@ export const CategorySection = ({
       <h2 className="text-2xl font-bold text-white mb-4">
         <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
       </h2>
+
       <div
         ref={useRef()}
         className="overflow-hidden"
@@ -48,52 +56,47 @@ export const CategorySection = ({
 
       {canViewMore && (
         <div className="mt-4">
-          {/* 
-            Hier: Container mit 'group', damit wir per group-hover
-            die Linien animieren können. 
-          */}
-          <div className="flex items-center group">
+          {/* Flex-Container: Button zentriert, Linien links/rechts flex-grow */}
+          <div className="flex items-center">
             {/* Linke Linie */}
             <span
-              className="
-                flex-1            /* füllt den zur Verfügung stehenden Platz links */
-                h-px              /* Höhe = 1px (gleich dick wie border: 1px) */
-                bg-gray-600       /* gleiche Farbe wie button-border */
-                scale-x-0         /* initial: auf 0 skaliert */
-                group-hover:scale-x-100   /* beim Hover auf group: volle Breite */
-                transition-transform duration-300  /* sanfte Animation (300ms) */
-                origin-left       /* Skalierung beginnt links */
-              "
-            ></span>
-
-            {/* Button selbst */}
+              className={`
+                h-px                    /* Höhe = 1px (wie border: 1px) */
+                bg-gray-600             /* gleiche Farbe wie der Button-Rand */
+                flex-grow               /* füllt automatisch den verbleibenden Platz */
+                origin-left             /* Skalierungsherkunft (für Mount-Animation) */
+                transform               /* aktiviert transform-Anpassung */
+                transition-all duration-500
+                ${mounted ? "scale-x-100" : "scale-x-0"}
+              `}
+            />
+            {/* Mittelstück: Button */}
             <button
               onClick={() => setVisibleRows(visibleRows + 1)}
-              className="
-                mx-4               /* Abstand zu den Linien: 1rem (Tailwind) links & rechts */
-                px-4 py-2          /* horizontales/vertikales Padding */
-                rounded-md         /* abgerundete Ecken */
-                border border-gray-600  /* 1px Border, grau */
+              className={`
+                mx-4                    /* Abstand je 1rem (16px) zu beiden Linien */
+                px-4 py-2               /* horizontales / vertikales Padding */
+                rounded-md              /* abgerundete Ecken (md-Radius) */
+                border border-gray-600  /* 1px grauer Rand */
                 text-white text-sm font-semibold
                 transition-colors
-                hover:border-yellow-400   /* beim Hover: Border wird gelb */
-              "
+                hover:border-yellow-400 /* Hover: Rand wird gelb */
+              `}
             >
               View More
             </button>
-
             {/* Rechte Linie */}
             <span
-              className="
-                flex-1
+              className={`
                 h-px
                 bg-gray-600
-                scale-x-0
-                group-hover:scale-x-100
-                transition-transform duration-300
-                origin-right      /* Skalierung beginnt rechts */
-              "
-            ></span>
+                flex-grow
+                origin-right            /* Skalierungsherkunft rechts */
+                transform
+                transition-all duration-500
+                ${mounted ? "scale-x-100" : "scale-x-0"}
+              `}
+            />
           </div>
         </div>
       )}
