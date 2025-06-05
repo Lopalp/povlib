@@ -1,17 +1,8 @@
+// components/POVlib/POVlib.jsx
 'use client';
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback
-} from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import {
-  Search,
-  Filter,
-  X,
-  Menu
-} from 'lucide-react';
+import { Search, Filter, X, Menu } from 'lucide-react';
 import {
   getFilteredDemos,
   getTrendingDemos,
@@ -33,13 +24,11 @@ import Footer from './POVlib/Footer';
 import CompetitionModule from './POVlib/CompetitionModule';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
+import { CategorySection } from './containers/CategorySection';
+import { LoadingFullscreen } from './loading/LoadingFullscreen';
+import DemoCard from './POVlib/DemoCard'; // Import DemoCard to pass handleTagClick
 import PlanComparisonModule from './POVlib/PlanComparisonModule';
 import UnderConstructionModal from './POVlib/UnderConstructionModal';
-
-// <- HIER FEHLTE DER IMPORT VON LoadingFullscreen. BITTE EINFÜGEN:
-import { LoadingFullscreen } from './loading/LoadingFullscreen';
-
-import ModalDemoCard from './POVlib/ModalDemoCard';
 
 const mapDemo = (demo) => ({
   id: demo.id,
@@ -62,23 +51,25 @@ const mapDemo = (demo) => ({
 const POVlib = () => {
   const router = useRouter();
 
-  // ----------------------------
-  // Under Construction Modal
-  // ----------------------------
+  // -------------------------------------
+  // Under Construction Modal (show on load)
+  // -------------------------------------
   const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(true);
 
-  // ----------------------------
-  // Plan‐State für Vergleichs‐Modul
-  // ----------------------------
-  const [currentPlan, setCurrentPlan] = useState('free');
+  // -------------------------------------
+  // Plan state for comparison module
+  // -------------------------------------
+  const [currentPlan, setCurrentPlan] = useState('free'); // default—could come from user profile/API
   const handleUpgrade = (nextPlanKey) => {
     if (!nextPlanKey) {
+      // User is already on the highest tier or clicked "Manage Subscription"
       console.log('Manage subscription clicked');
       return;
     }
+    // Example API call to upgrade plan, then update local state:
     fetch('/api/upgrade-plan', {
       method: 'POST',
-      body: JSON.stringify({ newPlan: nextPlanKey })
+      body: JSON.stringify({ newPlan: nextPlanKey }),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Upgrade failed');
@@ -94,21 +85,16 @@ const POVlib = () => {
   };
 
   // -------------------------------------
-  // UserQuestionModule: onSubmit‐Handler
-  // -------------------------------------
-  const handleUserQuestionSubmit = ({ useCase, surveyData, answer }) => {
-    console.log(`UserQuestion (${useCase}) eingegangen:`, surveyData ?? answer);
-    // z.B. API‐Call:
-    // fetch('/api/user-questions', { method: 'POST', body: JSON.stringify({ useCase, ...surveyData ? { surveyData } : { answer } }) })
-  };
-
-  // -------------------------------------
-  // UI‐States
+  // UI States
   // -------------------------------------
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
+
+  const handleTagClick = (tag) => {
+    setActiveTag(tag);
+  };
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideoId, setActiveVideoId] = useState('');
@@ -120,7 +106,7 @@ const POVlib = () => {
   const [isVideoPlayerPage, setIsVideoPlayerPage] = useState(false);
 
   // -------------------------------------
-  // Data‐States
+  // Data States
   // -------------------------------------
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
@@ -147,30 +133,27 @@ const POVlib = () => {
     search: searchQuery
   });
 
-  // -------------------------------------
   // Dynamische Tags
-  // -------------------------------------
   const dynamicTags = useMemo(() => {
     const tagsSet = new Set();
-    filteredDemos.forEach((demo) => {
-      demo.tags.forEach((tag) => tagsSet.add(tag));
+    filteredDemos.forEach(demo => {
+      demo.tags.forEach(tag => tagsSet.add(tag));
     });
-    tagsSet.add('Maps');
-    tagsSet.add('Players');
-    tagsSet.add('Teams');
-    tagsSet.add('Map + CT Position');
+    tagsSet.add("Maps");
+    tagsSet.add("Players");
+    tagsSet.add("Teams");
+    tagsSet.add("Map + CT Position");
     const allTags = Array.from(tagsSet);
-    // zufällige Reihenfolge mischen
+
+    // Shuffle the array randomly
     for (let i = allTags.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [allTags[i], allTags[j]] = [allTags[j], allTags[i]];
     }
-    return allTags.slice(0, 5);
+    return allTags.slice(0, 5); // Take only the first 5 elements
   }, [filteredDemos]);
 
-  // -------------------------------------
-  // Helper für Map/Position‐Filter
-  // -------------------------------------
+  // Helper functions for Map/Positions filters
   const getFilteredDemosByMap = useCallback(
     (map) => mapDemos[map] || [],
     [mapDemos]
@@ -180,9 +163,7 @@ const POVlib = () => {
     [positionDemos]
   );
 
-  // -------------------------------------
   // Load initial data
-  // -------------------------------------
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -212,17 +193,12 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
 
-  // -------------------------------------
-  // Update filtered demos bei Filter‐Änderung
-  // -------------------------------------
+  // Update filtered demos
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
         setIsLoading(true);
-        const demos = await getFilteredDemos(
-          { ...filtersApplied, search: searchQuery },
-          demoType
-        );
+        const demos = await getFilteredDemos({ ...filtersApplied, search: searchQuery }, demoType);
         setFilteredDemos(demos.map(mapDemo));
         setIsLoading(false);
       } catch (err) {
@@ -234,18 +210,13 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
 
-  // -------------------------------------
-  // Load Map‐Demos
-  // -------------------------------------
+  // Load Map demos
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
         try {
           const demos = await getDemosByMap(map);
-          setMapDemos((prev) => ({
-            ...prev,
-            [map]: demos.map(mapDemo)
-          }));
+          setMapDemos(prev => ({ ...prev, [map]: demos.map(mapDemo) }));
         } catch (err) {
           console.error(`Error loading demos for map ${map}:`, err);
         }
@@ -257,23 +228,15 @@ const POVlib = () => {
     }
   }, [mapDemos, filtersApplied.map]);
 
-  // -------------------------------------
-  // Load Position‐Demos
-  // -------------------------------------
+  // Load Position demos
   useEffect(() => {
     const loadPositionDemos = async (position) => {
       if (!positionDemos[position]) {
         try {
           const demos = await getDemosByPosition(position);
-          setPositionDemos((prev) => ({
-            ...prev,
-            [position]: demos.map(mapDemo)
-          }));
+          setPositionDemos(prev => ({ ...prev, [position]: demos.map(mapDemo) }));
         } catch (err) {
-          console.error(
-            `Error loading demos for position ${position}:`,
-            err
-          );
+          console.error(`Error loading demos for position ${position}:`, err);
         }
       }
     };
@@ -282,26 +245,18 @@ const POVlib = () => {
     }
   }, [positionDemos, filtersApplied.position]);
 
-  // -------------------------------------
-  // Update Views bei Demo‐Auswahl
-  // -------------------------------------
+  // Update views on demo selection
   useEffect(() => {
     if (selectedDemo) {
       const updateViews = async () => {
         try {
-          const result = await updateDemoStats(
-            selectedDemo.id,
-            'views',
-            1
-          );
+          const result = await updateDemoStats(selectedDemo.id, 'views', 1);
           if (result.success) {
             const updateList = (list) =>
-              list.map((demo) =>
-                demo.id === selectedDemo.id
-                  ? { ...demo, views: demo.views + 1 }
-                  : demo
+              list.map(demo =>
+                demo.id === selectedDemo.id ? { ...demo, views: demo.views + 1 } : demo
               );
-            setFilteredDemos((prev) => updateList(prev));
+            setFilteredDemos(prev => updateList(prev));
           }
         } catch (err) {
           console.error('Error updating views:', err);
@@ -311,27 +266,16 @@ const POVlib = () => {
     }
   }, [selectedDemo]);
 
-  // -------------------------------------
-  // Helper‐Funktionen zum Demo‐Update
-  // -------------------------------------
   const handleDemoUpdate = async (demoId, updateFn, updater) => {
     try {
       const result = await updateFn(demoId, updater);
       if (result.success) {
         const updatedDemo = mapDemo(result.demo);
         const updateList = (list) =>
-          list.map((demo) =>
-            demo.id === demoId ? { ...demo, ...updatedDemo } : demo
-          );
-        setFilteredDemos((prev) => updateList(prev));
-        if (
-          selectedDemo &&
-          selectedDemo.id === demoId
-        ) {
-          setSelectedDemo({
-            ...selectedDemo,
-            ...updatedDemo
-          });
+          list.map(demo => demo.id === demoId ? { ...demo, ...updatedDemo } : demo);
+        setFilteredDemos(prev => updateList(prev));
+        if (selectedDemo && selectedDemo.id === demoId) {
+          setSelectedDemo({ ...selectedDemo, ...updatedDemo });
         }
       }
     } catch (err) {
@@ -340,10 +284,7 @@ const POVlib = () => {
   };
 
   const handleLikeDemo = async (demoId) => {
-    await handleDemoUpdate(demoId, updateDemoStats, {
-      field: 'likes',
-      increment: 1
-    });
+    await handleDemoUpdate(demoId, updateDemoStats, { field: 'likes', increment: 1 });
   };
 
   const handleUpdateTags = async (demoId, tags) => {
@@ -352,20 +293,10 @@ const POVlib = () => {
       if (result.success) {
         const updatedDemo = mapDemo(result.demo);
         const updateList = (list) =>
-          list.map((demo) =>
-            demo.id === demoId
-              ? { ...demo, tags: updatedDemo.tags }
-              : demo
-          );
-        setFilteredDemos((prev) => updateList(prev));
-        if (
-          selectedDemo &&
-          selectedDemo.id === demoId
-        ) {
-          setSelectedDemo({
-            ...selectedDemo,
-            tags: updatedDemo.tags
-          });
+          list.map(demo => demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo);
+        setFilteredDemos(prev => updateList(prev));
+        if (selectedDemo && selectedDemo.id === demoId) {
+          setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
         }
         setIsTaggingModalOpen(false);
       }
@@ -376,27 +307,14 @@ const POVlib = () => {
 
   const handleUpdatePositions = async (demoId, positions) => {
     try {
-      const result = await updateDemoPositions(
-        demoId,
-        positions
-      );
+      const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
         const updatedDemo = mapDemo(result.demo);
         const updateList = (list) =>
-          list.map((demo) =>
-            demo.id === demoId
-              ? { ...demo, positions: updatedDemo.positions }
-              : demo
-          );
-        setFilteredDemos((prev) => updateList(prev));
-        if (
-          selectedDemo &&
-          selectedDemo.id === demoId
-        ) {
-          setSelectedDemo({
-            ...selectedDemo,
-            positions: updatedDemo.positions
-          });
+          list.map(demo => demo.id === demoId ? { ...demo, positions: updatedDemo.positions } : demo);
+        setFilteredDemos(prev => updateList(prev));
+        if (selectedDemo && selectedDemo.id === demoId) {
+          setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
         }
       }
     } catch (err) {
@@ -404,22 +322,15 @@ const POVlib = () => {
     }
   };
 
-  // -------------------------------------
-  // Berechne „Recently Added“ bzw. nach activeTag
-  // -------------------------------------
   const recentlyAddedDemos = useMemo(() => {
     if (activeTag === null) {
       return filteredDemos.slice(0, 12);
     } else {
-      return filteredDemos.filter((demo) =>
-        demo.tags.includes(activeTag)
-      );
+      return filteredDemos.filter(demo => demo.tags.includes(activeTag));
     }
   }, [activeTag, filteredDemos]);
 
-  // -------------------------------------
-  // Video‐Auswahl und Navigation
-  // -------------------------------------
+  // Video selection and navigation
   const onSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
   };
@@ -430,20 +341,16 @@ const POVlib = () => {
     setIsVideoPlayerPage(false);
   };
 
-  // -------------------------------------
-  // Lade‐/Fehler‐Zustände
-  // -------------------------------------
   if (isLoading && !filteredDemos.length) {
     return <LoadingFullscreen />;
   }
+
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6 bg-gray-800 rounded-xl shadow-lg">
           <div className="text-red-500 text-5xl mb-4">!</div>
-          <h2 className="text-white text-2xl font-bold mb-2">
-            Error Loading Data
-          </h2>
+          <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -456,9 +363,6 @@ const POVlib = () => {
     );
   }
 
-  // -------------------------------------
-  // VideoPlayerPage (wenn in Fullscreen‐Ansicht)
-  // -------------------------------------
   if (isVideoPlayerPage && selectedDemo) {
     return (
       <>
@@ -466,17 +370,13 @@ const POVlib = () => {
           selectedDemo={selectedDemo}
           onClose={onCloseVideoPlayer}
           onLike={handleLikeDemo}
-          onOpenTagModal={() =>
-            setIsTaggingModalOpen(true)
-          }
+          onOpenTagModal={() => setIsTaggingModalOpen(true)}
         />
         {isTaggingModalOpen && selectedDemo && (
           <TaggingModal
             selectedDemo={selectedDemo}
             filterOptions={filterOptions}
-            onClose={() =>
-              setIsTaggingModalOpen(false)
-            }
+            onClose={() => setIsTaggingModalOpen(false)}
             onUpdateTags={handleUpdateTags}
             onUpdatePositions={handleUpdatePositions}
           />
@@ -485,26 +385,18 @@ const POVlib = () => {
     );
   }
 
-  // ---------------------------------------------------
-  // Normale Ansicht: Navbar, Filter, Rasterschnitte usw.
-  // ---------------------------------------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white">
       <style jsx>{`
         .bg-pattern {
-          background-image: radial-gradient(
-            rgba(255, 255, 255, 0.05) 1px,
-            transparent 1px
-          );
+          background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
           background-size: 20px 20px;
         }
       `}</style>
 
       <UnderConstructionModal
         isOpen={isUnderConstructionOpen}
-        onClose={() =>
-          setIsUnderConstructionOpen(false)
-        }
+        onClose={() => setIsUnderConstructionOpen(false)}
       />
 
       <Navbar
@@ -533,183 +425,98 @@ const POVlib = () => {
           searchQuery={searchQuery}
         />
 
-        {/* ------------------------------------
-            Filter‐Icon + Tag‐Leiste
-        ------------------------------------ */}
+        {/* Filter Icon + Tag Bar */}
         <div className="flex items-center gap-2 mb-4">
           <Filter
-            onClick={() =>
-              setIsFilterModalOpen(true)
-            }
+            onClick={() => setIsFilterModalOpen(true)}
             className="text-yellow-400 cursor-pointer"
           />
           <div className="flex flex-wrap items-center gap-2">
-            {dynamicTags.map((tag) => (
+            {dynamicTags.map(tag => (
               <button
                 key={tag}
-                onClick={() => setActiveTag(tag)}
+                onClick={() => handleTagClick(tag)}
                 className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 hover:border-yellow-400 transition-colors"
               >
                 {tag}
               </button>
             ))}
-            <Link
-              href="/demos"
-              className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors"
-            >
+            <Link href="/demos" className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors">
               View All Demos
             </Link>
           </div>
         </div>
 
-        {/* ================================
-            1) „Recently Added“ (oder Tag‐Filter)
-           ================================ */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">
-            {activeTag === null ? 'Recently Added' : activeTag}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {recentlyAddedDemos.map((demo) => (
-              <ModalDemoCard
-                key={demo.id}
-                demo={demo}
-                onSelect={onSelectDemo}
-              />
-            ))}
-          </div>
-        </section>
+        {/* Category Sections */}
+        <CategorySection
+          title={activeTag === null ? 'Recently Added' : activeTag}
+          demos={recentlyAddedDemos}
+          onSelectDemo={onSelectDemo}
+          onTagClick={handleTagClick}
+        />
 
-        {/* ==================
-            2) Competition Module
-           ================== */}
+        {/* Competition Module */}
         <div className="mt-8">
           <CompetitionModule />
         </div>
 
-        {/* ===========================
-            3) Plan Comparison Module
-           =========================== */}
+        {/* Plan Comparison Module inserted directly under CompetitionModule */}
         <div className="mt-8">
-          <PlanComparisonModule
-            currentPlan={currentPlan}
-            onUpgrade={handleUpgrade}
-          />
+          <PlanComparisonModule currentPlan={currentPlan} onUpgrade={handleUpgrade} />
         </div>
 
-        {/* =========================================
-            4) UserQuestionModule (hier regeredet)
-           ========================================= */}
-        <div className="mt-8">
-          <UserQuestionModule
-            mode="survey"
-            useCase="feedback"
-            onSubmit={handleUserQuestionSubmit}
-          />
-        </div>
-
-        {/* =================================
-            5) Mirage POVs (nur, wenn kein Map‐Filter)
-           ================================= */}
         {!filtersApplied.map && (
-          <section className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4">
-              Mirage POVs
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {getFilteredDemosByMap('Mirage').map((demo) => (
-                <ModalDemoCard
-                  key={demo.id}
-                  demo={demo}
-                  onSelect={onSelectDemo}
-                />
-              ))}
-            </div>
-          </section>
+          <>
+            <CategorySection
+              title="Mirage POVs"
+              demos={getFilteredDemosByMap("Mirage")}
+              onSelectDemo={onSelectDemo}
+            />
+            <CategorySection
+              title="Inferno POVs"
+              demos={getFilteredDemosByMap("Inferno")}
+              onSelectDemo={onSelectDemo}
+            />
+          </>
         )}
 
-        {/* =================================
-            6) Inferno POVs (nur, wenn kein Map‐Filter)
-           ================================= */}
-        {!filtersApplied.map && (
-          <section className="mt-8">
-            <h2 className="text-2xl font-semibold mb-4">
-              Inferno POVs
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {getFilteredDemosByMap('Inferno').map((demo) => (
-                <ModalDemoCard
-                  key={demo.id}
-                  demo={demo}
-                  onSelect={onSelectDemo}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ===========================
-            7) Navigations‐Karten (Players, Maps)
-           =========================== */}
+        {/* Revised Navigation Cards Below */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Link
-              href="/players"
-              className="relative block rounded-2xl overflow-hidden shadow-lg group"
-            >
+            <Link href="/players" className="relative block rounded-2xl overflow-hidden shadow-lg group">
               <img
                 src="/images/players-example.png"
                 alt="Players"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold group-hover:underline">
-                  Players
-                </h3>
+                <h3 className="text-white text-2xl font-bold group-hover:underline">Players</h3>
                 <p className="text-gray-300">View all players</p>
               </div>
             </Link>
-            <Link
-              href="/maps"
-              className="relative block rounded-2xl overflow-hidden shadow-lg group"
-            >
+            <Link href="/maps" className="relative block rounded-2xl overflow-hidden shadow-lg group">
               <img
                 src="/images/maps-example.png"
                 alt="Maps"
                 className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                <h3 className="text-white text-2xl font-bold group-hover:underline">
-                  Maps
-                </h3>
-                <p className="text-gray-300 text-center">
-                  View all maps
-                </p>
+                <h3 className="text-white text-2xl font-bold group-hover:underline">Maps</h3>
+                <p className="text-gray-300 text-center">View all maps</p>
               </div>
             </Link>
           </div>
         </section>
       </main>
 
-      {/* ----------------------------
-          Filter‐Modal
-         ---------------------------- */}
       {isFilterModalOpen && (
         <FilterModal
           demoType={demoType}
           filterOptions={filterOptions}
           filtersApplied={filtersApplied}
-          onClose={() =>
-            setIsFilterModalOpen(false)
-          }
-          onFilterChange={(changed) =>
-            setFiltersApplied((prev) => ({
-              ...prev,
-              ...changed
-            }))
-          }
-          onResetFilters={() =>
-            setFiltersApplied({
+          onClose={() => setIsFilterModalOpen(false)}
+          onFilterChange={(changed) => setFiltersApplied(prev => ({ ...prev, ...changed }))}
+          onResetFilters={() => setFiltersApplied({
               map: '',
               position: '',
               player: '',
@@ -718,24 +525,16 @@ const POVlib = () => {
               event: '',
               result: '',
               search: searchQuery
-            })
-          }
-          onApplyFilters={() =>
-            setIsFilterModalOpen(false)
-          }
+            })}
+          onApplyFilters={() => setIsFilterModalOpen(false)}
         />
       )}
 
-      {/* ----------------------------
-          Tagging‐Modal
-         ---------------------------- */}
       {isTaggingModalOpen && selectedDemo && (
         <TaggingModal
           selectedDemo={selectedDemo}
           filterOptions={filterOptions}
-          onClose={() =>
-            setIsTaggingModalOpen(false)
-          }
+          onClose={() => setIsTaggingModalOpen(false)}
           onUpdateTags={handleUpdateTags}
           onUpdatePositions={handleUpdatePositions}
         />
