@@ -34,15 +34,17 @@ import Footer from './POVlib/Footer';
 import CompetitionModule from './POVlib/CompetitionModule';
 import FeaturedHero from './POVlib/FeaturedHero';
 import SelectedFilters from './POVlib/SelectedFilters';
-import { CategorySection } from './containers/CategorySection';
-import { LoadingFullscreen } from './loading/LoadingFullscreen';
-import DemoCard from './POVlib/DemoCard';
 import PlanComparisonModule from './POVlib/PlanComparisonModule';
 import UnderConstructionModal from './POVlib/UnderConstructionModal';
 
-// Import des neuen UserQuestionModule
-import UserQuestionModule from './POVlib/UserQuestionModule';
+// --------------------------------------------------
+// Statt DemoCard importieren wir jetzt ModalDemoCard
+// --------------------------------------------------
+import ModalDemoCard from './POVlib/ModalDemoCard';
 
+// --------------------------------------------------
+// Hilfsfunktion: Mapping der Roh‐Daten aus Supabase
+// --------------------------------------------------
 const mapDemo = (demo) => ({
   id: demo.id,
   title: demo.title,
@@ -64,15 +66,15 @@ const mapDemo = (demo) => ({
 const POVlib = () => {
   const router = useRouter();
 
-  // -------------------------------------
-  // Under Construction Modal (show on load)
-  // -------------------------------------
+  // ----------------------------
+  // Under Construction Modal
+  // ----------------------------
   const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(true);
 
-  // -------------------------------------
-  // Plan state for comparison module
-  // -------------------------------------
-  const [currentPlan, setCurrentPlan] = useState('free'); // default—kann aus Profil/API kommen
+  // ----------------------------
+  // Plan‐State für Vergleichs‐Modul
+  // ----------------------------
+  const [currentPlan, setCurrentPlan] = useState('free');
   const handleUpgrade = (nextPlanKey) => {
     if (!nextPlanKey) {
       console.log('Manage subscription clicked');
@@ -96,26 +98,21 @@ const POVlib = () => {
   };
 
   // -------------------------------------
-  // UserQuestionModule: onSubmit-Handler
+  // UserQuestionModule: onSubmit‐Handler
   // -------------------------------------
   const handleUserQuestionSubmit = ({ useCase, surveyData, answer }) => {
-    // Die übermittelten Daten können hier weiterverarbeitet werden.
-    // Beispiel: Konsolenausgabe oder API-Call
     console.log(`UserQuestion (${useCase}) eingegangen:`, surveyData ?? answer);
-    // z.B.: fetch('/api/user-questions', { method: 'POST', body: JSON.stringify({ useCase, ...surveyData ? { surveyData } : { answer } }) })
+    // z.B. API‐Call:
+    // fetch('/api/user-questions', { method: 'POST', body: JSON.stringify({ useCase, ...surveyData ? { surveyData } : { answer } }) })
   };
 
   // -------------------------------------
-  // UI States
+  // UI‐States
   // -------------------------------------
   const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
-
-  const handleTagClick = (tag) => {
-    setActiveTag(tag);
-  };
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeVideoId, setActiveVideoId] = useState('');
@@ -127,7 +124,7 @@ const POVlib = () => {
   const [isVideoPlayerPage, setIsVideoPlayerPage] = useState(false);
 
   // -------------------------------------
-  // Data States
+  // Data‐States
   // -------------------------------------
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
@@ -154,7 +151,9 @@ const POVlib = () => {
     search: searchQuery
   });
 
+  // -------------------------------------
   // Dynamische Tags
+  // -------------------------------------
   const dynamicTags = useMemo(() => {
     const tagsSet = new Set();
     filteredDemos.forEach((demo) => {
@@ -165,7 +164,7 @@ const POVlib = () => {
     tagsSet.add('Teams');
     tagsSet.add('Map + CT Position');
     const allTags = Array.from(tagsSet);
-
+    // zufällige Reihenfolge mischen
     for (let i = allTags.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [allTags[i], allTags[j]] = [allTags[j], allTags[i]];
@@ -173,7 +172,9 @@ const POVlib = () => {
     return allTags.slice(0, 5);
   }, [filteredDemos]);
 
-  // Helper für Map/Position-Filter
+  // -------------------------------------
+  // Helper für Map/Position‐Filter
+  // -------------------------------------
   const getFilteredDemosByMap = useCallback(
     (map) => mapDemos[map] || [],
     [mapDemos]
@@ -183,7 +184,9 @@ const POVlib = () => {
     [positionDemos]
   );
 
+  // -------------------------------------
   // Load initial data
+  // -------------------------------------
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -213,7 +216,9 @@ const POVlib = () => {
     loadInitialData();
   }, [demoType]);
 
-  // Update filtered demos
+  // -------------------------------------
+  // Update filtered demos bei Filter‐Änderung
+  // -------------------------------------
   useEffect(() => {
     const updateFilteredDemos = async () => {
       try {
@@ -233,7 +238,9 @@ const POVlib = () => {
     updateFilteredDemos();
   }, [filtersApplied, searchQuery, demoType]);
 
-  // Load Map demos
+  // -------------------------------------
+  // Load Map‐Demos
+  // -------------------------------------
   useEffect(() => {
     const loadMapDemos = async (map) => {
       if (!mapDemos[map]) {
@@ -254,7 +261,9 @@ const POVlib = () => {
     }
   }, [mapDemos, filtersApplied.map]);
 
-  // Load Position demos
+  // -------------------------------------
+  // Load Position‐Demos
+  // -------------------------------------
   useEffect(() => {
     const loadPositionDemos = async (position) => {
       if (!positionDemos[position]) {
@@ -277,7 +286,9 @@ const POVlib = () => {
     }
   }, [positionDemos, filtersApplied.position]);
 
-  // Update views on demo selection
+  // -------------------------------------
+  // Update Views bei Demo‐Auswahl
+  // -------------------------------------
   useEffect(() => {
     if (selectedDemo) {
       const updateViews = async () => {
@@ -304,6 +315,9 @@ const POVlib = () => {
     }
   }, [selectedDemo]);
 
+  // -------------------------------------
+  // Helper‐Funktionen zum Demo‐Update
+  // -------------------------------------
   const handleDemoUpdate = async (demoId, updateFn, updater) => {
     try {
       const result = await updateFn(demoId, updater);
@@ -394,6 +408,9 @@ const POVlib = () => {
     }
   };
 
+  // -------------------------------------
+  // Berechne „Recently Added“ bzw. nach activeTag
+  // -------------------------------------
   const recentlyAddedDemos = useMemo(() => {
     if (activeTag === null) {
       return filteredDemos.slice(0, 12);
@@ -404,7 +421,9 @@ const POVlib = () => {
     }
   }, [activeTag, filteredDemos]);
 
-  // Video selection and navigation
+  // -------------------------------------
+  // Video‐Auswahl und Navigation
+  // -------------------------------------
   const onSelectDemo = (demo) => {
     router.push(`/demos/${demo.id}`);
   };
@@ -415,10 +434,12 @@ const POVlib = () => {
     setIsVideoPlayerPage(false);
   };
 
+  // -------------------------------------
+  // Lade‐/Fehler‐Zustände
+  // -------------------------------------
   if (isLoading && !filteredDemos.length) {
     return <LoadingFullscreen />;
   }
-
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -439,6 +460,9 @@ const POVlib = () => {
     );
   }
 
+  // -------------------------------------
+  // VideoPlayerPage (wenn in Fullscreen‐Ansicht)
+  // -------------------------------------
   if (isVideoPlayerPage && selectedDemo) {
     return (
       <>
@@ -465,6 +489,9 @@ const POVlib = () => {
     );
   }
 
+  // ---------------------------------------------------
+  // Normale Ansicht: Navbar, Filter, Rasterschnitte usw.
+  // ---------------------------------------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white">
       <style jsx>{`
@@ -510,7 +537,9 @@ const POVlib = () => {
           searchQuery={searchQuery}
         />
 
-        {/* Filter Icon + Tag Bar */}
+        {/* ------------------------------------
+            Filter‐Icon + Tag‐Leiste
+        ------------------------------------ */}
         <div className="flex items-center gap-2 mb-4">
           <Filter
             onClick={() =>
@@ -522,8 +551,12 @@ const POVlib = () => {
             {dynamicTags.map((tag) => (
               <button
                 key={tag}
-                onClick={() => handleTagClick(tag)}
-                className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20 hover:border-yellow-400 transition-colors"
+                onClick={() => setActiveTag(tag)}
+                className="
+                  text-xs px-3 py-1 rounded-full
+                  bg-white/10 text-white border border-white/20
+                  hover:border-yellow-400 transition-colors
+                "
               >
                 {tag}
               </button>
@@ -537,24 +570,34 @@ const POVlib = () => {
           </div>
         </div>
 
-        {/* Category Sections */}
-        <CategorySection
-          title={
-            activeTag === null
-              ? 'Recently Added'
-              : activeTag
-          }
-          demos={recentlyAddedDemos}
-          onSelectDemo={onSelectDemo}
-          onTagClick={handleTagClick}
-        />
+        {/* ================================
+            1) „Recently Added“ (oder Tag‐Filter)
+           ================================ */}
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">
+            {activeTag === null ? 'Recently Added' : activeTag}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {recentlyAddedDemos.map((demo) => (
+              <ModalDemoCard
+                key={demo.id}
+                demo={demo}
+                onSelect={onSelectDemo}
+              />
+            ))}
+          </div>
+        </section>
 
-        {/* Competition Module */}
+        {/* ==================
+            2) Competition Module
+           ================== */}
         <div className="mt-8">
           <CompetitionModule />
         </div>
 
-        {/* Plan Comparison Module */}
+        {/* ===========================
+            3) Plan Comparison Module
+           =========================== */}
         <div className="mt-8">
           <PlanComparisonModule
             currentPlan={currentPlan}
@@ -562,7 +605,9 @@ const POVlib = () => {
           />
         </div>
 
-        {/* UserQuestionModule-Platzierung */}
+        {/* =========================================
+            4) UserQuestionModule (hier regeredet)
+           ========================================= */}
         <div className="mt-8">
           <UserQuestionModule
             mode="survey"
@@ -571,26 +616,49 @@ const POVlib = () => {
           />
         </div>
 
+        {/* =================================
+            5) Mirage POVs (nur, wenn kein Map‐Filter)
+           ================================= */}
         {!filtersApplied.map && (
-          <>
-            <CategorySection
-              title="Mirage POVs"
-              demos={getFilteredDemosByMap(
-                'Mirage'
-              )}
-              onSelectDemo={onSelectDemo}
-            />
-            <CategorySection
-              title="Inferno POVs"
-              demos={getFilteredDemosByMap(
-                'Inferno'
-              )}
-              onSelectDemo={onSelectDemo}
-            />
-          </>
+          <section className="mt-8">
+            <h2 className="text-2xl font-semibold mb-4">
+              Mirage POVs
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {getFilteredDemosByMap('Mirage').map((demo) => (
+                <ModalDemoCard
+                  key={demo.id}
+                  demo={demo}
+                  onSelect={onSelectDemo}
+                />
+              ))}
+            </div>
+          </section>
         )}
 
-        {/* Navigation Cards */}
+        {/* =================================
+            6) Inferno POVs (nur, wenn kein Map‐Filter)
+           ================================= */}
+        {!filtersApplied.map && (
+          <section className="mt-8">
+            <h2 className="text-2xl font-semibold mb-4">
+              Inferno POVs
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {getFilteredDemosByMap('Inferno').map((demo) => (
+                <ModalDemoCard
+                  key={demo.id}
+                  demo={demo}
+                  onSelect={onSelectDemo}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ===========================
+            7) Navigations‐Karten (Players, Maps)
+           =========================== */}
         <section className="mt-8 mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Link
@@ -631,6 +699,9 @@ const POVlib = () => {
         </section>
       </main>
 
+      {/* ----------------------------
+          Filter‐Modal
+         ---------------------------- */}
       {isFilterModalOpen && (
         <FilterModal
           demoType={demoType}
@@ -663,6 +734,9 @@ const POVlib = () => {
         />
       )}
 
+      {/* ----------------------------
+          Tagging‐Modal
+         ---------------------------- */}
       {isTaggingModalOpen && selectedDemo && (
         <TaggingModal
           selectedDemo={selectedDemo}
