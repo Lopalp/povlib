@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
 import Footer from './Footer';
-import DemoCard from './DemoCard';
 import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
