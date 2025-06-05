@@ -12,9 +12,9 @@ import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
 
 // Die neuen Module:
-import CategorySection from './containers/CategorySection';
-import CategorySectionFeatured from './containers/CategorySectionFeatured';
-import CategoryCarousel from './containers/CategoryCarousel';
+import CategorySection from 'src/components/containers/CategorySection.jsx';
+import CategorySectionFeatured from 'src/components/containers/CategorySectionFeatured';
+import CategoryCarousel from 'src/components/containers/CategoryCarousel';
 
 import {
   getPlayerInfo,
