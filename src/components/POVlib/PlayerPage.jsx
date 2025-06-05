@@ -4,17 +4,17 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Filter, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-import Navbar from './Navbar';
-import Footer from './Footer';
-import DemoCard from './DemoCard';
-import VideoPlayerPage from './VideoPlayerPage';
-import TaggingModal from './TaggingModal';
-import FilterModal from './FilterModal';
+import Navbar from '../Navbar';
+import Footer from '../Footer';
+import DemoCard from '../DemoCard';
+import VideoPlayerPage from '../VideoPlayerPage';
+import TaggingModal from '../TaggingModal';
+import FilterModal from '../FilterModal';
 
-// Die neuen Module:
-import CategorySection from 'src/components/containers/CategorySection.jsx';
-import CategorySectionFeatured from 'src/components/containers/CategorySectionFeatured';
-import CategoryCarousel from 'src/components/containers/CategoryCarousel';
+// Angepasste Imports für die drei neuen Komponenten:
+import CategorySection from '../../components/containers/CategorySection';
+import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
+import CategoryCarousel from '../../components/containers/CategoryCarousel';
 
 import {
   getPlayerInfo,
