@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Filter, Shield, Twitter, Twitch, Instagram, Youtube, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, Shield, Twitter, Twitch, Instagram, Youtube, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
@@ -9,11 +9,7 @@ import Footer from './Footer';
 import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
-
-// NEUE Imports für die drei Container-Komponenten:
-import CategorySection from '../../components/containers/CategorySection';
-import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
-import CategoryCarousel from '../../components/containers/CategoryCarousel';
+import FeaturedHero from './FeaturedHero';
 
 import {
   getPlayerInfo,
@@ -66,6 +62,7 @@ const PlayerPage = ({ playerName }) => {
   });
   const [relatedDemos, setRelatedDemos] = useState([]);
   const [isFullScreenPlayer, setIsFullScreenPlayer] = useState(false);
+  const [teamHistoryOpen, setTeamHistoryOpen] = useState(false);
 
   const infiniteScrollRef = useRef(null);
 
@@ -86,7 +83,6 @@ const PlayerPage = ({ playerName }) => {
     twitch: '1eer24',
     instagram: '1eer24',
     youtube_channel: 'channel/UCGeIRw5f-QzBGQejlhMGoBQ',
-    steam_id: '76561198837117408',
     vk_page: '1eeer24',
     page_title: '1eeR',
     liquipedia_url: 'https://liquipedia.net/counterstrike/1eeR',
@@ -294,7 +290,6 @@ const PlayerPage = ({ playerName }) => {
       const result = await updateDemoStats(demoId, 'likes', 1);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        // allDemos updaten
         setAllDemos(prev =>
           prev.map(d => d.id === demoId ? { ...d, likes: updatedDemo.likes } : d)
         );
@@ -424,21 +419,18 @@ const PlayerPage = ({ playerName }) => {
   }
 
   return (
-    // Hier: pt-20 gibt der Navbar oben Platz
     <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .custom-scrollbar {
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .bg-pattern {
-          background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-          background-size: 20px 20px;
-        }
-      `}</style>
+      {/* Hintergrundflagge halbtransparent */}
+      {player?.nationality && (
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none z-0"
+          style={{
+            backgroundImage: `url('https://countryflagsapi.com/png/${player.nationality.toLowerCase()}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        />
+      )}
 
       <Navbar
         demoType={demoType}
@@ -449,160 +441,156 @@ const PlayerPage = ({ playerName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Player Header */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10" />
+      {/* Featured Hero mit Demo-Video */}
+      {!isLoading && trendingDemos.length > 0 && (
+        <FeaturedHero
+          demo={trendingDemos[0]}
+          autoplayVideo={true}
+          setSelectedDemo={setSelectedDemo}
+          setActiveVideoId={setActiveVideoId}
+          setIsFilterModalOpen={setIsFilterModalOpen}
+        />
+      )}
 
-        <div className="container mx-auto px-6 pt-12 pb-16 relative z-20">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-            {/* Player Image */}
-            <div className="relative w-40 h-40 md:w-48 md:h-48 overflow-hidden rounded-full border-4 border-yellow-400/30 shadow-[0_0_30px_rgba(250,204,21,0.15)]">
-              {player?.image_url ? (
-                <img
-                  src={player.image_url}
-                  alt={playerName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-6xl font-bold">
-                  {playerName.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-
-            {/* Player Info */}
-            <div className="md:flex-1 text-center md:text-left space-y-4">
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-1 text-white">{playerName}</h1>
-                <p className="text-gray-400 italic">{player.romanized_name}</p>
+      {/* Player-Info-Overlay */}
+      <div className="relative z-20 -mt-32 px-6">
+        <div className="max-w-4xl mx-auto bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 flex flex-col lg:flex-row items-center lg:items-start gap-6">
+          {/* Spielerbild */}
+          <div className="relative w-32 h-32 md:w-40 md:h-40 overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
+            {player?.image_url ? (
+              <img
+                src={player.image_url}
+                alt={playerName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-5xl font-bold">
+                {playerName.charAt(0).toUpperCase()}
               </div>
-
-              {player.current_team?.name && (
-                <div className="inline-flex items-center bg-gray-800/80 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium mb-2">
-                  <Shield className="w-4 h-4 mr-2" />
-                  {player.current_team.name}
-                </div>
-              )}
-
-              <p className="text-gray-300 mb-4 max-w-2xl">
-                {player.bio ||
-                  `Watch the best POV demos from ${playerName}. Analyze positioning, setups, and gameplay to improve your own skills.`}
-              </p>
-
-              {/* Zusätzliche Spieler-Details */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-left">
-                <div>
-                  <div className="text-gray-400 text-xs">Real Name</div>
-                  <div className="text-white font-medium">{player.real_name}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 text-xs">Geburtstag</div>
-                  <div className="text-white font-medium">{player.birth_date}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 text-xs">Nationalität</div>
-                  <div className="text-white font-medium">{player.nationality}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 text-xs">Rolle</div>
-                  <div className="text-white font-medium">{player.role}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 text-xs">Status</div>
-                  <div className="text-white font-medium">{player.status}</div>
-                </div>
-                <div className="col-span-full sm:col-span-3 lg:col-span-2">
-                  <div className="text-gray-400 text-xs">Liquipedia</div>
-                  <a
-                    href={player.liquipedia_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-yellow-400 hover:underline font-medium"
-                  >
-                    {player.page_title}
-                  </a>
-                </div>
-              </div>
-
-              {/* Social Media Links */}
-              <div className="flex space-x-4 mt-4 justify-center md:justify-start">
-                {player.twitter && (
-                  <a
-                    href={`https://twitter.com/${player.twitter}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-yellow-400"
-                  >
-                    <Twitter className="w-6 h-6" />
-                  </a>
-                )}
-                {player.twitch && (
-                  <a
-                    href={`https://twitch.tv/${player.twitch}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-purple-500"
-                  >
-                    <Twitch className="w-6 h-6" />
-                  </a>
-                )}
-                {player.instagram && (
-                  <a
-                    href={`https://instagram.com/${player.instagram}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-pink-500"
-                  >
-                    <Instagram className="w-6 h-6" />
-                  </a>
-                )}
-                {player.youtube_channel && (
-                  <a
-                    href={`https://youtube.com/${player.youtube_channel}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-red-500"
-                  >
-                    <Youtube className="w-6 h-6" />
-                  </a>
-                )}
-                {player.vk_page && (
-                  <a
-                    href={`https://vk.com/${player.vk_page}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-blue-500"
-                  >
-                    <User className="w-6 h-6" />
-                  </a>
-                )}
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Team History (Mock) */}
-          <div className="mt-10 bg-gray-800/60 backdrop-blur-sm p-6 rounded-lg">
-            <h2 className="text-white text-xl font-semibold mb-4">Team History</h2>
-            <div className="space-y-3">
-              {player.team_history.map((entry, idx) => (
-                <div key={idx} className="flex justify-between items-center">
-                  <div>
-                    <div className="text-gray-300">{entry.team_name}</div>
-                    <div className="text-gray-500 text-xs">
-                      {entry.start_date} &ndash; {entry.end_date}
-                    </div>
-                  </div>
-                  <Shield className="w-5 h-5 text-yellow-400" />
-                </div>
-              ))}
+          {/* Textinfos */}
+          <div className="flex-1 text-center lg:text-left space-y-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">
+              {playerName}
+            </h1>
+            <p className="text-gray-400 text-lg">{player.real_name}</p>
+
+            {player.current_team?.name && (
+              <div className="inline-flex items-center bg-gray-800/60 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium">
+                <Shield className="w-4 h-4 mr-2" />
+                {player.current_team.name}
+              </div>
+            )}
+
+            <div className="flex space-x-4 mt-4 justify-center lg:justify-start">
+              {player.twitter && (
+                <a
+                  href={`https://twitter.com/${player.twitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-yellow-400"
+                >
+                  <Twitter className="w-6 h-6" />
+                </a>
+              )}
+              {player.twitch && (
+                <a
+                  href={`https://twitch.tv/${player.twitch}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-purple-500"
+                >
+                  <Twitch className="w-6 h-6" />
+                </a>
+              )}
+              {player.instagram && (
+                <a
+                  href={`https://instagram.com/${player.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-pink-500"
+                >
+                  <Instagram className="w-6 h-6" />
+                </a>
+              )}
+              {player.youtube_channel && (
+                <a
+                  href={`https://youtube.com/${player.youtube_channel}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-red-500"
+                >
+                  <Youtube className="w-6 h-6" />
+                </a>
+              )}
+              {player.vk_page && (
+                <a
+                  href={`https://vk.com/${player.vk_page}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-blue-500"
+                >
+                  <User className="w-6 h-6" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Zusätzliche Details und Team History */}
+        <div className="max-w-4xl mx-auto mt-6 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
+            <div>
+              <div className="text-gray-400 text-xs">Geburtstag</div>
+              <div className="text-white">{player.birth_date}</div>
+            </div>
+            <div>
+              <div className="text-gray-400 text-xs">Nationalität</div>
+              <div className="text-white">{player.nationality}</div>
+            </div>
+            <div>
+              <div className="text-gray-400 text-xs">Rolle</div>
+              <div className="text-white">{player.role}</div>
+            </div>
+            <div>
+              <div className="text-gray-400 text-xs">Status</div>
+              <div className="text-white">{player.status}</div>
+            </div>
+            <div className="col-span-full">
+              <div className="flex items-center justify-between">
+                <div className="text-gray-400 text-xs">Liquipedia</div>
+                <button
+                  onClick={() => setTeamHistoryOpen(!teamHistoryOpen)}
+                  className="flex items-center text-gray-400 text-xs space-x-1 hover:text-yellow-400"
+                >
+                  <span>Team History</span>
+                  {teamHistoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+              {teamHistoryOpen && (
+                <ul className="mt-2 space-y-2">
+                  {player.team_history.map((entry, idx) => (
+                    <li key={idx} className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2">
+                      <div>
+                        <div className="text-gray-200">{entry.team_name}</div>
+                        <div className="text-gray-500 text-xs">
+                          {entry.start_date} &ndash; {entry.end_date}
+                        </div>
+                      </div>
+                      <Shield className="w-5 h-5 text-yellow-400" />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12 bg-pattern">
+      <main className="container mx-auto px-6 py-12 bg-pattern relative z-10">
         {/* == 1. Most Popular POVs (Trending) == */}
         {trendingDemos.length > 0 && (
           <CategorySectionFeatured
@@ -616,9 +604,6 @@ const PlayerPage = ({ playerName }) => {
         {/* == 2. Demos nach Map == */}
         {Object.entries(demosByMap).map(([map, demos]) => {
           const len = demos.length;
-          // ≤ 3 → Featured
-          // 4–5 → Carousel
-          // ≥ 6 → Grid (CategorySection)
           if (len <= 3) {
             return (
               <div className="mb-16" key={`map-featured-${map}`}>
