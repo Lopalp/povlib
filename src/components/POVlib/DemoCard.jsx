@@ -38,11 +38,11 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
       onClick={() => onSelect(demo)}
     >
       {/** ─── Thumbnail (gerundet) ─── */}
-      <div className="overflow-hidden rounded-lg">
+      <div className="rounded-lg"> {/* overflow-hidden wurde entfernt */}
         <img
           src={thumbnailSrc}
           alt={`${demo.title} Thumbnail`}
-          className="w-full aspect-video object-cover transition-transform duration-200 hover:scale-105"
+          className="w-full aspect-video object-cover transition-transform duration-200 hover:scale-105 rounded-lg" // rounded-lg hierher verschoben
           loading="lazy"
         />
       </div>
@@ -63,14 +63,14 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
         <div
           className="
             absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 
-            z-10 
+            z-40 /* Hoher z-index, damit es über allem schwebt */
             w-80 
             bg-gray-800 border border-gray-700 rounded-2xl shadow-xl 
             overflow-visible
           "
         >
           {/** ===== Header: Großes Thumbnail + Play-Button ===== */}
-          <div className="relative w-full aspect-video overflow-hidden">
+          <div className="relative w-full aspect-video overflow-hidden rounded-t-2xl"> {/* abgerundete Ecken nur oben */}
             <img
               src={thumbnailSrc}
               alt={`${demo.title} Preview`}

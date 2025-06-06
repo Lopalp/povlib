@@ -26,9 +26,9 @@ export const CategorySection = ({
         <span className="border-l-4 border-yellow-400 pl-3 py-1">{title}</span>
       </h2>
 
+      {/* Die umschließende div ohne overflow-hidden */}
       <div
         ref={useRef()}
-        className="overflow-hidden"
         style={{ boxSizing: "border-box", padding: 0, margin: 0 }}
       >
         <div
