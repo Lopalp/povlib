@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { User } from "lucide-react"; // Play-Icon wird nicht mehr benötigt
 import YouTubeEmbed from "./YouTubeEmbed";
@@ -20,13 +20,17 @@ const getRandomImage = () => {
 
 const DemoCard = ({ demo, onSelect, className = "" }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [thumbnailSrc, setThumbnailSrc] = useState("/img/placeholder.png");
+
+  useEffect(() => {
+    setThumbnailSrc(getRandomImage());
+  }, []);
 
   const ctRounds = demo.id % 7 + 6;
   const tRounds = demo.id % 5 + 8;
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
-  const mockKDA = "23/5/2";
-  const thumbnailSrc = getRandomImage();
+  const mockKDA = "23/5/2"; // Platzhalter für K/D/A
 
   return (
     <div

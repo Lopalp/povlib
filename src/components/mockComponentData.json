@@ -1,0 +1,172 @@
+{
+  "logoHeading": { "size": 2 },
+  "backButton": { "text": "Back to previous page" },
+  "imageButton": {
+    "size": 48,
+    "imageSrc": "/img/1.png",
+    "altText": "Sample Image"
+  },
+  "demo": {
+    "id": 1,
+    "title": "s1mple vs NAVI - Mirage Ace",
+    "date": "2023-10-12",
+    "event": "BLAST Premier",
+    "map": "Mirage",
+    "team": "NAVI",
+    "year": "2023",
+    "players": ["s1mple", "electroNic"],
+    "positions": ["Window", "Connector"],
+    "tags": ["ace", "clutch"],
+    "thumbnail": "/img/1.png"
+  },
+  "demos": [
+    {
+      "id": 1,
+      "title": "s1mple vs NAVI - Mirage Ace",
+      "date": "2023-10-12",
+      "event": "BLAST Premier",
+      "map": "Mirage",
+      "team": "NAVI",
+      "year": "2023",
+      "players": ["s1mple", "electroNic"],
+      "positions": ["Window", "Connector"],
+      "tags": ["ace", "clutch"],
+      "thumbnail": "/img/1.png"
+    },
+    {
+      "id": 2,
+      "title": "ZywOo 1v4 Clutch - Inferno",
+      "date": "2023-09-20",
+      "event": "IEM Cologne",
+      "map": "Inferno",
+      "team": "Vitality",
+      "year": "2023",
+      "players": ["ZywOo"],
+      "positions": ["Banana", "B Site"],
+      "tags": ["clutch", "highlight"],
+      "thumbnail": "/img/2.png"
+    },
+    {
+      "id": 3,
+      "title": "NiKo Entry Frags - Ancient",
+      "date": "2023-08-15",
+      "event": "ESL Pro League",
+      "map": "Ancient",
+      "team": "G2",
+      "year": "2023",
+      "players": ["NiKo"],
+      "positions": ["Donut", "Mid"],
+      "tags": ["entry", "multi-kill"],
+      "thumbnail": "/img/3.png"
+    }
+  ],
+  "player": {
+    "name": "s1mple",
+    "avatar": "/img/players/s1mple.png",
+    "team": "NAVI"
+  },
+  "playerCard": {
+    "player": {
+      "name": "ZywOo",
+      "avatar": "/img/players/zywoo.png",
+      "team": "Vitality"
+    },
+    "demoCount": 42,
+    "viewCount": 12345
+  },
+  "categorySection": {
+    "title": "Featured Demos",
+    "demos": [1, 2, 3],
+    "onSelectDemo": "noop"
+  },
+  "categorySectionFeatured": {
+    "title": "Top Plays",
+    "demos": [1, 2],
+    "onSelectDemo": "noop"
+  },
+  "categoryCarousel": {
+    "title": "Recent Highlights",
+    "demos": [1, 2, 3],
+    "onSelectDemo": "noop"
+  },
+  "underConstructionModal": {
+    "isOpen": false,
+    "onClose": "noop"
+  },
+  "surveyModal": {
+    "isOpen": false,
+    "onClose": "noop",
+    "tabs": [
+      {
+        "key": "feedback",
+        "label": "Feedback",
+        "fields": [
+          { "name": "comment", "label": "Your Feedback", "type": "textarea" },
+          { "name": "rating", "label": "Rating", "type": "radio", "options": ["1", "2", "3", "4", "5"] }
+        ]
+      }
+    ],
+    "useCase": "feedback",
+    "onSubmit": "noop"
+  },
+  "filterModal": {
+    "demoType": "pro",
+    "filterOptions": {
+      "maps": ["Mirage", "Inferno", "Ancient"],
+      "positions": {
+        "Mirage": ["Window", "Connector"],
+        "Inferno": ["Banana", "B Site"],
+        "Ancient": ["Donut", "Mid"]
+      },
+      "roles": ["IGL", "AWP", "Entry", "Support"]
+    },
+    "filtersApplied": {
+      "map": "Mirage",
+      "position": "Window",
+      "player": "s1mple",
+      "team": "NAVI",
+      "year": "2023",
+      "event": "BLAST Premier",
+      "platform": "Faceit",
+      "roles": ["AWP"],
+      "eloMin": 2000,
+      "eloMax": 3000
+    },
+    "onClose": "noop",
+    "onFilterChange": "noop",
+    "onResetFilters": "noop",
+    "onApplyFilters": "noop"
+  },
+  "comparePlansModal": {
+    "isOpen": false,
+    "onClose": "noop",
+    "currentPlan": "basic"
+  },
+  "createDemoModal": {
+    "isOpen": false,
+    "onClose": "noop",
+    "matchLink": "https://faceit.com/match/12345",
+    "onMatchLinkChange": "noop",
+    "onMatchLinkSubmit": "noop",
+    "selectedFile": null,
+    "onFileChange": "noop",
+    "onFileSubmit": "noop",
+    "uploadError": "",
+    "onLinkAccount": "noop"
+  },
+  "taggingModal": {
+    "selectedDemo": 1,
+    "filterOptions": {
+      "positions": {
+        "Mirage": ["Window", "Connector"],
+        "Inferno": ["Banana", "B Site"]
+      }
+    },
+    "onClose": "noop",
+    "onUpdateTags": "noop",
+    "onUpdatePositions": "noop"
+  },
+  "errorWindow": {
+    "text": "This is an error message example."
+  }
+} 
