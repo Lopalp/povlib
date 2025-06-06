@@ -13,10 +13,8 @@ import {
   User,
   MapPin,
   Star,
-  BookOpen,
-  Play
-} from 'lucide-react'; // <-- Added Play here
-
+  BookOpen
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
@@ -24,10 +22,9 @@ import Footer from './Footer';
 import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
-import FeaturedHero from './FeaturedHero';
 
 import CategorySection from '../../components/containers/CategorySection';
-import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured'; // <-- Ensure this is imported
+import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
 import CategoryCarousel from '../../components/containers/CategoryCarousel';
 
 import {
@@ -83,11 +80,10 @@ const PlayerPage = ({ playerName }) => {
   const [isFullScreenPlayer, setIsFullScreenPlayer] = useState(false);
   const [teamHistoryOpen, setTeamHistoryOpen] = useState(false);
 
-  // Neue States für Utility Book und Highlights
+  // Neue States für Utility Book
   const [utilityFilters, setUtilityFilters] = useState({ map: '' });
   const [utilities, setUtilities] = useState([]);
   const [filteredUtilities, setFilteredUtilities] = useState([]);
-  const [highlightClips, setHighlightClips] = useState([]);
 
   const infiniteScrollRef = useRef(null);
 
@@ -99,10 +95,7 @@ const PlayerPage = ({ playerName }) => {
     nationality: 'Belarus',
     status: 'Active',
     role: 'Support',
-    current_team: {
-      name: 'Nemiga Gaming',
-      link: null
-    },
+    current_team: { name: 'Nemiga Gaming', link: null },
     image_url: 'https://liquipedia.net/commons/images/0/00/1eeR_at_ESL_Pro_League_S21.jpg',
     twitter: '1eeR24',
     twitch: '1eer24',
@@ -117,31 +110,11 @@ const PlayerPage = ({ playerName }) => {
       videoId: 'dQw4w9WgXcQ'
     },
     team_history: [
-      {
-        start_date: '2020-08-05',
-        end_date: '2020-09-19',
-        team_name: 'Trial'
-      },
-      {
-        start_date: '2020-09-19',
-        end_date: '2021-08-30',
-        team_name: 'Zorka'
-      },
-      {
-        start_date: '2021-08-30',
-        end_date: '2022-01-16',
-        team_name: 'Nemiga Gaming'
-      },
-      {
-        start_date: '2022-04-24',
-        end_date: '2022-08-05',
-        team_name: 'PLATOON Alpha'
-      },
-      {
-        start_date: '2022-08-05',
-        end_date: 'Present',
-        team_name: 'Nemiga Gaming'
-      }
+      { start_date: '2020-08-05', end_date: '2020-09-19', team_name: 'Trial' },
+      { start_date: '2020-09-19', end_date: '2021-08-30', team_name: 'Zorka' },
+      { start_date: '2021-08-30', end_date: '2022-01-16', team_name: 'Nemiga Gaming' },
+      { start_date: '2022-04-24', end_date: '2022-08-05', team_name: 'PLATOON Alpha' },
+      { start_date: '2022-08-05', end_date: 'Present', team_name: 'Nemiga Gaming' }
     ],
   };
 
@@ -151,13 +124,6 @@ const PlayerPage = ({ playerName }) => {
     { id: 2, map: 'Inferno', title: 'Banana Flash', description: 'Flashbang for Banana push.', videoId: 'GhIjKl456' },
     { id: 3, map: 'Mirage', title: 'Connector Molotov', description: 'Molotov Conn to prevent push.', videoId: 'MnOpQr789' },
     { id: 4, map: 'Dust II', title: 'A Short Molotov', description: 'Molotov Short to deny plant.', videoId: 'StUvWx012' },
-  ];
-
-  // Mock-Daten für Recent Highlights (Clips)
-  const mockHighlights = [
-    { id: 1, title: '1v3 Clutch on Mirage', videoId: 'ClipID123', thumbnail: 'https://i.ytimg.com/vi/ClipID123/hqdefault.jpg' },
-    { id: 2, title: 'Ace on Dust II', videoId: 'ClipID456', thumbnail: 'https://i.ytimg.com/vi/ClipID456/hqdefault.jpg' },
-    { id: 3, title: 'Savage Entry Peek', videoId: 'ClipID789', thumbnail: 'https://i.ytimg.com/vi/ClipID789/hqdefault.jpg' },
   ];
 
   // Lade Spieler- und Demo-Daten
@@ -186,10 +152,9 @@ const PlayerPage = ({ playerName }) => {
         };
         setPlayer(mergedPlayer);
 
-        // Utilities und Highlights initial laden (Mock)
+        // Utilities initial laden (Mock)
         setUtilities(mockUtilities);
         setFilteredUtilities(mockUtilities);
-        setHighlightClips(mockHighlights);
 
         // Erste Seite Demos laden
         const demosData = await getDemosByPlayer(playerName, demoType, 1, 12, filtersApplied);
@@ -505,41 +470,33 @@ const PlayerPage = ({ playerName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Featured Hero (Top POV Demo) */}
-      {!isLoading && trendingDemos.length > 0 && (
-        <FeaturedHero
-          demo={trendingDemos[0]}
-          autoplayVideo={true}
-          setSelectedDemo={setSelectedDemo}
-          setActiveVideoId={setActiveVideoId}
-          setIsFilterModalOpen={setIsFilterModalOpen}
-        />
-      )}
+      {/* Hero Section mit Spieler-Infos */}
+      <div className="relative w-full overflow-hidden bg-gray-900/70 group h-[60vh] max-h-[80vh]">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img
+            src={player.image_url}
+            alt={playerName}
+            className="w-full h-full object-cover filter brightness-50"
+          />
+        </div>
+        <div className="relative z-10 container mx-auto h-full flex items-center justify-center px-6">
+          <div className="text-center max-w-xl space-y-4">
+            <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
+              {player.image_url ? (
+                <img
+                  src={player.image_url}
+                  alt={playerName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-5xl font-bold">
+                  {playerName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
 
-      {/* Player-Info-Overlay */}
-      <div className="relative z-20 -mt-32 px-6">
-        <div className="max-w-4xl mx-auto bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 flex flex-col lg:flex-row items-center lg:items-start gap-6">
-          {/* Spielerbild */}
-          <div className="relative w-32 h-32 md:w-40 md:h-40 overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
-            {player?.image_url ? (
-              <img
-                src={player.image_url}
-                alt={playerName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-5xl font-bold">
-                {playerName.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-
-          {/* Textinfos */}
-          <div className="flex-1 text-center lg:text-left space-y-3">
-            <h1 className="text-3xl md:text-4xl font-bold text-white">
-              {playerName}
-            </h1>
-            <p className="text-gray-400 text-lg">{player.real_name}</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-white">{playerName}</h1>
+            <p className="text-gray-300 text-lg">{player.real_name}</p>
 
             {player.current_team?.name && (
               <div className="inline-flex items-center bg-gray-800/60 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium">
@@ -548,7 +505,7 @@ const PlayerPage = ({ playerName }) => {
               </div>
             )}
 
-            <div className="flex space-x-4 mt-4 justify-center lg:justify-start">
+            <div className="flex space-x-4 mt-4 justify-center">
               {player.twitter && (
                 <a
                   href={`https://twitter.com/${player.twitter}`}
@@ -602,59 +559,67 @@ const PlayerPage = ({ playerName }) => {
             </div>
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-gray-900 to-transparent z-10 pointer-events-none" />
+      </div>
 
-        {/* Zusätzliche Details und Team History */}
-        <div className="max-w-4xl mx-auto mt-6 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
-            <div>
-              <div className="text-gray-400 text-xs">Birthday</div>
-              <div className="text-white">{player.birth_date}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs">Nationality</div>
-              <div className="text-white">{player.nationality}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs">Role</div>
-              <div className="text-white">{player.role}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs">Status</div>
-              <div className="text-white">{player.status}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs">Favorite Map</div>
-              <div className="flex items-center text-white">
-                <MapPin className="w-5 h-5 mr-1 text-yellow-400" />
-                {player.favorite_map}
+      {/* Informationen unterhalb des Hero */}
+      <div className="relative z-20 -mt-20 px-6">
+        <div className="max-w-4xl mx-auto bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 flex flex-col lg:flex-row items-center lg:items-start gap-6">
+          {/* Left: already shown in hero, skip duplicate */}
+
+          {/* Right: restliche Details */}
+          <div className="flex-1 space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
+              <div>
+                <div className="text-gray-400 text-xs">Birthday</div>
+                <div className="text-white">{player.birth_date}</div>
               </div>
-            </div>
-            <div className="col-span-full">
-              <div className="flex items-center justify-between">
-                <div className="text-gray-400 text-xs">Liquipedia</div>
-                <button
-                  onClick={() => setTeamHistoryOpen(!teamHistoryOpen)}
-                  className="flex items-center text-gray-400 text-xs space-x-1 hover:text-yellow-400"
-                >
-                  <span>Team History</span>
-                  {teamHistoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
+              <div>
+                <div className="text-gray-400 text-xs">Nationality</div>
+                <div className="text-white">{player.nationality}</div>
               </div>
-              {teamHistoryOpen && (
-                <ul className="mt-2 space-y-2">
-                  {player.team_history.map((entry, idx) => (
-                    <li key={idx} className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2">
-                      <div>
-                        <div className="text-gray-200">{entry.team_name}</div>
-                        <div className="text-gray-500 text-xs">
-                          {entry.start_date} &ndash; {entry.end_date}
+              <div>
+                <div className="text-gray-400 text-xs">Role</div>
+                <div className="text-white">{player.role}</div>
+              </div>
+              <div>
+                <div className="text-gray-400 text-xs">Status</div>
+                <div className="text-white">{player.status}</div>
+              </div>
+              <div>
+                <div className="text-gray-400 text-xs">Favorite Map</div>
+                <div className="flex items-center text-white">
+                  <MapPin className="w-5 h-5 mr-1 text-yellow-400" />
+                  {player.favorite_map}
+                </div>
+              </div>
+              <div className="col-span-full">
+                <div className="flex items-center justify-between">
+                  <div className="text-gray-400 text-xs">Liquipedia</div>
+                  <button
+                    onClick={() => setTeamHistoryOpen(!teamHistoryOpen)}
+                    className="flex items-center text-gray-400 text-xs space-x-1 hover:text-yellow-400"
+                  >
+                    <span>Team History</span>
+                    {teamHistoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                </div>
+                {teamHistoryOpen && (
+                  <ul className="mt-2 space-y-2">
+                    {player.team_history.map((entry, idx) => (
+                      <li key={idx} className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2">
+                        <div>
+                          <div className="text-gray-200">{entry.team_name}</div>
+                          <div className="text-gray-500 text-xs">
+                            {entry.start_date} &ndash; {entry.end_date}
+                          </div>
                         </div>
-                      </div>
-                      <Shield className="w-5 h-5 text-yellow-400" />
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        <Shield className="w-5 h-5 text-yellow-400" />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -726,7 +691,7 @@ const PlayerPage = ({ playerName }) => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 bg-pattern relative z-10">
-        {/* == 1. Favorite Player's Best Game == */}
+        {/* == Best Game of All Time == */}
         {player?.best_game && (
           <section className="mb-16">
             <div className="flex items-center mb-4">
@@ -747,7 +712,7 @@ const PlayerPage = ({ playerName }) => {
               </div>
               <div className="md:ml-6 flex-1">
                 <h3 className="text-xl font-semibold text-white mb-2">{player.best_game.title}</h3>
-                <p className="text-gray-400">Relive the most iconic performance. Watch the full POV demo to see how {playerName} dominated the match.</p>
+                <p className="text-gray-400">Relive this iconic performance. Watch the full POV demo to see how {playerName} dominated the match.</p>
                 <button
                   onClick={() => {
                     setSelectedDemo({
@@ -776,7 +741,7 @@ const PlayerPage = ({ playerName }) => {
           </section>
         )}
 
-        {/* == 2. Most Popular POVs (Trending) == */}
+        {/* == Most Popular POVs (Trending) == */}
         {trendingDemos.length > 0 && (
           <CategorySectionFeatured
             title="Most Popular POVs"
@@ -786,7 +751,7 @@ const PlayerPage = ({ playerName }) => {
           />
         )}
 
-        {/* == 3. Demos by Map == */}
+        {/* == Demos by Map == */}
         {Object.entries(demosByMap).map(([map, demos]) => {
           const len = demos.length;
           if (len <= 3) {
@@ -826,7 +791,7 @@ const PlayerPage = ({ playerName }) => {
           }
         })}
 
-        {/* == 4. Demos by Event == */}
+        {/* == Demos by Event == */}
         {Object.entries(demosByEvent)
           .filter(([event]) => event)
           .map(([event, demos]) => {
@@ -868,7 +833,7 @@ const PlayerPage = ({ playerName }) => {
             }
           })}
 
-        {/* == 5. Demos by Year == */}
+        {/* == Demos by Year == */}
         {Object.entries(demosByYear)
           .sort(([yearA], [yearB]) => parseInt(yearB) - parseInt(yearA))
           .map(([year, demos]) => {
@@ -910,7 +875,7 @@ const PlayerPage = ({ playerName }) => {
             }
           })}
 
-        {/* == 6. All POVs == */}
+        {/* == All POVs == */}
         <div className="mb-16">
           <CategorySection
             title="All POVs"
@@ -920,34 +885,6 @@ const PlayerPage = ({ playerName }) => {
             gap={24}
           />
         </div>
-
-        {/* Recent Highlights / Clips (unten, da wenige scrollen) */}
-        {highlightClips.length > 0 && (
-          <section className="mb-16">
-            <div className="flex items-center mb-4">
-              <Shield className="w-6 h-6 text-yellow-400 mr-2 rotate-45" />
-              <h2 className="text-2xl font-bold text-white">Recent Highlights & Clips</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {highlightClips.map((clip) => (
-                <div key={clip.id} className="bg-gray-800/60 rounded-lg overflow-hidden">
-                  <div className="relative w-full h-0 pb-[56.25%]">
-                    <iframe
-                      className="absolute top-0 left-0 w-full h-full"
-                      src={`https://www.youtube.com/embed/${clip.videoId}?rel=0&modestbranding=1`}
-                      title={clip.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-white font-semibold">{clip.title}</h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </main>
 
       {/* Filter Modal */}
