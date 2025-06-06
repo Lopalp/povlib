@@ -34,7 +34,12 @@ const TaggingModal = ({ selectedDemo, filterOptions, onClose, onUpdateTags, onUp
   };
   
   return (
-    <div className="fixed inset-0 bg-gray-900/95 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 bg-gray-900/95 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+      onClick={e => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-yellow-400/30 shadow-[0_0_30px_rgba(250,204,21,0.15)]">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
