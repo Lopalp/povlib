@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Play, Tag as TagIcon, User } from "lucide-react";
+import { User } from "lucide-react"; // Play-Icon wird nicht mehr benötigt
+import YouTubeEmbed from "./YouTubeEmbed";
 
 // ─── Hilfsfunktion: Zufälliges Bild aus einer Liste auswählen ───
 const getRandomImage = () => {
@@ -25,7 +26,6 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
     setThumbnailSrc(getRandomImage());
   }, []);
 
-  // Beispielhafte Runden-Berechnung (CT vs. T)
   const ctRounds = demo.id % 7 + 6;
   const tRounds = demo.id % 5 + 8;
   const totalRounds = ctRounds + tRounds;
@@ -37,14 +37,13 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
       className={`relative w-full cursor-pointer ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelect(demo)}
     >
-      {/** ─── Thumbnail (gerundet) ─── */}
-      <div className="overflow-hidden rounded-lg">
+      {/** ─── Thumbnail (statisch) ─── */}
+      <div className="rounded-lg">
         <img
           src={thumbnailSrc}
           alt={`${demo.title} Thumbnail`}
-          className="w-full aspect-video object-cover transition-transform duration-200 hover:scale-105"
+          className="w-full aspect-video object-cover rounded-lg"
           loading="lazy"
         />
       </div>
@@ -60,43 +59,41 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
         </div>
       </div>
 
-      {/** ─── Hover-Modal ─── */}
+      {/** ─── Hover-Modal mit Video und Klick-Overlay ─── */}
       {isHovered && (
         <div
           className="
-            absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 
-            z-10 
-            w-80 
+            absolute top-0 left-0 
+            w-full 
+            transform -translate-y-4 
+            z-40 
             bg-gray-800 border border-gray-700 rounded-2xl shadow-xl 
-            overflow-visible
+            overflow-hidden
           "
         >
-          {/** ===== Header: Großes Thumbnail + Play-Button ===== */}
-          <div className="relative w-full aspect-video overflow-hidden">
-            <img
-              src={thumbnailSrc}
-              alt={`${demo.title} Preview`}
-              className="w-full h-full object-cover brightness-75"
-              loading="lazy"
+          {/** ===== Header: YouTube-Video mit unsichtbarem Klick-Overlay ===== */}
+          <div className="relative w-full aspect-video">
+            <YouTubeEmbed 
+              videoId={demo.videoId} 
+              autoplay={true} 
+              title={demo.title}
+              controls={false}
+              showInfo={false}
             />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <button
-                className="flex items-center justify-center rounded-full p-3 bg-black/60 border-2 border-yellow-400 text-yellow-400 
-                           hover:bg-black/80 hover:scale-110 transition-all duration-200"
-              >
-                <Play className="h-5 w-5" fill="currentColor" />
-              </button>
-            </div>
+            {/* NEU: Unsichtbares Overlay, das Klicks abfängt und zur Player-Seite weiterleitet */}
+            <div 
+              className="absolute inset-0 cursor-pointer" 
+              onClick={() => onSelect(demo)}
+            ></div>
           </div>
 
           {/** ===== Body: Titel, Meta & Spieler/KDA ===== */}
           <div className="p-4 flex flex-col space-y-3">
-            {/* Titel */}
-            <h3 className="text-white font-bold text-lg leading-tight">
+            {/* Titel (ohne separaten Play-Button) */}
+            <h3 className="text-white font-bold text-lg leading-tight truncate">
               {demo.title}
             </h3>
-
-            {/* Meta-Infos in zwei Zeilen */}
+            
             <div className="flex flex-col gap-1 text-xs text-gray-300">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.map}</span>
@@ -105,15 +102,10 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
                 )}
                 <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.year}</span>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.date}</span>
-                <span className="px-2 py-1 bg-gray-700 rounded-full">{demo.event}</span>
-              </div>
             </div>
 
             <div className="border-t border-gray-700"></div>
 
-            {/* Spieler & KDA */}
             <section className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <User className="h-5 w-5 text-gray-400" />
@@ -122,9 +114,7 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
                     key={idx}
                     href={`/players/${player.replace(/\s+/g, "-").toLowerCase()}`}
                     className="text-sm font-medium text-gray-200 hover:text-yellow-400 transition-colors duration-200"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {player}
                   </Link>
@@ -136,36 +126,16 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
             </section>
           </div>
 
-          {/** ===== Footer: Tags/Positionen & CT/T-Rounds-Bar ===== */}
-          <div className="px-4 pb-4 flex flex-col space-y-3">
-            {/* Tags & Positionen */}
-            <section className="flex flex-wrap gap-2">
-              {[...demo.positions.slice(0, 2), ...demo.tags.slice(0, 2)].map((item, i) => (
-                <span
-                  key={i}
-                  className="flex items-center gap-1 text-xs font-medium bg-gray-700 text-gray-200 px-2 py-1 rounded-full
-                             hover:bg-gray-600 transition-colors duration-150"
-                >
-                  {demo.tags.includes(item) && <TagIcon className="h-4 w-4 text-gray-400" />}
-                  {item}
-                </span>
-              ))}
-              {(demo.positions.length + demo.tags.length) > 4 && (
-                <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded-full">
-                  +{demo.positions.length + demo.tags.length - 4} more
-                </span>
-              )}
-            </section>
-
-            {/* CT/T-Rounds-Bar */}
-            <footer>
+          {/** ===== Footer: CT/T-Rounds-Bar ===== */}
+          <div className="px-4 pb-4">
+             <footer>
               <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden flex">
                 <div
-                  className="bg-blue-500/60 h-full transition-all duration-300"
+                  className="bg-blue-500/60 h-full"
                   style={{ width: `${ctPercentage}%` }}
                 />
                 <div
-                  className="bg-yellow-500/60 h-full transition-all duration-300"
+                  className="bg-yellow-500/60 h-full"
                   style={{ width: `${100 - ctPercentage}%` }}
                 />
               </div>
