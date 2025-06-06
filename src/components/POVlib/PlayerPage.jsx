@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Filter, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Shield, Twitter, Twitch, Instagram, Youtube, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
@@ -69,6 +69,56 @@ const PlayerPage = ({ playerName }) => {
 
   const infiniteScrollRef = useRef(null);
 
+  // Mock-Daten für Spielerdetails (wird mit DB-Daten gemerged)
+  const mockPlayerDetails = {
+    real_name: 'Александр Нагорный',
+    romanized_name: 'Aleksandr Nahornyj',
+    birth_date: '2001-12-31',
+    nationality: 'Belarus',
+    status: 'Active',
+    role: 'support',
+    current_team: {
+      name: 'Nemiga Gaming',
+      link: null
+    },
+    image_url: 'https://liquipedia.net/commons/images/0/00/1eeR_at_ESL_Pro_League_S21.jpg',
+    twitter: '1eeR24',
+    twitch: '1eer24',
+    instagram: '1eer24',
+    youtube_channel: 'channel/UCGeIRw5f-QzBGQejlhMGoBQ',
+    steam_id: '76561198837117408',
+    vk_page: '1eeer24',
+    page_title: '1eeR',
+    liquipedia_url: 'https://liquipedia.net/counterstrike/1eeR',
+    team_history: [
+      {
+        start_date: '2020-08-05',
+        end_date: '2020-09-19',
+        team_name: 'Trial'
+      },
+      {
+        start_date: '2020-09-19',
+        end_date: '2021-08-30',
+        team_name: 'Zorka'
+      },
+      {
+        start_date: '2021-08-30',
+        end_date: '2022-01-16',
+        team_name: 'Nemiga Gaming'
+      },
+      {
+        start_date: '2022-04-24',
+        end_date: '2022-08-05',
+        team_name: 'PLATOON Alpha'
+      },
+      {
+        start_date: '2022-08-05',
+        end_date: 'Present',
+        team_name: 'Nemiga Gaming'
+      }
+    ],
+  };
+
   // Lade Spieler- und Demo-Daten
   useEffect(() => {
     const loadPlayerData = async () => {
@@ -86,7 +136,14 @@ const PlayerPage = ({ playerName }) => {
           setIsLoading(false);
           return;
         }
-        setPlayer(playerData);
+
+        // Mergen der Mock-Daten mit den DB-Daten, DB-Daten haben Vorrang
+        const mergedPlayer = {
+          ...mockPlayerDetails,
+          ...playerData,
+          current_team: (playerData.current_team || mockPlayerDetails.current_team)
+        };
+        setPlayer(mergedPlayer);
 
         // Erste Seite Demos laden
         const demosData = await getDemosByPlayer(playerName, demoType, 1, 12, filtersApplied);
@@ -401,8 +458,12 @@ const PlayerPage = ({ playerName }) => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             {/* Player Image */}
             <div className="relative w-40 h-40 md:w-48 md:h-48 overflow-hidden rounded-full border-4 border-yellow-400/30 shadow-[0_0_30px_rgba(250,204,21,0.15)]">
-              {player?.avatar ? (
-                <img src={player.avatar} alt={playerName} className="w-full h-full object-cover" />
+              {player?.image_url ? (
+                <img
+                  src={player.image_url}
+                  alt={playerName}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-6xl font-bold">
                   {playerName.charAt(0).toUpperCase()}
@@ -411,59 +472,130 @@ const PlayerPage = ({ playerName }) => {
             </div>
 
             {/* Player Info */}
-            <div className="md:flex-1 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white">{playerName}</h1>
+            <div className="md:flex-1 text-center md:text-left space-y-4">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-1 text-white">{playerName}</h1>
+                <p className="text-gray-400 italic">{player.romanized_name}</p>
+              </div>
 
-              {player?.team && (
-                <div className="inline-flex items-center bg-gray-800/80 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium mb-4">
+              {player.current_team?.name && (
+                <div className="inline-flex items-center bg-gray-800/80 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium mb-2">
                   <Shield className="w-4 h-4 mr-2" />
-                  {player.team}
+                  {player.current_team.name}
                 </div>
               )}
 
-              <p className="text-gray-300 mb-6 max-w-2xl">
-                {player?.bio ||
+              <p className="text-gray-300 mb-4 max-w-2xl">
+                {player.bio ||
                   `Watch the best POV demos from ${playerName}. Analyze positioning, setups, and gameplay to improve your own skills.`}
               </p>
 
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                {player?.stats && (
-                  <>
-                    <div className="bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-                      <div className="text-yellow-400 font-bold text-2xl">
-                        {player.stats.totalDemos || allDemos.length}
-                      </div>
-                      <div className="text-gray-400 text-xs">Total Demos</div>
-                    </div>
-
-                    {player.stats.totalViews && (
-                      <div className="bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-                        <div className="text-yellow-400 font-bold text-2xl">
-                          {player.stats.totalViews.toLocaleString()}
-                        </div>
-                        <div className="text-gray-400 text-xs">Total Views</div>
-                      </div>
-                    )}
-
-                    {player.stats.avgRating && (
-                      <div className="bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-                        <div className="text-yellow-400 font-bold text-2xl">
-                          {player.stats.avgRating}
-                        </div>
-                        <div className="text-gray-400 text-xs">Avg. Rating</div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <button
-                  onClick={() => setIsFilterModalOpen(true)}
-                  className="px-4 py-2 bg-gray-800/60 backdrop-blur-sm text-white rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all duration-300 flex items-center"
-                >
-                  <Filter className="h-5 w-5 mr-2" />
-                  Filter POVs
-                </button>
+              {/* Zusätzliche Spieler-Details */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-left">
+                <div>
+                  <div className="text-gray-400 text-xs">Real Name</div>
+                  <div className="text-white font-medium">{player.real_name}</div>
+                </div>
+                <div>
+                  <div className="text-gray-400 text-xs">Geburtstag</div>
+                  <div className="text-white font-medium">{player.birth_date}</div>
+                </div>
+                <div>
+                  <div className="text-gray-400 text-xs">Nationalität</div>
+                  <div className="text-white font-medium">{player.nationality}</div>
+                </div>
+                <div>
+                  <div className="text-gray-400 text-xs">Rolle</div>
+                  <div className="text-white font-medium">{player.role}</div>
+                </div>
+                <div>
+                  <div className="text-gray-400 text-xs">Status</div>
+                  <div className="text-white font-medium">{player.status}</div>
+                </div>
+                <div className="col-span-full sm:col-span-3 lg:col-span-2">
+                  <div className="text-gray-400 text-xs">Liquipedia</div>
+                  <a
+                    href={player.liquipedia_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-yellow-400 hover:underline font-medium"
+                  >
+                    {player.page_title}
+                  </a>
+                </div>
               </div>
+
+              {/* Social Media Links */}
+              <div className="flex space-x-4 mt-4 justify-center md:justify-start">
+                {player.twitter && (
+                  <a
+                    href={`https://twitter.com/${player.twitter}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-yellow-400"
+                  >
+                    <Twitter className="w-6 h-6" />
+                  </a>
+                )}
+                {player.twitch && (
+                  <a
+                    href={`https://twitch.tv/${player.twitch}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-purple-500"
+                  >
+                    <Twitch className="w-6 h-6" />
+                  </a>
+                )}
+                {player.instagram && (
+                  <a
+                    href={`https://instagram.com/${player.instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-pink-500"
+                  >
+                    <Instagram className="w-6 h-6" />
+                  </a>
+                )}
+                {player.youtube_channel && (
+                  <a
+                    href={`https://youtube.com/${player.youtube_channel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-red-500"
+                  >
+                    <Youtube className="w-6 h-6" />
+                  </a>
+                )}
+                {player.vk_page && (
+                  <a
+                    href={`https://vk.com/${player.vk_page}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-500"
+                  >
+                    <User className="w-6 h-6" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Team History (Mock) */}
+          <div className="mt-10 bg-gray-800/60 backdrop-blur-sm p-6 rounded-lg">
+            <h2 className="text-white text-xl font-semibold mb-4">Team History</h2>
+            <div className="space-y-3">
+              {player.team_history.map((entry, idx) => (
+                <div key={idx} className="flex justify-between items-center">
+                  <div>
+                    <div className="text-gray-300">{entry.team_name}</div>
+                    <div className="text-gray-500 text-xs">
+                      {entry.start_date} &ndash; {entry.end_date}
+                    </div>
+                  </div>
+                  <Shield className="w-5 h-5 text-yellow-400" />
+                </div>
+              ))}
             </div>
           </div>
         </div>

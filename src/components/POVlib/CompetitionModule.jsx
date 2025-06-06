@@ -40,8 +40,8 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
     })();
   }, [clipCount]);
 
-  // 2) Countdown (10 Sekunden Demo)
-  const endTime = useMemo(() => new Date(Date.now() + 10000), []);
+  // 2) Countdown: 7 Tage in Millisekunden
+  const endTime = useMemo(() => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), []);
   useEffect(() => {
     const tick = () => {
       const diff = endTime.getTime() - Date.now();
@@ -49,8 +49,15 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
         setTimeLeft('Closed');
         return;
       }
-      const s = Math.floor(diff / 1000);
-      setTimeLeft(`${s}S`);
+      // Rechne verbleibende Tage, Stunden, Minuten
+      const remainingSeconds = Math.floor(diff / 1000);
+      const days = Math.floor(remainingSeconds / (24 * 3600));
+      const hours = Math.floor((remainingSeconds % (24 * 3600)) / 3600);
+      const minutes = Math.floor((remainingSeconds % 3600) / 60);
+      const seconds = remainingSeconds % 60;
+      setTimeLeft(
+        `${days}d ${hours}h ${minutes}m ${seconds}s`
+      );
     };
     tick();
     const iv = setInterval(tick, 1000);
