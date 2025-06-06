@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Play, Tag as TagIcon, User } from "lucide-react";
 
@@ -19,6 +19,11 @@ const getRandomImage = () => {
 
 const DemoCard = ({ demo, onSelect, className = "" }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [thumbnailSrc, setThumbnailSrc] = useState("/img/placeholder.png");
+
+  useEffect(() => {
+    setThumbnailSrc(getRandomImage());
+  }, []);
 
   // Beispielhafte Runden-Berechnung (CT vs. T)
   const ctRounds = demo.id % 7 + 6;
@@ -26,9 +31,6 @@ const DemoCard = ({ demo, onSelect, className = "" }) => {
   const totalRounds = ctRounds + tRounds;
   const ctPercentage = (ctRounds / totalRounds) * 100;
   const mockKDA = "23/5/2"; // Platzhalter für K/D/A
-
-  // Zufälliges Bild für dieses Demo-Element
-  const thumbnailSrc = getRandomImage();
 
   return (
     <div
