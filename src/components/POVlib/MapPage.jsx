@@ -1,5 +1,4 @@
-
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +22,10 @@ import VideoPlayerPage from "./VideoPlayerPage";
 import TaggingModal from "./TaggingModal";
 import FilterModal from "./FilterModal";
 import DemoCarousel from "./DemoCarousel";
+
+// NEW Imports for Category modules:
+import CategorySectionFeatured from "../../components/containers/CategorySectionFeatured";
+import CategoryCarousel from "../../components/containers/CategoryCarousel";
 
 import {
   getDemosByMap,
@@ -686,6 +689,18 @@ const MapPage = ({ mapName }) => {
     );
   }
 
+  // Derive "best" and "recent" demos
+  const bestDemos = [...allDemos]
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5);
+  const recentDemos = [...allDemos]
+    .sort((a, b) => {
+      // First sort by year desc; if equal, fallback to ID desc for recency
+      if (b.year !== a.year) return parseInt(b.year) - parseInt(a.year);
+      return b.id - a.id;
+    })
+    .slice(0, 5);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       <style jsx>{`
@@ -894,38 +909,69 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
 
-        {/* Recently Added POVs Section - Only visible if NOT on 'all-demos' tab */}
-        {activeTab !== "all-demos" &&
-          (allDemos.length > 0 ? (
-            <div className="mb-12">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                  Recently Added POVs
-                </span>
-              </h2>
-              <DemoCarousel
-                demos={allDemos.slice(0, 10)}
-                onSelectDemo={handleSelectDemo}
-              />
-              {allDemos.length > 10 && (
-                <p className="text-gray-300 mt-4">
-                  Scroll down to the "All POVs" tab for more!
-                </p>
-              )}
-            </div>
-          ) : (
-            <p className="text-gray-300">
-              No recently added demos available for this map.
-            </p>
-          ))}
+        {/* Overview: Best and Recent modules appear when NOT on 'all-demos' */}
+        {activeTab !== "all-demos" && allDemos.length > 0 && (
+          <>
+            {/* Best POVs */}
+            {bestDemos.length > 0 && (
+              <div className="mb-12">
+                <CategorySectionFeatured
+                  title={`${formattedMapName}'s Best POVs`}
+                  demos={bestDemos}
+                  onSelectDemo={handleSelectDemo}
+                  gap={24}
+                />
+              </div>
+            )}
+
+            {/* Recent POVs */}
+            {recentDemos.length > 0 && (
+              <div className="mb-12">
+                <CategoryCarousel
+                  title={`${formattedMapName}'s Recent POVs`}
+                  demos={recentDemos}
+                  onSelectDemo={handleSelectDemo}
+                  gap={24}
+                />
+              </div>
+            )}
+
+            {/* Recently Added POVs Section */}
+            {allDemos.length > 0 ? (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-white mb-6">
+                  <span className="border-l-4 border-yellow-400 pl-3 py-1">
+                    Recently Added POVs
+                  </span>
+                </h2>
+                <DemoCarousel
+                  demos={allDemos.slice(0, 10)}
+                  onSelectDemo={handleSelectDemo}
+                />
+                {allDemos.length > 10 && (
+                  <p className="text-gray-300 mt-4">
+                    Scroll down to the "All POVs" tab for more!
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-gray-300">
+                No recently added demos available for this map.
+              </p>
+            )}
+          </>
+        )}
+
         {/* All POVs Tab */}
         {activeTab === "all-demos" && (
           <div>
+            {/* All POVs Title */}
             <h2 className="text-2xl font-bold text-white mb-6">
               <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                All POV Demos
+                {formattedMapName}'s All POVs
               </span>
             </h2>
+            {/* Grid of all POVs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {allDemos.map((demo) => (
                 <DemoCard
