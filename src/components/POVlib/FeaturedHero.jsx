@@ -19,8 +19,8 @@ const FeaturedHero = ({
   if (!demo) return null;
 
   return (
-<div className="relative w-full overflow-hidden bg-black group h-screen sm:aspect-video sm:h-auto max-h-[100vh]">
-      {/* Hintergrund-Video */}
+<div className="relative w-full overflow-hidden bg-black group h-[75vh] sm:aspect-video sm:h-auto max-h-[100vh]">
+{/* Hintergrund-Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-black/15 z-10" />
         <YouTubeEmbed
