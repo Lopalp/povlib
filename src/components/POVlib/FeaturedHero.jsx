@@ -19,10 +19,13 @@ const FeaturedHero = ({
   if (!demo) return null;
 
   return (
-    <div className="relative w-full overflow-hidden bg-black group h-[75vh] sm:aspect-video sm:h-auto max-h-[90vh]">
+    <div className="relative w-full overflow-hidden bg-black group h-[75vh] max-h-[90vh]">
       {/* Hintergrund-Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        {/* Halbtransparenter Schwarz-Overlay (optional) */}
         <div className="absolute inset-0 bg-black/15 z-10" />
+
+        {/* Das YouTubeEmbed füllt jetzt immer die volle Höhe aus */}
         <YouTubeEmbed
           videoId={demo.videoId}
           title={demo.title}
@@ -32,7 +35,7 @@ const FeaturedHero = ({
         />
       </div>
 
-      {/* Inhalt (Titel, Tags, Buttons) */}
+      {/* Inhalt: Titel, Tags, Buttons */}
       <div className="relative z-30 container mx-auto h-full flex items-end justify-start px-6 pb-8">
         <div
           className={`max-w-2xl transition-all duration-700 ${
@@ -46,7 +49,14 @@ const FeaturedHero = ({
 
           {/* Tags – nur ab sm sichtbar */}
           <div className="hidden sm:flex flex-wrap gap-2 mb-4">
-            {[demo.map, demo.team, demo.event, demo.year, ...demo.players, ...(demo.positions || [])]
+            {[
+              demo.map,
+              demo.team,
+              demo.event,
+              demo.year,
+              ...demo.players,
+              ...(demo.positions || []),
+            ]
               .filter(Boolean)
               .map((tag, i) => (
                 <span
@@ -82,7 +92,7 @@ const FeaturedHero = ({
         </div>
       </div>
 
-      {/* Bottom-Fade */}
+      {/* Bottom-Fade-Overlay */}
       <div className="absolute bottom-0 left-0 right-0 h-80 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
     </div>
   );
