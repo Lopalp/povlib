@@ -14,7 +14,7 @@ import {
   MapPin,
   Star,
   BookOpen,
-  Play 
+  Play
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -23,6 +23,7 @@ import Footer from './Footer';
 import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
+import YouTubeEmbed from './YouTubeEmbed';
 
 import CategorySection from '../../components/containers/CategorySection';
 import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
@@ -471,103 +472,108 @@ const PlayerPage = ({ playerName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Hero Section mit Spieler-Infos */}
-      <div className="relative w-full overflow-hidden bg-gray-900/70 group h-[60vh] max-h-[80vh]">
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <img
-            src={player.image_url}
-            alt={playerName}
-            className="w-full h-full object-cover filter brightness-50"
-          />
-        </div>
-        <div className="relative z-10 container mx-auto h-full flex items-center justify-center px-6">
-          <div className="text-center max-w-xl space-y-4">
-            <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
-              {player.image_url ? (
-                <img
-                  src={player.image_url}
-                  alt={playerName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-5xl font-bold">
-                  {playerName.charAt(0).toUpperCase()}
+      {/* Hero Section: Demo-Video + Spieler-Infos */}
+      {!isLoading && trendingDemos.length > 0 && (
+        <div className="relative w-full overflow-hidden bg-black group h-[60vh] max-h-[80vh]">
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <YouTubeEmbed
+              videoId={trendingDemos[0].videoId}
+              title={trendingDemos[0].title}
+              autoplay={true}
+              controls={false}
+              showInfo={false}
+            />
+            <div className="absolute inset-0 bg-black/30 z-10" />
+          </div>
+
+          <div className="relative z-20 container mx-auto h-full flex items-center justify-center px-6">
+            <div className="text-center max-w-xl space-y-4">
+              <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
+                {player.image_url ? (
+                  <img
+                    src={player.image_url}
+                    alt={playerName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-5xl font-bold">
+                    {playerName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+
+              <h1 className="text-4xl md:text-5xl font-bold text-white">{playerName}</h1>
+              <p className="text-gray-300 text-lg">{player.real_name}</p>
+
+              {player.current_team?.name && (
+                <div className="inline-flex items-center bg-gray-800/60 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium">
+                  <Shield className="w-4 h-4 mr-2" />
+                  {player.current_team.name}
                 </div>
               )}
-            </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white">{playerName}</h1>
-            <p className="text-gray-300 text-lg">{player.real_name}</p>
-
-            {player.current_team?.name && (
-              <div className="inline-flex items-center bg-gray-800/60 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium">
-                <Shield className="w-4 h-4 mr-2" />
-                {player.current_team.name}
+              <div className="flex space-x-4 mt-4 justify-center">
+                {player.twitter && (
+                  <a
+                    href={`https://twitter.com/${player.twitter}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-yellow-400"
+                  >
+                    <Twitter className="w-6 h-6" />
+                  </a>
+                )}
+                {player.twitch && (
+                  <a
+                    href={`https://twitch.tv/${player.twitch}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-purple-500"
+                  >
+                    <Twitch className="w-6 h-6" />
+                  </a>
+                )}
+                {player.instagram && (
+                  <a
+                    href={`https://instagram.com/${player.instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-pink-500"
+                  >
+                    <Instagram className="w-6 h-6" />
+                  </a>
+                )}
+                {player.youtube_channel && (
+                  <a
+                    href={`https://youtube.com/${player.youtube_channel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-red-500"
+                  >
+                    <Youtube className="w-6 h-6" />
+                  </a>
+                )}
+                {player.vk_page && (
+                  <a
+                    href={`https://vk.com/${player.vk_page}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-500"
+                  >
+                    <User className="w-6 h-6" />
+                  </a>
+                )}
               </div>
-            )}
-
-            <div className="flex space-x-4 mt-4 justify-center">
-              {player.twitter && (
-                <a
-                  href={`https://twitter.com/${player.twitter}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-yellow-400"
-                >
-                  <Twitter className="w-6 h-6" />
-                </a>
-              )}
-              {player.twitch && (
-                <a
-                  href={`https://twitch.tv/${player.twitch}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-purple-500"
-                >
-                  <Twitch className="w-6 h-6" />
-                </a>
-              )}
-              {player.instagram && (
-                <a
-                  href={`https://instagram.com/${player.instagram}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-pink-500"
-                >
-                  <Instagram className="w-6 h-6" />
-                </a>
-              )}
-              {player.youtube_channel && (
-                <a
-                  href={`https://youtube.com/${player.youtube_channel}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-red-500"
-                >
-                  <Youtube className="w-6 h-6" />
-                </a>
-              )}
-              {player.vk_page && (
-                <a
-                  href={`https://vk.com/${player.vk_page}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-500"
-                >
-                  <User className="w-6 h-6" />
-                </a>
-              )}
             </div>
           </div>
+
+          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-gray-900 to-transparent z-10 pointer-events-none" />
-      </div>
+      )}
 
       {/* Informationen unterhalb des Hero */}
       <div className="relative z-20 -mt-20 px-6">
         <div className="max-w-4xl mx-auto bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 flex flex-col lg:flex-row items-center lg:items-start gap-6">
-          {/* Left: already shown in hero, skip duplicate */}
-
           {/* Right: restliche Details */}
           <div className="flex-1 space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
