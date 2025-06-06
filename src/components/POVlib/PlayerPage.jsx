@@ -635,7 +635,7 @@ const PlayerPage = ({ playerName }) => {
         <div className="max-w-4xl mx-auto mt-10 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6">
           <div className="flex items-center mb-4">
             <BookOpen className="w-6 h-6 text-yellow-400 mr-2" />
-            <h2 className="text-xl font-bold text-white">Utility Book</h2>
+            <h2 className="text-xl font-bold text-white">{playerName}'s Utility Book</h2>
           </div>
           <div className="flex flex-wrap gap-4 mb-6">
             <div>
@@ -703,7 +703,7 @@ const PlayerPage = ({ playerName }) => {
           <section className="mb-16">
             <div className="flex items-center mb-4">
               <Star className="w-6 h-6 text-yellow-400 mr-2" />
-              <h2 className="text-2xl font-bold text-white">Best Game of All Time</h2>
+              <h2 className="text-2xl font-bold text-white">{playerName}'s Best Game of All Time</h2>
             </div>
             <div className="bg-gray-800/60 p-6 rounded-lg flex flex-col md:flex-row items-center">
               <div className="w-full md:w-1/2 mb-4 md:mb-0">
@@ -751,7 +751,7 @@ const PlayerPage = ({ playerName }) => {
         {/* == Most Popular POVs (Trending) == */}
         {trendingDemos.length > 0 && (
           <CategorySectionFeatured
-            title="Most Popular POVs"
+            title={`${playerName}'s Most Popular POVs`}
             demos={trendingDemos}
             onSelectDemo={handleSelectDemo}
             gap={24}
@@ -765,7 +765,7 @@ const PlayerPage = ({ playerName }) => {
             return (
               <div className="mb-16" key={`map-featured-${map}`}>
                 <CategorySectionFeatured
-                  title={`${map} Demos`}
+                  title={`${playerName}'s ${map} Demos`}
                   demos={demos}
                   onSelectDemo={handleSelectDemo}
                   gap={24}
@@ -776,7 +776,7 @@ const PlayerPage = ({ playerName }) => {
             return (
               <div className="mb-16" key={`map-carousel-${map}`}>
                 <CategoryCarousel
-                  title={`${map} Demos`}
+                  title={`${playerName}'s ${map} Demos`}
                   demos={demos}
                   onSelectDemo={handleSelectDemo}
                   gap={24}
@@ -787,7 +787,7 @@ const PlayerPage = ({ playerName }) => {
             return (
               <div className="mb-16" key={`map-grid-${map}`}>
                 <CategorySection
-                  title={`${map} Demos`}
+                  title={`${playerName}'s ${map} Demos`}
                   demos={demos}
                   onSelectDemo={handleSelectDemo}
                   minCardWidth={280}
@@ -807,7 +807,7 @@ const PlayerPage = ({ playerName }) => {
               return (
                 <div className="mb-16" key={`event-featured-${event}`}>
                   <CategorySectionFeatured
-                    title={event}
+                    title={`${playerName}'s ${event}`}
                     demos={demos}
                     onSelectDemo={handleSelectDemo}
                     gap={24}
@@ -818,7 +818,7 @@ const PlayerPage = ({ playerName }) => {
               return (
                 <div className="mb-16" key={`event-carousel-${event}`}>
                   <CategoryCarousel
-                    title={event}
+                    title={`${playerName}'s ${event}`}
                     demos={demos}
                     onSelectDemo={handleSelectDemo}
                     gap={24}
@@ -829,7 +829,7 @@ const PlayerPage = ({ playerName }) => {
               return (
                 <div className="mb-16" key={`event-grid-${event}`}>
                   <CategorySection
-                    title={event}
+                    title={`${playerName}'s ${event}`}
                     demos={demos}
                     onSelectDemo={handleSelectDemo}
                     minCardWidth={280}
@@ -849,7 +849,7 @@ const PlayerPage = ({ playerName }) => {
               return (
                 <div className="mb-16" key={`year-featured-${year}`}>
                   <CategorySectionFeatured
-                    title={`${year} POVs`}
+                    title={`${playerName}'s ${year} POVs`}
                     demos={demos}
                     onSelectDemo={handleSelectDemo}
                     gap={24}
@@ -860,7 +860,7 @@ const PlayerPage = ({ playerName }) => {
               return (
                 <div className="mb-16" key={`year-carousel-${year}`}>
                   <CategoryCarousel
-                    title={`${year} POVs`}
+                    title={`${playerName}'s ${year} POVs`}
                     demos={demos}
                     onSelectDemo={handleSelectDemo}
                     gap={24}
@@ -871,7 +871,7 @@ const PlayerPage = ({ playerName }) => {
               return (
                 <div className="mb-16" key={`year-grid-${year}`}>
                   <CategorySection
-                    title={`${year} POVs`}
+                    title={`${playerName}'s ${year} POVs`}
                     demos={demos}
                     onSelectDemo={handleSelectDemo}
                     minCardWidth={280}
@@ -885,7 +885,7 @@ const PlayerPage = ({ playerName }) => {
         {/* == All POVs == */}
         <div className="mb-16">
           <CategorySection
-            title="All POVs"
+            title={`${playerName}'s All POVs`}
             demos={allDemos}
             onSelectDemo={handleSelectDemo}
             minCardWidth={280}
