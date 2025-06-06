@@ -29,7 +29,6 @@ const FeaturedHero = ({
           autoplay={autoplayVideo}
           controls={false}
           showInfo={false}
-          className="w-full h-full object-cover sm:object-contain"
         />
       </div>
 
