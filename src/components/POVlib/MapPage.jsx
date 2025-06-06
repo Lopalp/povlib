@@ -4,15 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   MapPin,
-  ChevronLeft,
-  ChevronRight,
   Filter,
   User,
-  Trophy,
   Info,
   Eye,
-  Server,
-  Tag,
 } from "lucide-react";
 
 import Navbar from "./Navbar";
@@ -21,11 +16,9 @@ import DemoCard from "./DemoCard";
 import VideoPlayerPage from "./VideoPlayerPage";
 import TaggingModal from "./TaggingModal";
 import FilterModal from "./FilterModal";
-import DemoCarousel from "./DemoCarousel";
 
-// NEW Imports for Category modules:
-import CategorySectionFeatured from "../../components/containers/CategorySectionFeatured";
-import CategoryCarousel from "../../components/containers/CategoryCarousel";
+// NEW: YouTubeEmbed for background demo
+import YouTubeEmbed from "./YouTubeEmbed";
 
 import {
   getDemosByMap,
@@ -36,10 +29,9 @@ import {
 } from "@/lib/supabase";
 
 const MapPage = ({ mapName }) => {
-  // Format map name for display (capitalize first letter)
+  // Format map name for display
   const formattedMapName = mapName.charAt(0).toUpperCase() + mapName.slice(1);
 
-  // State
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,10 +47,7 @@ const MapPage = ({ mapName }) => {
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
-  // State to manage the year filter input fields
   const [yearRange, setYearRange] = useState({ from: "", to: "" });
-
-  // Filter states
   const [filtersApplied, setFiltersApplied] = useState({
     position: "",
     player: "",
@@ -76,7 +65,7 @@ const MapPage = ({ mapName }) => {
     players: [],
   });
 
-  // Map description placeholder data - in a real app, this would come from an API
+  // Placeholder map data
   const mapDescriptions = {
     mirage: {
       description:
@@ -293,7 +282,6 @@ const MapPage = ({ mapName }) => {
     },
   };
 
-  // Ref for the map section (for scrolling)
   const mapSectionRef = useRef(null);
 
   // Load map data and demos
@@ -302,20 +290,14 @@ const MapPage = ({ mapName }) => {
       try {
         setIsLoading(true);
 
-        // Get map info from our placeholder data
         const mapInfo = mapDescriptions[mapName];
         if (!mapInfo) {
           setError("Map not found");
           setIsLoading(false);
           return;
         }
+        setMap({ name: formattedMapName, ...mapInfo });
 
-        setMap({
-          name: formattedMapName,
-          ...mapInfo,
-        });
-
-        // Load filter options
         const options = await getFilterOptions();
         setFilterOptions({
           positions: options.positions || {},
@@ -325,10 +307,7 @@ const MapPage = ({ mapName }) => {
           players: options.players || [],
         });
 
-        // Load demos for this map
         const demosData = await getDemosByMap(formattedMapName);
-
-        // Map the data
         const mappedDemos = demosData.map((demo) => ({
           id: demo.id,
           title: demo.title,
@@ -349,7 +328,6 @@ const MapPage = ({ mapName }) => {
 
         setAllDemos(mappedDemos);
 
-        // Group demos by position
         const demosByPos = {};
         if (options.positions && options.positions[formattedMapName]) {
           options.positions[formattedMapName].forEach((position) => {
@@ -374,11 +352,9 @@ const MapPage = ({ mapName }) => {
     loadMapData();
   }, [mapName, formattedMapName]);
 
-  // Handler functions
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setIsVideoPlayerOpen(true);
-    // Find related demos (other demos on this map with similar positions or players)
     const related = allDemos.filter(
       (d) =>
         d.id !== demo.id &&
@@ -386,12 +362,9 @@ const MapPage = ({ mapName }) => {
           d.players.some((p) => demo.players.includes(p)))
     );
     setRelatedDemos(related.slice(0, 10));
-
-    // Update view count
     updateDemoStats(demo.id, "views", 1).catch((err) =>
       console.error("Error updating views:", err)
     );
-
     window.scrollTo(0, 0);
   };
 
@@ -427,14 +400,12 @@ const MapPage = ({ mapName }) => {
           isPro: result.demo.is_pro,
         };
 
-        // Update demos state
         setAllDemos((prev) =>
           prev.map((demo) =>
             demo.id === demoId ? { ...demo, tags: updatedDemo.tags } : demo
           )
         );
 
-        // Update demos by position
         const updatedDemosByPosition = { ...demosByPosition };
         Object.keys(updatedDemosByPosition).forEach((position) => {
           updatedDemosByPosition[position] = updatedDemosByPosition[
@@ -445,7 +416,6 @@ const MapPage = ({ mapName }) => {
         });
         setDemosByPosition(updatedDemosByPosition);
 
-        // Update selected demo if it's the one that was updated
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
         }
@@ -480,7 +450,6 @@ const MapPage = ({ mapName }) => {
           isPro: result.demo.is_pro,
         };
 
-        // Update demos state
         setAllDemos((prev) =>
           prev.map((demo) =>
             demo.id === demoId
@@ -489,7 +458,6 @@ const MapPage = ({ mapName }) => {
           )
         );
 
-        // Update demos by position (this needs a complete rebuild since positions changed)
         const updatedDemosByPosition = {};
         const updatedAllDemos = allDemos.map((demo) =>
           demo.id === demoId
@@ -512,7 +480,6 @@ const MapPage = ({ mapName }) => {
         }
         setDemosByPosition(updatedDemosByPosition);
 
-        // Update selected demo if it's the one that was updated
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({
             ...selectedDemo,
@@ -548,14 +515,12 @@ const MapPage = ({ mapName }) => {
           isPro: result.demo.is_pro,
         };
 
-        // Update demos state
         setAllDemos((prev) =>
           prev.map((demo) =>
             demo.id === demoId ? { ...demo, likes: updatedDemo.likes } : demo
           )
         );
 
-        // Update demos by position
         const updatedDemosByPosition = { ...demosByPosition };
         Object.keys(updatedDemosByPosition).forEach((position) => {
           updatedDemosByPosition[position] = updatedDemosByPosition[
@@ -566,7 +531,6 @@ const MapPage = ({ mapName }) => {
         });
         setDemosByPosition(updatedDemosByPosition);
 
-        // Update selected demo if it's the one that was liked
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
@@ -576,7 +540,6 @@ const MapPage = ({ mapName }) => {
     }
   };
 
-  // Effect to update the year filter in filtersApplied when yearRange changes
   useEffect(() => {
     const yearString =
       yearRange.from || yearRange.to ? `${yearRange.from}-${yearRange.to}` : "";
@@ -594,15 +557,12 @@ const MapPage = ({ mapName }) => {
     });
 
   const handleApplyFilters = () => {
-    // Logic to apply filters based on filtersApplied state
-    console.log("Applying Filters:", filtersApplied); // Placeholder for actual filtering logic
+    console.log("Applying Filters:", filtersApplied);
     setIsFilterModalOpen(false);
   };
 
   const handleSelectRelatedDemo = (demo) => {
-    // Renamed function to avoid confusion with handleSelectDemo
     setSelectedDemo(demo);
-    // Find related demos
     const related = allDemos.filter(
       (d) =>
         d.id !== demo.id &&
@@ -610,11 +570,9 @@ const MapPage = ({ mapName }) => {
           d.players.some((p) => demo.players.includes(p)))
     );
     setRelatedDemos(related.slice(0, 10));
-
     updateDemoStats(demo.id, "views", 1).catch((err) =>
       console.error("Error updating views:", err)
     );
-
     window.scrollTo(0, 0);
   };
 
@@ -624,7 +582,9 @@ const MapPage = ({ mapName }) => {
     }
   };
 
-  // If we're showing the video player
+  // Background demo for hero
+  const backgroundDemoId = allDemos[0]?.videoId || "";
+
   if (isVideoPlayerOpen && selectedDemo) {
     return (
       <>
@@ -642,7 +602,6 @@ const MapPage = ({ mapName }) => {
           isMenuOpen={isMenuOpen}
           setIsMenuOpen={setIsMenuOpen}
         />
-
         {isTaggingModalOpen && selectedDemo && (
           <TaggingModal
             selectedDemo={selectedDemo}
@@ -656,7 +615,6 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  // Render loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -668,7 +626,6 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -689,13 +646,12 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  // Derive "best" and "recent" demos
+  // Derive best and recent demos
   const bestDemos = [...allDemos]
     .sort((a, b) => b.views - a.views)
     .slice(0, 5);
   const recentDemos = [...allDemos]
     .sort((a, b) => {
-      // First sort by year desc; if equal, fallback to ID desc for recency
       if (b.year !== a.year) return parseInt(b.year) - parseInt(a.year);
       return b.id - a.id;
     })
@@ -729,75 +685,72 @@ const MapPage = ({ mapName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Map Hero Header */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent z-10"></div>
+      {/* Map Hero Header with background demo */}
+      <div className="relative h-[60vh] max-h-[80vh] overflow-hidden">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          {backgroundDemoId && (
+            <YouTubeEmbed
+              videoId={backgroundDemoId}
+              autoplay={true}
+              controls={false}
+              showInfo={false}
+              className="w-[130vw] h-[130vh] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            />
+          )}
+          <div className="absolute inset-0 bg-black/30 z-10" />
+        </div>
 
-        <div className="container mx-auto px-6 pt-32 pb-16 relative z-20">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
-              {formattedMapName}
-            </h1>
-            <p className="text-gray-300 text-lg mb-8">{map.description}</p>
-
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => {
-                  setActiveTab("overview");
-                  scrollToMapSection();
-                }}
-                className="hidden px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
-              >
-                <MapPin className="h-5 w-5 mr-2" />
-                Map Overview
-              </button>
-
-              <button
-                onClick={() => setIsFilterModalOpen(true)}
-                className="px-6 py-3 bg-gray-800/40 backdrop-blur-sm text-white rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all flex items-center"
-              >
-                <Filter className="h-5 w-5 mr-2" />
-                Filter POVs
-              </button>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-2">
-              <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <Eye className="h-4 w-4 mr-2 text-yellow-400" />
-                <div>
-                  <div className="text-white font-bold">{allDemos.length}</div>
-                  <div className="text-gray-400 text-xs">POV Demos</div>
-                </div>
-              </div>
-
-              <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
-                <div>
-                  <div className="text-white font-bold">
-                    {Object.keys(demosByPosition).length}
-                  </div>
-                  <div className="text-gray-400 text-xs">Positions</div>
-                </div>
-              </div>
-
-              <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-                <User className="h-4 w-4 mr-2 text-yellow-400" />
-                <div>
-                  <div className="text-white font-bold">
-                    {new Set(allDemos.flatMap((demo) => demo.players)).size}
-                  </div>
-                  <div className="text-gray-400 text-xs">Pro Players</div>
-                </div>
+        <div className="absolute inset-0 z-20 container mx-auto px-6 flex flex-col justify-center items-center text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+            {formattedMapName}
+          </h1>
+          <p className="text-gray-300 text-lg max-w-2xl">
+            {map.description}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-4 justify-center">
+            <button
+              onClick={() => {
+                setActiveTab("overview");
+                mapSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
+            >
+              <MapPin className="h-5 w-5 mr-2" />
+              Map Overview
+            </button>
+            <button
+              onClick={() => setIsFilterModalOpen(true)}
+              className="px-6 py-3 bg-gray-800/40 backdrop-blur-sm text-white rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all flex items-center"
+            >
+              <Filter className="h-5 w-5 mr-2" />
+              Filter POVs
+            </button>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-4 justify-center">
+            <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <Eye className="h-4 w-4 mr-2 text-yellow-400" />
+              <div>
+                <div className="text-white font-bold">{allDemos.length}</div>
+                <div className="text-gray-400 text-xs">POV Demos</div>
               </div>
             </div>
-            {/* Display Map Strategy */}
-            <div className="mt-8">
-              <h3 className="text-white font-bold mb-3 flex items-center">
-                <Info className="h-4 w-4 mr-2 text-yellow-400" />
-                Map Strategy
-              </h3>
-              <p className="text-gray-300 text-lg">{map.strategy}</p>
+            <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
+              <div>
+                <div className="text-white font-bold">
+                  {Object.keys(demosByPosition).length}
+                </div>
+                <div className="text-gray-400 text-xs">Positions</div>
+              </div>
+            </div>
+            <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
+              <User className="h-4 w-4 mr-2 text-yellow-400" />
+              <div>
+                <div className="text-white font-bold">
+                  {new Set(allDemos.flatMap((demo) => demo.players)).size}
+                </div>
+                <div className="text-gray-400 text-xs">Pro Players</div>
+              </div>
             </div>
           </div>
         </div>
@@ -889,16 +842,16 @@ const MapPage = ({ mapName }) => {
               Object.keys(demosByPosition).map((position, idx) => (
                 <div key={idx} className="mb-8">
                   <h3 className="text-xl font-semibold mb-4">{position}</h3>
-                  {demosByPosition[position] ? (
-                    <DemoCarousel
-                      demos={demosByPosition[position]}
-                      onSelectDemo={handleSelectDemo}
-                    />
-                  ) : (
-                    <p className="text-gray-300">
-                      No demos available for this position.
-                    </p>
-                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {demosByPosition[position].map((demo) => (
+                      <DemoCard
+                        key={demo.id}
+                        demo={demo}
+                        onSelectDemo={handleSelectDemo}
+                        onLike={handleLikeDemo}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))
             ) : (
@@ -909,55 +862,49 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
 
-        {/* Overview: Best and Recent modules appear when NOT on 'all-demos' */}
+        {/* Overview: Best and Recent modules when NOT on 'all-demos' */}
         {activeTab !== "all-demos" && allDemos.length > 0 && (
           <>
             {/* Best POVs */}
             {bestDemos.length > 0 && (
               <div className="mb-12">
-                <CategorySectionFeatured
-                  title={`${formattedMapName}'s Best POVs`}
-                  demos={bestDemos}
-                  onSelectDemo={handleSelectDemo}
-                  gap={24}
-                />
+                <h2 className="text-2xl font-bold text-white mb-6">
+                  <span className="border-l-4 border-yellow-400 pl-3 py-1">
+                    {formattedMapName}'s Best POVs
+                  </span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {bestDemos.map((demo) => (
+                    <DemoCard
+                      key={demo.id}
+                      demo={demo}
+                      onSelectDemo={handleSelectDemo}
+                      onLike={handleLikeDemo}
+                    />
+                  ))}
+                </div>
               </div>
             )}
 
             {/* Recent POVs */}
             {recentDemos.length > 0 && (
               <div className="mb-12">
-                <CategoryCarousel
-                  title={`${formattedMapName}'s Recent POVs`}
-                  demos={recentDemos}
-                  onSelectDemo={handleSelectDemo}
-                  gap={24}
-                />
-              </div>
-            )}
-
-            {/* Recently Added POVs Section */}
-            {allDemos.length > 0 ? (
-              <div className="mb-12">
                 <h2 className="text-2xl font-bold text-white mb-6">
                   <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                    Recently Added POVs
+                    {formattedMapName}'s Recent POVs
                   </span>
                 </h2>
-                <DemoCarousel
-                  demos={allDemos.slice(0, 10)}
-                  onSelectDemo={handleSelectDemo}
-                />
-                {allDemos.length > 10 && (
-                  <p className="text-gray-300 mt-4">
-                    Scroll down to the "All POVs" tab for more!
-                  </p>
-                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {recentDemos.map((demo) => (
+                    <DemoCard
+                      key={demo.id}
+                      demo={demo}
+                      onSelectDemo={handleSelectDemo}
+                      onLike={handleLikeDemo}
+                    />
+                  ))}
+                </div>
               </div>
-            ) : (
-              <p className="text-gray-300">
-                No recently added demos available for this map.
-              </p>
             )}
           </>
         )}
@@ -965,13 +912,11 @@ const MapPage = ({ mapName }) => {
         {/* All POVs Tab */}
         {activeTab === "all-demos" && (
           <div>
-            {/* All POVs Title */}
             <h2 className="text-2xl font-bold text-white mb-6">
               <span className="border-l-4 border-yellow-400 pl-3 py-1">
                 {formattedMapName}'s All POVs
               </span>
             </h2>
-            {/* Grid of all POVs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {allDemos.map((demo) => (
                 <DemoCard
@@ -995,7 +940,6 @@ const MapPage = ({ mapName }) => {
             </h2>
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
               <p className="text-gray-300 mb-4">{map.strategy}</p>
-              {/* Additional strategy insights can be added here */}
             </div>
           </div>
         )}
