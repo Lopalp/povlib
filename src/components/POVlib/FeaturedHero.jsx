@@ -19,8 +19,7 @@ const FeaturedHero = ({
   if (!demo) return null;
 
   return (
-    <div className="relative w-full overflow-hidden bg-black group 
-      aspect-video max-h-[90vh] sm:aspect-video sm:h-auto h-[66vh]">
+    <div className="relative w-full overflow-hidden bg-black group h-[66vh] sm:aspect-video sm:h-auto max-h-[90vh]">
       {/* Hintergrund-Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-black/15 z-10" />
@@ -30,7 +29,7 @@ const FeaturedHero = ({
           autoplay={autoplayVideo}
           controls={false}
           showInfo={false}
-          className="w-full h-full object-contain sm:object-contain object-cover"
+          className="w-full h-full object-cover sm:object-contain"
         />
       </div>
 
@@ -46,7 +45,7 @@ const FeaturedHero = ({
             {demo.title}
           </h1>
 
-          {/* Tags – nur sichtbar ab sm */}
+          {/* Tags – nur ab sm sichtbar */}
           <div className="hidden sm:flex flex-wrap gap-2 mb-4">
             {[demo.map, demo.team, demo.event, demo.year, ...demo.players, ...(demo.positions || [])]
               .filter(Boolean)
@@ -60,7 +59,7 @@ const FeaturedHero = ({
               ))}
           </div>
 
-          {/* Buttons */}
+          {/* Buttons – bleiben mit Text sichtbar */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -70,7 +69,7 @@ const FeaturedHero = ({
               className="flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
             >
               <Play className="h-5 w-5" />
-              <span className="hidden sm:inline text-sm">Watch Full POV</span>
+              <span className="text-sm">Watch Full POV</span>
             </button>
 
             <button
@@ -78,7 +77,7 @@ const FeaturedHero = ({
               className="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
             >
               <Filter className="h-5 w-5" />
-              <span className="hidden sm:inline text-sm">Filter POVs</span>
+              <span className="text-sm">Filter POVs</span>
             </button>
           </div>
         </div>
