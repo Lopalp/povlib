@@ -17,7 +17,7 @@ import {
   updateDemoPositions
 } from '@/lib/supabase';
 
-// --- HeroHeader, FilterTags, MapQuickFilters bleiben gleich wie zuvor ---
+// --- Helper Components ---
 const HeroHeader = ({ searchQuery, handleSearchChange, handleSearchSubmit, setIsFilterModalOpen }) => (
   <div className="relative py-24 bg-gradient-to-b from-gray-800 to-gray-900">
     <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
@@ -185,6 +185,24 @@ const DemosIndex = () => {
     [isLoading, hasMore]
   );
 
+  const mapDemoData = demo => ({
+    id: demo.id,
+    title: demo.title,
+    thumbnail: demo.thumbnail,
+    videoId: demo.video_id,
+    map: demo.map,
+    positions: demo.positions || [],
+    tags: demo.tags || [],
+    players: demo.players || [],
+    team: demo.team,
+    year: demo.year,
+    event: demo.event,
+    result: demo.result,
+    views: demo.views || 0,
+    likes: demo.likes || 0,
+    isPro: demo.is_pro
+  });
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -215,24 +233,6 @@ const DemosIndex = () => {
     };
     loadInitialData();
   }, [demoType, filtersApplied]);
-
-  const mapDemoData = demo => ({
-    id: demo.id,
-    title: demo.title,
-    thumbnail: demo.thumbnail,
-    videoId: demo.video_id,
-    map: demo.map,
-    positions: demo.positions || [],
-    tags: demo.tags || [],
-    players: demo.players || [],
-    team: demo.team,
-    year: demo.year,
-    event: demo.event,
-    result: demo.result,
-    views: demo.views || 0,
-    likes: demo.likes || 0,
-    isPro: demo.is_pro
-  });
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -478,9 +478,7 @@ const DemosIndex = () => {
         setIsFilterModalOpen={setIsFilterModalOpen}
       />
 
-      {/* Container mit Sidebar (Tools) und Grid */}
       <div className="container mx-auto px-6 py-12 flex flex-col md:flex-row gap-8">
-        {/* Linke Spalte: "Tools"-Bereich */}
         <aside className="md:w-1/4 w-full">
           <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
             <h3 className="text-xl font-bold text-white mb-4">Tools</h3>
@@ -488,19 +486,17 @@ const DemosIndex = () => {
               onClick={() => setIsFilterModalOpen(true)}
               className="w-full mb-3 px-4 py-2 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition-colors"
             >
-              Öffne Filter
+              Open Filters
             </button>
             <button
               onClick={handleResetFilters}
               className="w-full px-4 py-2 bg-gray-700 text-gray-200 font-semibold rounded-lg hover:bg-gray-600 transition-colors"
             >
-              Filter zurücksetzen
+              Reset Filters
             </button>
-            {/* Hier können weitere Tool-Elemente ergänzt werden */}
           </div>
         </aside>
 
-        {/* Rechte Spalte: Haupt-Content */}
         <main className="md:w-3/4 w-full flex-1 min-w-0">
           <FilterTags
             filtersApplied={filtersApplied}

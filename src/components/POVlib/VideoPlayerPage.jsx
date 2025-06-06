@@ -39,7 +39,6 @@ const demoMatchData = {
         { type: "death", time: 30, player: "PlayerB" },
       ],
     },
-    // ... more rounds
   ],
 };
 
@@ -60,6 +59,8 @@ const VideoPlayerPage = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
+  // NEU: State für das Input-Feld
+  const [matchroomUrl, setMatchroomUrl] = useState("");
 
   if (!selectedDemo) return null;
 
@@ -93,7 +94,8 @@ const VideoPlayerPage = ({
         isMenuOpen={isMenuOpen}
       />
 
-      <main className="pt-16 pb-12">
+      {/* KORREKTUR: Padding-Top (pt) von 16 auf 24 erhöht für mehr Abstand */}
+      <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-8 flex-wrap">
             <button
@@ -220,22 +222,38 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
+              {/* KORREKTUR: Matchroom Alert mit Input-Feld */}
               {!matchroomSubmitted && (
-                <div className="flex items-center justify-between bg-yellow-400 text-gray-900 px-4 py-2 rounded-md">
-                  <span className="text-sm">
-                    Help us complete the matchroom! Add your link here.
-                  </span>
+                <div className="flex flex-col sm:flex-row items-center gap-4 bg-yellow-400/20 border border-yellow-400/30 text-gray-100 p-4 rounded-md">
+                   <div className="flex-shrink-0">
+                      <Shield className="h-6 w-6 text-yellow-400" />
+                   </div>
+                   <div className="flex-grow text-sm">
+                      Help us complete the matchroom! Add the link here.
+                   </div>
+                   <input
+                     type="text"
+                     value={matchroomUrl}
+                     onChange={(e) => setMatchroomUrl(e.target.value)}
+                     placeholder="Paste matchroom URL..."
+                     className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
+                   />
                   <button
-                    onClick={() => setMatchroomSubmitted(true)}
-                    className="text-sm font-semibold hover:underline"
+                    onClick={() => {
+                      // Hier könnte man die URL verarbeiten, z.B. an eine API senden
+                      console.log("Submitted URL:", matchroomUrl);
+                      setMatchroomSubmitted(true);
+                    }}
+                    className="flex-shrink-0 w-full sm:w-auto bg-yellow-400 text-gray-900 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-yellow-300 transition-colors"
                   >
                     Submit
                   </button>
                 </div>
               )}
               {matchroomSubmitted && (
-                <div className="bg-gray-700 text-gray-300 px-4 py-2 rounded-md text-sm">
-                  Thank you! Your link is being reviewed, you will receive feedback soon.
+                <div className="bg-gray-700 text-gray-300 px-4 py-3 rounded-md text-sm flex items-center gap-3">
+                  <Shield className="h-5 w-5 text-green-400" />
+                  <span>Thank you! Your link is being reviewed and will be added shortly.</span>
                 </div>
               )}
 
