@@ -2,13 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import {
-  MapPin,
-  Filter,
-  User,
-  Info,
-  Eye,
-} from "lucide-react";
+import { Filter } from "lucide-react";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -16,8 +10,6 @@ import DemoCard from "./DemoCard";
 import VideoPlayerPage from "./VideoPlayerPage";
 import TaggingModal from "./TaggingModal";
 import FilterModal from "./FilterModal";
-
-// NEW: YouTubeEmbed for background demo
 import YouTubeEmbed from "./YouTubeEmbed";
 
 import {
@@ -29,9 +21,7 @@ import {
 } from "@/lib/supabase";
 
 const MapPage = ({ mapName }) => {
-  // Format map name for display
   const formattedMapName = mapName.charAt(0).toUpperCase() + mapName.slice(1);
-
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,7 +30,7 @@ const MapPage = ({ mapName }) => {
   const [demosByPosition, setDemosByPosition] = useState({});
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [relatedDemos, setRelatedDemos] = useState([]);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("all-demos");
   const [searchActive, setSearchActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [demoType, setDemoType] = useState("all");
@@ -65,11 +55,8 @@ const MapPage = ({ mapName }) => {
     players: [],
   });
 
-  // Placeholder map data
   const mapDescriptions = {
     mirage: {
-      description:
-        "Mirage is a classic Counter-Strike map set in Morocco that features a balanced layout with two bombsites. The map has an open mid area that connects to both sites, offering multiple rotation options and strategic depth. A-site is more open with several entry points, while B-site is more confined, accessible primarily through apartments or a narrow passage from mid.",
       callouts: [
         "A Site",
         "B Site",
@@ -100,8 +87,6 @@ const MapPage = ({ mapName }) => {
         "Mirage requires careful mid control and effective rotations. T-side usually focuses on securing mid control to split defenses, while CT-side often relies on crossfires and smart utility usage.",
     },
     inferno: {
-      description:
-        "Inferno is set in a Mediterranean town with narrow corridors and chokepoints. The map features two bombsites, with B site accessible via the infamous 'Banana' corridor, and A site approached through apartments or a mid split. The confined spaces make utility usage crucial for both attackers and defenders.",
       callouts: [
         "A Site",
         "B Site",
@@ -130,8 +115,6 @@ const MapPage = ({ mapName }) => {
         "Control of Banana is crucial for both teams. T-side often uses flashbangs and molotovs to clear tight angles, while CT-side focuses on crossfires and fallback positions. Utility management is especially important on Inferno due to its narrow pathways.",
     },
     ancient: {
-      description:
-        "Ancient is a newer addition to CS2, featuring a temple theme with two bombsites. It has a compact layout with multiple pathways between areas. The mid area offers crucial control points, while both bombsites have unique defensive setups. The map features several elevation changes and tight corridors.",
       callouts: [
         "A Site",
         "B Site",
@@ -154,8 +137,6 @@ const MapPage = ({ mapName }) => {
         "Ancient rewards methodical play and good utility usage. T-side often focuses on gaining mid control before committing to a site, while CT-side relies on crossfires and well-timed rotations. The tight corridors make flashbangs especially effective.",
     },
     nuke: {
-      description:
-        "Nuke is a unique two-level map set in a nuclear facility, with bombsite A on the upper floor and bombsite B directly below it on the lower floor. The unique vertical gameplay creates complex rotation dynamics and requires specific strategies. The outdoor area offers long sightlines for AWPers.",
       callouts: [
         "A Site",
         "B Site",
@@ -181,8 +162,6 @@ const MapPage = ({ mapName }) => {
         "Nuke heavily favors the CT-side due to quick rotation options between sites. T-side strategies often involve splitting between outside and ramp, or using vents for sneaky B-site executes. Sound cues are critical on Nuke due to its vertical layout.",
     },
     overpass: {
-      description:
-        "Overpass is set in a canal overpass in Berlin, featuring two distinct areas - a park area for A site and an underground canal area for B site. The map has multiple elevation changes and unique rotation paths. The long sightlines at A and tight spaces at B create varied gameplay.",
       callouts: [
         "A Site",
         "B Site",
@@ -208,8 +187,6 @@ const MapPage = ({ mapName }) => {
         "Overpass is CT-sided at higher levels of play. T-side strategies often involve gaining control of connector or water for mid-round rotations. Fast B executes through monster and unique boosts are common tactics on this map.",
     },
     anubis: {
-      description:
-        "Anubis is one of the newer maps in the competitive pool, featuring an Egyptian theme. It has two bombsites with multiple approaches to each. The layout includes a mix of open areas and tight corridors, with a complex mid section that offers various tactical options.",
       callouts: [
         "A Site",
         "B Site",
@@ -231,8 +208,6 @@ const MapPage = ({ mapName }) => {
         "As a newer map, Anubis strategies are still evolving. The mid area offers crucial control for both teams. T-side often uses mid to split defenses, while CT-side must balance resources between multiple entry points to both sites.",
     },
     vertigo: {
-      description:
-        "Vertigo is set on a skyscraper construction site, with both bombsites located on the same level but separated by a central area. The map features unique height advantages and fall hazards. The tight corridors and limited rotation options create intense firefights.",
       callouts: [
         "A Site",
         "B Site",
@@ -254,8 +229,6 @@ const MapPage = ({ mapName }) => {
         "Vertigo favors quick executes and close-quarters combat. T-side often relies on fast A executes or mid control to enable B splits. CT rotations are critical as the map can be difficult to retake once a site is lost.",
     },
     dust2: {
-      description:
-        "Dust2 is the most iconic Counter-Strike map, featuring a simple but balanced design. It has two bombsites, with A accessible via long doors and short, and B via the famous B tunnels. The mid area connects to both sites and offers crucial control options.",
       callouts: [
         "A Site",
         "B Site",
@@ -284,7 +257,6 @@ const MapPage = ({ mapName }) => {
 
   const mapSectionRef = useRef(null);
 
-  // Load map data and demos
   useEffect(() => {
     const loadMapData = async () => {
       try {
@@ -582,7 +554,6 @@ const MapPage = ({ mapName }) => {
     }
   };
 
-  // Background demo for hero
   const backgroundDemoId = allDemos[0]?.videoId || "";
 
   if (isVideoPlayerOpen && selectedDemo) {
@@ -646,7 +617,6 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  // Derive best and recent demos
   const bestDemos = [...allDemos]
     .sort((a, b) => b.views - a.views)
     .slice(0, 5);
@@ -685,8 +655,8 @@ const MapPage = ({ mapName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Map Hero Header with background demo */}
-      <div className="relative h-[60vh] max-h-[80vh] overflow-hidden">
+      {/* Map Hero Header with full-screen background demo */}
+      <div className="relative h-screen max-h-[90vh] overflow-hidden">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           {backgroundDemoId && (
             <YouTubeEmbed
@@ -694,65 +664,16 @@ const MapPage = ({ mapName }) => {
               autoplay={true}
               controls={false}
               showInfo={false}
-              className="w-[130vw] h-[130vh] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+              className="w-full h-full object-cover scale-[1.2]"
             />
           )}
-          <div className="absolute inset-0 bg-black/30 z-10" />
+          <div className="absolute inset-0 bg-black/60 z-10" />
         </div>
 
-        <div className="absolute inset-0 z-20 container mx-auto px-6 flex flex-col justify-center items-center text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+        <div className="absolute inset-0 z-20 container mx-auto px-6 flex flex-col justify-center items-center text-center pt-32">
+          <h1 className="text-6xl font-bold text-white mb-4">
             {formattedMapName}
           </h1>
-          <p className="text-gray-300 text-lg max-w-2xl">
-            {map.description}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-4 justify-center">
-            <button
-              onClick={() => {
-                setActiveTab("overview");
-                mapSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center"
-            >
-              <MapPin className="h-5 w-5 mr-2" />
-              Map Overview
-            </button>
-            <button
-              onClick={() => setIsFilterModalOpen(true)}
-              className="px-6 py-3 bg-gray-800/40 backdrop-blur-sm text-white rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-yellow-400/30 transition-all flex items-center"
-            >
-              <Filter className="h-5 w-5 mr-2" />
-              Filter POVs
-            </button>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-4 justify-center">
-            <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <Eye className="h-4 w-4 mr-2 text-yellow-400" />
-              <div>
-                <div className="text-white font-bold">{allDemos.length}</div>
-                <div className="text-gray-400 text-xs">POV Demos</div>
-              </div>
-            </div>
-            <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <MapPin className="h-4 w-4 mr-2 text-yellow-400" />
-              <div>
-                <div className="text-white font-bold">
-                  {Object.keys(demosByPosition).length}
-                </div>
-                <div className="text-gray-400 text-xs">Positions</div>
-              </div>
-            </div>
-            <div className="flex items-center bg-gray-800/60 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <User className="h-4 w-4 mr-2 text-yellow-400" />
-              <div>
-                <div className="text-white font-bold">
-                  {new Set(allDemos.flatMap((demo) => demo.players)).size}
-                </div>
-                <div className="text-gray-400 text-xs">Pro Players</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -862,7 +783,7 @@ const MapPage = ({ mapName }) => {
           </div>
         )}
 
-        {/* Overview: Best and Recent modules when NOT on 'all-demos' */}
+        {/* Overview: Best and Recent modules only when NOT 'all-demos' */}
         {activeTab !== "all-demos" && allDemos.length > 0 && (
           <>
             {/* Best POVs */}
@@ -912,11 +833,16 @@ const MapPage = ({ mapName }) => {
         {/* All POVs Tab */}
         {activeTab === "all-demos" && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">
-              <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                {formattedMapName}'s All POVs
-              </span>
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                <span className="border-l-4 border-yellow-400 pl-3 py-1">
+                  {formattedMapName}'s All POVs
+                </span>
+              </h2>
+              <div className="text-gray-400">
+                {allDemos.length} demos by {new Set(allDemos.flatMap(d => d.players)).size} players
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {allDemos.map((demo) => (
                 <DemoCard
