@@ -19,8 +19,9 @@ const FeaturedHero = ({
   if (!demo) return null;
 
   return (
-    <div className="relative w-full aspect-video max-h-[90vh] overflow-hidden bg-black group">
-      {/* Hintergrund-Video und Overlays mit z-Index 0-10 */}
+    <div className="relative w-full overflow-hidden bg-black group 
+      aspect-video max-h-[90vh] sm:aspect-video sm:h-auto h-[66vh]">
+      {/* Hintergrund-Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-black/15 z-10" />
         <YouTubeEmbed
@@ -29,11 +30,11 @@ const FeaturedHero = ({
           autoplay={autoplayVideo}
           controls={false}
           showInfo={false}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain sm:object-contain object-cover"
         />
       </div>
 
-      {/* Inhalt: Titel, Tags, Buttons */}
+      {/* Inhalt */}
       <div className="relative z-30 container mx-auto h-full flex items-end justify-start px-6 pb-8">
         <div
           className={`max-w-2xl transition-all duration-700 ${
@@ -45,8 +46,8 @@ const FeaturedHero = ({
             {demo.title}
           </h1>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          {/* Tags – nur sichtbar ab sm */}
+          <div className="hidden sm:flex flex-wrap gap-2 mb-4">
             {[demo.map, demo.team, demo.event, demo.year, ...demo.players, ...(demo.positions || [])]
               .filter(Boolean)
               .map((tag, i) => (
@@ -74,10 +75,10 @@ const FeaturedHero = ({
 
             <button
               onClick={() => setIsFilterModalOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
+              className="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
             >
               <Filter className="h-5 w-5" />
-              <span className="text-sm">Filter POVs</span>
+              <span className="hidden sm:inline text-sm">Filter POVs</span>
             </button>
           </div>
         </div>
