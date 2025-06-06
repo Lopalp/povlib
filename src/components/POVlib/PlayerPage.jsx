@@ -1,21 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  ChevronDown,
-  ChevronUp,
-  Filter,
-  Shield,
-  Twitter,
-  Twitch,
-  Instagram,
-  Youtube,
-  User,
-  Star,
-  Trophy,
-  Video,
-  BookOpen
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, Shield, Twitter, Twitch, Instagram, Youtube, User, MapPin, Star, BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
@@ -23,6 +9,7 @@ import Footer from './Footer';
 import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
+import FeaturedHero from './FeaturedHero';
 
 import CategorySection from '../../components/containers/CategorySection';
 import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
@@ -37,14 +24,17 @@ import {
   updateDemoPositions
 } from '@/lib/supabase';
 
-// Helper to group demos by a given property
-const groupDemosByProperty = (demos, property) =>
-  demos.reduce((acc, demo) => {
+// Hilfsfunktion, um Demos nach einer Eigenschaft zu gruppieren
+const groupDemosByProperty = (demos, property) => {
+  return demos.reduce((acc, demo) => {
     const key = demo[property] || 'Unknown';
-    if (!acc[key]) acc[key] = [];
+    if (!acc[key]) {
+      acc[key] = [];
+    }
     acc[key].push(demo);
     return acc;
   }, {});
+};
 
 const PlayerPage = ({ playerName }) => {
   const router = useRouter();
@@ -78,33 +68,15 @@ const PlayerPage = ({ playerName }) => {
   const [isFullScreenPlayer, setIsFullScreenPlayer] = useState(false);
   const [teamHistoryOpen, setTeamHistoryOpen] = useState(false);
 
-  // New states for additional sections
-  const [favoriteMap, setFavoriteMap] = useState('Dust II'); // mock data
-  const [bestGame, setBestGame] = useState({
-    title: 'Mirage 1v3 Clutch vs G2',
-    videoId: 'dQw4w9WgXcQ',
-    map: 'Mirage',
-    date: '2024-11-12'
-  }); // mock data
-  const [recentClips, setRecentClips] = useState([
-    { id: 1, title: 'Ace on Inferno', videoId: 'XxVg_s8xAms' },
-    { id: 2, title: 'Ninja Defuse on Nuke', videoId: 'V-_O7nl0Ii0' },
-    { id: 3, title: 'Clutch vs Astralis', videoId: 'M7lc1UVf-VE' }
-  ]); // mock data
-
-  // Util Book data and filter
-  const [utilBookItems, setUtilBookItems] = useState([
-    { id: 1, map: 'Dust II', description: 'Smoke mid doors', videoId: 'abcd1' },
-    { id: 2, map: 'Mirage', description: 'Connector A setup', videoId: 'abcd2' },
-    { id: 3, map: 'Inferno', description: 'Banana control', videoId: 'abcd3' },
-    { id: 4, map: 'Nuke', description: 'Heaven smoke', videoId: 'abcd4' },
-    { id: 5, map: 'Dust II', description: 'A long flash', videoId: 'abcd5' }
-  ]); // mock data
-  const [utilBookFilter, setUtilBookFilter] = useState('');
+  // Neue States für Utility Book und Highlights
+  const [utilityFilters, setUtilityFilters] = useState({ map: '' });
+  const [utilities, setUtilities] = useState([]);
+  const [filteredUtilities, setFilteredUtilities] = useState([]);
+  const [highlightClips, setHighlightClips] = useState([]);
 
   const infiniteScrollRef = useRef(null);
 
-  // Mock player details (merged with DB data; DB wins on overlap)
+  // Mock-Daten für Spielerdetails (wird mit DB-Daten gemerged)
   const mockPlayerDetails = {
     real_name: 'Александр Нагорный',
     romanized_name: 'Aleksandr Nahornyj',
@@ -124,26 +96,66 @@ const PlayerPage = ({ playerName }) => {
     vk_page: '1eeer24',
     page_title: '1eeR',
     liquipedia_url: 'https://liquipedia.net/counterstrike/1eeR',
+    favorite_map: 'Dust II',
+    best_game: {
+      title: 'Championship Finals vs. Team X',
+      videoId: 'dQw4w9WgXcQ'
+    },
     team_history: [
-      { start_date: '2020-08-05', end_date: '2020-09-19', team_name: 'Trial' },
-      { start_date: '2020-09-19', end_date: '2021-08-30', team_name: 'Zorka' },
-      { start_date: '2021-08-30', end_date: '2022-01-16', team_name: 'Nemiga Gaming' },
-      { start_date: '2022-04-24', end_date: '2022-08-05', team_name: 'PLATOON Alpha' },
-      { start_date: '2022-08-05', end_date: 'Present', team_name: 'Nemiga Gaming' },
+      {
+        start_date: '2020-08-05',
+        end_date: '2020-09-19',
+        team_name: 'Trial'
+      },
+      {
+        start_date: '2020-09-19',
+        end_date: '2021-08-30',
+        team_name: 'Zorka'
+      },
+      {
+        start_date: '2021-08-30',
+        end_date: '2022-01-16',
+        team_name: 'Nemiga Gaming'
+      },
+      {
+        start_date: '2022-04-24',
+        end_date: '2022-08-05',
+        team_name: 'PLATOON Alpha'
+      },
+      {
+        start_date: '2022-08-05',
+        end_date: 'Present',
+        team_name: 'Nemiga Gaming'
+      }
     ],
   };
 
-  // Fetch player and demo data
+  // Beispieldaten für Utility Book (Mock)
+  const mockUtilities = [
+    { id: 1, map: 'Dust II', title: 'CT Mid Smoke', description: 'Block CT vision at mid.', videoId: 'AbCdEf123' },
+    { id: 2, map: 'Inferno', title: 'Banana Flash', description: 'Flashbang for Banana push.', videoId: 'GhIjKl456' },
+    { id: 3, map: 'Mirage', title: 'Connector Molotov', description: 'Molotov Conn to prevent push.', videoId: 'MnOpQr789' },
+    { id: 4, map: 'Dust II', title: 'A Short Molotov', description: 'Molotov Short to deny plant.', videoId: 'StUvWx012' },
+  ];
+
+  // Mock-Daten für Recent Highlights (Clips)
+  const mockHighlights = [
+    { id: 1, title: '1v3 Clutch on Mirage', videoId: 'ClipID123', thumbnail: 'https://i.ytimg.com/vi/ClipID123/hqdefault.jpg' },
+    { id: 2, title: 'Ace on Dust II', videoId: 'ClipID456', thumbnail: 'https://i.ytimg.com/vi/ClipID456/hqdefault.jpg' },
+    { id: 3, title: 'Savage Entry Peek', videoId: 'ClipID789', thumbnail: 'https://i.ytimg.com/vi/ClipID789/hqdefault.jpg' },
+  ];
+
+  // Lade Spieler- und Demo-Daten
   useEffect(() => {
     const loadPlayerData = async () => {
       try {
         setIsLoading(true);
 
-        // Load filter options
+        // Filter-Optionen laden
         const options = await getFilterOptions();
         setFilterOptions(options);
 
-        // Fetch player info
+        // Spieler-Info laden
         const playerData = await getPlayerInfo(playerName);
         if (!playerData) {
           setError('Player not found');
@@ -151,15 +163,20 @@ const PlayerPage = ({ playerName }) => {
           return;
         }
 
-        // Merge mock and DB data; DB has priority
+        // Mergen der Mock-Daten mit den DB-Daten, DB-Daten haben Vorrang
         const mergedPlayer = {
           ...mockPlayerDetails,
           ...playerData,
-          current_team: playerData.current_team || mockPlayerDetails.current_team
+          current_team: (playerData.current_team || mockPlayerDetails.current_team)
         };
         setPlayer(mergedPlayer);
 
-        // Fetch first page of demos
+        // Utilities und Highlights initial laden (Mock)
+        setUtilities(mockUtilities);
+        setFilteredUtilities(mockUtilities);
+        setHighlightClips(mockHighlights);
+
+        // Erste Seite Demos laden
         const demosData = await getDemosByPlayer(playerName, demoType, 1, 12, filtersApplied);
         if (!demosData || demosData.length === 0) {
           setAllDemos([]);
@@ -170,12 +187,12 @@ const PlayerPage = ({ playerName }) => {
         const mappedDemos = demosData.map(mapDemoData);
         setAllDemos(mappedDemos);
 
-        // Group demos
+        // Demos gruppieren
         setDemosByMap(groupDemosByProperty(mappedDemos, 'map'));
         setDemosByEvent(groupDemosByProperty(mappedDemos, 'event'));
         setDemosByYear(groupDemosByProperty(mappedDemos, 'year'));
 
-        // Top 5 by views
+        // Trending-Demos nach Views sortieren (Top 5)
         const sorted = [...mappedDemos].sort((a, b) => b.views - a.views);
         setTrendingDemos(sorted.slice(0, 5));
 
@@ -191,7 +208,7 @@ const PlayerPage = ({ playerName }) => {
     loadPlayerData();
   }, [playerName, demoType, filtersApplied]);
 
-  // Map raw demo data into internal format
+  // Mappt Rohdaten in das interne Demo-Format
   const mapDemoData = (demo) => ({
     id: demo.id,
     title: demo.title,
@@ -210,7 +227,7 @@ const PlayerPage = ({ playerName }) => {
     isPro: demo.is_pro
   });
 
-  // Load more demos (infinite scroll)
+  // Lädt weitere Demos (Infinite Scroll)
   const loadMoreDemos = async () => {
     if (!hasMore || isLoading) return;
     try {
@@ -225,7 +242,7 @@ const PlayerPage = ({ playerName }) => {
       const mappedDemos = demosData.map(mapDemoData);
       setAllDemos(prev => [...prev, ...mappedDemos]);
 
-      // Update groupings
+      // Aktualisiere Gruppen
       const updatedByMap = { ...demosByMap };
       const updatedByEvent = { ...demosByEvent };
       const updatedByYear = { ...demosByYear };
@@ -253,7 +270,7 @@ const PlayerPage = ({ playerName }) => {
     }
   };
 
-  // IntersectionObserver for infinite scroll
+  // IntersectionObserver für Infinite Scroll
   const observer = useRef();
   const lastDemoElementRef = useCallback(
     (node) => {
@@ -269,7 +286,7 @@ const PlayerPage = ({ playerName }) => {
     [isLoading, hasMore]
   );
 
-  // Select a demo → open player
+  // Demo auswählen – öffnet den VideoPlayer
   const handleSelectDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
@@ -281,7 +298,7 @@ const PlayerPage = ({ playerName }) => {
     window.scrollTo(0, 0);
   };
 
-  // Find related demos by map / players / positions
+  // Verwandte Demos finden
   const findRelatedDemos = (demo) => {
     const related = allDemos.filter(d =>
       d.id !== demo.id &&
@@ -294,7 +311,7 @@ const PlayerPage = ({ playerName }) => {
     setRelatedDemos(related.slice(0, 10));
   };
 
-  // Close video player
+  // VideoPlayer schließen
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
     setActiveVideoId('');
@@ -302,17 +319,17 @@ const PlayerPage = ({ playerName }) => {
     setRelatedDemos([]);
   };
 
-  // Like a demo
+  // Demo liken
   const handleLikeDemo = async (demoId) => {
     try {
       const result = await updateDemoStats(demoId, 'likes', 1);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
         setAllDemos(prev =>
-          prev.map(d => (d.id === demoId ? { ...d, likes: updatedDemo.likes } : d))
+          prev.map(d => d.id === demoId ? { ...d, likes: updatedDemo.likes } : d)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo(prev => ({ ...prev, likes: updatedDemo.likes }));
+          setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
       }
     } catch (err) {
@@ -320,17 +337,17 @@ const PlayerPage = ({ playerName }) => {
     }
   };
 
-  // Update tags
+  // Tags updaten
   const handleUpdateTags = async (demoId, tags) => {
     try {
       const result = await updateDemoTags(demoId, tags);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
         setAllDemos(prev =>
-          prev.map(d => (d.id === demoId ? { ...d, tags: updatedDemo.tags } : d))
+          prev.map(d => d.id === demoId ? { ...d, tags: updatedDemo.tags } : d)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo(prev => ({ ...prev, tags: updatedDemo.tags }));
+          setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
         }
         setIsTaggingModalOpen(false);
       }
@@ -339,17 +356,17 @@ const PlayerPage = ({ playerName }) => {
     }
   };
 
-  // Update positions
+  // Positionen updaten
   const handleUpdatePositions = async (demoId, positions) => {
     try {
       const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
         setAllDemos(prev =>
-          prev.map(d => (d.id === demoId ? { ...d, positions: updatedDemo.positions } : d))
+          prev.map(d => d.id === demoId ? { ...d, positions: updatedDemo.positions } : d)
         );
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo(prev => ({ ...prev, positions: updatedDemo.positions }));
+          setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
         }
       }
     } catch (err) {
@@ -373,7 +390,21 @@ const PlayerPage = ({ playerName }) => {
     window.scrollTo(0, 0);
   };
 
-  // Loading state (before content)
+  // Utility Book: Filter anwenden
+  const handleUtilityFilterChange = (e) => {
+    const { value } = e.target;
+    setUtilityFilters({ map: value });
+  };
+
+  useEffect(() => {
+    if (utilityFilters.map) {
+      setFilteredUtilities(utilities.filter(u => u.map === utilityFilters.map));
+    } else {
+      setFilteredUtilities(utilities);
+    }
+  }, [utilityFilters, utilities]);
+
+  // Lade-Zustand (fullscreen, bevor Content geladen)
   if (isLoading && !allDemos.length) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -385,7 +416,7 @@ const PlayerPage = ({ playerName }) => {
     );
   }
 
-  // Error state
+  // Fehler-Zustand
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
@@ -404,7 +435,7 @@ const PlayerPage = ({ playerName }) => {
     );
   }
 
-  // Fullscreen player view
+  // Fullscreen-Player anzeigen
   if (isFullScreenPlayer && selectedDemo) {
     return (
       <>
@@ -436,14 +467,9 @@ const PlayerPage = ({ playerName }) => {
     );
   }
 
-  // Filtered UtilBook entries
-  const filteredUtilBook = utilBookFilter
-    ? utilBookItems.filter(item => item.map === utilBookFilter)
-    : utilBookItems;
-
   return (
-    <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      {/* Semi-transparent background flag */}
+    <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200 relative">
+      {/* Hintergrundflagge halbtransparent */}
       {player?.nationality && (
         <div
           className="absolute inset-0 opacity-10 pointer-events-none z-0"
@@ -464,13 +490,21 @@ const PlayerPage = ({ playerName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Clean Hero Banner */}
-      <div className="h-36 md:h-48 lg:h-56 bg-gradient-to-r from-gray-800 to-black"></div>
+      {/* Featured Hero (Top POV Demo) */}
+      {!isLoading && trendingDemos.length > 0 && (
+        <FeaturedHero
+          demo={trendingDemos[0]}
+          autoplayVideo={true}
+          setSelectedDemo={setSelectedDemo}
+          setActiveVideoId={setActiveVideoId}
+          setIsFilterModalOpen={setIsFilterModalOpen}
+        />
+      )}
 
-      {/* Player Info Card (topmost) */}
-      <div className="relative z-20 -mt-20 px-6">
+      {/* Player-Info-Overlay */}
+      <div className="relative z-20 -mt-32 px-6">
         <div className="max-w-4xl mx-auto bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 flex flex-col lg:flex-row items-center lg:items-start gap-6">
-          {/* Player image */}
+          {/* Spielerbild */}
           <div className="relative w-32 h-32 md:w-40 md:h-40 overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
             {player?.image_url ? (
               <img
@@ -485,8 +519,8 @@ const PlayerPage = ({ playerName }) => {
             )}
           </div>
 
-          {/* Text info */}
-          <div className="flex-1 text-center lg:text-left space-y-2">
+          {/* Textinfos */}
+          <div className="flex-1 text-center lg:text-left space-y-3">
             <h1 className="text-3xl md:text-4xl font-bold text-white">
               {playerName}
             </h1>
@@ -499,7 +533,7 @@ const PlayerPage = ({ playerName }) => {
               </div>
             )}
 
-            <div className="flex space-x-4 mt-3 justify-center lg:justify-start">
+            <div className="flex space-x-4 mt-4 justify-center lg:justify-start">
               {player.twitter && (
                 <a
                   href={`https://twitter.com/${player.twitter}`}
@@ -554,23 +588,9 @@ const PlayerPage = ({ playerName }) => {
           </div>
         </div>
 
-        {/* Additional details and collapsible team history */}
+        {/* Zusätzliche Details und Team History */}
         <div className="max-w-4xl mx-auto mt-6 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
-            <div>
-              <div className="text-gray-400 text-xs flex items-center">
-                <Star className="w-4 h-4 mr-1" />
-                Favorite Map
-              </div>
-              <div className="text-white">{favoriteMap}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs flex items-center">
-                <Trophy className="w-4 h-4 mr-1" />
-                Best Game Ever
-              </div>
-              <div className="text-white">{bestGame.title}</div>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
             <div>
               <div className="text-gray-400 text-xs">Birthday</div>
               <div className="text-white">{player.birth_date}</div>
@@ -587,6 +607,13 @@ const PlayerPage = ({ playerName }) => {
               <div className="text-gray-400 text-xs">Status</div>
               <div className="text-white">{player.status}</div>
             </div>
+            <div>
+              <div className="text-gray-400 text-xs">Favorite Map</div>
+              <div className="flex items-center text-white">
+                <MapPin className="w-5 h-5 mr-1 text-yellow-400" />
+                {player.favorite_map}
+              </div>
+            </div>
             <div className="col-span-full">
               <div className="flex items-center justify-between">
                 <div className="text-gray-400 text-xs">Liquipedia</div>
@@ -595,24 +622,17 @@ const PlayerPage = ({ playerName }) => {
                   className="flex items-center text-gray-400 text-xs space-x-1 hover:text-yellow-400"
                 >
                   <span>Team History</span>
-                  {teamHistoryOpen ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
+                  {teamHistoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
               </div>
               {teamHistoryOpen && (
                 <ul className="mt-2 space-y-2">
                   {player.team_history.map((entry, idx) => (
-                    <li
-                      key={idx}
-                      className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2"
-                    >
+                    <li key={idx} className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2">
                       <div>
                         <div className="text-gray-200">{entry.team_name}</div>
                         <div className="text-gray-500 text-xs">
-                          {entry.start_date} – {entry.end_date}
+                          {entry.start_date} &ndash; {entry.end_date}
                         </div>
                       </div>
                       <Shield className="w-5 h-5 text-yellow-400" />
@@ -623,98 +643,99 @@ const PlayerPage = ({ playerName }) => {
             </div>
           </div>
         </div>
+
+        {/* Utility Book Section */}
+        <div className="max-w-4xl mx-auto mt-10 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6">
+          <div className="flex items-center mb-4">
+            <BookOpen className="w-6 h-6 text-yellow-400 mr-2" />
+            <h2 className="text-xl font-bold text-white">Utility Book</h2>
+          </div>
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div>
+              <label className="text-gray-400 text-xs block mb-1">Filter by Map</label>
+              <select
+                value={utilityFilters.map}
+                onChange={handleUtilityFilterChange}
+                className="bg-gray-800 text-white px-3 py-2 rounded-md border border-gray-700 focus:outline-none"
+              >
+                <option value="">All Maps</option>
+                {Array.from(new Set(utilities.map(u => u.map))).map((mapName) => (
+                  <option key={mapName} value={mapName}>{mapName}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {filteredUtilities.map((util) => (
+              <div key={util.id} className="bg-gray-800/60 p-4 rounded-lg flex flex-col">
+                <div className="flex items-center mb-2">
+                  <MapPin className="w-5 h-5 text-yellow-400 mr-2" />
+                  <span className="text-white font-semibold">{util.map}</span>
+                </div>
+                <div className="text-white font-bold">{util.title}</div>
+                <p className="text-gray-400 text-sm mb-3">{util.description}</p>
+                <button
+                  onClick={() => {
+                    setSelectedDemo({ videoId: util.videoId, title: util.title, players: [], map: util.map, team: '', event: '', year: '', positions: [], tags: [], views: 0, likes: 0, id: util.id });
+                    setActiveVideoId(util.videoId);
+                    setIsFullScreenPlayer(true);
+                  }}
+                  className="mt-auto self-start flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
+                >
+                  <Play className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm">View Utility</span>
+                </button>
+              </div>
+            ))}
+            {filteredUtilities.length === 0 && (
+              <div className="col-span-full text-gray-400 text-center">
+                No utilities match this filter.
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12 bg-pattern relative z-10 space-y-16">
-        {/* Utility Book Section */}
-        <section>
-          <h2 className="text-2xl font-bold text-white mb-4">
-            <span className="border-l-4 border-yellow-400 pl-3 py-1 flex items-center">
-              <BookOpen className="w-5 h-5 mr-2" />
-              Utility Book
-            </span>
-          </h2>
-          <div className="mb-4 flex items-center space-x-3">
-            <label htmlFor="util-map-filter" className="text-gray-300 text-sm">
-              Filter by Map:
-            </label>
-            <select
-              id="util-map-filter"
-              value={utilBookFilter}
-              onChange={(e) => setUtilBookFilter(e.target.value)}
-              className="bg-gray-800/60 backdrop-blur-sm text-white px-3 py-2 rounded-md border border-gray-700 focus:outline-none focus:border-yellow-400"
-            >
-              <option value="">All Maps</option>
-              {[...new Set(utilBookItems.map(item => item.map))].map((map) => (
-                <option key={map} value={map}>
-                  {map}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredUtilBook.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-gray-800/60 rounded-lg overflow-hidden"
-              >
-                <div className="p-3">
-                  <h3 className="text-white font-medium">{entry.map}</h3>
-                  <p className="text-gray-300 text-sm mb-2">
-                    {entry.description}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSelectedDemo({
-                        title: entry.description,
-                        videoId: entry.videoId
-                      });
-                      setActiveVideoId(entry.videoId);
-                      setIsFullScreenPlayer(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-700 text-white hover:border-yellow-400 transition"
-                  >
-                    <Video className="w-4 h-4" />
-                    <span className="text-sm">Watch Utility</span>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Highlights / Clips */}
-        <section>
-          <h2 className="text-2xl font-bold text-white mb-4">
-            <span className="border-l-4 border-yellow-400 pl-3 py-1">
-              Recent Highlights
-            </span>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recentClips.map((clip) => (
-              <div
-                key={clip.id}
-                className="bg-gray-800/60 rounded-lg overflow-hidden"
-              >
-                <div className="relative w-full h-48 bg-black">
+      <main className="container mx-auto px-6 py-12 bg-pattern relative z-10">
+        {/* == 1. Favorite Player's Best Game == */}
+        {player?.best_game && (
+          <section className="mb-16">
+            <div className="flex items-center mb-4">
+              <Star className="w-6 h-6 text-yellow-400 mr-2" />
+              <h2 className="text-2xl font-bold text-white">Best Game of All Time</h2>
+            </div>
+            <div className="bg-gray-800/60 p-6 rounded-lg flex flex-col md:flex-row items-center">
+              <div className="w-full md:w-1/2 mb-4 md:mb-0">
+                <div className="relative w-full h-0 pb-[56.25%] overflow-hidden rounded-lg">
                   <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${clip.videoId}?rel=0&modestbranding=1`}
-                    title={clip.title}
+                    className="absolute top-0 left-0 w-full h-full"
+                    src={`https://www.youtube.com/embed/${player.best_game.videoId}?rel=0&modestbranding=1`}
+                    title={player.best_game.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     allowFullScreen
                   />
                 </div>
-                <div className="p-3">
-                  <h3 className="text-white font-medium">{clip.title}</h3>
-                </div>
               </div>
-            ))}
-          </div>
-        </section>
+              <div className="md:ml-6 flex-1">
+                <h3 className="text-xl font-semibold text-white mb-2">{player.best_game.title}</h3>
+                <p className="text-gray-400">Relive the most iconic performance. Watch the full POV demo to see how {playerName} dominated the match.</p>
+                <button
+                  onClick={() => {
+                    setSelectedDemo({ videoId: player.best_game.videoId, title: player.best_game.title, players: [], map: '', team: '', event: '', year: '', positions: [], tags: [], views: 0, likes: 0, id: 'best-game' });
+                    setActiveVideoId(player.best_game.videoId);
+                    setIsFullScreenPlayer(true);
+                  }}
+                  className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
+                >
+                  Watch Full Demo
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
 
-        {/* Trending POVs */}
+        {/* == 2. Most Popular POVs (Trending) == */}
         {trendingDemos.length > 0 && (
           <CategorySectionFeatured
             title="Most Popular POVs"
@@ -724,14 +745,14 @@ const PlayerPage = ({ playerName }) => {
           />
         )}
 
-        {/* Demos by Map */}
+        {/* == 3. Demos by Map == */}
         {Object.entries(demosByMap).map(([map, demos]) => {
           const len = demos.length;
           if (len <= 3) {
             return (
               <div className="mb-16" key={`map-featured-${map}`}>
                 <CategorySectionFeatured
-                  title={`${map} POVs`}
+                  title={`${map} Demos`}
                   demos={demos}
                   onSelectDemo={handleSelectDemo}
                   gap={24}
@@ -742,7 +763,7 @@ const PlayerPage = ({ playerName }) => {
             return (
               <div className="mb-16" key={`map-carousel-${map}`}>
                 <CategoryCarousel
-                  title={`${map} POVs`}
+                  title={`${map} Demos`}
                   demos={demos}
                   onSelectDemo={handleSelectDemo}
                   gap={24}
@@ -753,7 +774,7 @@ const PlayerPage = ({ playerName }) => {
             return (
               <div className="mb-16" key={`map-grid-${map}`}>
                 <CategorySection
-                  title={`${map} POVs`}
+                  title={`${map} Demos`}
                   demos={demos}
                   onSelectDemo={handleSelectDemo}
                   minCardWidth={280}
@@ -764,7 +785,7 @@ const PlayerPage = ({ playerName }) => {
           }
         })}
 
-        {/* Demos by Event */}
+        {/* == 4. Demos by Event == */}
         {Object.entries(demosByEvent)
           .filter(([event]) => event)
           .map(([event, demos]) => {
@@ -806,7 +827,7 @@ const PlayerPage = ({ playerName }) => {
             }
           })}
 
-        {/* Demos by Year */}
+        {/* == 5. Demos by Year == */}
         {Object.entries(demosByYear)
           .sort(([yearA], [yearB]) => parseInt(yearB) - parseInt(yearA))
           .map(([year, demos]) => {
@@ -848,7 +869,7 @@ const PlayerPage = ({ playerName }) => {
             }
           })}
 
-        {/* All POVs (grid with “View More”) */}
+        {/* == 6. All POVs == */}
         <div className="mb-16">
           <CategorySection
             title="All POVs"
@@ -858,6 +879,34 @@ const PlayerPage = ({ playerName }) => {
             gap={24}
           />
         </div>
+
+        {/* Recent Highlights / Clips (unten, da wenige scrollen) */}
+        {highlightClips.length > 0 && (
+          <section className="mb-16">
+            <div className="flex items-center mb-4">
+              <Shield className="w-6 h-6 text-yellow-400 mr-2 rotate-45" />
+              <h2 className="text-2xl font-bold text-white">Recent Highlights & Clips</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {highlightClips.map((clip) => (
+                <div key={clip.id} className="bg-gray-800/60 rounded-lg overflow-hidden">
+                  <div className="relative w-full h-0 pb-[56.25%]">
+                    <iframe
+                      className="absolute top-0 left-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${clip.videoId}?rel=0&modestbranding=1`}
+                      title={clip.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-white font-semibold">{clip.title}</h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Filter Modal */}
