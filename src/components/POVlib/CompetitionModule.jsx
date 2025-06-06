@@ -136,8 +136,8 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
         <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center">Results</h2>
           <p className="text-yellow-400 text-center font-semibold">GZ to the winner! 🎉</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex flex-col items-center gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
+            <div className="flex flex-col items-center gap-4 col-span-1">
               <h3 className="text-xl font-semibold text-yellow-400">Winner</h3>
               <div
                 className={`relative w-full bg-gray-800 rounded-2xl overflow-hidden border-4 border-yellow-400`}
@@ -162,9 +162,8 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
               </div>
               <p className="text-yellow-400 font-semibold text-lg">{results[0].percent}% – {results[0].votes} votes</p>
             </div>
-            <div className="flex flex-col items-center gap-4">
-              <h3 className="text-xl font-semibold text-white">Other Results</h3>
-              <div className="w-full h-64 bg-gray-800 p-4 rounded-2xl">
+            <div className="col-span-3">
+              <div className="w-full h-72 bg-gray-800 p-4 rounded-2xl">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={results.slice(1).map((item) => ({
                     name: item.title.length > 10 ? item.title.slice(0, 10) + '…' : item.title,
