@@ -39,7 +39,7 @@ const demoMatchData = {
         { type: "death", time: 30, player: "PlayerB" },
       ],
     },
-    // … weitere Runden
+    // ... more rounds
   ],
 };
 
@@ -58,26 +58,26 @@ const VideoPlayerPage = ({
   setIsMenuOpen = () => {},
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false); // für das Ellipsis-Dropdown
+  const [menuOpen, setMenuOpen] = useState(false);
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
 
   if (!selectedDemo) return null;
 
   const generateDescription = () => {
-    let desc = `Erlebe Top-CS2-Gameplay mit ${selectedDemo.players.join(
+    let desc = `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(
       ", "
-    )} auf ${selectedDemo.map}. `;
+    )} on ${selectedDemo.map}. `;
     if (selectedDemo.team)
-      desc += `Sieh zu, wie ${selectedDemo.team}-Spieler professionelle `;
-    else desc += "Sieh dir professionelle ";
+      desc += `Watch how ${selectedDemo.team} players demonstrate professional `;
+    else desc += "Check out professional ";
     if (selectedDemo.positions?.length)
-      desc += `Positionierung für ${selectedDemo.positions.join(" und ")}. `;
-    else desc += "Positionierung und Game Sense. ";
+      desc += `positioning for ${selectedDemo.positions.join(" and ")}. `;
+    else desc += "positioning and game sense. ";
     if (selectedDemo.tags?.length)
-      desc += `Dieses POV-Video hebt Techniken wie ${selectedDemo.tags.join(
+      desc += `This POV video highlights techniques like ${selectedDemo.tags.join(
         ", "
-      )} hervor.`;
-    else desc += "Lerne Strategien und Techniken direkt von den Profis.";
+      )}.`;
+    else desc += "Learn strategies and techniques directly from the pros.";
     return desc;
   };
   const description = generateDescription();
@@ -95,28 +95,26 @@ const VideoPlayerPage = ({
 
       <main className="pt-16 pb-12">
         <div className="container mx-auto px-4">
-          {/* ───────────── Back-Link ───────────── */}
           <div className="flex items-center gap-4 mb-8 flex-wrap">
             <button
               onClick={onClose}
               className="flex items-center text-gray-400 hover:text-yellow-400 transition-colors"
             >
-              <ArrowLeft className="h-5 w-5 mr-2" /> Zurück zur Übersicht
+              <ArrowLeft className="h-5 w-5 mr-2" /> Back to Overview
             </button>
             <Link
               href="/videoplaypagecopy"
               className="text-gray-400 hover:text-yellow-400 transition-colors"
             >
-              Kopie der Seite öffnen
+              Open Page Copy
             </Link>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* ───────────── Linke Spalte: Video + Infos ───────────── */}
             <div className="w-full lg:w-8/12 space-y-6">
               <div className="w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg min-h-[420px]">
                 <YouTubeEmbed
-                  videoId={selectedDemo.videoId}
+                  videoId={selectedDemo.video_id}
                   title={selectedDemo.title}
                   autoplay
                   controls
@@ -124,9 +122,7 @@ const VideoPlayerPage = ({
                 />
               </div>
 
-              {/* ─── Titel + Stats + Actions (ohne extra Box) ─── */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                {/* Titel & Statistik */}
                 <div className="space-y-2">
                   <h1 className="text-2xl font-bold text-white">
                     {selectedDemo.title}
@@ -135,19 +131,15 @@ const VideoPlayerPage = ({
                     <div className="flex items-center">
                       <Eye className="h-5 w-5 mr-1" />
                       <span>
-                        {selectedDemo.views?.toLocaleString()} Aufrufe
+                        {selectedDemo.views?.toLocaleString()} views
                       </span>
                     </div>
                     <div>{selectedDemo.year}</div>
                     {selectedDemo.event && (
-                      <div className="text-yellow-400">
-                        {selectedDemo.event}
-                      </div>
+                      <div className="text-yellow-400">{selectedDemo.event}</div>
                     )}
                   </div>
                 </div>
-
-                {/* Direkt sichtbare Actions + Ellipsis */}
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={() => onLike(selectedDemo.id)}
@@ -159,7 +151,6 @@ const VideoPlayerPage = ({
                   <button className="flex items-center hover:text-yellow-400 transition-colors text-gray-400">
                     <Share2 className="h-5 w-5" />
                   </button>
-                  {/* Ellipsis-Button */}
                   <div className="relative">
                     <button
                       onClick={() => setMenuOpen(!menuOpen)}
@@ -177,23 +168,17 @@ const VideoPlayerPage = ({
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
                           <Tag className="h-4 w-4 text-yellow-400" />
-                          <span>Tag hinzufügen</span>
+                          <span>Add Tag</span>
                         </button>
                         <button
-                          onClick={() => {
-                            /* Save-Funktion hier aufrufen */
-                            setMenuOpen(false);
-                          }}
+                          onClick={() => setMenuOpen(false)}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
                           <Bookmark className="h-4 w-4 text-yellow-400" />
-                          <span>Speichern</span>
+                          <span>Save</span>
                         </button>
                         <button
-                          onClick={() => {
-                            /* Report-Funktion hier aufrufen */
-                            setMenuOpen(false);
-                          }}
+                          onClick={() => setMenuOpen(false)}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
                           <Flag className="h-4 w-4 text-red-500" />
@@ -201,25 +186,23 @@ const VideoPlayerPage = ({
                         </button>
                         <button
                           onClick={() => {
-                            /* Download Video */
                             window.open(selectedDemo.video_url);
                             setMenuOpen(false);
                           }}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
                           <Download className="h-4 w-4 text-yellow-400" />
-                          <span>Video herunterladen</span>
+                          <span>Download Video</span>
                         </button>
                         <button
                           onClick={() => {
-                            /* Download Demo */
                             window.open(selectedDemo.dem_url);
                             setMenuOpen(false);
                           }}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
                           <FileText className="h-4 w-4 text-yellow-400" />
-                          <span>Demo herunterladen</span>
+                          <span>Download Demo</span>
                         </button>
                         <button
                           onClick={() => {
@@ -229,7 +212,7 @@ const VideoPlayerPage = ({
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
                           <ExternalLink className="h-4 w-4 text-yellow-400" />
-                          <span>Matchroom öffnen</span>
+                          <span>Open Matchroom</span>
                         </button>
                       </div>
                     )}
@@ -237,32 +220,28 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* ─── Matchroom Alert-Leiste (unaufdringlich) ─── */}
               {!matchroomSubmitted && (
                 <div className="flex items-center justify-between bg-yellow-400 text-gray-900 px-4 py-2 rounded-md">
                   <span className="text-sm">
-                    Hilf uns, das Matchroom zu vervollständigen! Füge hier
-                    deinen Link ein.
+                    Help us complete the matchroom! Add your link here.
                   </span>
                   <button
                     onClick={() => setMatchroomSubmitted(true)}
                     className="text-sm font-semibold hover:underline"
                   >
-                    Absenden
+                    Submit
                   </button>
                 </div>
               )}
               {matchroomSubmitted && (
                 <div className="bg-gray-700 text-gray-300 px-4 py-2 rounded-md text-sm">
-                  Vielen Dank! Dein Link wird geprüft, du erhältst bald
-                  Feedback.
+                  Thank you! Your link is being reviewed, you will receive feedback soon.
                 </div>
               )}
 
-              {/* ─── Beschreibung (als einziger Block mit Hintergrund) ─── */}
               <div className="bg-gray-800 rounded-lg p-6">
                 <h2 className="border-l-4 border-yellow-400 pl-2 mb-4 text-xl font-semibold text-white">
-                  Beschreibung
+                  Description
                 </h2>
                 {selectedDemo.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -289,12 +268,11 @@ const VideoPlayerPage = ({
                     onClick={() => setShowFullDescription(true)}
                     className="mt-3 flex items-center text-yellow-400 hover:text-yellow-300 text-sm transition-colors"
                   >
-                    weiterlesen <ChevronDown className="ml-1 h-4 w-4" />
+                    Read more <ChevronDown className="ml-1 h-4 w-4" />
                   </button>
                 )}
               </div>
 
-              {/* ─── Featured Players als horizontale Scroll-Liste ─── */}
               <div className="overflow-x-auto py-4">
                 <div className="flex space-x-4">
                   {selectedDemo.players.map((player, idx) => (
@@ -324,7 +302,6 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* ─── Match Timeline (ohne extra Hintergrund-Box) ─── */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">
                   Match Timeline
@@ -332,7 +309,7 @@ const VideoPlayerPage = ({
                 {demoMatchData.rounds.map((round) => (
                   <div key={round.roundNumber}>
                     <div className="mb-2 text-gray-300 text-sm">
-                      Runde {round.roundNumber}
+                      Round {round.roundNumber}
                     </div>
                     <div className="relative h-3 bg-gray-700 rounded">
                       {round.events.map((event, idx) => {
@@ -352,7 +329,6 @@ const VideoPlayerPage = ({
               </div>
             </div>
 
-            {/* ───────────── Rechte Spalte: Related POVs ───────────── */}
             <div className="w-full lg:w-4/12 space-y-6">
               <h2 className="text-xl font-semibold text-white">Related POVs</h2>
               <div className="space-y-4">
@@ -386,7 +362,7 @@ const VideoPlayerPage = ({
                           {d.players.join(", ")}
                         </p>
                         <div className="flex items-center text-gray-500 text-xs mt-2">
-                          <span>{d.views.toLocaleString()} Aufrufe</span>
+                          <span>{d.views.toLocaleString()} views</span>
                           <span className="mx-1">•</span>
                           <span>{d.map}</span>
                           <div className="ml-auto flex items-center text-yellow-400">
@@ -399,7 +375,7 @@ const VideoPlayerPage = ({
                   ))
                 ) : (
                   <div className="text-gray-400 text-center py-8">
-                    Keine verwandten Videos verfügbar
+                    No related videos available
                   </div>
                 )}
               </div>
