@@ -27,7 +27,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [results, setResults] = useState(null);
 
-  // 1) Beim Mount zufällig clips holen
+  // 1) Beim Mount zufällig Clips holen
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
@@ -40,7 +40,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
     })();
   }, [clipCount]);
 
-  // 2) Countdown (10 Sekunden, nur zum Demo-Zweck)
+  // 2) Countdown (10 Sekunden Demo)
   const endTime = useMemo(() => new Date(Date.now() + 10000), []);
   useEffect(() => {
     const tick = () => {
@@ -57,7 +57,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
     return () => clearInterval(iv);
   }, [endTime]);
 
-  // 3) Wenn zu Ende, Ergebnisse berechnen
+  // 3) Wenn Zeit abgelaufen, Ergebnisse berechnen
   useEffect(() => {
     if (timeLeft !== 'Closed' || clips.length === 0) return;
 
@@ -153,9 +153,9 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
       ) : (
         /* =========================
            2) Ergebnis-Zustand
-           – exakt dieselbe Grid-Struktur wie Voting
-           – links Platz 1 (Winner)
-           – rechts Plätze 2–4, jeweils eine “Karte” im selben 4:3-Format
+           – Grid: 4 Spalten
+           – links Gewinner (Index 0)
+           – rechts Plätze 2–4, grau/transparenter Filter
         ========================= */
         <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center">Results</h2>
@@ -165,11 +165,14 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
             {results.slice(0, 4).map((item, idx) => {
               const isWinner = idx === 0;
               return (
-                <div key={item.id} className="flex flex-col items-center gap-2">
+                <div
+                  key={item.id}
+                  className="flex flex-col items-center gap-2"
+                >
                   {/* Karte für Platz idx+1 */}
                   <div
                     className={`relative w-full bg-gray-800 rounded-2xl overflow-hidden border-2 ${
-                      isWinner ? 'border-yellow-400' : 'border-transparent'
+                      isWinner ? 'border-yellow-400' : 'border-transparent filter grayscale contrast-75'
                     }`}
                   >
                     {/* Aspect-Ratio-Box 4:3 */}
@@ -201,7 +204,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
                   {isWinner ? (
                     <span className="text-yellow-400 font-semibold">Winner</span>
                   ) : (
-                    <span className="text-gray-300 text-sm">Rank {idx + 1}</span>
+                    <span className="text-gray-500 text-sm">Rank {idx + 1}</span>
                   )}
                 </div>
               );
