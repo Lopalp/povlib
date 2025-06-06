@@ -1,7 +1,21 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Filter, Shield, Twitter, Twitch, Instagram, Youtube, User } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Filter,
+  Shield,
+  Twitter,
+  Twitch,
+  Instagram,
+  Youtube,
+  User,
+  Star,
+  Trophy,
+  Video,
+  BookOpen
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
@@ -10,6 +24,10 @@ import VideoPlayerPage from './VideoPlayerPage';
 import TaggingModal from './TaggingModal';
 import FilterModal from './FilterModal';
 import FeaturedHero from './FeaturedHero';
+
+import CategorySection from '../../components/containers/CategorySection';
+import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
+import CategoryCarousel from '../../components/containers/CategoryCarousel';
 
 import {
   getPlayerInfo,
@@ -63,6 +81,30 @@ const PlayerPage = ({ playerName }) => {
   const [relatedDemos, setRelatedDemos] = useState([]);
   const [isFullScreenPlayer, setIsFullScreenPlayer] = useState(false);
   const [teamHistoryOpen, setTeamHistoryOpen] = useState(false);
+
+  // Neue State für zusätzliche Sektionen
+  const [favoriteMap, setFavoriteMap] = useState('Dust II'); // mock
+  const [bestGame, setBestGame] = useState({
+    title: 'Mirage 1v3 Clutch vs G2',
+    videoId: 'dQw4w9WgXcQ',
+    map: 'Mirage',
+    date: '2024-11-12'
+  }); // mock
+  const [recentClips, setRecentClips] = useState([
+    { id: 1, title: 'Ace on Inferno', videoId: 'XxVg_s8xAms' },
+    { id: 2, title: 'Ninja Defuse on Nuke', videoId: 'V-_O7nl0Ii0' },
+    { id: 3, title: 'Clutch vs Astralis', videoId: 'M7lc1UVf-VE' }
+  ]); // mock
+
+  // UtilBook-Daten und Filter
+  const [utilBookItems, setUtilBookItems] = useState([
+    { id: 1, map: 'Dust II', description: 'Smoke mid doors', videoId: 'abcd1' },
+    { id: 2, map: 'Mirage', description: 'Connector A setup', videoId: 'abcd2' },
+    { id: 3, map: 'Inferno', description: 'Banana control', videoId: 'abcd3' },
+    { id: 4, map: 'Nuke', description: 'Heaven smoke', videoId: 'abcd4' },
+    { id: 5, map: 'Dust II', description: 'A long flash', videoId: 'abcd5' }
+  ]); // mock
+  const [utilBookFilter, setUtilBookFilter] = useState('');
 
   const infiniteScrollRef = useRef(null);
 
@@ -418,6 +460,11 @@ const PlayerPage = ({ playerName }) => {
     );
   }
 
+  // Gefilterte UtilBook-Einträge
+  const filteredUtilBook = utilBookFilter
+    ? utilBookItems.filter(item => item.map === utilBookFilter)
+    : utilBookItems;
+
   return (
     <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
       {/* Hintergrundflagge halbtransparent */}
@@ -543,20 +590,18 @@ const PlayerPage = ({ playerName }) => {
         <div className="max-w-4xl mx-auto mt-6 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 space-y-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
             <div>
-              <div className="text-gray-400 text-xs">Geburtstag</div>
-              <div className="text-white">{player.birth_date}</div>
+              <div className="text-gray-400 text-xs flex items-center">
+                <Star className="w-4 h-4 mr-1" />
+                Lieblings-Map
+              </div>
+              <div className="text-white">{favoriteMap}</div>
             </div>
             <div>
-              <div className="text-gray-400 text-xs">Nationalität</div>
-              <div className="text-white">{player.nationality}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs">Rolle</div>
-              <div className="text-white">{player.role}</div>
-            </div>
-            <div>
-              <div className="text-gray-400 text-xs">Status</div>
-              <div className="text-white">{player.status}</div>
+              <div className="text-gray-400 text-xs flex items-center">
+                <Trophy className="w-4 h-4 mr-1" />
+                Bestes Game All Time
+              </div>
+              <div className="text-white">{bestGame.title}</div>
             </div>
             <div className="col-span-full">
               <div className="flex items-center justify-between">
@@ -590,7 +635,7 @@ const PlayerPage = ({ playerName }) => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12 bg-pattern relative z-10">
+      <main className="container mx-auto px-6 py-12 bg-pattern relative z-10 space-y-16">
         {/* == 1. Most Popular POVs (Trending) == */}
         {trendingDemos.length > 0 && (
           <CategorySectionFeatured
@@ -735,6 +780,76 @@ const PlayerPage = ({ playerName }) => {
             gap={24}
           />
         </div>
+
+        {/* == 6. Recent Highlights / Clips == */}
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            <span className="border-l-4 border-yellow-400 pl-3 py-1">Recent Highlights</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentClips.map((clip) => (
+              <div key={clip.id} className="bg-gray-800/60 rounded-lg overflow-hidden">
+                <div className="relative w-full h-48 bg-black">
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${clip.videoId}?rel=0&modestbranding=1`}
+                    title={clip.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-3">
+                  <h3 className="text-white font-medium">{clip.title}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* == 7. Util Book == */}
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            <span className="border-l-4 border-yellow-400 pl-3 py-1 flex items-center">
+              <BookOpen className="w-5 h-5 mr-2" />
+              Utility Book
+            </span>
+          </h2>
+          <div className="mb-4 flex items-center space-x-3">
+            <label htmlFor="util-map-filter" className="text-gray-300 text-sm">Filter by Map:</label>
+            <select
+              id="util-map-filter"
+              value={utilBookFilter}
+              onChange={(e) => setUtilBookFilter(e.target.value)}
+              className="bg-gray-800/60 backdrop-blur-sm text-white px-3 py-2 rounded-md border border-gray-700 focus:outline-none focus:border-yellow-400"
+            >
+              <option value="">All Maps</option>
+              {[...new Set(utilBookItems.map(item => item.map))].map((map) => (
+                <option key={map} value={map}>{map}</option>
+              ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredUtilBook.map((entry) => (
+              <div key={entry.id} className="bg-gray-800/60 rounded-lg overflow-hidden">
+                <div className="p-3">
+                  <h3 className="text-white font-medium">{entry.map}</h3>
+                  <p className="text-gray-300 text-sm mb-2">{entry.description}</p>
+                  <button
+                    onClick={() => {
+                      setSelectedDemo({ title: entry.description, videoId: entry.videoId });
+                      setActiveVideoId(entry.videoId);
+                      setIsFullScreenPlayer(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-700 text-white hover:border-yellow-400 transition"
+                  >
+                    <Video className="w-4 h-4" />
+                    <span className="text-sm">Watch Utility</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       {/* Filter Modal */}
