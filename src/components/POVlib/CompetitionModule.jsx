@@ -24,7 +24,7 @@ export default function CompetitionModule({
   const [timeLeft, setTimeLeft] = useState('');
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
-  // load clips
+  // Clips laden
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
@@ -33,24 +33,30 @@ export default function CompetitionModule({
     })();
   }, [clipCount]);
 
-  // countdown
+  // Endzeitpunkt nur einmal berechnen
   const endTime = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + durationDays);
     return d;
   }, [durationDays]);
 
+  // Countdown (jetzt jede Sekunde) mit D H M S
   useEffect(() => {
     const tick = () => {
-      const diff = endTime - Date.now();
-      if (diff <= 0) return setTimeLeft('Closed');
+      const diff = endTime.getTime() - Date.now();
+      if (diff <= 0) {
+        setTimeLeft('Closed');
+        return;
+      }
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      setTimeLeft(`${d}d ${h}h ${m}m left`);
+      const s = Math.floor((diff % 60000) / 1000);
+      setTimeLeft(`${d}D ${h}H ${m}M ${s}S`);
     };
+
     tick();
-    const iv = setInterval(tick, 60000);
+    const iv = setInterval(tick, 1000);
     return () => clearInterval(iv);
   }, [endTime]);
 
@@ -62,7 +68,7 @@ export default function CompetitionModule({
   return (
     <>
       <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
-        {/* Header with Info icon */}
+        {/* Header mit Info-Icon */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <h2 className="text-2xl md:text-3xl font-bold text-white">{title}</h2>
@@ -73,7 +79,8 @@ export default function CompetitionModule({
               <Info className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
             </button>
           </div>
-          <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-white border border-white/20">
+          {/* Timer mit gelbem Rahmen */}
+          <span className="text-xs px-3 py-1 rounded-full bg-white/10 text-yellow-400 border border-yellow-400">
             {timeLeft}
           </span>
         </div>
@@ -93,7 +100,7 @@ export default function CompetitionModule({
                     ${selectedClip && !isSelected ? 'filter grayscale contrast-75' : ''}
                   `}
                 >
-                  {/* Video Preview */}
+                  {/* Video-Vorschau */}
                   <div className="relative w-full pb-[133%] bg-black">
                     <video
                       src={clip.videoUrl || clip.video_id}
@@ -114,7 +121,7 @@ export default function CompetitionModule({
                   </div>
                 </div>
 
-                {/* Select Button under card */}
+                {/* Select-Button unter der Karte */}
                 <button
                   onClick={() => handleSelect(clip.id)}
                   className={`
@@ -142,7 +149,7 @@ export default function CompetitionModule({
           </p>
         </div>
 
-        {/* Summary */}
+        {/* Auswahl-Feedback */}
         {selectedClip && (
           <p className="text-center text-yellow-400 font-medium">
             You selected: <strong>{clips.find(c => c.id === selectedClip)?.title}</strong>
@@ -150,7 +157,7 @@ export default function CompetitionModule({
         )}
       </section>
 
-      {/* Info Modal with glow */}
+      {/* Info-Modal mit gelbem Glow */}
       {isInfoOpen && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
