@@ -13,7 +13,8 @@ import {
   User,
   MapPin,
   Star,
-  BookOpen
+  BookOpen,
+  Play 
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
