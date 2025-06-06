@@ -148,7 +148,7 @@ export default function Navbar({
               Players
             </Link>
             <Link
-              href="/utility-book"
+              href="/demos"
               className={`${linkClasses} text-gray-200`}
             >
               Utility Book
@@ -307,7 +307,7 @@ export default function Navbar({
               </Link>
 
               <Link
-                href="/utility-book"
+                href="/demos"
                 onClick={() => setIsMenuOpen(false)}
                 className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
               >
