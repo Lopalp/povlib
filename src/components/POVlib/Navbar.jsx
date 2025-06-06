@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import {
@@ -26,6 +27,7 @@ const mapNamesDesktop = [
   { label: "Anubis", slug: "anubis" },
   { label: "Vertigo", slug: "vertigo" },
 ];
+
 const mostPlayedMapsMobile = [
   { label: "Mirage", slug: "mirage" },
   { label: "Inferno", slug: "inferno" },
@@ -67,6 +69,7 @@ export default function Navbar({
     setMapMenuOpen(false);
     setSearchActive((prev) => !prev);
   };
+
   const toggleMaps = () => {
     setSearchActive(false);
     setMapMenuOpen((prev) => !prev);
@@ -77,6 +80,7 @@ export default function Navbar({
     // Such-Logik hier
     setSearchActive(false);
   };
+
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
@@ -127,7 +131,7 @@ export default function Navbar({
                       All Maps
                     </Link>
                   </li>
-                  <li className="border-t border-gray-600 my-1"></li>
+                  <li className="border-t border-gray-600 my-1" />
                   {mapNamesDesktop.map((m) => (
                     <li key={m.slug}>
                       <Link
@@ -147,11 +151,8 @@ export default function Navbar({
             <Link href="/players" className={`${linkClasses} text-gray-200`}>
               Players
             </Link>
-            <Link
-              href="/demos"
-              className={`${linkClasses} text-gray-200`}
-            >
-              Utility Book
+            <Link href="/viewer" className={`${linkClasses} text-gray-200`}>
+              Demo Viewer
             </Link>
             <div className="relative group">
               <span className={`${linkClasses} text-gray-200 cursor-default`}>
@@ -307,11 +308,11 @@ export default function Navbar({
               </Link>
 
               <Link
-                href="/demos"
+                href="/viewer"
                 onClick={() => setIsMenuOpen(false)}
                 className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
               >
-                <FileVideo className="h-5 w-5 text-yellow-400" /> Utility Book
+                <FileVideo className="h-5 w-5 text-yellow-400" /> Demo Viewer
               </Link>
 
               <Link
