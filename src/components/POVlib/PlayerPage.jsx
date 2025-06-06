@@ -14,7 +14,8 @@ import {
   MapPin,
   Star,
   BookOpen,
-  Play
+  Play,
+  Crosshair
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -386,6 +387,13 @@ const PlayerPage = ({ playerName }) => {
     }
   }, [utilityFilters, utilities]);
 
+  // Kopier-Funktion für Crosshair (Mock-Code)
+  const copyCrosshair = () => {
+    const crosshairConfig = 'csgo://...'; // Platzhalter für tatsächliche Crosshair-Config
+    navigator.clipboard.writeText(crosshairConfig);
+    alert('Crosshair configuration copied!');
+  };
+
   // Lade-Zustand (fullscreen, bevor Content geladen)
   if (isLoading && !allDemos.length) {
     return (
@@ -476,13 +484,15 @@ const PlayerPage = ({ playerName }) => {
       {!isLoading && trendingDemos.length > 0 && (
         <div className="relative w-full overflow-hidden bg-black group h-[60vh] max-h-[80vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <YouTubeEmbed
-              videoId={trendingDemos[0].videoId}
-              title={trendingDemos[0].title}
-              autoplay={true}
-              controls={false}
-              showInfo={false}
-            />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130vw] h-[130vh]">
+              <YouTubeEmbed
+                videoId={trendingDemos[0].videoId}
+                title={trendingDemos[0].title}
+                autoplay={true}
+                controls={false}
+                showInfo={false}
+              />
+            </div>
             <div className="absolute inset-0 bg-black/30 z-10" />
           </div>
 
@@ -564,6 +574,15 @@ const PlayerPage = ({ playerName }) => {
                   </a>
                 )}
               </div>
+
+              {/* Crosshair-Icon und Copy-Funktion */}
+              <button
+                onClick={copyCrosshair}
+                className="mt-4 inline-flex items-center gap-2 text-green-400 hover:text-green-300 transition"
+              >
+                <Crosshair className="w-6 h-6" />
+                <span className="text-sm">Copy Crosshair</span>
+              </button>
             </div>
           </div>
 
