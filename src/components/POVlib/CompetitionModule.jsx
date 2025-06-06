@@ -25,7 +25,6 @@ const getRandomImage = () => {
 
 export default function CompetitionModule({
   title = 'Clip of the Week',
-  durationDays = 7,
   clipCount = 4
 }) {
   const [clips, setClips] = useState([]);
@@ -34,22 +33,19 @@ export default function CompetitionModule({
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [results, setResults] = useState(null);
 
-  // Clips laden (angenommen: jedes Clip-Objekt hat zusätzlich eine Zahl-Eigenschaft "votes")
+  // Clips laden (angenommen: jedes Clip-Objekt hat zusätzlich eine "votes"-Eigenschaft)
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
-      // Beispiel: demos[i].votes ist vorhanden
       const chosen = demos.sort(() => 0.5 - Math.random()).slice(0, clipCount);
       setClips(chosen);
     })();
   }, [clipCount]);
 
-  // Endzeitpunkt nur einmal berechnen
+  // Endzeitpunkt auf "jetzt + 10 Sekunden" setzen
   const endTime = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + durationDays);
-    return d;
-  }, [durationDays]);
+    return new Date(Date.now() + 10 * 1000);
+  }, []);
 
   // Countdown (jede Sekunde) mit D H M S
   useEffect(() => {
@@ -75,10 +71,8 @@ export default function CompetitionModule({
   useEffect(() => {
     if (timeLeft !== 'Closed' || clips.length === 0) return;
 
-    // Stimmen summieren
     const totalVotes = clips.reduce((sum, clip) => sum + (clip.votes || 0), 0);
     if (totalVotes === 0) {
-      // Falls keine Stimmen vorhanden: alle Prozentwerte 0
       const flatResults = clips.map(clip => ({
         id: clip.id,
         title: clip.title,
@@ -91,7 +85,6 @@ export default function CompetitionModule({
       return;
     }
 
-    // Ergebnisse mit Prozenten anreichern
     const computed = clips.map(clip => {
       const votes = clip.votes || 0;
       const percent = Math.round((votes / totalVotes) * 100);
@@ -105,7 +98,6 @@ export default function CompetitionModule({
       };
     });
 
-    // Sortieren nach Stimmen (absteigend)
     const sorted = computed.sort((a, b) => b.votes - a.votes);
     setResults(sorted);
   }, [timeLeft, clips]);
@@ -115,7 +107,6 @@ export default function CompetitionModule({
     setSelectedClip(prev => (prev === id ? null : id));
   };
 
-  // Falls die Zeit abgelaufen ist und Ergebnisse vorhanden sind: Warte-Checkbox
   const hasEnded = timeLeft === 'Closed' && results;
 
   return (
