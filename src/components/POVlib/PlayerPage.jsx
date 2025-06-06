@@ -464,55 +464,10 @@ const PlayerPage = ({ playerName }) => {
         isMenuOpen={isMenuOpen}
       />
 
-      {/* Custom Hero (adapted from homepage) */}
-      {!isLoading && (
-        <div className="relative w-full overflow-hidden bg-black h-[60vh] md:h-[70vh] lg:h-[75vh]">
-          {/* Background YouTube embed of top demo */}
-          {trendingDemos.length > 0 && (
-            <iframe
-              className="absolute inset-0 w-full h-full object-cover opacity-30"
-              src={`https://www.youtube.com/embed/${trendingDemos[0].videoId}?autoplay=1&mute=1&controls=0&rel=0&loop=1&playlist=${trendingDemos[0].videoId}`}
-              title={trendingDemos[0].title}
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            />
-          )}
-          {/* Dark overlay */}
-          <div className="absolute inset-0 bg-black/50 z-10" />
+      {/* Clean Hero Banner */}
+      <div className="h-36 md:h-48 lg:h-56 bg-gradient-to-r from-gray-800 to-black"></div>
 
-          {/* Hero content */}
-          <div className="relative z-20 container mx-auto h-full flex flex-col justify-center items-start px-6">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-              {playerName}
-            </h1>
-            <p className="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-2xl">
-              {/* Brief tagline under hero */}
-              {player?.role
-                ? `${player.real_name} • ${player.role} • ${player.current_team?.name}`
-                : player.real_name}
-            </p>
-            <div className="mt-6 flex items-center gap-4">
-              <button
-                onClick={() => {
-                  if (trendingDemos[0]) handleSelectDemo(trendingDemos[0]);
-                }}
-                className="flex items-center gap-2 px-5 py-3 rounded-md border-2 border-yellow-400 text-yellow-400 font-semibold hover:bg-yellow-400 hover:text-black transition"
-              >
-                <PlayIcon />
-                <span className="text-sm sm:text-base">Watch Top Demo</span>
-              </button>
-              <button
-                onClick={() => setIsFilterModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
-              >
-                <Filter className="w-5 h-5" />
-                <span className="text-sm sm:text-base">Filter Demos</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Player Info Card Overlapping Hero */}
+      {/* Player Info Card (topmost) */}
       <div className="relative z-20 -mt-20 px-6">
         <div className="max-w-4xl mx-auto bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 flex flex-col lg:flex-row items-center lg:items-start gap-6">
           {/* Player image */}
@@ -531,7 +486,7 @@ const PlayerPage = ({ playerName }) => {
           </div>
 
           {/* Text info */}
-          <div className="flex-1 text-center lg:text-left space-y-3">
+          <div className="flex-1 text-center lg:text-left space-y-2">
             <h1 className="text-3xl md:text-4xl font-bold text-white">
               {playerName}
             </h1>
@@ -544,7 +499,7 @@ const PlayerPage = ({ playerName }) => {
               </div>
             )}
 
-            <div className="flex space-x-4 mt-4 justify-center lg:justify-start">
+            <div className="flex space-x-4 mt-3 justify-center lg:justify-start">
               {player.twitter && (
                 <a
                   href={`https://twitter.com/${player.twitter}`}
@@ -601,7 +556,7 @@ const PlayerPage = ({ playerName }) => {
 
         {/* Additional details and collapsible team history */}
         <div className="max-w-4xl mx-auto mt-6 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6 space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
             <div>
               <div className="text-gray-400 text-xs flex items-center">
                 <Star className="w-4 h-4 mr-1" />
@@ -612,7 +567,7 @@ const PlayerPage = ({ playerName }) => {
             <div>
               <div className="text-gray-400 text-xs flex items-center">
                 <Trophy className="w-4 h-4 mr-1" />
-                Best Game of All Time
+                Best Game Ever
               </div>
               <div className="text-white">{bestGame.title}</div>
             </div>
@@ -672,7 +627,7 @@ const PlayerPage = ({ playerName }) => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12 bg-pattern relative z-10 space-y-16">
-        {/* Utility Book Section (moved up) */}
+        {/* Utility Book Section */}
         <section>
           <h2 className="text-2xl font-bold text-white mb-4">
             <span className="border-l-4 border-yellow-400 pl-3 py-1 flex items-center">
@@ -729,7 +684,7 @@ const PlayerPage = ({ playerName }) => {
           </div>
         </section>
 
-        {/* Recent Highlights / Clips (moved up) */}
+        {/* Recent Highlights / Clips */}
         <section>
           <h2 className="text-2xl font-bold text-white mb-4">
             <span className="border-l-4 border-yellow-400 pl-3 py-1">
@@ -926,15 +881,3 @@ const PlayerPage = ({ playerName }) => {
 };
 
 export default PlayerPage;
-
-// Note: Add this icon component since we used <PlayIcon /> above
-const PlayIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5"
-    fill="currentColor"
-    viewBox="0 0 20 20"
-  >
-    <path d="M6.5 5.5v9l8-4.5-8-4.5z" />
-  </svg>
-);
