@@ -135,18 +135,26 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
       ) : (
         <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center">Results</h2>
+          <p className="text-yellow-400 text-center font-semibold">GZ to the winner! 🎉</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col items-center gap-4">
               <h3 className="text-xl font-semibold text-yellow-400">Winner</h3>
-              <div className="relative w-full bg-gray-800 rounded-2xl overflow-hidden border-4 border-yellow-400" style={{ aspectRatio: '4 / 3' }}>
-                <video
-                  src={results[0].videoUrl}
-                  poster={getRandomImage()}
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
+              <div
+                className={`relative w-full bg-gray-800 rounded-2xl overflow-hidden border-4 border-yellow-400`}
+              >
+                <div className="relative w-full pb-[133%] bg-black">
+                  <video
+                    src={results[0].videoUrl}
+                    poster={getRandomImage()}
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <PlayCircle className="w-12 h-12 text-white" />
+                  </div>
+                </div>
                 <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
                   <h4 className="text-white font-bold truncate">{results[0].title}</h4>
                   <p className="text-gray-300 text-sm">by {results[0].submitter || 'Unknown'}</p>
