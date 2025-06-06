@@ -19,7 +19,7 @@ const FeaturedHero = ({
   if (!demo) return null;
 
   return (
-    <div className="relative w-full overflow-hidden bg-black group h-[66vh] sm:aspect-video sm:h-auto max-h-[90vh]">
+    <div className="relative w-full overflow-hidden bg-black group h-[75vh] sm:aspect-video sm:h-auto max-h-[90vh]">
       {/* Hintergrund-Video */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-black/15 z-10" />
