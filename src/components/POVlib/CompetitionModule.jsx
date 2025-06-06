@@ -1,3 +1,4 @@
+// components/POVlib/CompetitionModule.jsx
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -26,7 +27,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [results, setResults] = useState(null);
 
-  // Demos laden
+  // 1) Beim Mount zufällig clips holen
   useEffect(() => {
     (async () => {
       const demos = await getFilteredDemos({}, 'all');
@@ -39,7 +40,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
     })();
   }, [clipCount]);
 
-  // Countdown (hier 10 Sekunden)
+  // 2) Countdown (10 Sekunden, nur zum Demo-Zweck)
   const endTime = useMemo(() => new Date(Date.now() + 10000), []);
   useEffect(() => {
     const tick = () => {
@@ -56,7 +57,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
     return () => clearInterval(iv);
   }, [endTime]);
 
-  // Wenn Zeit vorbei, Ergebnisse berechnen
+  // 3) Wenn zu Ende, Ergebnisse berechnen
   useEffect(() => {
     if (timeLeft !== 'Closed' || clips.length === 0) return;
 
@@ -80,9 +81,9 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
 
   return (
     <>
-      {/* ====================================================
-          1) Voting-Zustand (bis Zeit abgelaufen)
-      ==================================================== */}
+      {/* =========================
+          1) Voting-Zustand
+      ========================= */}
       {!hasEnded ? (
         <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
           <div className="flex items-center justify-between">
@@ -113,7 +114,7 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
                       selectedClip && !isSelected ? 'filter grayscale contrast-75' : ''
                     }`}
                   >
-                    {/* Aspect-Ratio-Box: 4:3 */}
+                    {/* Aspect-Ratio-Box 4:3 */}
                     <div className="relative w-full pb-[133%] bg-black">
                       <video
                         src={clip.videoUrl || clip.video_id}
@@ -150,95 +151,68 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
           </div>
         </section>
       ) : (
-        /* ====================================================
-           2) Auswertungs-Zustand (nach Ablauf)
-           – Grid: gleiche Struktur wie vorher (sm:2, lg:4)
-           – Gewinner in Spalte 1
-           – Chart-Wrapper (4:3) in Spalten 2–4
-        ==================================================== */
+        /* =========================
+           2) Ergebnis-Zustand
+           – exakt dieselbe Grid-Struktur wie Voting
+           – links Platz 1 (Winner)
+           – rechts Plätze 2–4, jeweils eine “Karte” im selben 4:3-Format
+        ========================= */
         <section className="bg-gray-900 rounded-2xl p-8 space-y-6 shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center">Results</h2>
-          <p className="text-yellow-400 text-center font-semibold">
-            GZ to the winner! 🎉
-          </p>
+          <p className="text-yellow-400 text-center font-semibold">GZ to the winner! 🎉</p>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {/* ---------- Gewinner-Karte ---------- */}
-            <div className="flex flex-col items-center gap-4">
-              <h3 className="text-xl font-semibold text-yellow-400">Winner</h3>
-              <div className="relative w-full bg-gray-800 rounded-2xl overflow-hidden border-4 border-yellow-400">
-                {/* Aspect-Ratio: 4:3, identisch zur Voting-Ansicht */}
-                <div className="relative w-full pb-[133%] bg-black">
-                  <video
-                    src={results[0].videoUrl}
-                    poster={getRandomImage()}
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <PlayCircle className="w-12 h-12 text-white" />
+            {results.slice(0, 4).map((item, idx) => {
+              const isWinner = idx === 0;
+              return (
+                <div key={item.id} className="flex flex-col items-center gap-2">
+                  {/* Karte für Platz idx+1 */}
+                  <div
+                    className={`relative w-full bg-gray-800 rounded-2xl overflow-hidden border-2 ${
+                      isWinner ? 'border-yellow-400' : 'border-transparent'
+                    }`}
+                  >
+                    {/* Aspect-Ratio-Box 4:3 */}
+                    <div className="relative w-full pb-[133%] bg-black">
+                      <video
+                        src={item.videoUrl}
+                        poster={getRandomImage()}
+                        muted
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <PlayCircle className="w-12 h-12 text-white" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
+                      <h4 className="text-white font-bold truncate">{item.title}</h4>
+                      <p className="text-gray-300 text-sm">
+                        by {item.submitter || 'Unknown'}
+                      </p>
+                      <p className="text-yellow-400 text-sm font-semibold mt-1">
+                        {item.percent}% – {item.votes} votes
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="absolute bottom-0 inset-x-0 p-4 bg-black/40 backdrop-blur-md">
-                  <h4 className="text-white font-bold truncate">{results[0].title}</h4>
-                  <p className="text-gray-300 text-sm">
-                    by {results[0].submitter || 'Unknown'}
-                  </p>
-                </div>
-              </div>
-              <p className="text-yellow-400 font-semibold text-lg">
-                {results[0].percent}% – {results[0].votes} votes
-              </p>
-            </div>
 
-            {/* ---------- Chart-Bereich (Spalten 2–4) ---------- */}
-            <div className="col-span-3">
-              {/* Wrapper sorgt dafür, dass Chart exakt 4:3 behält (Höhe = 133% von Breite) */}
-              <div className="relative w-full pb-[133%] bg-gray-800 rounded-2xl overflow-hidden">
-                <div className="absolute inset-0 p-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={results.slice(1).map((item) => ({
-                        name:
-                          item.title.length > 10
-                            ? item.title.slice(0, 10) + '…'
-                            : item.title,
-                        percent: item.percent,
-                      }))}
-                    >
-                      <XAxis
-                        dataKey="name"
-                        tick={{ fill: '#ddd', fontSize: 12 }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        tick={{ fill: '#ddd', fontSize: 12 }}
-                        axisLine={false}
-                        tickLine={false}
-                        domain={[0, 100]}
-                        unit="%"
-                      />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#2d2d2d', border: 'none' }}
-                        itemStyle={{ color: '#fff' }}
-                        cursor={{ fill: 'rgba(250,204,21,0.1)' }}
-                      />
-                      <Bar dataKey="percent" fill="#FACC15" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {/* Platz-Beschriftung */}
+                  {isWinner ? (
+                    <span className="text-yellow-400 font-semibold">Winner</span>
+                  ) : (
+                    <span className="text-gray-300 text-sm">Rank {idx + 1}</span>
+                  )}
                 </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
       )}
 
-      {/* ====================================================
-          3) Info-Modal
-      ==================================================== */}
+      {/* =========================
+          3) Info-Modal (unverändert)
+      ========================= */}
       {isInfoOpen && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
@@ -254,15 +228,9 @@ export default function CompetitionModule({ title = 'Clip of the Week', clipCoun
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <p className="text-gray-300 mb-2">
-              Each round showcases top POV clips. Vote for your favorite!
-            </p>
-            <p className="text-gray-300 mb-2">
-              The clip with the most votes at the end wins.
-            </p>
-            <p className="text-gray-300">
-              Use the "Submit Your Clip" option to enter future competitions.
-            </p>
+            <p className="text-gray-300 mb-2">Each round showcases top POV clips. Vote for your favorite!</p>
+            <p className="text-gray-300 mb-2">The clip with the most votes at the end wins.</p>
+            <p className="text-gray-300">Use the "Submit Your Clip" option to enter future competitions.</p>
           </div>
         </div>
       )}
