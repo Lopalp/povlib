@@ -1,7 +1,22 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Filter, Shield, Twitter, Twitch, Instagram, Youtube, User, MapPin, Star, BookOpen } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Filter,
+  Shield,
+  Twitter,
+  Twitch,
+  Instagram,
+  Youtube,
+  User,
+  MapPin,
+  Star,
+  BookOpen,
+  Play
+} from 'lucide-react'; // <-- Added Play here
+
 import { useRouter } from 'next/navigation';
 
 import Navbar from './Navbar';
@@ -12,7 +27,7 @@ import FilterModal from './FilterModal';
 import FeaturedHero from './FeaturedHero';
 
 import CategorySection from '../../components/containers/CategorySection';
-import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
+import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured'; // <-- Ensure this is imported
 import CategoryCarousel from '../../components/containers/CategoryCarousel';
 
 import {
@@ -676,7 +691,20 @@ const PlayerPage = ({ playerName }) => {
                 <p className="text-gray-400 text-sm mb-3">{util.description}</p>
                 <button
                   onClick={() => {
-                    setSelectedDemo({ videoId: util.videoId, title: util.title, players: [], map: util.map, team: '', event: '', year: '', positions: [], tags: [], views: 0, likes: 0, id: util.id });
+                    setSelectedDemo({
+                      videoId: util.videoId,
+                      title: util.title,
+                      players: [],
+                      map: util.map,
+                      team: '',
+                      event: '',
+                      year: '',
+                      positions: [],
+                      tags: [],
+                      views: 0,
+                      likes: 0,
+                      id: util.id
+                    });
                     setActiveVideoId(util.videoId);
                     setIsFullScreenPlayer(true);
                   }}
@@ -722,7 +750,20 @@ const PlayerPage = ({ playerName }) => {
                 <p className="text-gray-400">Relive the most iconic performance. Watch the full POV demo to see how {playerName} dominated the match.</p>
                 <button
                   onClick={() => {
-                    setSelectedDemo({ videoId: player.best_game.videoId, title: player.best_game.title, players: [], map: '', team: '', event: '', year: '', positions: [], tags: [], views: 0, likes: 0, id: 'best-game' });
+                    setSelectedDemo({
+                      videoId: player.best_game.videoId,
+                      title: player.best_game.title,
+                      players: [],
+                      map: '',
+                      team: '',
+                      event: '',
+                      year: '',
+                      positions: [],
+                      tags: [],
+                      views: 0,
+                      likes: 0,
+                      id: 'best-game'
+                    });
                     setActiveVideoId(player.best_game.videoId);
                     setIsFullScreenPlayer(true);
                   }}
