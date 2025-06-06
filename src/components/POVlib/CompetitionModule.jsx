@@ -43,12 +43,12 @@ export default function CompetitionModule({
     })();
   }, [clipCount]);
 
-  // Endzeitpunkt: genau 10 Sekunden ab Page-Load
+  // Endzeitpunkt auf jetzt + 10 Sekunden setzen
   const endTime = useMemo(() => {
-    return new Date(Date.now() + 10_000);
+    return new Date(Date.now() + 10000); // 10.000 ms = 10 Sekunden
   }, []);
 
-  // Countdown (jede Sekunde) mit D H M S
+  // Countdown (jede Sekunde) mit S-Format
   useEffect(() => {
     const tick = () => {
       const diff = endTime.getTime() - Date.now();
@@ -56,11 +56,8 @@ export default function CompetitionModule({
         setTimeLeft('Closed');
         return;
       }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      setTimeLeft(`${d}D ${h}H ${m}M ${s}S`);
+      const s = Math.floor(diff / 1000);
+      setTimeLeft(`${s}S`);
     };
 
     tick();
@@ -309,10 +306,10 @@ export default function CompetitionModule({
               </button>
             </div>
             <p className="text-gray-300 mb-2">
-              Each round features top POV clips. Select your favorite clip below.
+              Jede Runde läuft nur 10 Sekunden! Wähle deinen Lieblingsclip in der Zeit aus.
             </p>
             <p className="text-gray-300 mb-2">
-              The clip with the most selections when time runs out wins the title.
+              Wenn die Zeit abgelaufen ist, wird automatisch der Sieger ermittelt.
             </p>
             <p className="text-gray-300">
               Use "Submit Your Clip" to enter your clips in upcoming rounds.
