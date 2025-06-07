@@ -13,14 +13,14 @@ import {
   FileText,
   ExternalLink,
   ChevronDown,
-  ChevronRight,
   Shield,
   Play,
 } from "lucide-react";
 import YouTubeEmbed from "./YouTubeEmbed";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import MatchTimeline, { demoMatchData } from "./MatchTimeline";
+// Korrigierter Import-Pfad: Anpassen je nach Ordnerstruktur
+import MatchTimeline, { demoMatchData } from "../components/POVlib/MatchTimeline"; "../components/POVlib/MatchTimeline";
 
 const VideoPlayerPage = ({
   selectedDemo,
@@ -43,15 +43,13 @@ const VideoPlayerPage = ({
 
   if (!selectedDemo) return null;
 
-  const generateDescription = () => {
+  const description = () => {
     let desc = `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(
       ", "
     )} on ${selectedDemo.map}. `;
-    if (selectedDemo.team)
-      desc += `Watch how ${selectedDemo.team} players demonstrate professional `;
+    if (selectedDemo.team) desc += `Watch how ${selectedDemo.team} players demonstrate professional `;
     else desc += "Check out professional ";
-    if (selectedDemo.positions?.length)
-      desc += `positioning for ${selectedDemo.positions.join(" and ")}. `;
+    if (selectedDemo.positions?.length) desc += `positioning for ${selectedDemo.positions.join(" and ")}. `;
     else desc += "positioning and game sense. ";
     if (selectedDemo.tags?.length)
       desc += `This POV video highlights techniques like ${selectedDemo.tags.join(
@@ -60,7 +58,6 @@ const VideoPlayerPage = ({
     else desc += "Learn strategies and techniques directly from the pros.";
     return desc;
   };
-  const description = generateDescription();
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200">
@@ -75,6 +72,7 @@ const VideoPlayerPage = ({
 
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
+          {/* Navigation Controls */}
           <div className="flex items-center gap-4 mb-8 flex-wrap">
             <button
               onClick={onClose}
@@ -91,7 +89,9 @@ const VideoPlayerPage = ({
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
+            {/* Video & Details Left */}
             <div className="w-full lg:w-8/12 space-y-6">
+              {/* Video Embed */}
               <div className="w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg min-h-[420px]">
                 <YouTubeEmbed
                   videoId={selectedDemo.video_id}
@@ -102,20 +102,17 @@ const VideoPlayerPage = ({
                 />
               </div>
 
+              {/* Titel, Views, Like, Menu */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="space-y-2">
-                  <h1 className="text-2xl font-bold text-white">
-                    {selectedDemo.title}
-                  </h1>
+                  <h1 className="text-2xl font-bold text-white">{selectedDemo.title}</h1>
                   <div className="flex flex-wrap items-center space-x-6 text-gray-400 text-sm">
                     <div className="flex items-center">
                       <Eye className="h-5 w-5 mr-1" />
-                      <span>{selectedDemo.views?.toLocaleString()} views</span>
+                      <span>{selectedDemo.views.toLocaleString()} views</span>
                     </div>
                     <div>{selectedDemo.year}</div>
-                    {selectedDemo.event && (
-                      <div className="text-yellow-400">{selectedDemo.event}</div>
-                    )}
+                    {selectedDemo.event && <div className="text-yellow-400">{selectedDemo.event}</div>}
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -139,58 +136,40 @@ const VideoPlayerPage = ({
                     {menuOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10">
                         <button
-                          onClick={() => {
-                            onOpenTagModal();
-                            setMenuOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                          onClick={() => { onOpenTagModal(); setMenuOpen(false); }}
+                          className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-200 hover:bg-gray-700"
                         >
-                          <Tag className="h-4 w-4 text-yellow-400" />
-                          <span>Add Tag</span>
+                          <Tag className="h-4 w-4 text-yellow-400" /> <span>Add Tag</span>
                         </button>
                         <button
                           onClick={() => setMenuOpen(false)}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                          className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-200 hover:bg-gray-700"
                         >
-                          <Bookmark className="h-4 w-4 text-yellow-400" />
-                          <span>Save</span>
+                          <Bookmark className="h-4 w-4 text-yellow-400" /> <span>Save</span>
                         </button>
                         <button
                           onClick={() => setMenuOpen(false)}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                          className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-200 hover:bg-gray-700"
                         >
-                          <Flag className="h-4 w-4 text-red-500" />
-                          <span>Report</span>
+                          <Flag className="h-4 w-4 text-red-500" /> <span>Report</span>
                         </button>
                         <button
-                          onClick={() => {
-                            window.open(selectedDemo.video_url);
-                            setMenuOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                          onClick={() => { window.open(selectedDemo.video_url); setMenuOpen(false); }}
+                          className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-200 hover:bg-gray-700"
                         >
-                          <Download className="h-4 w-4 text-yellow-400" />
-                          <span>Download Video</span>
+                          <Download className="h-4 w-4 text-yellow-400" /> <span>Download Video</span>
                         </button>
                         <button
-                          onClick={() => {
-                            window.open(selectedDemo.dem_url);
-                            setMenuOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                          onClick={() => { window.open(selectedDemo.dem_url); setMenuOpen(false); }}
+                          className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-200 hover:bg-gray-700"
                         >
-                          <FileText className="h-4 w-4 text-yellow-400" />
-                          <span>Download Demo</span>
+                          <FileText className="h-4 w-4 text-yellow-400" /> <span>Download Demo</span>
                         </button>
                         <button
-                          onClick={() => {
-                            window.open(selectedDemo.matchroom_url, "_blank");
-                            setMenuOpen(false);
-                          }}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
+                          onClick={() => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}
+                          className="w-full text-left px-4 py-2 flex items-center space-x-2 text-gray-200 hover:bg-gray-700"
                         >
-                          <ExternalLink className="h-4 w-4 text-yellow-400" />
-                          <span>Open Matchroom</span>
+                          <ExternalLink className="h-4 w-4 text-yellow-400" /> <span>Open Matchroom</span>
                         </button>
                       </div>
                     )}
@@ -198,109 +177,23 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* Matchroom Input */}
-              {!matchroomSubmitted && (
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-yellow-400/20 border border-yellow-400/30 text-gray-100 p-4 rounded-md">
-                  <div className="flex-shrink-0">
-                    <Shield className="h-6 w-6 text-yellow-400" />
-                  </div>
-                  <div className="flex-grow text-sm">
-                    Help us complete the matchroom! Add the link here.
-                  </div>
-                  <input
-                    type="text"
-                    value={matchroomUrl}
-                    onChange={(e) => setMatchroomUrl(e.target.value)}
-                    placeholder="Paste matchroom URL..."
-                    className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
-                  />
-                  <button
-                    onClick={() => {
-                      console.log("Submitted URL:", matchroomUrl);
-                      setMatchroomSubmitted(true);
-                    }}
-                    className="flex-shrink-0 w-full sm:w-auto bg-yellow-400 text-gray-900 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-yellow-300 transition-colors"
-                  >
-                    Submit
-                  </button>
-                </div>
-              )}
-              {matchroomSubmitted && (
-                <div className="bg-gray-700 text-gray-300 px-4 py-3 rounded-md text-sm flex items-center gap-3">
-                  <Shield className="h-5 w-5 text-green-400" />
-                  <span>Thank you! Your link is being reviewed and will be added shortly.</span>
-                </div>
-              )}
-
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h2 className="border-l-4 border-yellow-400 pl-2 mb-4 text-xl font-semibold text-white">
-                  Description
-                </h2>
-                {selectedDemo.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedDemo.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="flex items-center px-3 py-1 bg-gray-700 rounded-full text-sm text-gray-200 hover:bg-yellow-400/20 transition-colors"
-                      >
-                        <Tag className="h-4 w-4 mr-1 text-yellow-400" />
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <p className={`${showFullDescription ? "" : "line-clamp-4"} text-gray-300 text-lg leading-relaxed`}>
-                  {description}
-                </p>
-                {description.length > 240 && !showFullDescription && (
-                  <button
-                    onClick={() => setShowFullDescription(true)}
-                    className="mt-3 flex items-center text-yellow-400 hover:text-yellow-300 text-sm transition-colors"
-                  >
-                    Read more <ChevronDown className="ml-1 h-4 w-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Players List */}
-              <div className="overflow-x-auto py-4">
-                <div className="flex space-x-4">
-                  {selectedDemo.players.map((player, idx) => (
-                    <Link
-                      key={idx}
-                      href={`/players/${player.replace(/\s+/g, "-").toLowerCase()}`}
-                    >
-                      <a className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors">
-                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
-                          {player.charAt(0)}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-white font-medium">{player}</span>
-                          {selectedDemo.team && <span className="text-gray-400 text-sm">{selectedDemo.team}</span>}
-                        </div>
-                      </a>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Timeline-Komponente */}
+              {/* MatchTimeline mit echten Daten */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold text-white">Match Timeline</h2>
-                <MatchTimeline rounds={demoMatchData.rounds} />
+                <MatchTimeline rounds={selectedDemo.rounds || demoMatchData.rounds} />
               </div>
             </div>
 
-            {/* Related POVs */}
+            {/* Sidebar Related POVs */}
             <div className="w-full lg:w-4/12 space-y-6">
               <h2 className="text-xl font-semibold text-white">Related POVs</h2>
               <div className="space-y-4">
-                {relatedDemos.length ? (
+                {relatedDemos.length > 0 ? (
                   relatedDemos.map((d) => (
                     <div
                       key={d.id}
                       onClick={() => onSelectRelatedDemo(d.id)}
-                      className="flex gap-4 cursor-pointer items-center hover:bg-gray-800 transition-colors p-2 rounded-md"
+                      className="flex gap-4 cursor-pointer items-center p-2 rounded-md hover:bg-gray-800 transition-colors"
                     >
                       <div className="w-28 h-20 relative overflow-hidden rounded-lg group flex-shrink-0">
                         <img
@@ -322,8 +215,7 @@ const VideoPlayerPage = ({
                           <span className="mx-1">•</span>
                           <span>{d.map}</span>
                           <div className="ml-auto flex items-center text-yellow-400">
-                            <ThumbsUp className="h-3 w-3 mr-1" />
-                            <span>{d.likes}</span>
+                            <ThumbsUp className="h-3 w-3 mr-1" /> <span>{d.likes}</span>
                           </div>
                         </div>
                       </div>
