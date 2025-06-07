@@ -20,7 +20,7 @@ import YouTubeEmbed from "./YouTubeEmbed";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 // Korrigierter Import-Pfad: Anpassen je nach Ordnerstruktur
-import MatchTimeline, { demoMatchData } from "../components/POVlib/MatchTimeline"; "../components/POVlib/MatchTimeline";
+import MatchTimeline, { demoMatchData } from "./MatchTimeline"; 
 
 const VideoPlayerPage = ({
   selectedDemo,
