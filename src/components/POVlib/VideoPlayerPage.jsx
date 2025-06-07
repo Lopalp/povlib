@@ -20,27 +20,7 @@ import {
 import YouTubeEmbed from "./YouTubeEmbed";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-
-const demoMatchData = {
-  rounds: [
-    {
-      roundNumber: 1,
-      events: [
-        { type: "utility", time: 10, player: "PlayerA" },
-        { type: "kill", time: 45, player: "PlayerB" },
-        { type: "death", time: 46, player: "PlayerA" },
-      ],
-    },
-    {
-      roundNumber: 2,
-      events: [
-        { type: "utility", time: 5, player: "PlayerC" },
-        { type: "kill", time: 30, player: "PlayerA" },
-        { type: "death", time: 30, player: "PlayerB" },
-      ],
-    },
-  ],
-};
+import MatchTimeline, { demoMatchData } from "Components/POVlib/MatchTimeline";
 
 const VideoPlayerPage = ({
   selectedDemo,
@@ -59,7 +39,6 @@ const VideoPlayerPage = ({
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
-  // NEU: State für das Input-Feld
   const [matchroomUrl, setMatchroomUrl] = useState("");
 
   if (!selectedDemo) return null;
@@ -94,7 +73,6 @@ const VideoPlayerPage = ({
         isMenuOpen={isMenuOpen}
       />
 
-      {/* KORREKTUR: Padding-Top (pt) von 16 auf 24 erhöht für mehr Abstand */}
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-8 flex-wrap">
@@ -132,9 +110,7 @@ const VideoPlayerPage = ({
                   <div className="flex flex-wrap items-center space-x-6 text-gray-400 text-sm">
                     <div className="flex items-center">
                       <Eye className="h-5 w-5 mr-1" />
-                      <span>
-                        {selectedDemo.views?.toLocaleString()} views
-                      </span>
+                      <span>{selectedDemo.views?.toLocaleString()} views</span>
                     </div>
                     <div>{selectedDemo.year}</div>
                     {selectedDemo.event && (
@@ -222,25 +198,24 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* KORREKTUR: Matchroom Alert mit Input-Feld */}
+              {/* Matchroom Input */}
               {!matchroomSubmitted && (
                 <div className="flex flex-col sm:flex-row items-center gap-4 bg-yellow-400/20 border border-yellow-400/30 text-gray-100 p-4 rounded-md">
-                   <div className="flex-shrink-0">
-                      <Shield className="h-6 w-6 text-yellow-400" />
-                   </div>
-                   <div className="flex-grow text-sm">
-                      Help us complete the matchroom! Add the link here.
-                   </div>
-                   <input
-                     type="text"
-                     value={matchroomUrl}
-                     onChange={(e) => setMatchroomUrl(e.target.value)}
-                     placeholder="Paste matchroom URL..."
-                     className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
-                   />
+                  <div className="flex-shrink-0">
+                    <Shield className="h-6 w-6 text-yellow-400" />
+                  </div>
+                  <div className="flex-grow text-sm">
+                    Help us complete the matchroom! Add the link here.
+                  </div>
+                  <input
+                    type="text"
+                    value={matchroomUrl}
+                    onChange={(e) => setMatchroomUrl(e.target.value)}
+                    placeholder="Paste matchroom URL..."
+                    className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
+                  />
                   <button
                     onClick={() => {
-                      // Hier könnte man die URL verarbeiten, z.B. an eine API senden
                       console.log("Submitted URL:", matchroomUrl);
                       setMatchroomSubmitted(true);
                     }}
@@ -274,11 +249,7 @@ const VideoPlayerPage = ({
                     ))}
                   </div>
                 )}
-                <p
-                  className={`${
-                    showFullDescription ? "" : "line-clamp-4"
-                  } text-gray-300 text-lg leading-relaxed`}
-                >
+                <p className={`${showFullDescription ? "" : "line-clamp-4"} text-gray-300 text-lg leading-relaxed`}>
                   {description}
                 </p>
                 {description.length > 240 && !showFullDescription && (
@@ -291,28 +262,21 @@ const VideoPlayerPage = ({
                 )}
               </div>
 
+              {/* Players List */}
               <div className="overflow-x-auto py-4">
                 <div className="flex space-x-4">
                   {selectedDemo.players.map((player, idx) => (
                     <Link
                       key={idx}
-                      href={`/players/${player
-                        .replace(/\s+/g, "-")
-                        .toLowerCase()}`}
+                      href={`/players/${player.replace(/\s+/g, "-").toLowerCase()}`}
                     >
                       <a className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors">
                         <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
                           {player.charAt(0)}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-white font-medium">
-                            {player}
-                          </span>
-                          {selectedDemo.team && (
-                            <span className="text-gray-400 text-sm">
-                              {selectedDemo.team}
-                            </span>
-                          )}
+                          <span className="text-white font-medium">{player}</span>
+                          {selectedDemo.team && <span className="text-gray-400 text-sm">{selectedDemo.team}</span>}
                         </div>
                       </a>
                     </Link>
@@ -320,33 +284,14 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
+              {/* Timeline-Komponente */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">
-                  Match Timeline
-                </h2>
-                {demoMatchData.rounds.map((round) => (
-                  <div key={round.roundNumber}>
-                    <div className="mb-2 text-gray-300 text-sm">
-                      Round {round.roundNumber}
-                    </div>
-                    <div className="relative h-3 bg-gray-700 rounded">
-                      {round.events.map((event, idx) => {
-                        const percent = Math.min((event.time / 60) * 100, 100);
-                        return (
-                          <div
-                            key={idx}
-                            className="absolute -top-1 w-2 h-2 bg-yellow-400 rounded-full border-2 border-gray-900"
-                            style={{ left: `${percent}%` }}
-                            title={`${event.type} – ${event.player} (${event.time}s)`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                <h2 className="text-xl font-semibold text-white">Match Timeline</h2>
+                <MatchTimeline rounds={demoMatchData.rounds} />
               </div>
             </div>
 
+            {/* Related POVs */}
             <div className="w-full lg:w-4/12 space-y-6">
               <h2 className="text-xl font-semibold text-white">Related POVs</h2>
               <div className="space-y-4">
@@ -365,20 +310,13 @@ const VideoPlayerPage = ({
                         />
                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                           <div className="rounded-full bg-yellow-400/80 p-2">
-                            <Play
-                              className="h-4 w-4 text-gray-900"
-                              fill="currentColor"
-                            />
+                            <Play className="h-4 w-4 text-gray-900" fill="currentColor" />
                           </div>
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-medium text-sm line-clamp-2">
-                          {d.title}
-                        </h3>
-                        <p className="text-gray-400 text-xs mt-1">
-                          {d.players.join(", ")}
-                        </p>
+                        <h3 className="text-white font-medium text-sm line-clamp-2">{d.title}</h3>
+                        <p className="text-gray-400 text-xs mt-1">{d.players.join(", ")}.</p>
                         <div className="flex items-center text-gray-500 text-xs mt-2">
                           <span>{d.views.toLocaleString()} views</span>
                           <span className="mx-1">•</span>
@@ -392,9 +330,7 @@ const VideoPlayerPage = ({
                     </div>
                   ))
                 ) : (
-                  <div className="text-gray-400 text-center py-8">
-                    No related videos available
-                  </div>
+                  <div className="text-gray-400 text-center py-8">No related videos available</div>
                 )}
               </div>
             </div>

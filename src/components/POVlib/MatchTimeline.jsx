@@ -99,7 +99,7 @@ export default function MatchTimeline({ matchData }) {
               <div className="flex-1 flex space-x-2">
                 {playerEvents.length === 0 ? (
                   <span className="text-gray-500 italic">No events</span>
-                ) : (
+                ) : ( 
                   playerEvents.map((evt, i) => {
                     let IconComponent = null;
                     let color = '';
