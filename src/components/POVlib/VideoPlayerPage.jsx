@@ -20,7 +20,7 @@ import {
 import YouTubeEmbed from "./YouTubeEmbed";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import MatchTimeline, { demoMatchData } from "Components/POVlib/MatchTimeline";
+import MatchTimeline, { demoMatchData } from "./MatchTimeline";
 
 const VideoPlayerPage = ({
   selectedDemo,
