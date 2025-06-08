@@ -1,11 +1,12 @@
 // components/POVlib/PlanComparisonModule.jsx
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
-import { ArrowRight, X } from 'lucide-react';
-import ComparePlansModal from './ComparePlansModal';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import React, { useMemo, useState } from "react";
+import { ArrowRight, X } from "lucide-react";
+import ComparePlansModal from "./ComparePlansModal";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { SecondaryButton } from "../buttons";
 
 const PlanComparisonModule = ({ currentPlan }) => {
   const router = useRouter();
@@ -15,60 +16,60 @@ const PlanComparisonModule = ({ currentPlan }) => {
   const allPlans = useMemo(
     () => [
       {
-        key: 'free',
-        name: 'Free',
-        priceLabel: 'Free',
+        key: "free",
+        name: "Free",
+        priceLabel: "Free",
         features: [
-          '2 Halftime demos per week',
-          'Access to the full demo library',
-          'Risk-free entry into POVLib',
-          'Community support',
+          "2 Halftime demos per week",
+          "Access to the full demo library",
+          "Risk-free entry into POVLib",
+          "Community support",
         ],
-        highlight: 'Start for free und erkunde alle Grundlagen.',
+        highlight: "Start for free und erkunde alle Grundlagen.",
       },
       {
-        key: 'basic',
-        name: 'Basic',
-        priceLabel: '$6.99/mo',
+        key: "basic",
+        name: "Basic",
+        priceLabel: "$6.99/mo",
         features: [
-          '10 Full-Demos pro Monat',
-          'Bis zu 1080p @ 30fps',
-          'Zugriff auf das Pro Utility Book',
-          'Standard-Verarbeitungs-Queue',
+          "10 Full-Demos pro Monat",
+          "Bis zu 1080p @ 30fps",
+          "Zugriff auf das Pro Utility Book",
+          "Standard-Verarbeitungs-Queue",
         ],
-        highlight: 'Beliebter Einstiegspack.',
+        highlight: "Beliebter Einstiegspack.",
       },
       {
-        key: 'advanced',
-        name: 'Advanced',
-        priceLabel: '$12.99/mo',
+        key: "advanced",
+        name: "Advanced",
+        priceLabel: "$12.99/mo",
         features: [
-          'Highlight-Clips erstellen',
-          'Bis zu 30 Demos pro Monat',
-          'Baue dein eigenes Utility Book',
-          '2D-Views & mehrere POVs',
-          'Custom-Quizzes beim Anschauen der Demos',
-          'Demos für jeden Spieler generieren',
-          'Eigene Tastenanschläge in Spielen sehen',
+          "Highlight-Clips erstellen",
+          "Bis zu 30 Demos pro Monat",
+          "Baue dein eigenes Utility Book",
+          "2D-Views & mehrere POVs",
+          "Custom-Quizzes beim Anschauen der Demos",
+          "Demos für jeden Spieler generieren",
+          "Eigene Tastenanschläge in Spielen sehen",
         ],
-        highlight: 'Alles, um auf das nächste Level zu kommen.',
+        highlight: "Alles, um auf das nächste Level zu kommen.",
       },
       {
-        key: 'pro',
-        name: 'Pro',
-        priceLabel: '$25.99/mo',
+        key: "pro",
+        name: "Pro",
+        priceLabel: "$25.99/mo",
         features: [
-          'Bis zu 4K Demo-Exporte',
-          'Individualisierte Death-Screens',
-          'Früher Zugriff auf neue Features',
-          'Dedizierter Support',
-          'Professionelle Analytics-Video-Ansicht',
-          'Anpassbare Videos',
-          'Mehrere Spiele verbinden',
-          'Bestimmte Runden auswählen',
-          'Schnellste Generierungszeiten',
+          "Bis zu 4K Demo-Exporte",
+          "Individualisierte Death-Screens",
+          "Früher Zugriff auf neue Features",
+          "Dedizierter Support",
+          "Professionelle Analytics-Video-Ansicht",
+          "Anpassbare Videos",
+          "Mehrere Spiele verbinden",
+          "Bestimmte Runden auswählen",
+          "Schnellste Generierungszeiten",
         ],
-        highlight: 'Für ernste Spieler und Teams.',
+        highlight: "Für ernste Spieler und Teams.",
       },
     ],
     []
@@ -78,7 +79,8 @@ const PlanComparisonModule = ({ currentPlan }) => {
   const { currentPlanData, nextPlanData } = useMemo(() => {
     const idx = allPlans.findIndex((p) => p.key === currentPlan);
     const current = idx >= 0 ? allPlans[idx] : null;
-    const next = idx >= 0 && idx < allPlans.length - 1 ? allPlans[idx + 1] : null;
+    const next =
+      idx >= 0 && idx < allPlans.length - 1 ? allPlans[idx + 1] : null;
     return { currentPlanData: current, nextPlanData: next };
   }, [currentPlan, allPlans]);
 
@@ -98,10 +100,14 @@ const PlanComparisonModule = ({ currentPlan }) => {
       <>
         <div className="bg-gray-900 rounded-2xl p-8 shadow-lg text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            You’re on the highest plan!
+            You're on the highest plan!
           </h2>
           <p className="text-sm text-gray-300 mb-6">
-            Du hast bereits den <span className="font-semibold text-yellow-400">{currentPlanData.name}</span>-Plan, der alle Features enthält.
+            Du hast bereits den{" "}
+            <span className="font-semibold text-yellow-400">
+              {currentPlanData.name}
+            </span>
+            -Plan, der alle Features enthält.
           </p>
           <button
             onClick={() => router.push(`/checkout?plan=${currentPlanData.key}`)}
@@ -172,12 +178,12 @@ const PlanComparisonModule = ({ currentPlan }) => {
                 </li>
               ))}
             </ul>
-            <button
+            <SecondaryButton
               disabled
-              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2 rounded-md bg-gray-700 text-gray-500 cursor-not-allowed"
+              className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2"
             >
               <span className="text-sm">Current Plan</span>
-            </button>
+            </SecondaryButton>
           </div>
 
           {/* Nächster Plan */}

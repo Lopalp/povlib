@@ -1,5 +1,15 @@
-import React from 'react';
-import { X, Map as MapIcon, Users, Calendar, Trophy, Zap, ShieldCheck, Sliders } from 'lucide-react';
+import React from "react";
+import {
+  X,
+  Map as MapIcon,
+  Users,
+  Calendar,
+  Trophy,
+  Zap,
+  ShieldCheck,
+  Sliders,
+} from "lucide-react";
+import { PrimaryButton } from "../buttons";
 
 const FilterModal = ({
   demoType,
@@ -8,7 +18,7 @@ const FilterModal = ({
   onClose,
   onFilterChange,
   onResetFilters,
-  onApplyFilters
+  onApplyFilters,
 }) => {
   // Helper to toggle items in array filters (e.g., roles, platforms)
   const toggleArrayFilter = (key, value) => {
@@ -43,21 +53,21 @@ const FilterModal = ({
             <div className="flex border-b border-gray-700 mb-4">
               <button
                 className={`px-6 py-3 text-sm font-bold ${
-                  demoType === 'pro'
-                    ? 'text-yellow-400 border-b-2 border-yellow-400'
-                    : 'text-gray-400 hover:text-white'
+                  demoType === "pro"
+                    ? "text-yellow-400 border-b-2 border-yellow-400"
+                    : "text-gray-400 hover:text-white"
                 }`}
-                onClick={() => onFilterChange({ demoType: 'pro' })}
+                onClick={() => onFilterChange({ demoType: "pro" })}
               >
                 PRO POVs
               </button>
               <button
                 className={`px-6 py-3 text-sm font-bold ${
-                  demoType === 'community'
-                    ? 'text-yellow-400 border-b-2 border-yellow-400'
-                    : 'text-gray-400 hover:text-white'
+                  demoType === "community"
+                    ? "text-yellow-400 border-b-2 border-yellow-400"
+                    : "text-gray-400 hover:text-white"
                 }`}
-                onClick={() => onFilterChange({ demoType: 'community' })}
+                onClick={() => onFilterChange({ demoType: "community" })}
               >
                 COMMUNITY POVs
               </button>
@@ -73,7 +83,9 @@ const FilterModal = ({
                 <select
                   className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                   value={filtersApplied.map}
-                  onChange={(e) => onFilterChange({ map: e.target.value, position: '' })}
+                  onChange={(e) =>
+                    onFilterChange({ map: e.target.value, position: "" })
+                  }
                 >
                   <option value="">All Maps</option>
                   {filterOptions.maps.map((map) => (
@@ -97,11 +109,13 @@ const FilterModal = ({
                 >
                   <option value="">All Positions</option>
                   {filtersApplied.map
-                    ? (filterOptions.positions[filtersApplied.map] || []).map((pos) => (
-                        <option key={pos} value={pos}>
-                          {pos}
-                        </option>
-                      ))
+                    ? (filterOptions.positions[filtersApplied.map] || []).map(
+                        (pos) => (
+                          <option key={pos} value={pos}>
+                            {pos}
+                          </option>
+                        )
+                      )
                     : Object.values(filterOptions.positions)
                         .flat()
                         .filter((pos, i, arr) => arr.indexOf(pos) === i)
@@ -129,7 +143,7 @@ const FilterModal = ({
                 />
               </div>
 
-              {demoType === 'pro' && (
+              {demoType === "pro" && (
                 <div>
                   <label className="flex items-center text-sm font-medium text-gray-300 mb-2">
                     <Users className="h-4 w-4 mr-2 text-yellow-400" />
@@ -163,7 +177,7 @@ const FilterModal = ({
                 />
               </div>
 
-              {demoType === 'pro' && (
+              {demoType === "pro" && (
                 <>
                   <div>
                     <label className="flex items-center text-sm font-medium text-gray-300 mb-2">
@@ -173,7 +187,9 @@ const FilterModal = ({
                     <input
                       className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                       value={filtersApplied.event}
-                      onChange={(e) => onFilterChange({ event: e.target.value })}
+                      onChange={(e) =>
+                        onFilterChange({ event: e.target.value })
+                      }
                       placeholder="Search Event"
                     />
                   </div>
@@ -186,7 +202,9 @@ const FilterModal = ({
                     <select
                       className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 outline-none"
                       value={filtersApplied.platform}
-                      onChange={(e) => onFilterChange({ platform: e.target.value })}
+                      onChange={(e) =>
+                        onFilterChange({ platform: e.target.value })
+                      }
                     >
                       <option value="">All Platforms</option>
                       <option value="Faceit">Faceit</option>
@@ -213,10 +231,14 @@ const FilterModal = ({
                       max="5000"
                       step="50"
                       value={filtersApplied.eloMin || 0}
-                      onChange={(e) => onFilterChange({ eloMin: Number(e.target.value) })}
+                      onChange={(e) =>
+                        onFilterChange({ eloMin: Number(e.target.value) })
+                      }
                       className="w-full"
                     />
-                    <div className="text-xs text-gray-300 mt-1">Min: {filtersApplied.eloMin || 0}</div>
+                    <div className="text-xs text-gray-300 mt-1">
+                      Min: {filtersApplied.eloMin || 0}
+                    </div>
                   </div>
                   <div className="flex-1">
                     <input
@@ -225,10 +247,14 @@ const FilterModal = ({
                       max="5000"
                       step="50"
                       value={filtersApplied.eloMax || 5000}
-                      onChange={(e) => onFilterChange({ eloMax: Number(e.target.value) })}
+                      onChange={(e) =>
+                        onFilterChange({ eloMax: Number(e.target.value) })
+                      }
                       className="w-full"
                     />
-                    <div className="text-xs text-gray-300 mt-1">Max: {filtersApplied.eloMax || 5000}</div>
+                    <div className="text-xs text-gray-300 mt-1">
+                      Max: {filtersApplied.eloMax || 5000}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -240,12 +266,21 @@ const FilterModal = ({
                   Role
                 </label>
                 <div className="flex flex-wrap gap-3">
-                  {(filterOptions.roles || ['IGL', 'Support', 'Entry', 'Lurk', 'AWP', 'Rifle']).map((role) => (
+                  {(
+                    filterOptions.roles || [
+                      "IGL",
+                      "Support",
+                      "Entry",
+                      "Lurk",
+                      "AWP",
+                      "Rifle",
+                    ]
+                  ).map((role) => (
                     <label key={role} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={(filtersApplied.roles || []).includes(role)}
-                        onChange={() => toggleArrayFilter('roles', role)}
+                        onChange={() => toggleArrayFilter("roles", role)}
                         className="h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded focus:ring-yellow-400"
                       />
                       <span className="text-sm text-gray-300">{role}</span>
@@ -264,17 +299,21 @@ const FilterModal = ({
                   <input
                     type="checkbox"
                     checked={filtersApplied.povlib || false}
-                    onChange={(e) => onFilterChange({ povlib: e.target.checked })}
+                    onChange={(e) =>
+                      onFilterChange({ povlib: e.target.checked })
+                    }
                     className="sr-only"
                   />
                   <div className="w-10 h-5 bg-gray-600 rounded-full relative transition-colors duration-200 ease-in-out">
                     <span
                       className={`absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transform transition-transform duration-200 ease-in-out ${
-                        filtersApplied.povlib ? 'translate-x-5' : ''
+                        filtersApplied.povlib ? "translate-x-5" : ""
                       }`}
                     />
                   </div>
-                  <span className="ml-3 text-sm text-gray-300">{filtersApplied.povlib ? 'Yes' : 'No'}</span>
+                  <span className="ml-3 text-sm text-gray-300">
+                    {filtersApplied.povlib ? "Yes" : "No"}
+                  </span>
                 </label>
               </div>
 
@@ -286,17 +325,21 @@ const FilterModal = ({
                 </label>
                 <div className="flex flex-wrap gap-3">
                   {[
-                    'Faceit Top 1000',
-                    'Faceit Pro League',
-                    'ESEA',
-                    'Pro Esport',
-                    'Pros Playing Faceit'
+                    "Faceit Top 1000",
+                    "Faceit Pro League",
+                    "ESEA",
+                    "Pro Esport",
+                    "Pros Playing Faceit",
                   ].map((plat) => (
                     <label key={plat} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={(filtersApplied.extraPlatforms || []).includes(plat)}
-                        onChange={() => toggleArrayFilter('extraPlatforms', plat)}
+                        checked={(filtersApplied.extraPlatforms || []).includes(
+                          plat
+                        )}
+                        onChange={() =>
+                          toggleArrayFilter("extraPlatforms", plat)
+                        }
                         className="h-4 w-4 text-yellow-400 bg-gray-700 border-gray-600 rounded focus:ring-yellow-400"
                       />
                       <span className="text-sm text-gray-300">{plat}</span>
@@ -316,12 +359,12 @@ const FilterModal = ({
                 Reset Filters
               </button>
 
-              <button
+              <PrimaryButton
                 onClick={onApplyFilters}
-                className="px-6 py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all shadow-[0_0_15px_rgba(250,204,21,0.3)]"
+                className="px-6 py-3 shadow-[0_0_15px_rgba(250,204,21,0.3)]"
               >
                 Apply Filters
-              </button>
+              </PrimaryButton>
             </div>
           </div>
         </div>

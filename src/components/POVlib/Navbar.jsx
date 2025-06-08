@@ -14,9 +14,10 @@ import {
   LogIn,
 } from "lucide-react";
 import { UserContext } from "../../../context/UserContext";
-import LogoHeading from "@/components/typography/LogoHeading";
+import LogoHeading from "../typography/LogoHeading";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { IconButton } from "../buttons";
 
 const mapNamesDesktop = [
   { label: "Mirage", slug: "mirage" },
@@ -103,9 +104,11 @@ export default function Navbar({
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <LogoHeading size={2} />
-          </Link>
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center">
+              <LogoHeading size={1.5} />
+            </Link>
+          </div>
 
           {/* Desktop-Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
@@ -168,12 +171,12 @@ export default function Navbar({
 
           <div className="flex items-center space-x-4">
             {/* Such-Icon */}
-            <button
+            <IconButton
               onClick={toggleSearch}
-              className="p-2 text-gray-300 hover:text-yellow-400 cursor-pointer"
+              className="text-gray-300 hover:text-yellow-400"
             >
               <Search className="h-5 w-5" />
-            </button>
+            </IconButton>
             {searchActive && (
               <form
                 onSubmit={handleSearchSubmit}
@@ -187,17 +190,20 @@ export default function Navbar({
                   className="flex-grow px-4 py-2 bg-transparent placeholder-gray-400 text-white focus:outline-none"
                 />
                 {searchQuery && (
-                  <button
+                  <IconButton
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="px-3"
+                    className="px-3 text-gray-300 hover:text-white"
                   >
-                    <X className="h-5 w-5 text-gray-300 hover:text-white" />
-                  </button>
+                    <X className="h-5 w-5" />
+                  </IconButton>
                 )}
-                <button type="submit" className="px-3">
-                  <Search className="h-5 w-5 text-gray-300 hover:text-white" />
-                </button>
+                <IconButton
+                  type="submit"
+                  className="px-3 text-gray-300 hover:text-white"
+                >
+                  <Search className="h-5 w-5" />
+                </IconButton>
               </form>
             )}
 

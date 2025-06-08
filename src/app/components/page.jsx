@@ -5,12 +5,24 @@ import mockData from "../../components/mockComponentData.json";
 
 // Typography
 import LogoHeading from "../../components/typography/LogoHeading";
+import HeroHeading from "../../components/typography/HeroHeading";
+import ModalHeading from "../../components/typography/ModalHeading";
+import SectionHeading from "../../components/typography/SectionHeading";
+import SettingsHeading from "../../components/typography/SettingsHeading";
 
 // Buttons
 import BackButton from "../../components/buttons/BackButton";
 import ImageButton from "../../components/buttons/ImageButton";
 import DiscordSignInButton from "../../components/auth/DiscordSignInButton";
 import GoogleSignInButton from "../../components/auth/GoogleSignInButton";
+import {
+  PrimaryButton,
+  SecondaryButton,
+  TertiaryButton,
+  IconButton,
+  NavigationButton,
+  ToggleButton,
+} from "../../components/buttons";
 
 // Cards/Sections
 import CategorySection from "../../components/containers/CategorySection";
@@ -167,9 +179,7 @@ export default function ComponentsPlayground() {
           <div className="space-y-8">
             {/* 3. Hero Page Headings */}
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-2 text-white">
-                Hero Page Headings
-              </h1>
+              <HeroHeading>Hero Page Headings</HeroHeading>
               <div className="component-lib-mono text-xs text-gray-400 mb-3">
                 MapsIndex, PlayersIndex, PlayerPage, etc.
               </div>
@@ -177,9 +187,7 @@ export default function ComponentsPlayground() {
 
             {/* 4. Modal/Panel Headings */}
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                Modal/Panel Headings
-              </h2>
+              <ModalHeading>Modal/Panel Headings</ModalHeading>
               <div className="component-lib-mono text-xs text-gray-400 mb-3">
                 Modals, PlanComparisonModule, etc.
               </div>
@@ -187,11 +195,7 @@ export default function ComponentsPlayground() {
 
             {/* 2. Section Title with Yellow Border */}
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                  Section Title with Yellow Border
-                </span>
-              </h2>
+              <SectionHeading>Section Title with Yellow Border</SectionHeading>
               <div className="component-lib-mono text-xs text-gray-400 mb-3">
                 CategorySection, etc.
               </div>
@@ -199,9 +203,7 @@ export default function ComponentsPlayground() {
 
             {/* 5. Settings/Tab Headings */}
             <div>
-              <h2 className="text-xl font-bold text-white mb-2">
-                Settings/Tab Headings
-              </h2>
+              <SettingsHeading>Settings/Tab Headings</SettingsHeading>
               <div className="component-lib-mono text-xs text-gray-400 mb-3">
                 User page settings tab, etc.
               </div>
@@ -300,12 +302,12 @@ export default function ComponentsPlayground() {
               </h3>
               <div className="flex gap-4 flex-wrap">
                 <BackButton text="Back" />
-                <button className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors">
+                <NavigationButton>
                   <span>Previous</span>
-                </button>
-                <button className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors">
+                </NavigationButton>
+                <NavigationButton>
                   <span>Next</span>
-                </button>
+                </NavigationButton>
               </div>
             </div>
 
@@ -326,15 +328,9 @@ export default function ComponentsPlayground() {
                 Action Buttons
               </h3>
               <div className="flex gap-4 flex-wrap">
-                <button className="px-4 py-2 bg-yellow-400 text-black rounded font-semibold hover:bg-yellow-300 transition component-lib-mono">
-                  Primary Action
-                </button>
-                <button className="px-4 py-2 bg-gray-700 text-white rounded font-semibold hover:bg-gray-600 transition component-lib-mono">
-                  Secondary Action
-                </button>
-                <button className="px-4 py-2 border border-gray-600 text-white rounded hover:border-yellow-400 transition component-lib-mono">
-                  Tertiary Action
-                </button>
+                <PrimaryButton>Primary Action</PrimaryButton>
+                <SecondaryButton>Secondary Action</SecondaryButton>
+                <TertiaryButton>Tertiary Action</TertiaryButton>
               </div>
             </div>
 
@@ -350,7 +346,7 @@ export default function ComponentsPlayground() {
                   altText="Demo"
                   onClick={noop}
                 />
-                <button className="p-2 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
+                <IconButton>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
@@ -366,8 +362,8 @@ export default function ComponentsPlayground() {
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
-                </button>
-                <button className="p-2 rounded-full hover:bg-gray-700 text-gray-400 hover:text-white transition-colors">
+                </IconButton>
+                <IconButton>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
@@ -384,7 +380,7 @@ export default function ComponentsPlayground() {
                     <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
                     <path d="M6 9v12a2 2 0 0 0 2 2h7"></path>
                   </svg>
-                </button>
+                </IconButton>
               </div>
             </div>
 
@@ -394,12 +390,8 @@ export default function ComponentsPlayground() {
                 Toggle Buttons
               </h3>
               <div className="flex gap-4 flex-wrap">
-                <button className="px-6 py-3 text-sm font-bold text-yellow-400 border-b-2 border-yellow-400">
-                  Active Tab
-                </button>
-                <button className="px-6 py-3 text-sm font-bold text-gray-400 hover:text-white">
-                  Inactive Tab
-                </button>
+                <ToggleButton active>Active Tab</ToggleButton>
+                <ToggleButton>Inactive Tab</ToggleButton>
               </div>
             </div>
 
@@ -409,12 +401,8 @@ export default function ComponentsPlayground() {
                 Form Buttons
               </h3>
               <div className="flex gap-4 flex-wrap">
-                <button className="px-4 py-2 bg-yellow-500 text-black rounded-md font-semibold hover:bg-yellow-600 transition">
-                  Submit
-                </button>
-                <button className="px-4 py-2 bg-gray-700 text-gray-500 rounded-md font-semibold cursor-not-allowed">
-                  Disabled
-                </button>
+                <PrimaryButton>Submit</PrimaryButton>
+                <SecondaryButton disabled>Disabled</SecondaryButton>
               </div>
             </div>
           </div>

@@ -12,6 +12,7 @@ import UtilityBook from "../../components/POVlib/UtilityBook";
 import { getFilteredDemos } from "@/lib/supabase";
 import { UserContext } from "../../../context/UserContext";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
+import { PrimaryButton } from "../../components/buttons";
 
 const mapDemo = (demo) => ({
   id: demo.id,
@@ -226,12 +227,12 @@ export default function UserPage() {
                     {user.plan}
                   </span>
                   {user.plan !== "Pro" && (
-                    <button
+                    <PrimaryButton
                       onClick={handleUpgrade}
-                      className="px-3 py-1 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-300"
+                      className="px-3 py-1 text-sm"
                     >
                       Upgrade
-                    </button>
+                    </PrimaryButton>
                   )}
                 </div>
               </div>

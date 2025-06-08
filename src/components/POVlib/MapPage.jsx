@@ -1,8 +1,10 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Filter } from "lucide-react";
+import HeroHeading from "../typography/HeroHeading";
+import SectionHeading from "../typography/SectionHeading";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -617,9 +619,7 @@ const MapPage = ({ mapName }) => {
     );
   }
 
-  const bestDemos = [...allDemos]
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 5);
+  const bestDemos = [...allDemos].sort((a, b) => b.views - a.views).slice(0, 5);
   const recentDemos = [...allDemos]
     .sort((a, b) => {
       if (b.year !== a.year) return parseInt(b.year) - parseInt(a.year);
@@ -671,9 +671,7 @@ const MapPage = ({ mapName }) => {
         </div>
 
         <div className="absolute inset-0 z-20 container mx-auto px-6 flex flex-col justify-center items-center text-center pt-32">
-          <h1 className="text-6xl font-bold text-white mb-4">
-            {formattedMapName}
-          </h1>
+          <HeroHeading>{formattedMapName}</HeroHeading>
         </div>
       </div>
 
@@ -789,11 +787,7 @@ const MapPage = ({ mapName }) => {
             {/* Best POVs */}
             {bestDemos.length > 0 && (
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                    {formattedMapName}'s Best POVs
-                  </span>
-                </h2>
+                <SectionHeading>{formattedMapName}'s Best POVs</SectionHeading>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {bestDemos.map((demo) => (
                     <DemoCard
@@ -810,11 +804,9 @@ const MapPage = ({ mapName }) => {
             {/* Recent POVs */}
             {recentDemos.length > 0 && (
               <div className="mb-12">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  <span className="border-l-4 border-yellow-400 pl-3 py-1">
-                    {formattedMapName}'s Recent POVs
-                  </span>
-                </h2>
+                <SectionHeading>
+                  {formattedMapName}'s Recent POVs
+                </SectionHeading>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {recentDemos.map((demo) => (
                     <DemoCard
@@ -840,7 +832,8 @@ const MapPage = ({ mapName }) => {
                 </span>
               </h2>
               <div className="text-gray-400">
-                {allDemos.length} demos by {new Set(allDemos.flatMap(d => d.players)).size} players
+                {allDemos.length} demos by{" "}
+                {new Set(allDemos.flatMap((d) => d.players)).size} players
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

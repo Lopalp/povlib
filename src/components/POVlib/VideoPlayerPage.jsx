@@ -6,7 +6,7 @@ import {
   ThumbsUp,
   Share2,
   MoreHorizontal,
-  Tag,
+  Tag as TagIcon,
   Bookmark,
   Flag,
   Download,
@@ -20,6 +20,10 @@ import {
 import YouTubeEmbed from "./YouTubeEmbed";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ModalHeading from "../typography/ModalHeading";
+import SettingsHeading from "../typography/SettingsHeading";
+import Tag from "../typography/Tag";
+import { IconButton } from "../buttons";
 
 const demoMatchData = {
   rounds: [
@@ -126,40 +130,38 @@ const VideoPlayerPage = ({
 
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="space-y-2">
-                  <h1 className="text-2xl font-bold text-white">
-                    {selectedDemo.title}
-                  </h1>
+                  <ModalHeading>{selectedDemo.title}</ModalHeading>
                   <div className="flex flex-wrap items-center space-x-6 text-gray-400 text-sm">
                     <div className="flex items-center">
                       <Eye className="h-5 w-5 mr-1" />
-                      <span>
-                        {selectedDemo.views?.toLocaleString()} views
-                      </span>
+                      <span>{selectedDemo.views?.toLocaleString()} views</span>
                     </div>
                     <div>{selectedDemo.year}</div>
                     {selectedDemo.event && (
-                      <div className="text-yellow-400">{selectedDemo.event}</div>
+                      <div className="text-yellow-400">
+                        {selectedDemo.event}
+                      </div>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <button
+                  <IconButton
                     onClick={() => onLike(selectedDemo.id)}
-                    className="flex items-center hover:text-yellow-400 transition-colors text-gray-400"
+                    className="text-gray-400 hover:text-yellow-400"
                   >
                     <ThumbsUp className="h-5 w-5" />
                     <span className="ml-1">{selectedDemo.likes}</span>
-                  </button>
-                  <button className="flex items-center hover:text-yellow-400 transition-colors text-gray-400">
+                  </IconButton>
+                  <IconButton className="text-gray-400 hover:text-yellow-400">
                     <Share2 className="h-5 w-5" />
-                  </button>
+                  </IconButton>
                   <div className="relative">
-                    <button
+                    <IconButton
                       onClick={() => setMenuOpen(!menuOpen)}
-                      className="flex items-center hover:text-yellow-400 transition-colors text-gray-400"
+                      className="text-gray-400 hover:text-yellow-400"
                     >
                       <MoreHorizontal className="h-5 w-5" />
-                    </button>
+                    </IconButton>
                     {menuOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10">
                         <button
@@ -169,7 +171,7 @@ const VideoPlayerPage = ({
                           }}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors text-gray-200 flex items-center space-x-2"
                         >
-                          <Tag className="h-4 w-4 text-yellow-400" />
+                          <TagIcon className="h-4 w-4 text-yellow-400" />
                           <span>Add Tag</span>
                         </button>
                         <button
@@ -225,19 +227,19 @@ const VideoPlayerPage = ({
               {/* KORREKTUR: Matchroom Alert mit Input-Feld */}
               {!matchroomSubmitted && (
                 <div className="flex flex-col sm:flex-row items-center gap-4 bg-yellow-400/20 border border-yellow-400/30 text-gray-100 p-4 rounded-md">
-                   <div className="flex-shrink-0">
-                      <Shield className="h-6 w-6 text-yellow-400" />
-                   </div>
-                   <div className="flex-grow text-sm">
-                      Help us complete the matchroom! Add the link here.
-                   </div>
-                   <input
-                     type="text"
-                     value={matchroomUrl}
-                     onChange={(e) => setMatchroomUrl(e.target.value)}
-                     placeholder="Paste matchroom URL..."
-                     className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
-                   />
+                  <div className="flex-shrink-0">
+                    <Shield className="h-6 w-6 text-yellow-400" />
+                  </div>
+                  <div className="flex-grow text-sm">
+                    Help us complete the matchroom! Add the link here.
+                  </div>
+                  <input
+                    type="text"
+                    value={matchroomUrl}
+                    onChange={(e) => setMatchroomUrl(e.target.value)}
+                    placeholder="Paste matchroom URL..."
+                    className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
+                  />
                   <button
                     onClick={() => {
                       // Hier könnte man die URL verarbeiten, z.B. an eine API senden
@@ -253,7 +255,10 @@ const VideoPlayerPage = ({
               {matchroomSubmitted && (
                 <div className="bg-gray-700 text-gray-300 px-4 py-3 rounded-md text-sm flex items-center gap-3">
                   <Shield className="h-5 w-5 text-green-400" />
-                  <span>Thank you! Your link is being reviewed and will be added shortly.</span>
+                  <span>
+                    Thank you! Your link is being reviewed and will be added
+                    shortly.
+                  </span>
                 </div>
               )}
 
@@ -264,13 +269,14 @@ const VideoPlayerPage = ({
                 {selectedDemo.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
                     {selectedDemo.tags.map((tag) => (
-                      <span
+                      <Tag
                         key={tag}
-                        className="flex items-center px-3 py-1 bg-gray-700 rounded-full text-sm text-gray-200 hover:bg-yellow-400/20 transition-colors"
+                        variant="default"
+                        className="hover:bg-yellow-400/20 transition-colors"
                       >
-                        <Tag className="h-4 w-4 mr-1 text-yellow-400" />
+                        <TagIcon className="h-4 w-4 mr-1 text-yellow-400" />
                         {tag}
-                      </span>
+                      </Tag>
                     ))}
                   </div>
                 )}
@@ -282,42 +288,37 @@ const VideoPlayerPage = ({
                   {description}
                 </p>
                 {description.length > 240 && !showFullDescription && (
-                  <button
+                  <IconButton
                     onClick={() => setShowFullDescription(true)}
-                    className="mt-3 flex items-center text-yellow-400 hover:text-yellow-300 text-sm transition-colors"
+                    className="mt-3 text-yellow-400 hover:text-yellow-300 text-sm"
                   >
                     Read more <ChevronDown className="ml-1 h-4 w-4" />
-                  </button>
+                  </IconButton>
                 )}
               </div>
 
-              <div className="overflow-x-auto py-4">
-                <div className="flex space-x-4">
-                  {selectedDemo.players.map((player, idx) => (
-                    <Link
-                      key={idx}
-                      href={`/players/${player
-                        .replace(/\s+/g, "-")
-                        .toLowerCase()}`}
-                    >
-                      <a className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors">
-                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
-                          {player.charAt(0)}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-white font-medium">
-                            {player}
-                          </span>
-                          {selectedDemo.team && (
-                            <span className="text-gray-400 text-sm">
-                              {selectedDemo.team}
-                            </span>
-                          )}
-                        </div>
-                      </a>
-                    </Link>
-                  ))}
-                </div>
+              <div className="flex space-x-4">
+                {selectedDemo.players.map((player, idx) => (
+                  <Link
+                    key={idx}
+                    href={`/players/${player
+                      .replace(/\s+/g, "-")
+                      .toLowerCase()}`}
+                    className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
+                      {player.charAt(0)}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-white font-medium">{player}</span>
+                      {selectedDemo.team && (
+                        <span className="text-gray-400 text-sm">
+                          {selectedDemo.team}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                ))}
               </div>
 
               <div className="space-y-6">
@@ -348,7 +349,7 @@ const VideoPlayerPage = ({
             </div>
 
             <div className="w-full lg:w-4/12 space-y-6">
-              <h2 className="text-xl font-semibold text-white">Related POVs</h2>
+              <SettingsHeading>Related POVs</SettingsHeading>
               <div className="space-y-4">
                 {relatedDemos.length ? (
                   relatedDemos.map((d) => (

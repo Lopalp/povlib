@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -15,20 +15,20 @@ import {
   Star,
   BookOpen,
   Play,
-  Crosshair
-} from 'lucide-react';
-import { useRouter } from 'next/navigation';
+  Crosshair,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
-import Navbar from './Navbar';
-import Footer from './Footer';
-import VideoPlayerPage from './VideoPlayerPage';
-import TaggingModal from './TaggingModal';
-import FilterModal from './FilterModal';
-import YouTubeEmbed from './YouTubeEmbed';
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import VideoPlayerPage from "./VideoPlayerPage";
+import TaggingModal from "./TaggingModal";
+import FilterModal from "./FilterModal";
+import YouTubeEmbed from "./YouTubeEmbed";
 
-import CategorySection from '../../components/containers/CategorySection';
-import CategorySectionFeatured from '../../components/containers/CategorySectionFeatured';
-import CategoryCarousel from '../../components/containers/CategoryCarousel';
+import CategorySection from "../../components/containers/CategorySection";
+import CategorySectionFeatured from "../../components/containers/CategorySectionFeatured";
+import CategoryCarousel from "../../components/containers/CategoryCarousel";
 
 import {
   getPlayerInfo,
@@ -36,13 +36,15 @@ import {
   getFilterOptions,
   updateDemoStats,
   updateDemoTags,
-  updateDemoPositions
-} from '@/lib/supabase';
+  updateDemoPositions,
+} from "@/lib/supabase";
+
+import SettingsHeading from "../typography/SettingsHeading";
 
 // Hilfsfunktion, um Demos nach einer Eigenschaft zu gruppieren
 const groupDemosByProperty = (demos, property) => {
   return demos.reduce((acc, demo) => {
-    const key = demo[property] || 'Unknown';
+    const key = demo[property] || "Unknown";
     if (!acc[key]) {
       acc[key] = [];
     }
@@ -61,7 +63,7 @@ const PlayerPage = ({ playerName }) => {
   const [trendingDemos, setTrendingDemos] = useState([]);
   const [filterOptions, setFilterOptions] = useState({});
   const [selectedDemo, setSelectedDemo] = useState(null);
-  const [activeVideoId, setActiveVideoId] = useState('');
+  const [activeVideoId, setActiveVideoId] = useState("");
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -70,21 +72,21 @@ const PlayerPage = ({ playerName }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
-  const [demoType, setDemoType] = useState('all');
+  const [demoType, setDemoType] = useState("all");
   const [filtersApplied, setFiltersApplied] = useState({
-    map: '',
-    position: '',
-    team: '',
-    year: '',
-    event: '',
-    result: '',
+    map: "",
+    position: "",
+    team: "",
+    year: "",
+    event: "",
+    result: "",
   });
   const [relatedDemos, setRelatedDemos] = useState([]);
   const [isFullScreenPlayer, setIsFullScreenPlayer] = useState(false);
   const [teamHistoryOpen, setTeamHistoryOpen] = useState(false);
 
   // Neue States für Utility Book
-  const [utilityFilters, setUtilityFilters] = useState({ map: '' });
+  const [utilityFilters, setUtilityFilters] = useState({ map: "" });
   const [utilities, setUtilities] = useState([]);
   const [filteredUtilities, setFilteredUtilities] = useState([]);
 
@@ -92,41 +94,78 @@ const PlayerPage = ({ playerName }) => {
 
   // Mock-Daten für Spielerdetails (wird mit DB-Daten gemerged)
   const mockPlayerDetails = {
-    real_name: 'Александр Нагорный',
-    romanized_name: 'Aleksandr Nahornyj',
-    birth_date: '2001-12-31',
-    nationality: 'Belarus',
-    status: 'Active',
-    role: 'Support',
-    current_team: { name: 'Nemiga Gaming', link: null },
-    image_url: 'https://liquipedia.net/commons/images/0/00/1eeR_at_ESL_Pro_League_S21.jpg',
-    twitter: '1eeR24',
-    twitch: '1eer24',
-    instagram: '1eer24',
-    youtube_channel: 'channel/UCGeIRw5f-QzBGQejlhMGoBQ',
-    vk_page: '1eeer24',
-    page_title: '1eeR',
-    liquipedia_url: 'https://liquipedia.net/counterstrike/1eeR',
-    favorite_map: 'Dust II',
+    real_name: "Александр Нагорный",
+    romanized_name: "Aleksandr Nahornyj",
+    birth_date: "2001-12-31",
+    nationality: "Belarus",
+    status: "Active",
+    role: "Support",
+    current_team: { name: "Nemiga Gaming", link: null },
+    image_url:
+      "https://liquipedia.net/commons/images/0/00/1eeR_at_ESL_Pro_League_S21.jpg",
+    twitter: "1eeR24",
+    twitch: "1eer24",
+    instagram: "1eer24",
+    youtube_channel: "channel/UCGeIRw5f-QzBGQejlhMGoBQ",
+    vk_page: "1eeer24",
+    page_title: "1eeR",
+    liquipedia_url: "https://liquipedia.net/counterstrike/1eeR",
+    favorite_map: "Dust II",
     best_game: {
-      title: 'Championship Finals vs. Team X',
-      videoId: 'dQw4w9WgXcQ'
+      title: "Championship Finals vs. Team X",
+      videoId: "dQw4w9WgXcQ",
     },
     team_history: [
-      { start_date: '2020-08-05', end_date: '2020-09-19', team_name: 'Trial' },
-      { start_date: '2020-09-19', end_date: '2021-08-30', team_name: 'Zorka' },
-      { start_date: '2021-08-30', end_date: '2022-01-16', team_name: 'Nemiga Gaming' },
-      { start_date: '2022-04-24', end_date: '2022-08-05', team_name: 'PLATOON Alpha' },
-      { start_date: '2022-08-05', end_date: 'Present', team_name: 'Nemiga Gaming' }
+      { start_date: "2020-08-05", end_date: "2020-09-19", team_name: "Trial" },
+      { start_date: "2020-09-19", end_date: "2021-08-30", team_name: "Zorka" },
+      {
+        start_date: "2021-08-30",
+        end_date: "2022-01-16",
+        team_name: "Nemiga Gaming",
+      },
+      {
+        start_date: "2022-04-24",
+        end_date: "2022-08-05",
+        team_name: "PLATOON Alpha",
+      },
+      {
+        start_date: "2022-08-05",
+        end_date: "Present",
+        team_name: "Nemiga Gaming",
+      },
     ],
   };
 
   // Beispieldaten für Utility Book (Mock)
   const mockUtilities = [
-    { id: 1, map: 'Dust II', title: 'CT Mid Smoke', description: 'Block CT vision at mid.', videoId: 'AbCdEf123' },
-    { id: 2, map: 'Inferno', title: 'Banana Flash', description: 'Flashbang for Banana push.', videoId: 'GhIjKl456' },
-    { id: 3, map: 'Mirage', title: 'Connector Molotov', description: 'Molotov Conn to prevent push.', videoId: 'MnOpQr789' },
-    { id: 4, map: 'Dust II', title: 'A Short Molotov', description: 'Molotov Short to deny plant.', videoId: 'StUvWx012' },
+    {
+      id: 1,
+      map: "Dust II",
+      title: "CT Mid Smoke",
+      description: "Block CT vision at mid.",
+      videoId: "AbCdEf123",
+    },
+    {
+      id: 2,
+      map: "Inferno",
+      title: "Banana Flash",
+      description: "Flashbang for Banana push.",
+      videoId: "GhIjKl456",
+    },
+    {
+      id: 3,
+      map: "Mirage",
+      title: "Connector Molotov",
+      description: "Molotov Conn to prevent push.",
+      videoId: "MnOpQr789",
+    },
+    {
+      id: 4,
+      map: "Dust II",
+      title: "A Short Molotov",
+      description: "Molotov Short to deny plant.",
+      videoId: "StUvWx012",
+    },
   ];
 
   // Lade Spieler- und Demo-Daten
@@ -142,7 +181,7 @@ const PlayerPage = ({ playerName }) => {
         // Spieler-Info laden
         const playerData = await getPlayerInfo(playerName);
         if (!playerData) {
-          setError('Player not found');
+          setError("Player not found");
           setIsLoading(false);
           return;
         }
@@ -151,7 +190,8 @@ const PlayerPage = ({ playerName }) => {
         const mergedPlayer = {
           ...mockPlayerDetails,
           ...playerData,
-          current_team: (playerData.current_team || mockPlayerDetails.current_team)
+          current_team:
+            playerData.current_team || mockPlayerDetails.current_team,
         };
         setPlayer(mergedPlayer);
 
@@ -160,7 +200,13 @@ const PlayerPage = ({ playerName }) => {
         setFilteredUtilities(mockUtilities);
 
         // Erste Seite Demos laden
-        const demosData = await getDemosByPlayer(playerName, demoType, 1, 12, filtersApplied);
+        const demosData = await getDemosByPlayer(
+          playerName,
+          demoType,
+          1,
+          12,
+          filtersApplied
+        );
         if (!demosData || demosData.length === 0) {
           setAllDemos([]);
           setHasMore(false);
@@ -171,9 +217,9 @@ const PlayerPage = ({ playerName }) => {
         setAllDemos(mappedDemos);
 
         // Demos gruppieren
-        setDemosByMap(groupDemosByProperty(mappedDemos, 'map'));
-        setDemosByEvent(groupDemosByProperty(mappedDemos, 'event'));
-        setDemosByYear(groupDemosByProperty(mappedDemos, 'year'));
+        setDemosByMap(groupDemosByProperty(mappedDemos, "map"));
+        setDemosByEvent(groupDemosByProperty(mappedDemos, "event"));
+        setDemosByYear(groupDemosByProperty(mappedDemos, "year"));
 
         // Trending-Demos nach Views sortieren (Top 5)
         const sorted = [...mappedDemos].sort((a, b) => b.views - a.views);
@@ -182,8 +228,8 @@ const PlayerPage = ({ playerName }) => {
         setHasMore(demosData.length === 12);
         setIsLoading(false);
       } catch (err) {
-        console.error('Error loading player data:', err);
-        setError('Failed to load player data. Please try again later.');
+        console.error("Error loading player data:", err);
+        setError("Failed to load player data. Please try again later.");
         setIsLoading(false);
       }
     };
@@ -207,7 +253,7 @@ const PlayerPage = ({ playerName }) => {
     result: demo.result,
     views: demo.views || 0,
     likes: demo.likes || 0,
-    isPro: demo.is_pro
+    isPro: demo.is_pro,
   });
 
   // Lädt weitere Demos (Infinite Scroll)
@@ -216,20 +262,26 @@ const PlayerPage = ({ playerName }) => {
     try {
       setIsLoading(true);
       const nextPage = page + 1;
-      const demosData = await getDemosByPlayer(playerName, demoType, nextPage, 12, filtersApplied);
+      const demosData = await getDemosByPlayer(
+        playerName,
+        demoType,
+        nextPage,
+        12,
+        filtersApplied
+      );
       if (!demosData || demosData.length === 0) {
         setHasMore(false);
         setIsLoading(false);
         return;
       }
       const mappedDemos = demosData.map(mapDemoData);
-      setAllDemos(prev => [...prev, ...mappedDemos]);
+      setAllDemos((prev) => [...prev, ...mappedDemos]);
 
       // Aktualisiere Gruppen
       const updatedByMap = { ...demosByMap };
       const updatedByEvent = { ...demosByEvent };
       const updatedByYear = { ...demosByYear };
-      mappedDemos.forEach(demo => {
+      mappedDemos.forEach((demo) => {
         if (!updatedByMap[demo.map]) updatedByMap[demo.map] = [];
         updatedByMap[demo.map].push(demo);
 
@@ -248,7 +300,7 @@ const PlayerPage = ({ playerName }) => {
       setHasMore(demosData.length === 12);
       setIsLoading(false);
     } catch (err) {
-      console.error('Error loading more demos:', err);
+      console.error("Error loading more demos:", err);
       setIsLoading(false);
     }
   };
@@ -275,21 +327,20 @@ const PlayerPage = ({ playerName }) => {
     setActiveVideoId(demo.videoId);
     setIsFullScreenPlayer(true);
     findRelatedDemos(demo);
-    updateDemoStats(demo.id, 'views', 1).catch(err =>
-      console.error('Error updating views:', err)
+    updateDemoStats(demo.id, "views", 1).catch((err) =>
+      console.error("Error updating views:", err)
     );
     window.scrollTo(0, 0);
   };
 
   // Verwandte Demos finden
   const findRelatedDemos = (demo) => {
-    const related = allDemos.filter(d =>
-      d.id !== demo.id &&
-      (
-        d.map === demo.map ||
-        d.players.some(p => demo.players.includes(p)) ||
-        d.positions.some(pos => demo.positions.includes(pos))
-      )
+    const related = allDemos.filter(
+      (d) =>
+        d.id !== demo.id &&
+        (d.map === demo.map ||
+          d.players.some((p) => demo.players.includes(p)) ||
+          d.positions.some((pos) => demo.positions.includes(pos)))
     );
     setRelatedDemos(related.slice(0, 10));
   };
@@ -297,7 +348,7 @@ const PlayerPage = ({ playerName }) => {
   // VideoPlayer schließen
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
-    setActiveVideoId('');
+    setActiveVideoId("");
     setIsFullScreenPlayer(false);
     setRelatedDemos([]);
   };
@@ -305,18 +356,20 @@ const PlayerPage = ({ playerName }) => {
   // Demo liken
   const handleLikeDemo = async (demoId) => {
     try {
-      const result = await updateDemoStats(demoId, 'likes', 1);
+      const result = await updateDemoStats(demoId, "likes", 1);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setAllDemos(prev =>
-          prev.map(d => d.id === demoId ? { ...d, likes: updatedDemo.likes } : d)
+        setAllDemos((prev) =>
+          prev.map((d) =>
+            d.id === demoId ? { ...d, likes: updatedDemo.likes } : d
+          )
         );
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, likes: updatedDemo.likes });
         }
       }
     } catch (err) {
-      console.error('Error liking demo:', err);
+      console.error("Error liking demo:", err);
     }
   };
 
@@ -326,8 +379,10 @@ const PlayerPage = ({ playerName }) => {
       const result = await updateDemoTags(demoId, tags);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setAllDemos(prev =>
-          prev.map(d => d.id === demoId ? { ...d, tags: updatedDemo.tags } : d)
+        setAllDemos((prev) =>
+          prev.map((d) =>
+            d.id === demoId ? { ...d, tags: updatedDemo.tags } : d
+          )
         );
         if (selectedDemo && selectedDemo.id === demoId) {
           setSelectedDemo({ ...selectedDemo, tags: updatedDemo.tags });
@@ -335,7 +390,7 @@ const PlayerPage = ({ playerName }) => {
         setIsTaggingModalOpen(false);
       }
     } catch (err) {
-      console.error('Error updating tags:', err);
+      console.error("Error updating tags:", err);
     }
   };
 
@@ -345,30 +400,42 @@ const PlayerPage = ({ playerName }) => {
       const result = await updateDemoPositions(demoId, positions);
       if (result.success) {
         const updatedDemo = mapDemoData(result.demo);
-        setAllDemos(prev =>
-          prev.map(d => d.id === demoId ? { ...d, positions: updatedDemo.positions } : d)
+        setAllDemos((prev) =>
+          prev.map((d) =>
+            d.id === demoId ? { ...d, positions: updatedDemo.positions } : d
+          )
         );
         if (selectedDemo && selectedDemo.id === demoId) {
-          setSelectedDemo({ ...selectedDemo, positions: updatedDemo.positions });
+          setSelectedDemo({
+            ...selectedDemo,
+            positions: updatedDemo.positions,
+          });
         }
       }
     } catch (err) {
-      console.error('Error updating positions:', err);
+      console.error("Error updating positions:", err);
     }
   };
 
   const handleSwitchDemoType = (type) => setDemoType(type);
 
   const handleResetFilters = () =>
-    setFiltersApplied({ map: '', position: '', team: '', year: '', event: '', result: '' });
+    setFiltersApplied({
+      map: "",
+      position: "",
+      team: "",
+      year: "",
+      event: "",
+      result: "",
+    });
   const handleApplyFilters = () => setIsFilterModalOpen(false);
 
   const handleSelectRelatedDemo = (demo) => {
     setSelectedDemo(demo);
     setActiveVideoId(demo.videoId);
     findRelatedDemos(demo);
-    updateDemoStats(demo.id, 'views', 1).catch(err =>
-      console.error('Error updating views:', err)
+    updateDemoStats(demo.id, "views", 1).catch((err) =>
+      console.error("Error updating views:", err)
     );
     window.scrollTo(0, 0);
   };
@@ -381,7 +448,9 @@ const PlayerPage = ({ playerName }) => {
 
   useEffect(() => {
     if (utilityFilters.map) {
-      setFilteredUtilities(utilities.filter(u => u.map === utilityFilters.map));
+      setFilteredUtilities(
+        utilities.filter((u) => u.map === utilityFilters.map)
+      );
     } else {
       setFilteredUtilities(utilities);
     }
@@ -389,9 +458,9 @@ const PlayerPage = ({ playerName }) => {
 
   // Kopier-Funktion für Crosshair (Mock-Code)
   const copyCrosshair = () => {
-    const crosshairConfig = 'csgo://...'; // Platzhalter für tatsächliche Crosshair-Config
+    const crosshairConfig = "csgo://..."; // Platzhalter für tatsächliche Crosshair-Config
     navigator.clipboard.writeText(crosshairConfig);
-    alert('Crosshair configuration copied!');
+    alert("Crosshair configuration copied!");
   };
 
   // Lade-Zustand (fullscreen, bevor Content geladen)
@@ -400,7 +469,9 @@ const PlayerPage = ({ playerName }) => {
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg font-medium">Loading player data...</p>
+          <p className="text-white text-lg font-medium">
+            Loading player data...
+          </p>
         </div>
       </div>
     );
@@ -412,7 +483,9 @@ const PlayerPage = ({ playerName }) => {
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6 bg-gray-800 rounded-xl shadow-lg">
           <div className="text-red-500 text-5xl mb-4">!</div>
-          <h2 className="text-white text-2xl font-bold mb-2">Error Loading Data</h2>
+          <h2 className="text-white text-2xl font-bold mb-2">
+            Error Loading Data
+          </h2>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
             onClick={() => router.back()}
@@ -465,8 +538,8 @@ const PlayerPage = ({ playerName }) => {
           className="absolute inset-0 opacity-10 pointer-events-none z-0"
           style={{
             backgroundImage: `url('https://countryflagsapi.com/png/${player.nationality.toLowerCase()}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         />
       )}
@@ -512,7 +585,9 @@ const PlayerPage = ({ playerName }) => {
                 )}
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold text-white">{playerName}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-white">
+                {playerName}
+              </h1>
               <p className="text-gray-300 text-lg">{player.real_name}</p>
 
               {player.current_team?.name && (
@@ -627,13 +702,20 @@ const PlayerPage = ({ playerName }) => {
                     className="flex items-center text-gray-400 text-xs space-x-1 hover:text-yellow-400"
                   >
                     <span>Team History</span>
-                    {teamHistoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    {teamHistoryOpen ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
                 {teamHistoryOpen && (
                   <ul className="mt-2 space-y-2">
                     {player.team_history.map((entry, idx) => (
-                      <li key={idx} className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2">
+                      <li
+                        key={idx}
+                        className="flex justify-between items-center bg-gray-800/60 rounded-md px-3 py-2"
+                      >
                         <div>
                           <div className="text-gray-200">{entry.team_name}</div>
                           <div className="text-gray-500 text-xs">
@@ -654,26 +736,37 @@ const PlayerPage = ({ playerName }) => {
         <div className="max-w-4xl mx-auto mt-10 bg-gray-900/80 backdrop-blur-lg rounded-xl p-6">
           <div className="flex items-center mb-4">
             <BookOpen className="w-6 h-6 text-yellow-400 mr-2" />
-            <h2 className="text-xl font-bold text-white">{playerName}'s Utility Book</h2>
+            <h2 className="text-xl font-bold text-white">
+              {playerName}'s Utility Book
+            </h2>
           </div>
           <div className="flex flex-wrap gap-4 mb-6">
             <div>
-              <label className="text-gray-400 text-xs block mb-1">Filter by Map</label>
+              <label className="text-gray-400 text-xs block mb-1">
+                Filter by Map
+              </label>
               <select
                 value={utilityFilters.map}
                 onChange={handleUtilityFilterChange}
                 className="bg-gray-800 text-white px-3 py-2 rounded-md border border-gray-700 focus:outline-none"
               >
                 <option value="">All Maps</option>
-                {Array.from(new Set(utilities.map(u => u.map))).map((mapName) => (
-                  <option key={mapName} value={mapName}>{mapName}</option>
-                ))}
+                {Array.from(new Set(utilities.map((u) => u.map))).map(
+                  (mapName) => (
+                    <option key={mapName} value={mapName}>
+                      {mapName}
+                    </option>
+                  )
+                )}
               </select>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {filteredUtilities.map((util) => (
-              <div key={util.id} className="bg-gray-800/60 p-4 rounded-lg flex flex-col">
+              <div
+                key={util.id}
+                className="bg-gray-800/60 p-4 rounded-lg flex flex-col"
+              >
                 <div className="flex items-center mb-2">
                   <MapPin className="w-5 h-5 text-yellow-400 mr-2" />
                   <span className="text-white font-semibold">{util.map}</span>
@@ -687,14 +780,14 @@ const PlayerPage = ({ playerName }) => {
                       title: util.title,
                       players: [],
                       map: util.map,
-                      team: '',
-                      event: '',
-                      year: '',
+                      team: "",
+                      event: "",
+                      year: "",
                       positions: [],
                       tags: [],
                       views: 0,
                       likes: 0,
-                      id: util.id
+                      id: util.id,
                     });
                     setActiveVideoId(util.videoId);
                     setIsFullScreenPlayer(true);
@@ -722,7 +815,9 @@ const PlayerPage = ({ playerName }) => {
           <section className="mb-16">
             <div className="flex items-center mb-4">
               <Star className="w-6 h-6 text-yellow-400 mr-2" />
-              <h2 className="text-2xl font-bold text-white">{playerName}'s Best Game of All Time</h2>
+              <h2 className="text-2xl font-bold text-white">
+                {playerName}'s Best Game of All Time
+              </h2>
             </div>
             <div className="bg-gray-800/60 p-6 rounded-lg flex flex-col md:flex-row items-center">
               <div className="w-full md:w-1/2 mb-4 md:mb-0">
@@ -737,23 +832,26 @@ const PlayerPage = ({ playerName }) => {
                 </div>
               </div>
               <div className="md:ml-6 flex-1">
-                <h3 className="text-xl font-semibold text-white mb-2">{player.best_game.title}</h3>
-                <p className="text-gray-400">Relive this iconic performance. Watch the full POV demo to see how {playerName} dominated the match.</p>
+                <SettingsHeading>{player.best_game.title}</SettingsHeading>
+                <p className="text-gray-400">
+                  Relive this iconic performance. Watch the full POV demo to see
+                  how {playerName} dominated the match.
+                </p>
                 <button
                   onClick={() => {
                     setSelectedDemo({
                       videoId: player.best_game.videoId,
                       title: player.best_game.title,
                       players: [],
-                      map: '',
-                      team: '',
-                      event: '',
-                      year: '',
+                      map: "",
+                      team: "",
+                      event: "",
+                      year: "",
                       positions: [],
                       tags: [],
                       views: 0,
                       likes: 0,
-                      id: 'best-game'
+                      id: "best-game",
                     });
                     setActiveVideoId(player.best_game.videoId);
                     setIsFullScreenPlayer(true);

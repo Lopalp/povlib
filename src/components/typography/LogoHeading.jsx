@@ -1,5 +1,6 @@
 import React from "react";
-import Image from "next/image";
+import Logo from "./Logo";
+import BrandHeading from "./BrandHeading";
 
 const LogoHeading = ({ size }) => {
   return (
@@ -11,32 +12,8 @@ const LogoHeading = ({ size }) => {
         gap: size * 5,
       }}
     >
-      <Image
-        src="/povlib_logo.svg"
-        width={size * 20}
-        height={size * 20}
-        alt="POVlib Logo"
-      />
-      <h1
-        className={`text-xl font-black`}
-        style={{
-          fontSize: `${size}rem`,
-          lineHeight: `${size * 1.2}rem`,
-          marginTop: 4,
-          fontFamily: "Arial, sans-serif",
-        }}
-      >
-        <span className="text-yellow-400">POV</span>
-        <span className="text-white" style={{ fontWeight: 900 }}>
-          lib
-        </span>
-        <span
-          className="text-gray-400"
-          style={{ fontSize: size * 10, fontWeight: 500 }}
-        >
-          .gg
-        </span>
-      </h1>
+      <Logo size={size} />
+      <BrandHeading size={size} />
     </div>
   );
 };
