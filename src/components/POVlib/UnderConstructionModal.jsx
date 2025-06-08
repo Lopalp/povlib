@@ -1,25 +1,19 @@
-// components/POVlib/UnderConstructionModal.jsx
-"use client";
-
 import React, { useState, useEffect } from "react";
 import {
   X,
   ChevronLeft,
   ChevronRight,
   MessageCircle,
-  PlayCircle,
-  Tv,
-  BookOpen,
-  Settings2,
   Library,
   Play,
+  BookOpen,
   Video,
 } from "lucide-react";
 
 const UnderConstructionModal = ({ isOpen, onClose }) => {
   const tabs = [
     {
-      title: "Demo Libary",
+      title: "Demo Library",
       description: "A searchable library of pro-level utility demos.",
       features: [
         "Search by map",
@@ -30,6 +24,8 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       ],
       icon: <Library className="h-12 w-12" />,
       imageSrc: "/demo.png",
+      gradient: "from-purple-500 to-pink-500",
+      bgGradient: "from-purple-500/20 to-pink-500/20",
     },
     {
       title: "Extended Player",
@@ -44,19 +40,23 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       ],
       icon: <Play className="h-12 w-12" />,
       imageSrc: "/demo.png",
+      gradient: "from-blue-500 to-cyan-500",
+      bgGradient: "from-blue-500/20 to-cyan-500/20",
     },
     {
       title: "Utility Book",
-      description: "A searchable library of pro-level utility demos.",
+      description: "Master every grenade lineup with our comprehensive guide.",
       features: [
-        "Search by map",
-        "Filter by type",
-        "Pro player demos",
-        "Download & share",
-        "Demo analysis",
+        "Interactive maps",
+        "Video tutorials",
+        "Success rates",
+        "Community ratings",
+        "Practice mode",
       ],
       icon: <BookOpen className="h-12 w-12" />,
       imageSrc: "/demo.png",
+      gradient: "from-green-500 to-emerald-500",
+      bgGradient: "from-green-500/20 to-emerald-500/20",
     },
     {
       title: "Watch Your Own Demo",
@@ -70,10 +70,13 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
       ],
       icon: <Video className="h-12 w-12" />,
       imageSrc: "/demo.png",
+      gradient: "from-orange-500 to-red-500",
+      bgGradient: "from-orange-500/20 to-red-500/20",
     },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -83,133 +86,191 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const { title, icon, imageSrc, description } = tabs[currentIndex];
+  const currentTab = tabs[currentIndex];
+
+  const handleTabChange = (newIndex) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentIndex(newIndex);
+      setIsTransitioning(false);
+    }, 200);
+  };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex((idx) => idx - 1);
+      handleTabChange(currentIndex - 1);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < tabs.length - 1) {
-      setCurrentIndex((idx) => idx + 1);
+      handleTabChange(currentIndex + 1);
     }
   };
 
   return (
     <div
-      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative w-full max-w-4xl h-[60vh] rounded-2xl overflow-hidden shadow-2xl">
-        {/* Full-background Image */}
-        <img
-          src={imageSrc}
-          alt={title}
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        />
-        {/* Dark overlay behind content */}
-        <div className="absolute inset-0 bg-black/60 z-10" />
+      <div className="relative w-full max-w-5xl h-[80vh] md:h-[75vh] rounded-3xl overflow-hidden shadow-2xl transform transition-all duration-500">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <img
+            src={currentTab.imageSrc}
+            alt={currentTab.title}
+            className="w-full h-full object-cover scale-110 transition-transform duration-700"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/40" />
+          <div className={`absolute inset-0 bg-gradient-to-br ${currentTab.bgGradient} opacity-30`} />
+        </div>
 
-        {/* Content Panel (Glass Effect) */}
-        <div className="relative z-20 h-full mx-4 sm:mx-0 bg-black/30 backdrop-blur-lg border border-gray-700 rounded-2xl px-6 py-8 sm:px-8 sm:py-10 flex flex-col">
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 z-30 text-gray-300 hover:text-yellow-400 transition-colors"
-          >
-            <X className="h-6 w-6" />
-          </button>
+        {/* Glass Content Container */}
+        <div className="relative h-full flex flex-col bg-white/5 backdrop-blur-2xl border border-white/10">
+          {/* Header Section */}
+          <div className="px-6 md:px-8 pt-6 pb-4">
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 md:top-6 md:right-6 p-2.5 rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all duration-200 hover:rotate-90"
+            >
+              <X className="h-5 w-5" />
+            </button>
 
-          {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Title + Icon */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="bg-yellow-400/20 rounded-full p-4 mb-7">
-                {React.cloneElement(icon, {
-                  className: "h-12 w-12 text-yellow-400",
-                })}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white text-center">
-                {title}
-              </h2>
-            </div>
-
-            {/* Description */}
-            <div className="flex justify-center">
-              <p className="text-white text-base sm:text-lg leading-relaxed text-center mb-6 font-light max-w-2xl">
-                {description}
-              </p>
-            </div>
-
-            {/* Features List */}
-            <div className="flex justify-center mb-8">
-              <div className="text-center max-w-3xl">
-                {tabs[currentIndex].features.map((feature, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-yellow-400/10 border border-yellow-400/20 mx-1 my-1"
-                  >
-                    <span className="text-yellow-400 mr-1.5 text-sm">★</span>
-                    <span className="text-gray-300 text-sm font-light">
-                      {feature}
-                    </span>
-                  </span>
-                ))}
-              </div>
+            {/* Progress Dots */}
+            <div className="flex justify-center items-center gap-3 mb-6">
+              {tabs.map((tab, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleTabChange(idx)}
+                  className="relative group"
+                >
+                  <div
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      idx === currentIndex
+                        ? `w-16 bg-gradient-to-r ${tab.gradient}`
+                        : "w-2 bg-white/30 hover:bg-white/50 hover:w-3"
+                    }`}
+                  />
+                  {idx === currentIndex && (
+                    <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${tab.gradient} blur-md opacity-50`} />
+                  )}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Fixed Bottom Section */}
-          <div className="mt-auto pt-6">
-            {/* Feedback Banner */}
-            <div className="flex items-center justify-center gap-4 bg-yellow-900/20 border border-yellow-800 rounded-lg p-4 mb-4">
-              <MessageCircle className="h-8 w-8 text-yellow-300 flex-shrink-0" />
-              <div className="text-yellow-300">
-                <p className="text-yellow-300/90 text-sm mb-2.5 font-medium">
-                  Everything here is a demo—features may be incomplete or
-                  non-functional.
-                </p>
-                <p className="text-sm">
-                  We need your feedback!{" "}
-                  <a
-                    href="https://discord.gg/XDwTABQr"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-yellow-400 hover:text-yellow-300 underline underline-offset-2"
-                  >
-                    Join our Discord
-                  </a>{" "}
-                  and let us know your thoughts.
-                </p>
+          {/* Scrollable Content */}
+          <div className={`flex-1 px-6 md:px-8 pb-6 overflow-y-auto transition-all duration-300 ${
+            isTransitioning ? "opacity-0 scale-95" : "opacity-100 scale-100"
+          }`}>
+            {/* Icon Container */}
+            <div className="flex justify-center mb-8">
+              <div className="relative group">
+                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${currentTab.gradient} blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-300`} />
+                <div className={`relative p-7 rounded-3xl bg-gradient-to-br ${currentTab.gradient} shadow-2xl transform transition-all duration-300 group-hover:scale-110`}>
+                  <div className="text-white">
+                    {currentTab.icon}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Title & Description */}
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+                {currentTab.title}
+              </h2>
+              <p className="text-lg text-gray-200/80 leading-relaxed">
+                {currentTab.description}
+              </p>
+            </div>
+
+            {/* Features Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              {currentTab.features.map((feature, index) => (
+                <div
+                  key={index}
+                  className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 p-5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:-translate-y-1"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${currentTab.gradient} opacity-20`} />
+                      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-gradient-to-r ${currentTab.gradient}`} />
+                    </div>
+                    <span className="text-gray-100 font-medium text-sm md:text-base">{feature}</span>
+                  </div>
+                  <div className={`absolute inset-0 bg-gradient-to-r ${currentTab.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Section */}
+          <div className="px-6 md:px-8 pb-6 md:pb-8">
+            {/* Discord CTA */}
+            <div className="relative mb-6 overflow-hidden rounded-2xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 animate-pulse" />
+              <div className="relative p-5 bg-black/30 backdrop-blur-sm border border-amber-500/30">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg">
+                    <MessageCircle className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-amber-100 font-semibold mb-1">
+                      Preview Build - Your Input Matters!
+                    </h3>
+                    <p className="text-amber-200/70 text-sm">
+                      These features are under active development.{" "}
+                      <a
+                        href="https://discord.gg/XDwTABQr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-300 hover:text-amber-100 underline underline-offset-2 font-semibold transition-colors"
+                      >
+                        Join Discord
+                      </a>{" "}
+                      to help shape the future!
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Navigation Buttons */}
             <div className="flex justify-between items-center">
-              {currentIndex > 0 ? (
-                <button
-                  onClick={handlePrev}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                  <span className="hidden sm:inline">Previous</span>
-                </button>
-              ) : (
-                <div className="w-24" />
-              )}
-              {currentIndex < tabs.length - 1 ? (
-                <button
-                  onClick={handleNext}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors ml-auto"
-                >
-                  <span className="hidden sm:inline">Next</span>
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              ) : (
-                <div className="w-24" />
-              )}
+              <button
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+                className={`group flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  currentIndex === 0
+                    ? "invisible"
+                    : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
+                }`}
+              >
+                <ChevronLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" />
+                <span className="hidden sm:inline">Previous</span>
+              </button>
+
+              <div className="flex-1 flex justify-center">
+                <span className="text-white/40 text-sm">
+                  {currentIndex + 1} of {tabs.length}
+                </span>
+              </div>
+
+              <button
+                onClick={handleNext}
+                disabled={currentIndex === tabs.length - 1}
+                className={`group flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  currentIndex === tabs.length - 1
+                    ? "invisible"
+                    : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
+                }`}
+              >
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+              </button>
             </div>
           </div>
         </div>
