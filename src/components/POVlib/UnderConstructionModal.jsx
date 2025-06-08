@@ -119,7 +119,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 md:top-6 md:right-6 p-2.5 rounded-full bg-white/10 text-gray-700 dark:text-white/60 hover:bg-white/20 hover:text-gray-900 dark:hover:text-white transition-all duration-200 hover:rotate-90"
+              className="absolute top-4 right-4 md:top-6 md:right-6 p-2.5 rounded-full bg-white/5 text-gray-700 dark:text-white/60 hover:bg-white/15 hover:text-gray-900 dark:hover:text-white transition-all duration-200 hover:rotate-90"
             >
               <X className="h-5 w-5" />
             </button>
@@ -155,7 +155,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
             <div className="flex justify-center mb-8">
               <div className="relative group">
                 <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${currentTab.gradient} blur-2xl opacity-30 group-hover:opacity-50 transition-opacity duration-300`} />
-                <div className={`relative p-7 rounded-3xl bg-gradient-to-br ${currentTab.gradient} bg-opacity-90 shadow-2xl transform transition-all duration-300 group-hover:scale-110`}>
+                <div className={`relative p-7 rounded-3xl bg-gradient-to-br ${currentTab.gradient} bg-opacity-70 shadow-2xl transform transition-all duration-300 group-hover:scale-110 backdrop-blur-sm`}>
                   <div className="text-white">
                     {currentTab.icon}
                   </div>
@@ -178,7 +178,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
               {currentTab.features.map((feature, index) => (
                 <div
                   key={index}
-                  className="group relative overflow-hidden rounded-2xl bg-white/20 dark:bg-white/5 backdrop-blur-md border border-white/30 dark:border-white/10 p-5 hover:bg-white/30 dark:hover:bg-white/10 hover:border-white/40 dark:hover:border-white/20 transition-all duration-300 hover:transform hover:-translate-y-1"
+                  className="group relative overflow-hidden rounded-2xl bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 p-5 hover:bg-white/20 dark:hover:bg-white/10 hover:border-white/30 dark:hover:border-white/20 transition-all duration-300 hover:transform hover:-translate-y-1"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div className="flex items-center gap-3">
@@ -199,7 +199,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
             {/* Discord CTA */}
             <div className="relative mb-6 overflow-hidden rounded-2xl">
               <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10" />
-              <div className="relative p-5 bg-white/20 dark:bg-black/20 backdrop-blur-md border border-amber-500/30">
+              <div className="relative p-5 bg-white/10 dark:bg-black/10 backdrop-blur-sm border border-amber-500/20">
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                   <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg">
                     <MessageCircle className="h-6 w-6 text-white" />
@@ -233,7 +233,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
                 className={`group flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 ${
                   currentIndex === 0
                     ? "invisible"
-                    : "bg-white/20 dark:bg-white/10 backdrop-blur-sm text-gray-700 dark:text-white hover:bg-white/30 dark:hover:bg-white/20"
+                    : "bg-white/10 dark:bg-white/5 backdrop-blur-sm text-gray-700 dark:text-white hover:bg-white/20 dark:hover:bg-white/10"
                 }`}
               >
                 <ChevronLeft className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1" />
@@ -252,7 +252,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
                 className={`group flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 ${
                   currentIndex === tabs.length - 1
                     ? "invisible"
-                    : "bg-white/20 dark:bg-white/10 backdrop-blur-sm text-gray-700 dark:text-white hover:bg-white/30 dark:hover:bg-white/20"
+                    : "bg-white/10 dark:bg-white/5 backdrop-blur-sm text-gray-700 dark:text-white hover:bg-white/20 dark:hover:bg-white/10"
                 }`}
               >
                 <span className="hidden sm:inline">Next</span>
