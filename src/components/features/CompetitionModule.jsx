@@ -132,7 +132,7 @@ export default function CompetitionModule({
                     {/* Aspect-Ratio-Box 4:3 */}
                     <div className="relative w-full pb-[133%] bg-black">
                       <video
-                        src={clip.videoUrl || clip.video_id}
+                        src={clip.videoUrl || undefined}
                         poster={getRandomImage()}
                         muted
                         loop
@@ -200,7 +200,7 @@ export default function CompetitionModule({
                     {/* Aspect-Ratio-Box 4:3 */}
                     <div className="relative w-full pb-[133%] bg-black">
                       <video
-                        src={item.videoUrl}
+                        src={item.videoUrl || undefined}
                         poster={getRandomImage()}
                         muted
                         loop

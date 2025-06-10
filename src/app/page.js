@@ -25,8 +25,7 @@ import { useRouter } from "next/navigation";
 import VideoPlayerPage from "../components/features/VideoPlayerPage";
 import TaggingModal from "../components/modals/TaggingModal";
 import FilterModal from "../components/modals/FilterModal";
-import Navbar from "../components/navigation/Navbar";
-import Footer from "../components/navigation/Footer";
+
 import CompetitionModule from "../components/features/CompetitionModule";
 import FeaturedHero from "../components/features/FeaturedHero";
 import SelectedFilters from "../components/misc/SelectedFilters";
@@ -37,6 +36,7 @@ import UnderConstructionModal from "../components/modals/UnderConstructionModal"
 import { Tag } from "../components/tags";
 import { UserContext } from "../../context/UserContext.js";
 import { createSupabaseBrowserClient } from "../lib/supabaseClient.js";
+import { useNavbar } from "../context/NavbarContext";
 
 const mapDemo = (demo) => ({
   id: demo.id,
@@ -57,6 +57,11 @@ const mapDemo = (demo) => ({
 });
 
 export default function Home() {
+  // -------------------------------------
+  // Get navbar state from context
+  // -------------------------------------
+  const { demoType } = useNavbar();
+
   // -------------------------------------
   // User Authentication State
   // -------------------------------------
@@ -103,7 +108,6 @@ export default function Home() {
   // -------------------------------------
   // UI States
   // -------------------------------------
-  const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState(null);
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
@@ -114,8 +118,6 @@ export default function Home() {
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeVideoId, setActiveVideoId] = useState("");
-  const [demoType, setDemoType] = useState("pro");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [autoplayVideo, setAutoplayVideo] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -489,17 +491,6 @@ export default function Home() {
           onClose={() => setIsUnderConstructionOpen(false)}
         />
 
-        <Navbar
-          demoType={demoType}
-          onSwitchDemoType={setDemoType}
-          searchActive={searchActive}
-          setSearchActive={setSearchActive}
-          setIsMenuOpen={setIsMenuOpen}
-          isMenuOpen={isMenuOpen}
-          user={user}
-          session={session}
-        />
-
         {filteredDemos.length > 0 && !selectedDemo && (
           <FeaturedHero
             demo={filteredDemos[0]}
@@ -667,8 +658,6 @@ export default function Home() {
             session={session}
           />
         )}
-
-        <Footer />
       </div>
     </main>
   );

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Filter, Users } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
-import Footer from "../../components/navigation/Footer";
+import { useNavbar } from "../../context/NavbarContext";
+
 import PlayerCard from "../../components/cards/PlayerCard";
 import FilterModal from "../../components/modals/FilterModal";
 import HeroHeading from "../../components/headings/HeroHeading";
@@ -12,17 +12,15 @@ import ErrorDisplay from "../../components/error/ErrorDisplay";
 import { getAllPlayers, getFilterOptions } from "@/lib/supabase";
 
 const PlayersIndex = () => {
+  const { demoType, handleSwitchDemoType } = useNavbar();
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [demoType, setDemoType] = useState("pro");
   const [filtersApplied, setFiltersApplied] = useState({
     team: "",
   });
@@ -144,8 +142,6 @@ const PlayersIndex = () => {
     // Already filtering in the useEffect
   };
 
-  const handleSwitchDemoType = (type) => setDemoType(type);
-
   const handleResetFilters = () => {
     setFiltersApplied({
       team: "",
@@ -176,15 +172,6 @@ const PlayersIndex = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={handleSwitchDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       {/* Hero Header */}
       <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
@@ -244,10 +231,15 @@ const PlayersIndex = () => {
         {filteredPlayers.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {filteredPlayers.map((player, index) => {
+              // Create a unique key using multiple fields
+              const uniqueKey =
+                player.id ||
+                `${player.name}-${player.team || "unknown"}-${index}`;
+
               // If this is the last item, attach the ref for intersection observer
               if (index === filteredPlayers.length - 1) {
                 return (
-                  <div ref={lastPlayerElementRef} key={player.name}>
+                  <div ref={lastPlayerElementRef} key={uniqueKey}>
                     <PlayerCard
                       player={player}
                       demoCount={player.stats?.totalDemos}
@@ -258,7 +250,7 @@ const PlayersIndex = () => {
               } else {
                 return (
                   <PlayerCard
-                    key={player.name}
+                    key={uniqueKey}
                     player={player}
                     demoCount={player.stats?.totalDemos}
                     viewCount={player.stats?.totalViews}
@@ -316,8 +308,6 @@ const PlayersIndex = () => {
           onApplyFilters={handleApplyFilters}
         />
       )}
-
-      <Footer />
     </div>
   );
 };

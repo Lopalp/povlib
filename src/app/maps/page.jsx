@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Filter, MapPin, Server } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
-import Footer from "../../components/navigation/Footer";
+import { useNavbar } from "../../context/NavbarContext";
+
 import FilterModal from "../../components/modals/FilterModal";
 import HeroHeading from "../../components/headings/HeroHeading";
 import ErrorDisplay from "../../components/error/ErrorDisplay";
@@ -17,13 +17,11 @@ import { getFilterOptions } from "@/lib/supabase";
 }; */
 
 const MapsIndex = () => {
+  const { demoType, handleSwitchDemoType } = useNavbar();
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchActive, setSearchActive] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [demoType, setDemoType] = useState("pro");
   const [maps, setMaps] = useState([]);
   const [filteredMaps, setFilteredMaps] = useState([]);
   const [filtersApplied, setFiltersApplied] = useState({
@@ -256,8 +254,6 @@ const MapsIndex = () => {
     // Already filtering in the useEffect
   };
 
-  const handleSwitchDemoType = (type) => setDemoType(type);
-
   const handleResetFilters = () => setFiltersApplied({});
 
   const handleApplyFilters = () => setIsFilterModalOpen(false);
@@ -283,15 +279,6 @@ const MapsIndex = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={handleSwitchDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       {/* Hero Header */}
       <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
@@ -434,8 +421,6 @@ const MapsIndex = () => {
           onApplyFilters={handleApplyFilters}
         />
       )}
-
-      <Footer />
     </div>
   );
 };

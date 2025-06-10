@@ -19,8 +19,6 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import Navbar from "../../../components/navigation/Navbar";
-import Footer from "../../../components/navigation/Footer";
 import VideoPlayerPage from "../../../components/features/VideoPlayerPage";
 import TaggingModal from "../../../components/modals/TaggingModal";
 import FilterModal from "../../../components/modals/FilterModal";
@@ -530,15 +528,6 @@ const PlayerPage = ({ playerName }) => {
         />
       )}
 
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={handleSwitchDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       {/* Hero Section: Demo-Video + Spieler-Infos */}
       {!isLoading && trendingDemos.length > 0 && (
         <div className="relative overflow-hidden bg-black group w-full aspect-[16/9] max-h-[75vh] h-auto">
@@ -816,7 +805,7 @@ const PlayerPage = ({ playerName }) => {
                     className="absolute top-0 left-0 w-full h-full"
                     src={`https://www.youtube.com/embed/${player.best_game.videoId}?rel=0&modestbranding=1`}
                     title={player.best_game.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     allowFullScreen
                   />
                 </div>
@@ -1014,8 +1003,6 @@ const PlayerPage = ({ playerName }) => {
           onApplyFilters={handleApplyFilters}
         />
       )}
-
-      <Footer />
     </div>
   );
 };

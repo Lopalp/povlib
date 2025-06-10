@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useNavbar } from "../../../context/NavbarContext";
 import { Filter } from "lucide-react";
 import HeroHeading from "../../../components/headings/HeroHeading";
 import SectionHeading from "../../../components/headings/SectionHeading";
 
-import Navbar from "../../../components/navigation/Navbar";
-import Footer from "../../../components/navigation/Footer";
 import DemoCard from "../../../components/cards/DemoCard";
 import VideoPlayerPage from "../../../components/features/VideoPlayerPage";
 import TaggingModal from "../../../components/modals/TaggingModal";
@@ -28,6 +27,7 @@ const MapPage = ({ params }) => {
   const { mapName } = React.use(params);
   const formattedMapName = mapName.charAt(0).toUpperCase() + mapName.slice(1);
   const router = useRouter();
+  const { demoType, handleSwitchDemoType } = useNavbar();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [map, setMap] = useState(null);
@@ -36,9 +36,6 @@ const MapPage = ({ params }) => {
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [relatedDemos, setRelatedDemos] = useState([]);
   const [activeTab, setActiveTab] = useState("all-demos");
-  const [searchActive, setSearchActive] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [demoType, setDemoType] = useState("all");
   const [isTaggingModalOpen, setIsTaggingModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
@@ -345,10 +342,6 @@ const MapPage = ({ params }) => {
     window.scrollTo(0, 0);
   };
 
-  const handleSwitchDemoType = (type) => {
-    setDemoType(type);
-  };
-
   const handleCloseVideoPlayer = () => {
     setSelectedDemo(null);
     setIsVideoPlayerOpen(false);
@@ -633,15 +626,6 @@ const MapPage = ({ params }) => {
         }
       `}</style>
 
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={handleSwitchDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       {/* Map Hero Header with background demo */}
       <div className="relative overflow-hidden bg-black group w-full aspect-[16/9] max-h-[75vh] h-auto">
         {/* Background Video */}
@@ -856,8 +840,6 @@ const MapPage = ({ params }) => {
           onReset={handleResetFilters}
         />
       )}
-
-      <Footer />
     </div>
   );
 };

@@ -3,8 +3,7 @@
 
 import React, { useState, useMemo } from "react";
 import { Search, Filter, MapPin, User, Tag as TagIcon } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
-import Footer from "../../components/navigation/Footer";
+
 import DemoCard from "../../components/cards/DemoCard";
 
 export default function UtilityBookPage() {
@@ -210,8 +209,6 @@ export default function UtilityBookPage() {
 
   return (
     <>
-      <Navbar />
-
       {/* Spacer for Navbar */}
       <div className="h-24 bg-gray-900"></div>
 
@@ -288,8 +285,6 @@ export default function UtilityBookPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </>
   );
 }

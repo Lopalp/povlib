@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FileVideo } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
-import Footer from "../../components/navigation/Footer";
+import { useNavbar } from "../../context/NavbarContext";
+
 import FilterModal from "../../components/modals/FilterModal";
 import { PrimaryButton, SecondaryButton } from "../../components/buttons";
 import ErrorDisplay from "../../components/error/ErrorDisplay";
@@ -20,20 +20,18 @@ import {
 } from "../../lib/utils";
 
 const DemosPage = () => {
+  const { demoType, handleSwitchDemoType } = useNavbar();
   const [demos, setDemos] = useState([]);
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
-  const [searchActive, setSearchActive] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const [demoType, setDemoType] = useState("pro");
   const [filtersApplied, setFiltersApplied] = useState(
     createInitialFilterState()
   );
@@ -133,8 +131,6 @@ const DemosPage = () => {
     e.preventDefault();
   };
 
-  const handleSwitchDemoType = (type) => setDemoType(type);
-
   const handleResetFilters = () =>
     setFiltersApplied(createInitialFilterState(searchQuery));
 
@@ -159,15 +155,6 @@ const DemosPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-gray-200">
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={handleSwitchDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       <HeroHeader
         searchQuery={searchQuery}
         handleSearchChange={handleSearchChange}
@@ -265,8 +252,6 @@ const DemosPage = () => {
           onApplyFilters={handleApplyFilters}
         />
       )}
-
-      <Footer />
     </div>
   );
 };

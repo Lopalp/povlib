@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { Settings } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
-import Footer from "../../components/navigation/Footer";
+
 import ComparePlansModal from "../../components/modals/ComparePlansModal";
 import CreateDemoModal from "../../components/modals/CreateDemoModal";
 import { CategorySection } from "../../components/features/CategorySection";
@@ -150,36 +149,19 @@ export default function UserPage() {
     );
   if (!user)
     return (
-      <>
-        <Navbar
-          searchActive={searchActive}
-          setSearchActive={setSearchActive}
-          setIsMenuOpen={setIsMenuOpen}
-          isMenuOpen={isMenuOpen}
-        />
-
-        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
-          <p>
-            You need{" "}
-            <a href="/signin" className="text-yellow-400 underline">
-              log in
-            </a>{" "}
-            to view your profile.
-          </p>
-        </div>
-        <Footer />
-      </>
+      <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 text-gray-200">
+        <p>
+          You need{" "}
+          <a href="/signin" className="text-yellow-400 underline">
+            log in
+          </a>{" "}
+          to view your profile.
+        </p>
+      </div>
     );
 
   return (
     <>
-      <Navbar
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       <main className="pt-24 pb-12 bg-gray-900 text-gray-200">
         <div className="container mx-auto px-4 md:px-8 space-y-6">
           {/* Profile Banner */}
@@ -380,8 +362,6 @@ export default function UserPage() {
         uploadError={uploadError}
         onLinkAccount={linkFaceit}
       />
-
-      <Footer />
     </>
   );
 }

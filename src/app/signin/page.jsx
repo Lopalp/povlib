@@ -34,7 +34,7 @@ export default function SignInPage() {
           className="absolute top-0 left-0 h-full w-full rounded-lg"
           src={`https://www.youtube-nocookie.com/embed/d-8WyXJ5EtQ?autoplay=1&mute=1&loop=1&playlist=d-8WyXJ5EtQ&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1&playsinline=1&enablejsapi=1`}
           title="selectedDemo.title"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           style={{
             border: "none",
             transform: `scale(${scale})`,

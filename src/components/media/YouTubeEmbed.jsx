@@ -7,11 +7,30 @@ const YouTubeEmbed = ({
   className = "",
   controls = true,
   showInfo = false,
+  fillParent = false,
 }) => {
+  // Don't render if videoId is invalid
+  if (!videoId || typeof videoId !== "string") {
+    return (
+      <div
+        className={`relative w-full overflow-hidden bg-gray-800 ${className}`}
+      >
+        <div className="flex items-center justify-center h-full min-h-[200px] text-gray-400">
+          Video not available
+        </div>
+      </div>
+    );
+  }
+
+  const containerStyle = fillParent ? {} : { paddingBottom: "56.25%" };
+
   return (
     <div className={`relative w-full overflow-hidden ${className}`}>
-      {/* 16:9 Aspect Ratio Container */}
-      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+      {/* Aspect Ratio Container */}
+      <div
+        className={`relative w-full ${fillParent ? "h-full" : ""}`}
+        style={containerStyle}
+      >
         <div className="absolute top-0 left-0 w-full h-full">
           <iframe
             className="w-full h-full"
@@ -21,8 +40,9 @@ const YouTubeEmbed = ({
               showInfo ? 1 : 0
             }&mute=${autoplay ? 1 : 0}&modestbranding=1`}
             title={title || "YouTube video player"}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowFullScreen
+            loading="lazy"
           />
         </div>
       </div>

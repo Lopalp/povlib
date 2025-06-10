@@ -20,8 +20,7 @@ import {
   Search,
 } from "lucide-react";
 import YouTubeEmbed from "../media/YouTubeEmbed";
-import Navbar from "../navigation/Navbar";
-import Footer from "../navigation/Footer";
+
 import ModalHeading from "../headings/ModalHeading";
 import SettingsHeading from "../headings/SettingsHeading";
 import Tag from "../typography/Tag";
@@ -92,15 +91,6 @@ const VideoPlayerPage = ({
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200">
-      <Navbar
-        demoType={demoType}
-        onSwitchDemoType={setDemoType}
-        searchActive={searchActive}
-        setSearchActive={setSearchActive}
-        setIsMenuOpen={setIsMenuOpen}
-        isMenuOpen={isMenuOpen}
-      />
-
       {/* KORREKTUR: Padding-Top (pt) von 16 auf 24 erhöht für mehr Abstand */}
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
@@ -398,8 +388,6 @@ const VideoPlayerPage = ({
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };
