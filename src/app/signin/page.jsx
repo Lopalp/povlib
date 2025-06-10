@@ -2,7 +2,7 @@
 import React from "react";
 import { FaDiscord } from "react-icons/fa";
 import { BackButton } from "../../components/buttons";
-import LogoHeading from "../../components/typography/LogoHeading";
+import LogoHeading from "../../components/brand/LogoHeading";
 import GoogleSignInButton from "../../components/auth/GoogleSignInButton";
 import DiscordSignInButton from "../../components/auth/DiscordSignInButton";
 import { useEffect, useState } from "react";

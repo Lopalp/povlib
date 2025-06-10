@@ -13,15 +13,17 @@ const SecondaryButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-4 py-2 
+        font-poppins
+        px-6 
+        py-3 
+        text-sm 
+        font-bold 
         bg-gray-700 
         text-white 
-        rounded 
-        font-semibold 
+        rounded-lg 
         hover:bg-gray-600 
-        transition 
-        component-lib-mono
-        disabled:bg-gray-700 
+        transition-colors
+        disabled:bg-gray-800 
         disabled:text-gray-500 
         disabled:cursor-not-allowed
         ${className}

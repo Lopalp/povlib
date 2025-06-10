@@ -15,6 +15,7 @@ const NavigationButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
+        font-poppins
         flex 
         items-center 
         gap-2 

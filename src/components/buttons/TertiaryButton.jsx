@@ -13,16 +13,19 @@ const TertiaryButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-4 py-2 
-        border 
-        border-gray-600 
+        font-poppins
+        px-6 
+        py-3 
+        text-sm 
+        font-bold 
+        border-2 
+        border-gray-700 
         text-white 
-        rounded 
-        font-semibold 
+        rounded-lg 
         hover:border-yellow-400 
-        transition 
-        component-lib-mono
-        disabled:border-gray-700 
+        hover:text-yellow-400 
+        transition-colors
+        disabled:border-gray-800 
         disabled:text-gray-500 
         disabled:cursor-not-allowed
         ${className}

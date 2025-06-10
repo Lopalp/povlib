@@ -1,5 +1,5 @@
 import React from "react";
-import LogoHeading from "../typography/LogoHeading";
+import LogoHeading from "../brand/LogoHeading";
 
 export const LoadingInline = ({ spinnerOnly = false }) => {
   if (spinnerOnly) {

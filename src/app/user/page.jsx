@@ -3,12 +3,12 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { Settings } from "lucide-react";
-import Navbar from "../../components/POVlib/Navbar";
-import Footer from "../../components/POVlib/Footer";
-import ComparePlansModal from "../../components/POVlib/ComparePlansModal";
-import CreateDemoModal from "../../components/POVlib/CreateDemoModal";
-import { CategorySection } from "../../components/containers/CategorySection";
-import UtilityBook from "../../components/POVlib/UtilityBook";
+import Navbar from "../../components/navigation/Navbar";
+import Footer from "../../components/navigation/Footer";
+import ComparePlansModal from "../../components/modals/ComparePlansModal";
+import CreateDemoModal from "../../components/modals/CreateDemoModal";
+import { CategorySection } from "../../components/features/CategorySection";
+import UtilityBook from "../../components/features/UtilityBook";
 import { getFilteredDemos } from "@/lib/supabase";
 import { UserContext } from "../../../context/UserContext";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";

@@ -1,22 +1,40 @@
-"use client"
+"use client";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const BackButton =  ({ text }) => {
+const BackButton = ({
+  text = "Back",
+  onClick,
+  className = "",
+  disabled = false,
+  type = "button",
+}) => {
+  const router = useRouter();
 
-    const router = useRouter();
-
-    return (
-        <button 
-            onClick={() => router.back()}
-            className="flex items-center text-gray-400 hover:text-yellow-400 mb-4 transition-colors cursor-pointer"
-            style={{cursor: "pointer"}}
-        >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            <span className="text-sm font-medium">{text}</span>
-        </button>
-    );
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`
+        font-poppins
+        px-4 
+        py-2 
+        text-sm 
+        font-bold 
+        text-gray-400 
+        hover:text-white 
+        transition-colors
+        disabled:text-gray-600 
+        disabled:cursor-not-allowed
+        ${className}
+      `}
+    >
+      <span className="mr-2">←</span>
+      {text}
+    </button>
+  );
 };
 
-export default BackButton; 
+export default BackButton;

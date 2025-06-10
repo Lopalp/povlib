@@ -9,9 +9,9 @@ const IconButton = ({
   size = "md",
 }) => {
   const sizeClasses = {
-    sm: "p-1",
-    md: "p-2",
-    lg: "p-3",
+    sm: "w-8 h-8",
+    md: "w-10 h-10",
+    lg: "w-12 h-12",
   };
 
   return (
@@ -20,14 +20,18 @@ const IconButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        rounded-full 
-        text-gray-400 
-        hover:text-white 
-        hover:bg-gray-700 
-        transition-colors
-        disabled:text-gray-600 
-        disabled:cursor-not-allowed
+        font-poppins
         ${sizeClasses[size]}
+        rounded-full
+        flex
+        items-center
+        justify-center
+        text-gray-400
+        hover:text-yellow-400
+        cursor-pointer
+        transition-colors
+        disabled:text-gray-600
+        disabled:cursor-not-allowed
         ${className}
       `}
     >

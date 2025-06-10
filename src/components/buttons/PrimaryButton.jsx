@@ -13,16 +13,18 @@ const PrimaryButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-4 py-2 
+        font-poppins
+        px-6 
+        py-3 
+        text-sm 
+        font-bold 
         bg-yellow-400 
-        text-black 
-        rounded 
-        font-semibold 
-        hover:bg-yellow-300 
-        transition 
-        component-lib-mono
-        disabled:bg-gray-700 
-        disabled:text-gray-500 
+        text-gray-900 
+        rounded-lg 
+        hover:bg-yellow-500 
+        transition-colors
+        disabled:bg-gray-600 
+        disabled:text-gray-400 
         disabled:cursor-not-allowed
         ${className}
       `}

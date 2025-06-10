@@ -14,6 +14,7 @@ const ToggleButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
+        font-poppins
         px-6 
         py-3 
         text-sm 
