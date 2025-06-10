@@ -35,6 +35,8 @@ const demoMatchData = {
         { type: "utility", time: 10, player: "PlayerA" },
         { type: "kill", time: 45, player: "PlayerB" },
         { type: "death", time: 46, player: "PlayerA" },
+        { type: "kill", time: 55, player: "PlayerC" },
+        { type: "utility", time: 60, player: "PlayerA" },
       ],
     },
     {
@@ -43,6 +45,27 @@ const demoMatchData = {
         { type: "utility", time: 5, player: "PlayerC" },
         { type: "kill", time: 30, player: "PlayerA" },
         { type: "death", time: 30, player: "PlayerB" },
+        { type: "utility", time: 40, player: "PlayerA" },
+        { type: "kill", time: 50, player: "PlayerC" },
+      ],
+    },
+    {
+      roundNumber: 3,
+      events: [
+        { type: "kill", time: 15, player: "PlayerB" },
+        { type: "utility", time: 25, player: "PlayerA" },
+        { type: "death", time: 35, player: "PlayerC" },
+        { type: "kill", time: 45, player: "PlayerA" },
+      ],
+    },
+    {
+      roundNumber: 4,
+      events: [
+        { type: "utility", time: 8, player: "PlayerB" },
+        { type: "kill", time: 20, player: "PlayerA" },
+        { type: "death", time: 25, player: "PlayerB" },
+        { type: "utility", time: 35, player: "PlayerC" },
+        { type: "kill", time: 50, player: "PlayerC" },
       ],
     },
   ],
@@ -307,30 +330,12 @@ const VideoPlayerPage = ({
                 ))}
               </div>
 
+              {/* REPLACED: Old match timeline section with new MatchTimeline component */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="border-l-4 border-yellow-400 pl-2 text-xl font-semibold text-white">
                   Match Timeline
                 </h2>
-                {demoMatchData.rounds.map((round) => (
-                  <div key={round.roundNumber}>
-                    <div className="mb-2 text-gray-300 text-sm">
-                      Round {round.roundNumber}
-                    </div>
-                    <div className="relative h-3 bg-gray-700 rounded">
-                      {round.events.map((event, idx) => {
-                        const percent = Math.min((event.time / 60) * 100, 100);
-                        return (
-                          <div
-                            key={idx}
-                            className="absolute -top-1 w-2 h-2 bg-yellow-400 rounded-full border-2 border-gray-900"
-                            style={{ left: `${percent}%` }}
-                            title={`${event.type} – ${event.player} (${event.time}s)`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                <MatchTimeline matchData={demoMatchData} />
               </div>
             </div>
 
