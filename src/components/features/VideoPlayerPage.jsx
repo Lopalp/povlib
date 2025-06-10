@@ -20,6 +20,7 @@ import {
   Search,
 } from "lucide-react";
 import YouTubeEmbed from "../media/YouTubeEmbed";
+import MatchTimeline from "./MatchTimeline";
 
 import ModalHeading from "../headings/ModalHeading";
 import SettingsHeading from "../headings/SettingsHeading";

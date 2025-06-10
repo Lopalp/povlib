@@ -75,7 +75,7 @@ export default function Home() {
   // -------------------------------------
   // Under Construction Modal (show on load)
   // -------------------------------------
-  const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(true);
+  const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(false);
 
   // -------------------------------------
   // Plan state for comparison module
@@ -225,9 +225,11 @@ export default function Home() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        console.log("Starting to load initial data...");
         setIsLoading(true);
         const options = await getFilterOptions();
         setFilterOptions(options);
+        console.log("Filter options loaded:", options);
 
         const [demos, trending, latest] = await Promise.all([
           getFilteredDemos(filtersApplied, demoType),
@@ -235,19 +237,83 @@ export default function Home() {
           getLatestDemos(5, demoType),
         ]);
 
-        const mappedDemos = demos.map(mapDemo);
-        setFilteredDemos(mappedDemos);
-        if (mappedDemos.length > 0) setActiveVideoId(mappedDemos[0].videoId);
-        setTrendingDemos(trending.map(mapDemo));
-        setLatestDemos(latest.map(mapDemo));
+        console.log("Raw demos from Supabase:", demos);
+        console.log("Raw trending:", trending);
+        console.log("Raw latest:", latest);
+
+        // If no demos from database, use fallback data
+        if (!demos || demos.length === 0) {
+          console.warn("No demos found in database, using fallback data");
+          const fallbackDemos = [
+            {
+              id: 999,
+              title: "Fallback Demo - s1mple Ace on Mirage",
+              thumbnail: "/img/1.png",
+              video_id: "dQw4w9WgXcQ",
+              map: "Mirage",
+              positions: ["A Site", "Connector"],
+              tags: ["ace", "clutch"],
+              players: ["s1mple"],
+              team: "NAVI",
+              year: "2024",
+              event: "BLAST Premier",
+              result: "Win",
+              views: 15420,
+              likes: 892,
+              is_pro: true,
+            },
+          ];
+          setFilteredDemos(fallbackDemos.map(mapDemo));
+          setTrendingDemos(fallbackDemos.map(mapDemo));
+          setLatestDemos(fallbackDemos.map(mapDemo));
+        } else {
+          const mappedDemos = demos.map(mapDemo);
+          console.log("Mapped demos:", mappedDemos);
+          setFilteredDemos(mappedDemos);
+
+          const mappedTrending = trending.map(mapDemo);
+          console.log("Mapped trending:", mappedTrending);
+          setTrendingDemos(mappedTrending);
+
+          const mappedLatest = latest.map(mapDemo);
+          setLatestDemos(mappedLatest);
+        }
 
         setIsLoading(false);
-      } catch (err) {
-        console.error("Error loading initial data:", err);
-        setError("Failed to load data. Please try again later.");
+        console.log("Initial data loading completed");
+      } catch (error) {
+        console.error("Error loading initial data:", error);
+
+        // Use fallback data on error
+        console.warn("Database error occurred, using fallback data");
+        const fallbackDemos = [
+          {
+            id: 998,
+            title: "Error Fallback - Test Video",
+            thumbnail: "/img/1.png",
+            video_id: "dQw4w9WgXcQ",
+            map: "Mirage",
+            positions: ["A Site"],
+            tags: ["test"],
+            players: ["TestPlayer"],
+            team: "TestTeam",
+            year: "2024",
+            event: "Test Event",
+            result: "Win",
+            views: 1000,
+            likes: 50,
+            is_pro: true,
+          },
+        ];
+        setFilteredDemos(fallbackDemos.map(mapDemo));
+        setTrendingDemos(fallbackDemos.map(mapDemo));
+        setLatestDemos(fallbackDemos.map(mapDemo));
+
+        setError(`Database connection failed: ${error.message}`);
         setIsLoading(false);
       }
     };
+
     loadInitialData();
   }, [demoType]);
 
@@ -503,7 +569,31 @@ export default function Home() {
           />
         )}
 
-        <main className="container mx-auto px-6 pt-8 bg-pattern">
+        {/* Debug info */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="fixed top-20 right-4 bg-black/80 text-white p-4 rounded text-xs z-50 max-w-xs">
+            <div>Debug Info:</div>
+            <div>filteredDemos.length: {filteredDemos.length}</div>
+            <div>selectedDemo: {selectedDemo ? "true" : "false"}</div>
+            <div>isLoading: {isLoading ? "true" : "false"}</div>
+            <div>
+              First demo:{" "}
+              {filteredDemos[0]
+                ? JSON.stringify(
+                    {
+                      id: filteredDemos[0].id,
+                      title: filteredDemos[0].title,
+                      videoId: filteredDemos[0].videoId,
+                    },
+                    null,
+                    2
+                  )
+                : "none"}
+            </div>
+          </div>
+        )}
+
+        <div className="container mx-auto px-6 pt-8 bg-pattern">
           <SelectedFilters
             filtersApplied={filtersApplied}
             setFiltersApplied={setFiltersApplied}
@@ -618,7 +708,7 @@ export default function Home() {
               </Link>
             </div>
           </section>
-        </main>
+        </div>
 
         {isFilterModalOpen && (
           <FilterModal

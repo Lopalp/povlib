@@ -11,20 +11,57 @@ const FeaturedHero = ({
   setIsFilterModalOpen,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [showPlayButton, setShowPlayButton] = useState(!autoplayVideo);
+
+  // Debug logging
+  console.log("FeaturedHero rendering with data:", {
+    demo,
+    autoplayVideo,
+    demoVideoId: demo?.videoId,
+    demoTitle: demo?.title,
+    showPlayButton,
+  });
 
   useEffect(() => {
     setIsVisible(true);
+    setShowPlayButton(!autoplayVideo);
+    console.log("FeaturedHero useEffect triggered:", {
+      demo: demo?.title,
+      autoplayVideo,
+    });
     return () => setIsVisible(false);
-  }, [demo]);
+  }, [demo, autoplayVideo]);
 
-  if (!demo) return null;
+  const handleVideoContainerClick = () => {
+    console.log("Play button clicked, hiding overlay");
+    setShowPlayButton(false);
+  };
+
+  if (!demo) {
+    console.warn("FeaturedHero: No demo data provided");
+    return null;
+  }
+
+  if (!demo.videoId) {
+    console.error("FeaturedHero: Demo missing videoId:", demo);
+    return (
+      <div className="relative overflow-hidden bg-red-900 group w-full aspect-[16/9] max-h-[75vh] h-auto">
+        <div className="absolute inset-0 flex items-center justify-center text-white">
+          <div className="text-center">
+            <p>Video ID missing</p>
+            <p className="text-sm">Demo: {demo.title || "Unknown"}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative overflow-hidden bg-black group w-full aspect-[16/9] max-h-[75vh] h-auto">
       {/* Hintergrund-Video */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Halbtransparenter Schwarz-Overlay (optional) */}
-        <div className="absolute inset-0 bg-black/15 z-10" />
+        <div className="absolute inset-0 bg-black/15 z-10 pointer-events-none" />
 
         {/* Das YouTubeEmbed füllt jetzt immer die volle Höhe aus */}
         <div className="absolute inset-0 w-full h-full">
@@ -32,11 +69,28 @@ const FeaturedHero = ({
             videoId={demo.videoId}
             title={demo.title}
             autoplay={autoplayVideo}
-            controls={false}
+            controls={true}
             showInfo={false}
             fillParent={true}
           />
         </div>
+
+        {/* Play Button Overlay - separate from iframe container */}
+        {showPlayButton && (
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-20 cursor-pointer"
+            onClick={handleVideoContainerClick}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <div className="bg-yellow-400/90 hover:bg-yellow-400 transition-colors p-4 rounded-full">
+                <Play className="h-8 w-8 text-black fill-black" />
+              </div>
+              <span className="text-white text-sm font-medium">
+                Click to play video
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Inhalt: Titel, Tags, Buttons */}
