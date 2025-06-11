@@ -13,43 +13,26 @@ const FeaturedHero = ({
   const [isVisible, setIsVisible] = useState(false);
   const [showPlayButton, setShowPlayButton] = useState(!autoplayVideo);
 
-  // Debug logging
-  console.log("FeaturedHero rendering with data:", {
-    demo,
-    autoplayVideo,
-    demoVideoId: demo?.videoId,
-    demoTitle: demo?.title,
-    showPlayButton,
-  });
-
   useEffect(() => {
     setIsVisible(true);
     setShowPlayButton(!autoplayVideo);
-    console.log("FeaturedHero useEffect triggered:", {
-      demo: demo?.title,
-      autoplayVideo,
-    });
     return () => setIsVisible(false);
   }, [demo, autoplayVideo]);
 
   const handleVideoContainerClick = () => {
-    console.log("Play button clicked, hiding overlay");
     setShowPlayButton(false);
   };
 
   if (!demo) {
-    console.warn("FeaturedHero: No demo data provided");
     return null;
   }
 
   if (!demo.videoId) {
-    console.error("FeaturedHero: Demo missing videoId:", demo);
     return (
-      <div className="relative overflow-hidden bg-red-900 group w-full aspect-[16/9] max-h-[75vh] h-auto">
+      <div className="relative overflow-hidden bg-gray-800 group w-full aspect-[16/9] max-h-[75vh] h-auto">
         <div className="absolute inset-0 flex items-center justify-center text-white">
           <div className="text-center">
-            <p>Video ID missing</p>
-            <p className="text-sm">Demo: {demo.title || "Unknown"}</p>
+            <p>Video not available</p>
           </div>
         </div>
       </div>

@@ -569,30 +569,6 @@ export default function Home() {
           />
         )}
 
-        {/* Debug info */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="fixed top-20 right-4 bg-black/80 text-white p-4 rounded text-xs z-50 max-w-xs">
-            <div>Debug Info:</div>
-            <div>filteredDemos.length: {filteredDemos.length}</div>
-            <div>selectedDemo: {selectedDemo ? "true" : "false"}</div>
-            <div>isLoading: {isLoading ? "true" : "false"}</div>
-            <div>
-              First demo:{" "}
-              {filteredDemos[0]
-                ? JSON.stringify(
-                    {
-                      id: filteredDemos[0].id,
-                      title: filteredDemos[0].title,
-                      videoId: filteredDemos[0].videoId,
-                    },
-                    null,
-                    2
-                  )
-                : "none"}
-            </div>
-          </div>
-        )}
-
         <div className="container mx-auto px-6 pt-8 bg-pattern">
           <SelectedFilters
             filtersApplied={filtersApplied}
