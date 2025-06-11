@@ -569,13 +569,12 @@ export default function Home() {
           />
         )}
 
-        <div className="container mx-auto px-6 pt-8 bg-pattern">
+        <div className="container mx-auto px-6 pt-8 pb-12 bg-pattern">
           <SelectedFilters
             filtersApplied={filtersApplied}
             setFiltersApplied={setFiltersApplied}
             searchQuery={searchQuery}
           />
-
           {/* Filter Icon + Tag Bar */}
           <div className="flex items-center gap-2 mb-4">
             <Filter
@@ -602,7 +601,6 @@ export default function Home() {
               </Link>
             </div>
           </div>
-
           {/* Category Sections */}
           <CategorySection
             title={activeTag === null ? "Recently Added" : activeTag}
@@ -612,12 +610,10 @@ export default function Home() {
             user={user}
             session={session}
           />
-
           {/* Competition Module */}
           <div className="mt-8">
             <CompetitionModule user={user} session={session} />
           </div>
-
           {/* Plan Comparison Module inserted directly under CompetitionModule */}
           <div className="mt-8">
             <PlanComparisonModule
@@ -627,7 +623,6 @@ export default function Home() {
               session={session}
             />
           </div>
-
           {!filtersApplied.map && (
             <>
               <CategorySection
@@ -646,9 +641,8 @@ export default function Home() {
               />
             </>
           )}
-
           {/* Revised Navigation Cards Below */}
-          <section className="mt-8 mb-12">
+          <section className="mt-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Link
                 href="/players"

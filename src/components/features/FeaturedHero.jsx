@@ -52,7 +52,7 @@ const FeaturedHero = ({
             videoId={demo.videoId}
             title={demo.title}
             autoplay={autoplayVideo}
-            controls={true}
+            controls={false}
             showInfo={false}
             fillParent={true}
           />
