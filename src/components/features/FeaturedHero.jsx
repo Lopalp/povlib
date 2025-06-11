@@ -46,16 +46,26 @@ const FeaturedHero = ({
         {/* Halbtransparenter Schwarz-Overlay (optional) */}
         <div className="absolute inset-0 bg-black/15 z-10 pointer-events-none" />
 
-        {/* Das YouTubeEmbed füllt jetzt immer die volle Höhe aus */}
+        {/* Das YouTubeEmbed mit verbesserter Skalierung für vollständige Abdeckung */}
         <div className="absolute inset-0 w-full h-full">
-          <YouTubeEmbed
-            videoId={demo.videoId}
-            title={demo.title}
-            autoplay={autoplayVideo}
-            controls={true}
-            showInfo={false}
-            fillParent={true}
-          />
+          <div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            style={{
+              width: "177.78vh", // 16:9 ratio calculated as 100vh * 16/9
+              height: "56.25vw", // 16:9 ratio calculated as 100vw * 9/16
+              minWidth: "100%",
+              minHeight: "100%",
+            }}
+          >
+            <YouTubeEmbed
+              videoId={demo.videoId}
+              title={demo.title}
+              autoplay={autoplayVideo}
+              controls={false}
+              showInfo={false}
+              fillParent={true}
+            />
+          </div>
         </div>
 
         {/* Play Button Overlay - separate from iframe container */}
