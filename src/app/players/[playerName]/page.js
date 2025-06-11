@@ -53,7 +53,8 @@ const groupDemosByProperty = (demos, property) => {
   }, {});
 };
 
-const PlayerPage = ({ playerName }) => {
+const PlayerPage = ({ params }) => {
+  const { playerName } = params;
   const router = useRouter();
   const [player, setPlayer] = useState(null);
   const [allDemos, setAllDemos] = useState([]);
