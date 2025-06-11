@@ -54,7 +54,7 @@ export default function Navbar({
   const router = useRouter();
 
   // Glas-Hintergrund für Desktop-Navbar
-  const glassBg = "bg-black/50 backdrop-blur-lg border border-gray-700";
+  const glassBg = "bg-black/50 backdrop-blur-lg";
 
   useEffect(() => {
     const onScroll = () => {
