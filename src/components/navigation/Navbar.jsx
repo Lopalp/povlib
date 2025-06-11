@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Search,
   Menu,
@@ -18,6 +19,7 @@ import LogoHeading from "../brand/LogoHeading";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { IconButton } from "../buttons";
+import NavbarMenu from "../menus/NavbarMenu";
 
 const mapNamesDesktop = [
   { label: "Mirage", slug: "mirage" },
@@ -52,9 +54,55 @@ export default function Navbar({
   const { user, setUser } = useContext(UserContext);
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
+  const pathname = usePathname();
+  const mapMenuRef = useRef(null);
+
+  // Maps menu items
+  const mapMenuItems = [
+    {
+      label: "All Maps",
+      href: "/maps",
+      primary: true,
+    },
+    {
+      type: "divider",
+    },
+    ...mapNamesDesktop.map((map) => ({
+      label: map.label,
+      href: `/maps/${map.slug}`,
+      backgroundImage: `/img/maps/${map.slug}.png`,
+    })),
+  ];
 
   // Glas-Hintergrund für Desktop-Navbar
   const glassBg = "bg-black/50 backdrop-blur-lg";
+
+  // Helper function to determine if a navigation item is active
+  const isActive = (path) => {
+    if (path === "/" && pathname === "/") return true;
+    if (path !== "/" && pathname.startsWith(path)) return true;
+    return false;
+  };
+
+  // Helper function to get link classes based on active state
+  const getLinkClasses = (path) => {
+    const baseClasses =
+      "text-sm font-light transition-colors duration-200 hover:text-yellow-400";
+    if (isActive(path)) {
+      return `${baseClasses} text-yellow-400`;
+    }
+    return `${baseClasses} text-gray-200`;
+  };
+
+  // Helper function for mobile link classes
+  const getMobileLinkClasses = (path) => {
+    const baseClasses =
+      "text-lg font-light hover:text-yellow-400 transition-colors";
+    if (isActive(path)) {
+      return `${baseClasses} text-yellow-400 border-l-4 border-yellow-400 pl-4`;
+    }
+    return `${baseClasses} text-gray-200`;
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -93,10 +141,6 @@ export default function Navbar({
     }
   };
 
-  // Jetzt mit font-light statt font-normal
-  const linkClasses =
-    "text-sm font-light transition-colors duration-200 hover:text-yellow-400";
-
   // Fullscreen-Overlay für das mobile Menü – höherer z-index als die Navbar
   const mobileOverlayBg =
     "fixed inset-0 z-60 bg-black/90 backdrop-blur-lg border-t border-gray-800 overflow-y-auto";
@@ -115,53 +159,38 @@ export default function Navbar({
 
           {/* Desktop-Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className={`${linkClasses} text-white`}>
+            <Link href="/" className={getLinkClasses("/")}>
               Home
             </Link>
             <div className="relative">
               <button
+                ref={mapMenuRef}
                 onClick={toggleMaps}
-                className={`${linkClasses} text-gray-300 flex items-center gap-1.5`}
+                className={`${getLinkClasses(
+                  "/maps"
+                )} flex items-center gap-1.5`}
               >
                 Maps <ChevronDown className="h-4 w-4" />
               </button>
-              {mapMenuOpen && (
-                <ul
-                  className={`absolute left-0 mt-2 w-52 rounded-lg py-2 shadow-lg ${glassBg} z-50`}
-                >
-                  <li>
-                    <Link
-                      href="/maps"
-                      className="block px-4 py-2 text-sm text-white hover:text-yellow-400"
-                    >
-                      All Maps
-                    </Link>
-                  </li>
-                  <li className="border-t border-gray-600 my-1" />
-                  {mapNamesDesktop.map((m) => (
-                    <li key={m.slug}>
-                      <Link
-                        href={`/maps/${m.slug}`}
-                        className="block px-4 py-2 text-sm text-gray-200 hover:text-yellow-400"
-                      >
-                        {m.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <NavbarMenu
+                isOpen={mapMenuOpen}
+                onClose={() => setMapMenuOpen(false)}
+                items={mapMenuItems}
+                position="bottom right"
+                triggerRef={mapMenuRef}
+              />
             </div>
-            <Link href="/demos" className={`${linkClasses} text-gray-200`}>
+            <Link href="/demos" className={getLinkClasses("/demos")}>
               Demos
             </Link>
-            <Link href="/players" className={`${linkClasses} text-gray-200`}>
+            <Link href="/players" className={getLinkClasses("/players")}>
               Players
             </Link>
-            <Link href="/viewer" className={`${linkClasses} text-gray-200`}>
+            <Link href="/viewer" className={getLinkClasses("/viewer")}>
               Demo Viewer
             </Link>
             <div className="relative group">
-              <span className={`${linkClasses} text-gray-200 cursor-default`}>
+              <span className="text-sm font-light transition-colors duration-200 hover:text-yellow-400 text-gray-200 cursor-default">
                 Community
               </span>
               <div
@@ -260,13 +289,19 @@ export default function Navbar({
               <Link
                 href="/"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-white text-lg font-light hover:text-yellow-400"
+                className={getMobileLinkClasses("/")}
               >
                 Home
               </Link>
 
               <div className="border-t border-gray-700 pt-4">
-                <div className="flex items-center mb-3 text-lg font-light text-white">
+                <div
+                  className={`flex items-center mb-3 text-lg font-light ${
+                    pathname.startsWith("/maps")
+                      ? "text-yellow-400"
+                      : "text-white"
+                  }`}
+                >
                   <MapPin className="h-5 w-5 text-yellow-400 mr-2" /> Maps
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -275,7 +310,11 @@ export default function Navbar({
                       key={m.slug}
                       href={`/maps/${m.slug}`}
                       onClick={() => setIsMenuOpen(false)}
-                      className="py-2 text-center text-gray-200 border border-gray-700 rounded-md hover:text-yellow-400 font-light"
+                      className={`py-2 text-center border border-gray-700 rounded-md hover:text-yellow-400 font-light transition-colors ${
+                        pathname === `/maps/${m.slug}`
+                          ? "text-yellow-400 border-yellow-400 bg-yellow-400/10"
+                          : "text-gray-200"
+                      }`}
                     >
                       {m.label}
                     </Link>
@@ -284,7 +323,9 @@ export default function Navbar({
                 <Link
                   href="/maps"
                   onClick={() => setIsMenuOpen(false)}
-                  className="mt-3 block text-sm text-yellow-400 hover:underline font-light"
+                  className={`mt-3 block text-sm hover:underline font-light transition-colors ${
+                    pathname === "/maps" ? "text-yellow-400" : "text-yellow-400"
+                  }`}
                 >
                   All Maps →
                 </Link>
@@ -293,7 +334,11 @@ export default function Navbar({
               <Link
                 href="/demos"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
+                className={`flex items-center gap-2 hover:text-yellow-400 font-light transition-colors ${
+                  pathname.startsWith("/demos")
+                    ? "text-yellow-400 border-l-4 border-yellow-400 pl-4"
+                    : "text-gray-200"
+                }`}
               >
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Demos
               </Link>
@@ -301,7 +346,11 @@ export default function Navbar({
               <Link
                 href="/players"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
+                className={`flex items-center gap-2 hover:text-yellow-400 font-light transition-colors ${
+                  pathname.startsWith("/players")
+                    ? "text-yellow-400 border-l-4 border-yellow-400 pl-4"
+                    : "text-gray-200"
+                }`}
               >
                 <User className="h-5 w-5 text-yellow-400" /> Players
               </Link>
@@ -309,7 +358,11 @@ export default function Navbar({
               <Link
                 href="/viewer"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-gray-200 hover:text-yellow-400 font-light"
+                className={`flex items-center gap-2 hover:text-yellow-400 font-light transition-colors ${
+                  pathname.startsWith("/viewer")
+                    ? "text-yellow-400 border-l-4 border-yellow-400 pl-4"
+                    : "text-gray-200"
+                }`}
               >
                 <FileVideo className="h-5 w-5 text-yellow-400" /> Demo Viewer
               </Link>
