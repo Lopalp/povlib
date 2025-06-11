@@ -1,6 +1,7 @@
 import "./globals.css";
 import UserProvider from "../../context/UserProvider";
 import { Poppins } from "next/font/google";
+import GlobalLayout from "../components/layout/GlobalLayout";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`dark ${poppins.className}`}>
       <body className="bg-gray-900 text-white">
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          <GlobalLayout>{children}</GlobalLayout>
+        </UserProvider>
       </body>
     </html>
   );

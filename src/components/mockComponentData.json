@@ -31,7 +31,9 @@
       "players": ["s1mple", "electroNic"],
       "positions": ["Window", "Connector"],
       "tags": ["ace", "clutch"],
-      "thumbnail": "/img/1.png"
+      "thumbnail": "/img/1.png",
+      "views": 15420,
+      "likes": 892
     },
     {
       "id": 2,
@@ -44,7 +46,9 @@
       "players": ["ZywOo"],
       "positions": ["Banana", "B Site"],
       "tags": ["clutch", "highlight"],
-      "thumbnail": "/img/2.png"
+      "thumbnail": "/img/2.png",
+      "views": 23150,
+      "likes": 1247
     },
     {
       "id": 3,
@@ -57,7 +61,9 @@
       "players": ["NiKo"],
       "positions": ["Donut", "Mid"],
       "tags": ["entry", "multi-kill"],
-      "thumbnail": "/img/3.png"
+      "thumbnail": "/img/3.png",
+      "views": 8760,
+      "likes": 543
     }
   ],
   "player": {
@@ -102,7 +108,12 @@
         "label": "Feedback",
         "fields": [
           { "name": "comment", "label": "Your Feedback", "type": "textarea" },
-          { "name": "rating", "label": "Rating", "type": "radio", "options": ["1", "2", "3", "4", "5"] }
+          {
+            "name": "rating",
+            "label": "Rating",
+            "type": "radio",
+            "options": ["1", "2", "3", "4", "5"]
+          }
         ]
       }
     ],
@@ -168,5 +179,96 @@
   },
   "errorWindow": {
     "text": "This is an error message example."
+  },
+  "featuredHero": {
+    "id": 1,
+    "title": "s1mple Amazing 1v4 Clutch - Mirage",
+    "videoId": "dQw4w9WgXcQ",
+    "thumbnail": "/img/1.png",
+    "map": "Mirage",
+    "team": "NAVI",
+    "event": "BLAST Premier",
+    "year": "2023",
+    "players": ["s1mple", "electroNic"],
+    "positions": ["Connector", "Palace"],
+    "tags": ["clutch", "ace"],
+    "views": 15420,
+    "likes": 892
+  },
+  "competitionModule": {
+    "title": "Clip of the Week",
+    "clipCount": 4
+  },
+  "planComparisonModule": {
+    "currentPlan": "basic"
+  },
+  "videoPlayerPage": {
+    "id": 1,
+    "title": "s1mple Amazing 1v4 Clutch - Mirage",
+    "videoId": "dQw4w9WgXcQ",
+    "thumbnail": "/img/1.png",
+    "map": "Mirage",
+    "team": "NAVI",
+    "event": "BLAST Premier",
+    "year": "2023",
+    "players": ["s1mple", "electroNic"],
+    "positions": ["Connector", "Palace"],
+    "tags": ["clutch", "ace"],
+    "views": 15420,
+    "likes": 892,
+    "description": "Watch s1mple pull off this incredible 1v4 clutch on Mirage connector. Amazing crosshair placement and game sense on display.",
+    "match_info": {
+      "score": "16-14",
+      "opponent": "Astralis",
+      "round": "Round 29"
+    }
+  },
+  "utilityBook": {
+    "selectedMap": "mirage",
+    "selectedPosition": "connector"
+  },
+  "mapGrid": {
+    "maps": [
+      { "name": "Mirage", "image": "/img/maps/mirage.jpg", "demoCount": 234 },
+      { "name": "Inferno", "image": "/img/maps/inferno.jpg", "demoCount": 189 },
+      { "name": "Dust2", "image": "/img/maps/dust2.jpg", "demoCount": 156 },
+      { "name": "Cache", "image": "/img/maps/cache.jpg", "demoCount": 98 }
+    ]
+  },
+  "matchTimeline": {
+    "rounds": [
+      {
+        "roundNumber": 1,
+        "events": [
+          { "type": "utility", "time": 10, "player": "s1mple" },
+          { "type": "kill", "time": 45, "player": "s1mple" },
+          { "type": "death", "time": 78, "player": "electroNic" }
+        ]
+      },
+      {
+        "roundNumber": 2,
+        "events": [
+          { "type": "utility", "time": 5, "player": "electroNic" },
+          { "type": "kill", "time": 30, "player": "flamie" },
+          { "type": "death", "time": 55, "player": "s1mple" }
+        ]
+      },
+      {
+        "roundNumber": 3,
+        "events": [
+          { "type": "kill", "time": 15, "player": "s1mple" },
+          { "type": "kill", "time": 32, "player": "s1mple" },
+          { "type": "utility", "time": 40, "player": "electroNic" }
+        ]
+      },
+      {
+        "roundNumber": 4,
+        "events": [
+          { "type": "utility", "time": 8, "player": "flamie" },
+          { "type": "death", "time": 25, "player": "flamie" },
+          { "type": "kill", "time": 60, "player": "electroNic" }
+        ]
+      }
+    ]
   }
-} 
+}
