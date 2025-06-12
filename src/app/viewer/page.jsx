@@ -1,9 +1,8 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Settings, Maximize2, Volume2, ChevronLeft, ChevronRight, Shield, Heart, DollarSign, Skull, Target, Bomb, Timer, Users, TrendingUp, Award, Zap, Package, AlertCircle, Crosshair, FlameIcon, Sparkles, CloudIcon, Menu, X, Activity, Eye, Percent, Clock, MapPin, Swords } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Settings, Maximize2, Volume2, ChevronLeft, ChevronRight, Shield, Heart, DollarSign, Skull, Target, Bomb, Timer, Users, TrendingUp, Award, Zap, Package, AlertCircle, Crosshair, FlameIcon, Sparkles, CloudIcon, Menu, X, Activity, Eye, Percent, Clock, MapPin, Swords, Search, Database, ZoomIn, ZoomOut, Move, BarChart, Trophy, Lightbulb } from 'lucide-react';
 
-// Erweiterte Spielerdaten-Generierung
+// Erweiterte Spielerdaten-Generierung mit verschiedenen Stat-Zeiträumen
 const generateDetailedPlayers = () => {
   const ctNames = ['nitr0', 'Stewie2K', 'NAF', 'Twistzz', 'EliGE'];
   const tNames = ['Magisk', 'device', 'Xyp9x', 'dupreeh', 'gla1ve'];
@@ -12,9 +11,45 @@ const generateDetailedPlayers = () => {
   
   const generatePlayerStats = (name, team, index) => {
     const isAwper = Math.random() > 0.7;
-    const kills = Math.floor(Math.random() * 25 + 5);
-    const deaths = Math.floor(Math.random() * 20 + 5);
-    const hs = Math.floor(Math.random() * kills * 0.6);
+    
+    // Generate different stats for different time periods
+    const roundStats = {
+      kills: Math.floor(Math.random() * 4),
+      deaths: Math.random() > 0.7 ? 1 : 0,
+      assists: Math.floor(Math.random() * 2),
+      damage: Math.floor(Math.random() * 300),
+      enemiesFlashed: Math.floor(Math.random() * 3),
+      utilityDamage: Math.floor(Math.random() * 100)
+    };
+    
+    const gameStats = {
+      kills: Math.floor(Math.random() * 20 + 5),
+      deaths: Math.floor(Math.random() * 15 + 5),
+      assists: Math.floor(Math.random() * 8),
+      adr: (Math.random() * 50 + 60).toFixed(1),
+      kast: (Math.random() * 20 + 65).toFixed(1),
+      rating: (Math.random() * 0.8 + 0.7).toFixed(2),
+      firstKills: Math.floor(Math.random() * 6),
+      firstDeaths: Math.floor(Math.random() * 4),
+      clutches: Math.floor(Math.random() * 3),
+      clutchAttempts: Math.floor(Math.random() * 6)
+    };
+    
+    const endStats = {
+      kills: Math.floor(Math.random() * 30 + 10),
+      deaths: Math.floor(Math.random() * 20 + 8),
+      assists: Math.floor(Math.random() * 12),
+      adr: (Math.random() * 40 + 70).toFixed(1),
+      kast: (Math.random() * 15 + 70).toFixed(1),
+      rating: (Math.random() * 0.6 + 0.9).toFixed(2),
+      firstKills: Math.floor(Math.random() * 10),
+      firstDeaths: Math.floor(Math.random() * 8),
+      clutches: Math.floor(Math.random() * 5),
+      clutchAttempts: Math.floor(Math.random() * 10),
+      mvps: Math.floor(Math.random() * 8)
+    };
+    
+    const hs = Math.floor(gameStats.kills * (Math.random() * 0.4 + 0.3));
     
     return {
       id: team === 'ct' ? index + 1 : index + 6,
@@ -27,25 +62,28 @@ const generateDetailedPlayers = () => {
       armor: Math.random() > 0.3 ? 100 : 0,
       money: Math.floor(Math.random() * 10000 + 2000),
       
-      // Basis Stats
-      kills,
-      deaths,
-      assists: Math.floor(Math.random() * 10),
+      // Stats for different time periods
+      roundStats,
+      gameStats,
+      endStats,
       
-      // Erweiterte Stats
-      adr: (Math.random() * 50 + 60).toFixed(1),
-      kast: (Math.random() * 20 + 65).toFixed(1),
-      rating: (Math.random() * 0.8 + 0.7).toFixed(2),
-      hsp: deaths > 0 ? ((hs / kills) * 100).toFixed(1) : '0.0',
-      kd: deaths > 0 ? (kills / deaths).toFixed(2) : kills.toFixed(2),
-      kpr: (kills / 20).toFixed(2), // Kills per round (assuming 20 rounds)
-      dpr: (deaths / 20).toFixed(2), // Deaths per round
+      // Current displayed stats (will switch based on toggle)
+      kills: gameStats.kills,
+      deaths: gameStats.deaths,
+      assists: gameStats.assists,
+      adr: gameStats.adr,
+      kast: gameStats.kast,
+      rating: gameStats.rating,
+      hsp: gameStats.deaths > 0 ? ((hs / gameStats.kills) * 100).toFixed(1) : '0.0',
+      kd: gameStats.deaths > 0 ? (gameStats.kills / gameStats.deaths).toFixed(2) : gameStats.kills.toFixed(2),
+      kpr: (gameStats.kills / 20).toFixed(2),
+      dpr: (gameStats.deaths / 20).toFixed(2),
       
-      // Detaillierte Stats
-      firstKills: Math.floor(Math.random() * 8),
-      firstDeaths: Math.floor(Math.random() * 6),
-      clutches: Math.floor(Math.random() * 4),
-      clutchAttempts: Math.floor(Math.random() * 8),
+      firstKills: gameStats.firstKills,
+      firstDeaths: gameStats.firstDeaths,
+      clutches: gameStats.clutches,
+      clutchAttempts: gameStats.clutchAttempts,
+      
       multiKills: {
         '2k': Math.floor(Math.random() * 6),
         '3k': Math.floor(Math.random() * 3),
@@ -53,7 +91,6 @@ const generateDetailedPlayers = () => {
         'ace': Math.random() > 0.9 ? 1 : 0
       },
       
-      // Waffen Stats
       weapon: isAwper ? 'awp' : weapons[Math.floor(Math.random() * weapons.length)],
       weaponKills: {
         ak47: Math.floor(Math.random() * 10),
@@ -63,14 +100,12 @@ const generateDetailedPlayers = () => {
         other: Math.floor(Math.random() * 5)
       },
       
-      // Utility Usage
       nades: ['flash', 'smoke', 'he', 'molotov'].filter(() => Math.random() > 0.5),
       utilityDamage: Math.floor(Math.random() * 200),
       enemiesFlashed: Math.floor(Math.random() * 15),
       flashAssists: Math.floor(Math.random() * 5),
       smokesThrown: Math.floor(Math.random() * 20),
       
-      // Positional Heat Map Data
       positions: Array.from({ length: 10 }, () => ({
         x: Math.random() * 800,
         y: Math.random() * 480,
@@ -85,7 +120,90 @@ const generateDetailedPlayers = () => {
   ];
 };
 
-// Event-Generierung mit mehr Details
+// Pro Demo Finder - Erweiterte Situationen
+const generateProDemos = () => {
+  const situations = [
+    {
+      id: 1,
+      player: 's1mple',
+      team: 'NAVI',
+      map: 'dust2',
+      event: '1v3 clutch A site',
+      similarity: 92,
+      date: '2024-03-15',
+      round: 28,
+      tournament: 'IEM Katowice 2024',
+      score: '14-14',
+      economy: 'Force buy',
+      video_id: 'abc123',
+      description: 'Similar positioning, low HP, same site control'
+    },
+    {
+      id: 2,
+      player: 'ZywOo',
+      team: 'Vitality', 
+      map: 'dust2',
+      event: 'AWP 4k hold A long',
+      similarity: 87,
+      date: '2024-02-20',
+      round: 15,
+      tournament: 'BLAST Premier',
+      score: '12-3',
+      economy: 'Full buy',
+      video_id: 'def456',
+      description: 'Same angle, similar timing, CT side'
+    },
+    {
+      id: 3,
+      player: 'NiKo',
+      team: 'G2',
+      map: 'dust2',
+      event: 'Deagle ace eco',
+      similarity: 78,
+      date: '2024-01-10',
+      round: 5,
+      tournament: 'ESL Pro League',
+      score: '3-2',
+      economy: 'Eco round',
+      video_id: 'ghi789',
+      description: 'Force buy situation, similar stack positions'
+    },
+    {
+      id: 4,
+      player: 'device',
+      team: 'Astralis',
+      map: 'dust2',
+      event: 'B site retake 2v4',
+      similarity: 75,
+      date: '2024-03-01',
+      round: 20,
+      tournament: 'PGL Major',
+      score: '10-10',
+      economy: 'Full buy',
+      video_id: 'jkl012',
+      description: 'Post-plant situation, similar utility usage'
+    },
+    {
+      id: 5,
+      player: 'sh1ro',
+      team: 'Cloud9',
+      map: 'dust2',
+      event: 'AWP wallbang triple',
+      similarity: 71,
+      date: '2024-02-05',
+      round: 11,
+      tournament: 'IEM Cologne',
+      score: '8-3',
+      economy: 'Full buy',
+      video_id: 'mno345',
+      description: 'Mid control, wallbang opportunity'
+    }
+  ];
+  
+  return situations;
+};
+
+// Event-Generierung
 const generateDetailedRoundEvents = (roundNum, players) => {
   const events = [];
   const roundDuration = 115;
@@ -97,7 +215,6 @@ const generateDetailedRoundEvents = (roundNum, players) => {
     description: `Round ${roundNum} Start`
   });
   
-  // Mehr verschiedene Event-Typen
   const eventTypes = ['kill', 'flash', 'smoke', 'damage', 'bomb_plant', 'defuse_start', 'nade_damage', 'flash_assist', 'trade_kill'];
   const numEvents = Math.floor(Math.random() * 20 + 15);
   
@@ -143,18 +260,6 @@ const generateDetailedRoundEvents = (roundNum, players) => {
         event.attackerId = attacker.id;
         event.victimId = victim.id;
         break;
-      case 'nade_damage':
-        event.attacker = attacker.name;
-        event.victim = victim.name;
-        event.damage = Math.floor(Math.random() * 50 + 10);
-        event.nadeType = ['he', 'molotov'][Math.floor(Math.random() * 2)];
-        break;
-      case 'trade_kill':
-        event.killer = attacker.name;
-        event.victim = victim.name;
-        event.traded = players[Math.floor(Math.random() * players.length)].name;
-        event.timeToTrade = (Math.random() * 3 + 0.5).toFixed(1);
-        break;
     }
     
     events.push(event);
@@ -172,7 +277,7 @@ const generateDetailedRoundEvents = (roundNum, players) => {
   return events.sort((a, b) => a.time - b.time);
 };
 
-// Match-Historie generieren
+// Match-Historie
 const generateMatchHistory = () => {
   const history = [];
   let ctScore = 0;
@@ -189,7 +294,8 @@ const generateMatchHistory = () => {
       score: { ct: ctScore, t: tScore },
       endReason: ['elimination', 'bomb', 'defuse', 'time'][Math.floor(Math.random() * 4)],
       duration: Math.floor(Math.random() * 60 + 60),
-      mvp: Math.floor(Math.random() * 10 + 1)
+      mvp: Math.floor(Math.random() * 10 + 1),
+      side: i <= 15 ? 'first' : 'second'
     });
     
     if (ctScore === 16 || tScore === 16) break;
@@ -223,11 +329,21 @@ export default function DemoViewer2D() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [roundEvents, setRoundEvents] = useState([]);
   const [showKillFeed, setShowKillFeed] = useState(true);
+  const [proDemos] = useState(generateProDemos());
+  const [statsView, setStatsView] = useState('game'); // 'round', 'game', 'end'
+  
+  // Pan & Zoom states
+  const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
+  const [mapScale, setMapScale] = useState(1);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  
   const canvasRef = useRef(null);
   const timelineRef = useRef(null);
+  const mapContainerRef = useRef(null);
 
   // Generate events for current round
   useEffect(() => {
@@ -254,6 +370,71 @@ export default function DemoViewer2D() {
     return () => clearInterval(interval);
   }, [isPlaying, playbackSpeed, currentRound, matchHistory]);
 
+  // Pan & Zoom handlers
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space' && !isPanning) {
+        e.preventDefault();
+        setIsPanning(true);
+        document.body.style.cursor = 'grab';
+      }
+    };
+    
+    const handleKeyUp = (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setIsPanning(false);
+        document.body.style.cursor = 'default';
+      }
+    };
+    
+    const handleWheel = (e) => {
+      if (mapContainerRef.current && mapContainerRef.current.contains(e.target)) {
+        e.preventDefault();
+        const delta = e.deltaY * -0.001;
+        const newScale = Math.min(Math.max(0.5, mapScale + delta), 3);
+        setMapScale(newScale);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('wheel', handleWheel);
+      document.body.style.cursor = 'default';
+    };
+  }, [isPanning, mapScale]);
+
+  // Mouse move handler for panning
+  const handleMouseMove = (e) => {
+    if (isPanning) {
+      const deltaX = e.clientX - panStart.x;
+      const deltaY = e.clientY - panStart.y;
+      setMapOffset({
+        x: mapOffset.x + deltaX,
+        y: mapOffset.y + deltaY
+      });
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleMouseDown = (e) => {
+    if (isPanning) {
+      setPanStart({ x: e.clientX, y: e.clientY });
+      document.body.style.cursor = 'grabbing';
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (isPanning) {
+      document.body.style.cursor = 'grab';
+    }
+  };
+
   // Draw map
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -262,6 +443,15 @@ export default function DemoViewer2D() {
     const ctx = canvas.getContext('2d');
     const MAP_WIDTH = canvas.width;
     const MAP_HEIGHT = canvas.height;
+    
+    // Clear and save context
+    ctx.save();
+    ctx.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+    
+    // Apply transformations
+    ctx.translate(MAP_WIDTH / 2, MAP_HEIGHT / 2);
+    ctx.scale(mapScale, mapScale);
+    ctx.translate(-MAP_WIDTH / 2 + mapOffset.x, -MAP_HEIGHT / 2 + mapOffset.y);
     
     // Background
     ctx.fillStyle = '#0a0a0a';
@@ -342,7 +532,9 @@ export default function DemoViewer2D() {
       ctx.fillStyle = player.health > 50 ? '#10b981' : player.health > 25 ? '#f59e0b' : '#ef4444';
       ctx.fillRect(player.x - 16, player.y + 20, healthWidth, 3);
     });
-  }, [players, selectedPlayer, roundEvents, currentTime]);
+    
+    ctx.restore();
+  }, [players, selectedPlayer, roundEvents, currentTime, mapOffset, mapScale]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -360,11 +552,36 @@ export default function DemoViewer2D() {
     );
   };
 
+  const getPlayerStats = (player) => {
+    if (!player) return null;
+    
+    switch(statsView) {
+      case 'round':
+        return {
+          kills: player.roundStats.kills,
+          deaths: player.roundStats.deaths,
+          assists: player.roundStats.assists,
+          damage: player.roundStats.damage,
+          enemiesFlashed: player.roundStats.enemiesFlashed,
+          utilityDamage: player.roundStats.utilityDamage
+        };
+      case 'game':
+        return player.gameStats;
+      case 'end':
+        return player.endStats;
+      default:
+        return player.gameStats;
+    }
+  };
+
   const currentScore = matchHistory[currentRound - 1]?.score || { ct: 0, t: 0 };
 
   return (
     <div className="bg-black min-h-screen text-white flex flex-col">
-      <div className="flex-1 flex flex-col max-h-screen">
+      {/* Extra space at top */}
+      <div className="h-8 bg-gray-950"></div>
+      
+      <div className="flex-1 flex flex-col max-h-[calc(100vh-2rem)]">
         {/* Header */}
         <header className="h-12 sm:h-16 border-b border-gray-800 bg-gray-950/50 backdrop-blur flex-shrink-0">
           <div className="h-full px-3 sm:px-6 flex items-center justify-between">
@@ -399,11 +616,14 @@ export default function DemoViewer2D() {
               </div>
               
               <div className="flex items-center gap-1 sm:gap-2">
+                <button 
+                  onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                  className="p-1.5 sm:p-2 hover:bg-gray-800 rounded transition-colors"
+                >
+                  <Lightbulb className="w-4 h-4" />
+                </button>
                 <button className="p-1.5 sm:p-2 hover:bg-gray-800 rounded transition-colors">
                   <Settings className="w-4 h-4" />
-                </button>
-                <button className="p-1.5 sm:p-2 hover:bg-gray-800 rounded transition-colors hidden sm:block">
-                  <Maximize2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -414,26 +634,77 @@ export default function DemoViewer2D() {
           {/* Main Content */}
           <div className="flex-1 flex flex-col">
             {/* Map Container */}
-            <div className="flex-1 relative p-2 sm:p-4">
-              <div className="h-full bg-gray-950 rounded-lg border border-gray-800 p-2 sm:p-4">
+            <div 
+              ref={mapContainerRef}
+              className="flex-1 relative p-2 sm:p-4"
+              onMouseMove={handleMouseMove}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+            >
+              <div className="h-full bg-gray-950 rounded-lg border border-gray-800 p-2 sm:p-4 relative overflow-hidden">
+                {/* Map Controls */}
+                <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
+                  <button
+                    onClick={() => setMapScale(Math.min(3, mapScale + 0.2))}
+                    className="p-2 bg-gray-900/90 backdrop-blur rounded hover:bg-gray-800 transition-colors"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setMapScale(Math.max(0.5, mapScale - 0.2))}
+                    className="p-2 bg-gray-900/90 backdrop-blur rounded hover:bg-gray-800 transition-colors"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMapScale(1);
+                      setMapOffset({ x: 0, y: 0 });
+                    }}
+                    className="p-2 bg-gray-900/90 backdrop-blur rounded hover:bg-gray-800 transition-colors"
+                  >
+                    <Crosshair className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Pan indicator */}
+                {isPanning && (
+                  <div className="absolute top-2 right-2 bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded text-sm flex items-center gap-2">
+                    <Move className="w-4 h-4" />
+                    Panning Mode
+                  </div>
+                )}
+
                 <canvas
                   ref={canvasRef}
                   width={800}
                   height={480}
                   className="w-full h-full object-contain rounded cursor-pointer"
+                  style={{ cursor: isPanning ? 'grab' : 'pointer' }}
                   onClick={(e) => {
+                    if (isPanning) return;
+                    
                     const rect = e.currentTarget.getBoundingClientRect();
                     const scaleX = 800 / rect.width;
                     const scaleY = 480 / rect.height;
                     const x = (e.clientX - rect.left) * scaleX;
                     const y = (e.clientY - rect.top) * scaleY;
                     
+                    // Adjust for pan and zoom
+                    const adjustedX = (x - 400) / mapScale + 400 - mapOffset.x;
+                    const adjustedY = (y - 240) / mapScale + 240 - mapOffset.y;
+                    
                     const clickedPlayer = players.find(
-                      (p) => Math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2) < 25
+                      (p) => Math.sqrt((p.x - adjustedX) ** 2 + (p.y - adjustedY) ** 2) < 25 / mapScale
                     );
                     setSelectedPlayer(clickedPlayer);
                   }}
                 />
+              </div>
+
+              {/* Instructions */}
+              <div className="absolute bottom-2 left-2 text-xs text-gray-500 bg-gray-900/80 backdrop-blur px-2 py-1 rounded">
+                Hold <kbd className="px-1 py-0.5 bg-gray-800 rounded text-xs">Space</kbd> to pan • Scroll to zoom
               </div>
 
               {/* Kill Feed Overlay */}
@@ -471,306 +742,219 @@ export default function DemoViewer2D() {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className={`${sidebarOpen ? 'w-80' : 'w-0'} lg:w-80 transition-all duration-300 border-l border-gray-800 bg-gray-950/50 backdrop-blur overflow-hidden`}>
-            <div className="w-80 h-full overflow-y-auto">
-              {/* Mobile Close Button */}
-              <div className="p-4 border-b border-gray-800 flex items-center justify-between lg:hidden">
-                <h3 className="text-sm font-medium text-gray-400">Player Details</h3>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-1 hover:bg-gray-800 rounded"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Tab Navigation */}
-              {selectedPlayer && (
-                <div className="border-b border-gray-800">
-                  <div className="flex">
-                    {['overview', 'stats', 'weapons', 'utility'].map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`flex-1 py-2 text-xs font-medium capitalize transition-colors ${
-                          activeTab === tab
-                            ? 'text-yellow-400 border-b-2 border-yellow-400'
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        {tab}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Selected Player Content */}
+          {/* Left Sidebar */}
+          <div className={`${sidebarOpen ? 'w-96' : 'w-0'} lg:w-96 transition-all duration-300 border-l border-gray-800 bg-gray-950/50 backdrop-blur overflow-hidden`}>
+            <div className="w-96 h-full overflow-y-auto">
+              {/* Selected Player with Stats Toggle */}
               {selectedPlayer ? (
-                <div className="p-4">
-                  {/* Player Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold">{selectedPlayer.name}</h3>
-                      <p className="text-xs text-gray-400">{selectedPlayer.position}</p>
+                <div className="p-4 space-y-4">
+                  {/* Header with Stats Toggle */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold">{selectedPlayer.name}</h3>
+                        <p className="text-xs text-gray-400">{selectedPlayer.position}</p>
+                      </div>
+                      <button
+                        onClick={() => setSelectedPlayer(null)}
+                        className="p-1 hover:bg-gray-800 rounded"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <span className={`text-xs font-medium px-2 py-1 rounded ${
-                      selectedPlayer.team === 'ct' 
-                        ? 'bg-blue-500/20 text-blue-400' 
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {selectedPlayer.team.toUpperCase()}
-                    </span>
+                    
+                    {/* Stats View Toggle */}
+                    <div className="flex gap-1 p-1 bg-gray-900 rounded-lg">
+                      {[
+                        { value: 'round', label: 'Round', icon: <Timer className="w-3 h-3" /> },
+                        { value: 'game', label: 'Game', icon: <BarChart className="w-3 h-3" /> },
+                        { value: 'end', label: 'Final', icon: <Trophy className="w-3 h-3" /> }
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => setStatsView(option.value)}
+                          className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded text-xs font-medium transition-colors ${
+                            statsView === option.value
+                              ? 'bg-yellow-400 text-black'
+                              : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                          }`}
+                        >
+                          {option.icon}
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Tab Content */}
-                  {activeTab === 'overview' && (
+                  {/* Stats Display based on toggle */}
+                  {statsView === 'round' ? (
+                    // Round Stats
                     <div className="space-y-4">
-                      {/* Basic Stats */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="bg-gray-900 rounded p-2">
-                          <div className="text-xs text-gray-400 mb-0.5 flex items-center gap-1">
-                            <Heart className="w-3 h-3" /> Health
-                          </div>
-                          <div className="text-lg font-semibold">{selectedPlayer.health}</div>
-                        </div>
-                        <div className="bg-gray-900 rounded p-2">
-                          <div className="text-xs text-gray-400 mb-0.5 flex items-center gap-1">
-                            <Shield className="w-3 h-3" /> Armor
-                          </div>
-                          <div className="text-lg font-semibold">{selectedPlayer.armor}</div>
-                        </div>
-                      </div>
-
-                      {/* Performance */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">PERFORMANCE</h4>
-                        <div className="space-y-1 text-sm">
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">K/A/D</span>
-                            <span className="font-medium">{selectedPlayer.kills}/{selectedPlayer.assists}/{selectedPlayer.deaths}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">K/D Ratio</span>
-                            <span className="font-medium">{selectedPlayer.kd}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">ADR</span>
-                            <span className="font-medium">{selectedPlayer.adr}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">HS%</span>
-                            <span className="font-medium text-yellow-400">{selectedPlayer.hsp}%</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">Rating 2.0</span>
-                            <span className="font-medium text-yellow-400">★ {selectedPlayer.rating}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'stats' && (
-                    <div className="space-y-4">
-                      {/* Advanced Stats */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">ROUND STATS</h4>
-                        <div className="space-y-1 text-sm">
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">KPR</span>
-                            <span>{selectedPlayer.kpr}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">DPR</span>
-                            <span>{selectedPlayer.dpr}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">KAST</span>
-                            <span>{selectedPlayer.kast}%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* First Stats */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">OPENING DUELS</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-gray-900 rounded p-2 text-center">
-                            <div className="text-lg font-semibold text-green-400">{selectedPlayer.firstKills}</div>
-                            <div className="text-xs text-gray-400">First Kills</div>
-                          </div>
-                          <div className="bg-gray-900 rounded p-2 text-center">
-                            <div className="text-lg font-semibold text-red-400">{selectedPlayer.firstDeaths}</div>
-                            <div className="text-xs text-gray-400">First Deaths</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Clutches */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">CLUTCHES</h4>
-                        <div className="bg-gray-900 rounded p-3">
+                      <div className="bg-gray-900 rounded p-3">
+                        <h4 className="text-xs text-gray-400 mb-2">ROUND {currentRound} PERFORMANCE</h4>
+                        <div className="grid grid-cols-3 gap-2">
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-yellow-400">
-                              {selectedPlayer.clutches}/{selectedPlayer.clutchAttempts}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {selectedPlayer.clutchAttempts > 0 
-                                ? `${((selectedPlayer.clutches / selectedPlayer.clutchAttempts) * 100).toFixed(0)}% Success Rate`
-                                : 'No clutch attempts'}
-                            </div>
+                            <div className="text-lg font-bold">{selectedPlayer.roundStats.kills}</div>
+                            <div className="text-xs text-gray-400">Kills</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-bold">{selectedPlayer.roundStats.deaths}</div>
+                            <div className="text-xs text-gray-400">Deaths</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-bold">{selectedPlayer.roundStats.damage}</div>
+                            <div className="text-xs text-gray-400">Damage</div>
                           </div>
                         </div>
                       </div>
-
-                      {/* Multi-kills */}
+                      
                       <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">MULTI-KILLS</h4>
-                        <div className="grid grid-cols-4 gap-1 text-center">
-                          <div className="bg-gray-900 rounded p-2">
-                            <div className="text-sm font-semibold">{selectedPlayer.multiKills['2k']}</div>
-                            <div className="text-xs text-gray-400">2K</div>
-                          </div>
-                          <div className="bg-gray-900 rounded p-2">
-                            <div className="text-sm font-semibold">{selectedPlayer.multiKills['3k']}</div>
-                            <div className="text-xs text-gray-400">3K</div>
-                          </div>
-                          <div className="bg-gray-900 rounded p-2">
-                            <div className="text-sm font-semibold">{selectedPlayer.multiKills['4k']}</div>
-                            <div className="text-xs text-gray-400">4K</div>
-                          </div>
-                          <div className="bg-gray-900 rounded p-2">
-                            <div className="text-sm font-semibold text-yellow-400">{selectedPlayer.multiKills.ace}</div>
-                            <div className="text-xs text-gray-400">ACE</div>
-                          </div>
+                        <div className="flex justify-between py-1 text-sm">
+                          <span className="text-gray-400">Enemies Flashed</span>
+                          <span>{selectedPlayer.roundStats.enemiesFlashed}</span>
+                        </div>
+                        <div className="flex justify-between py-1 text-sm">
+                          <span className="text-gray-400">Utility Damage</span>
+                          <span>{selectedPlayer.roundStats.utilityDamage}</span>
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  {activeTab === 'weapons' && (
+                  ) : statsView === 'game' ? (
+                    // Game Stats (Current)
                     <div className="space-y-4">
-                      {/* Current Weapon */}
-                      <div className="bg-gray-900 rounded p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs text-gray-400">CURRENT</span>
-                          <span className="text-sm font-medium uppercase">{selectedPlayer.weapon}</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="bg-gray-900 rounded p-2 text-center">
+                          <div className="text-xs text-gray-400">K/D</div>
+                          <div className="text-lg font-bold">{selectedPlayer.gameStats.kills}/{selectedPlayer.gameStats.deaths}</div>
+                          <div className="text-xs text-yellow-400">{selectedPlayer.kd}</div>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          ${selectedPlayer.money} available
+                        <div className="bg-gray-900 rounded p-2 text-center">
+                          <div className="text-xs text-gray-400">ADR</div>
+                          <div className="text-lg font-bold">{selectedPlayer.gameStats.adr}</div>
+                          <div className="text-xs text-gray-500">dmg/r</div>
+                        </div>
+                        <div className="bg-gray-900 rounded p-2 text-center">
+                          <div className="text-xs text-gray-400">Rating</div>
+                          <div className="text-lg font-bold text-yellow-400">★{selectedPlayer.gameStats.rating}</div>
+                          <div className="text-xs text-gray-500">2.0</div>
                         </div>
                       </div>
 
-                      {/* Weapon Stats */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">WEAPON KILLS</h4>
-                        <div className="space-y-2">
-                          {Object.entries(selectedPlayer.weaponKills).map(([weapon, kills]) => (
-                            <div key={weapon} className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm capitalize">{weapon}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-24 bg-gray-800 rounded-full h-2">
-                                  <div 
-                                    className="h-full bg-yellow-400 rounded-full"
-                                    style={{ width: `${(kills / Math.max(...Object.values(selectedPlayer.weaponKills))) * 100}%` }}
-                                  />
-                                </div>
-                                <span className="text-sm font-medium w-8 text-right">{kills}</span>
-                              </div>
-                            </div>
-                          ))}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-gray-900/50 rounded p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-400">HS%</span>
+                            <span className="text-sm font-medium text-yellow-400">{selectedPlayer.hsp}%</span>
+                          </div>
+                        </div>
+                        <div className="bg-gray-900/50 rounded p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-400">KAST</span>
+                            <span className="text-sm font-medium">{selectedPlayer.gameStats.kast}%</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  {activeTab === 'utility' && (
+                  ) : (
+                    // End Stats (Final)
                     <div className="space-y-4">
-                      {/* Current Utility */}
                       <div className="bg-gray-900 rounded p-3">
-                        <div className="text-xs text-gray-400 mb-2">CURRENT UTILITY</div>
-                        <div className="flex gap-2">
-                          {selectedPlayer.nades.map((nade, i) => (
-                            <div key={i} className="bg-gray-800 rounded p-2 text-center">
-                              <div className="text-lg">
-                                {nade === 'flash' ? '✨' : nade === 'smoke' ? '💨' : nade === 'he' ? '💥' : '🔥'}
-                              </div>
-                              <div className="text-xs text-gray-400 capitalize">{nade}</div>
-                            </div>
-                          ))}
+                        <h4 className="text-xs text-gray-400 mb-2">FINAL MATCH STATS</h4>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="text-center">
+                            <div className="text-lg font-bold">{selectedPlayer.endStats.kills}/{selectedPlayer.endStats.deaths}</div>
+                            <div className="text-xs text-gray-400">K/D</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-bold">{selectedPlayer.endStats.adr}</div>
+                            <div className="text-xs text-gray-400">ADR</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-lg font-bold text-yellow-400">★{selectedPlayer.endStats.rating}</div>
+                            <div className="text-xs text-gray-400">Rating</div>
+                          </div>
                         </div>
                       </div>
-
-                      {/* Utility Stats */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-medium text-gray-400">UTILITY USAGE</h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">Utility Damage</span>
-                            <span className="font-medium">{selectedPlayer.utilityDamage}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">Enemies Flashed</span>
-                            <span className="font-medium">{selectedPlayer.enemiesFlashed}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">Flash Assists</span>
-                            <span className="font-medium">{selectedPlayer.flashAssists}</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-gray-400">Smokes Thrown</span>
-                            <span className="font-medium">{selectedPlayer.smokesThrown}</span>
-                          </div>
+                      
+                      <div className="bg-gray-900/50 rounded p-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-gray-400">MVPs</span>
+                          <span className="text-sm font-medium text-yellow-400">{selectedPlayer.endStats.mvps}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">Clutches</span>
+                          <span className="text-sm font-medium">{selectedPlayer.endStats.clutches}/{selectedPlayer.endStats.clutchAttempts}</span>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <button
-                    onClick={() => setSelectedPlayer(null)}
-                    className="w-full mt-4 py-2 text-xs text-gray-400 hover:text-white transition-colors border border-gray-800 rounded hover:border-gray-700"
-                  >
-                    Clear Selection
-                  </button>
+                  {/* Common Stats */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-gray-900 rounded p-2">
+                      <div className="flex items-center gap-1 text-xs text-gray-400 mb-0.5">
+                        <Heart className="w-3 h-3" /> Health/Armor
+                      </div>
+                      <div className="text-lg font-semibold">{selectedPlayer.health}/{selectedPlayer.armor}</div>
+                    </div>
+                    <div className="bg-gray-900 rounded p-2">
+                      <div className="flex items-center gap-1 text-xs text-gray-400 mb-0.5">
+                        <DollarSign className="w-3 h-3" /> Money
+                      </div>
+                      <div className="text-lg font-semibold text-green-400">${selectedPlayer.money}</div>
+                    </div>
+                  </div>
                 </div>
               ) : (
+                /* Players Overview */
                 <div className="p-4">
-                  <p className="text-sm text-gray-500 text-center mb-4">Select a player to view details</p>
+                  <h3 className="text-sm font-medium text-gray-400 mb-3">PLAYERS OVERVIEW</h3>
                   
-                  {/* Players List */}
-                  <div className="space-y-2">
-                    <h3 className="text-xs font-medium text-gray-400 mb-3">ALL PLAYERS</h3>
-                    <div className="space-y-1.5">
-                      {players.map((player) => (
+                  {/* CT Team */}
+                  <div className="mb-4">
+                    <div className="text-xs text-blue-400 mb-2">Counter-Terrorists</div>
+                    <div className="space-y-1">
+                      {players.filter(p => p.team === 'ct').map((player) => (
                         <button
                           key={player.id}
-                          onClick={() => {
-                            setSelectedPlayer(player);
-                            setActiveTab('overview');
-                          }}
-                          className={`w-full p-2 rounded border transition-all text-left text-sm ${
-                            selectedPlayer?.id === player.id
-                              ? 'border-yellow-400 bg-yellow-400/10'
-                              : 'border-gray-800 hover:border-gray-700 hover:bg-gray-900'
-                          }`}
+                          onClick={() => setSelectedPlayer(player)}
+                          className="w-full p-2 bg-gray-900 hover:bg-gray-800 rounded transition-colors text-left"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <div className={`w-1.5 h-1.5 rounded-full ${
-                                player.team === 'ct' ? 'bg-blue-500' : 'bg-red-500'
-                              }`} />
-                              <div>
-                                <div className="font-medium">{player.name}</div>
-                                <div className="text-xs text-gray-500">{player.position}</div>
-                              </div>
+                              <div className="text-sm font-medium">{player.name}</div>
+                              <div className="text-xs text-gray-500">{player.position}</div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-xs font-medium">{player.kills}/{player.deaths}</div>
-                              <div className="text-xs text-yellow-400">★ {player.rating}</div>
+                            <div className="flex items-center gap-3 text-xs">
+                              <span>{player.kills}/{player.deaths}</span>
+                              <span className="text-yellow-400">★{player.rating}</span>
+                              <span className="text-green-400">${player.money}</span>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* T Team */}
+                  <div>
+                    <div className="text-xs text-red-400 mb-2">Terrorists</div>
+                    <div className="space-y-1">
+                      {players.filter(p => p.team === 't').map((player) => (
+                        <button
+                          key={player.id}
+                          onClick={() => setSelectedPlayer(player)}
+                          className="w-full p-2 bg-gray-900 hover:bg-gray-800 rounded transition-colors text-left"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium">{player.name}</div>
+                              <div className="text-xs text-gray-500">{player.position}</div>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs">
+                              <span>{player.kills}/{player.deaths}</span>
+                              <span className="text-yellow-400">★{player.rating}</span>
+                              <span className="text-green-400">${player.money}</span>
                             </div>
                           </div>
                         </button>
@@ -779,64 +963,159 @@ export default function DemoViewer2D() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
 
-              {/* Economy Overview */}
-              <div className="p-4 border-t border-gray-800">
-                <h3 className="text-xs font-medium text-gray-400 mb-3">ECONOMY</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-gray-900 rounded p-2">
-                    <div className="text-xs text-blue-400 mb-0.5">CT</div>
-                    <div className="text-base font-semibold">
-                      ${players.filter(p => p.team === 'ct').reduce((sum, p) => sum + p.money, 0).toLocaleString()}
+          {/* Right Panel - Pro Situations */}
+          <div className={`${rightPanelOpen ? 'w-80' : 'w-0'} transition-all duration-300 border-l border-gray-800 bg-gray-950/50 backdrop-blur overflow-hidden`}>
+            <div className="w-80 h-full overflow-y-auto">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4 text-yellow-400" />
+                    Pro Insights
+                  </h3>
+                  <button
+                    onClick={() => setRightPanelOpen(false)}
+                    className="p-1 hover:bg-gray-800 rounded lg:hidden"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Current Situation Analysis */}
+                <div className="bg-gray-900 rounded-lg p-3 mb-4">
+                  <h4 className="text-xs font-medium text-gray-400 mb-2">CURRENT SITUATION</h4>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Players Alive</span>
+                      <span>
+                        <span className="text-blue-400">{players.filter(p => p.team === 'ct' && !roundEvents.some(e => e.type === 'kill' && e.victimId === p.id && e.time <= currentTime)).length}</span>
+                        <span className="text-gray-600"> vs </span>
+                        <span className="text-red-400">{players.filter(p => p.team === 't' && !roundEvents.some(e => e.type === 'kill' && e.victimId === p.id && e.time <= currentTime)).length}</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Round Time</span>
+                      <span>{formatTime(currentTime)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Economy Type</span>
+                      <span className="text-green-400">Full Buy</span>
                     </div>
                   </div>
-                  <div className="bg-gray-900 rounded p-2">
-                    <div className="text-xs text-red-400 mb-0.5">T</div>
-                    <div className="text-base font-semibold">
-                      ${players.filter(p => p.team === 't').reduce((sum, p) => sum + p.money, 0).toLocaleString()}
+                </div>
+
+                {/* Similar Pro Situations */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-gray-400 mb-2">SIMILAR PRO PLAYS</h4>
+                  {proDemos.map((demo) => (
+                    <div
+                      key={demo.id}
+                      className="group relative bg-gray-900 hover:bg-gray-800 rounded-lg p-3 cursor-pointer transition-all hover:scale-[1.02]"
+                    >
+                      {/* Similarity Badge */}
+                      <div className="absolute top-2 right-2 bg-yellow-400/20 text-yellow-400 text-xs px-2 py-0.5 rounded font-medium">
+                        {demo.similarity}% match
+                      </div>
+                      
+                      {/* Player & Event */}
+                      <div className="mb-2">
+                        <div className="font-medium text-sm">{demo.player}</div>
+                        <div className="text-xs text-gray-400">{demo.team} • {demo.event}</div>
+                      </div>
+                      
+                      {/* Match Info */}
+                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                        <span>{demo.tournament}</span>
+                        <span>•</span>
+                        <span>Round {demo.round}</span>
+                        <span>•</span>
+                        <span>{demo.score}</span>
+                      </div>
+                      
+                      {/* Description */}
+                      <div className="text-xs text-gray-400 italic">
+                        "{demo.description}"
+                      </div>
+                      
+                      {/* Watch Button */}
+                      <button className="mt-2 w-full py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs font-medium transition-colors flex items-center justify-center gap-1">
+                        <Play className="w-3 h-3" />
+                        Watch Clip
+                      </button>
                     </div>
-                  </div>
+                  ))}
+                </div>
+
+                {/* Learning Tips */}
+                <div className="mt-4 bg-yellow-400/10 border border-yellow-400/20 rounded-lg p-3">
+                  <h4 className="text-xs font-medium text-yellow-400 mb-1">PRO TIP</h4>
+                  <p className="text-xs text-gray-300">
+                    In similar situations, pros often use utility to cut off rotations before executing. 
+                    Consider smoking CT spawn and flashing over A site.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="h-32 sm:h-40 border-t border-gray-800 bg-gray-950 flex-shrink-0">
+        {/* Timeline - Increased Height */}
+        <div className="h-56 border-t border-gray-800 bg-gray-950 flex-shrink-0">
           <div className="h-full flex flex-col">
-            {/* Round Timeline */}
-            <div className="flex-1 px-2 sm:px-4 py-1 sm:py-2 overflow-x-auto" ref={timelineRef}>
-              <div className="h-full flex items-center gap-0.5 min-w-max">
+            {/* Round Timeline - More Vertical Space */}
+            <div className="h-32 px-4 py-3 overflow-x-auto border-b border-gray-800" ref={timelineRef}>
+              <div className="h-full flex items-center gap-1 min-w-max">
                 {matchHistory.map((round, i) => (
-                  <div key={i} className="relative group">
+                  <div key={i} className="relative group h-full">
+                    {/* Halftime marker */}
                     {round.round === 16 && (
-                      <div className="absolute -left-2 top-0 bottom-0 w-0.5 bg-yellow-400">
-                        <span className="absolute -top-5 sm:-top-6 left-1/2 -translate-x-1/2 text-xs text-yellow-400 whitespace-nowrap">
-                          Halftime
+                      <div className="absolute -left-3 top-0 bottom-0 w-1 bg-yellow-400 rounded">
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 text-sm text-yellow-400 whitespace-nowrap font-bold">
+                          HALFTIME
                         </span>
                       </div>
                     )}
                     
                     <button
                       onClick={() => setCurrentRound(round.round)}
-                      className={`relative w-10 sm:w-12 h-12 sm:h-16 flex flex-col items-center justify-center border transition-all ${
+                      className={`relative h-full w-16 flex flex-col items-center justify-center border-2 rounded-lg transition-all ${
                         round.round === currentRound 
-                          ? 'border-yellow-400 bg-yellow-400/10' 
+                          ? 'border-yellow-400 bg-yellow-400/10 scale-110 shadow-lg' 
                           : 'border-gray-800 hover:border-gray-700 hover:bg-gray-900'
                       }`}
                     >
-                      <span className="text-xs text-gray-400 mb-0.5 sm:mb-1">{round.round}</span>
-                      <div className={`w-5 sm:w-6 h-5 sm:h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      {/* Round number */}
+                      <span className="text-sm text-gray-400 font-medium mb-1">R{round.round}</span>
+                      
+                      {/* Winner indicator */}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-1 ${
                         round.winner === 'ct' 
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' 
-                          : 'bg-red-500/20 text-red-400 border border-red-500/50'
+                          ? 'bg-blue-500/20 text-blue-400 border-2 border-blue-500/50' 
+                          : 'bg-red-500/20 text-red-400 border-2 border-red-500/50'
                       }`}>
-                        {round.winner === 'ct' ? 'CT' : 'T'}
+                        {round.winner.toUpperCase()}
                       </div>
-                      <span className="text-[10px] text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">
+                      
+                      {/* Score */}
+                      <span className="text-xs text-gray-500 font-medium">
                         {round.score.ct}-{round.score.t}
                       </span>
+                      
+                      {/* End reason icon */}
+                      <div className="absolute -bottom-3 text-xs text-gray-600">
+                        {round.endReason === 'bomb' ? '💣' :
+                         round.endReason === 'defuse' ? '✓' :
+                         round.endReason === 'time' ? '⏱' : '☠'}
+                      </div>
+                      
+                      {/* MVP indicator */}
+                      {round.mvp === selectedPlayer?.id && (
+                        <div className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                          ★
+                        </div>
+                      )}
                     </button>
                   </div>
                 ))}
@@ -844,7 +1123,7 @@ export default function DemoViewer2D() {
             </div>
 
             {/* Event Timeline */}
-            <div className="h-12 sm:h-16 border-t border-gray-800 px-2 sm:px-4 py-1 sm:py-2">
+            <div className="flex-1 px-4 py-2">
               <div className="relative h-full">
                 <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-gray-800" />
                 <div className="relative h-full">
@@ -861,7 +1140,7 @@ export default function DemoViewer2D() {
                         }`}
                         style={{ left: `${position}%` }}
                       >
-                        <div className={`p-0.5 sm:p-1 rounded-full ${
+                        <div className={`p-1 rounded-full ${
                           event.type === 'kill' ? 'bg-red-500/20 text-red-400' :
                           event.type === 'bomb_plant' ? 'bg-orange-500/20 text-orange-400' :
                           event.type === 'defuse_start' ? 'bg-blue-500/20 text-blue-400' :
@@ -881,23 +1160,23 @@ export default function DemoViewer2D() {
             </div>
 
             {/* Playback Controls */}
-            <div className="h-10 sm:h-12 border-t border-gray-800 px-2 sm:px-4 flex items-center gap-2 sm:gap-4">
-              <div className="flex items-center gap-1 sm:gap-2">
-                <button className="p-1 sm:p-1.5 hover:bg-gray-800 rounded transition-colors">
-                  <SkipBack className="w-3 h-3 sm:w-4 sm:h-4" />
+            <div className="h-12 border-t border-gray-800 px-4 flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <button className="p-1.5 hover:bg-gray-800 rounded transition-colors">
+                  <SkipBack className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="p-1 sm:p-1.5 bg-yellow-400 hover:bg-yellow-500 rounded text-black transition-colors"
+                  className="p-1.5 bg-yellow-400 hover:bg-yellow-500 rounded text-black transition-colors"
                 >
-                  {isPlaying ? <Pause className="w-3 h-3 sm:w-4 sm:h-4" /> : <Play className="w-3 h-3 sm:w-4 sm:h-4" />}
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </button>
-                <button className="p-1 sm:p-1.5 hover:bg-gray-800 rounded transition-colors">
-                  <SkipForward className="w-3 h-3 sm:w-4 sm:h-4" />
+                <button className="p-1.5 hover:bg-gray-800 rounded transition-colors">
+                  <SkipForward className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-gray-400">
                 <span>{formatTime(currentTime)}</span>
                 <span>/</span>
                 <span>{formatTime(matchHistory[currentRound - 1]?.duration || 120)}</span>
@@ -908,7 +1187,7 @@ export default function DemoViewer2D() {
               <select
                 value={playbackSpeed}
                 onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-                className="bg-transparent text-xs sm:text-sm text-gray-400 focus:outline-none"
+                className="bg-transparent text-sm text-gray-400 focus:outline-none"
               >
                 <option value={0.5}>0.5x</option>
                 <option value={1}>1x</option>
