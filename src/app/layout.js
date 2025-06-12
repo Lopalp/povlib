@@ -2,6 +2,8 @@ import "./globals.css";
 import UserProvider from "../../context/UserProvider";
 import { Poppins } from "next/font/google";
 import GlobalLayout from "../components/layout/GlobalLayout";
+import { CookieConsentProvider } from "../context/CookieConsentContext";
+import CookieConsentBanner from "../components/CookieConsentBanner";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -22,7 +24,10 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`dark ${poppins.className}`}>
       <body className="bg-gray-900 text-white">
         <UserProvider>
-          <GlobalLayout>{children}</GlobalLayout>
+          <CookieConsentProvider>
+            <GlobalLayout>{children}</GlobalLayout>
+            <CookieConsentBanner />
+          </CookieConsentProvider>
         </UserProvider>
       </body>
     </html>
