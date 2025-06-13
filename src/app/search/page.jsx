@@ -18,16 +18,16 @@ const PILL_OPTIONS = [
 const THUMBNAIL_IMAGE = "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"; // Placeholder
 
 const VIDEO_THUMBNAIL_POOL = [
-  '/public/img/1.png',
-  '/public/img/2.png',
-  '/public/img/3.png',
-  '/public/img/4.png',
-  '/public/img/5.png',
-  '/public/img/6.png',
-  '/public/img/7.png',
-  '/public/img/8.png',
-  '/public/img/v2.png',
-  '/public/img/v3.png',
+  '/img/1.png',
+  '/img/2.png',
+  '/img/3.png',
+  '/img/4.png',
+  '/img/5.png',
+  '/img/6.png',
+  '/img/7.png',
+  '/img/8.png',
+  '/img/v2.png',
+  '/img/v3.png',
 ];
 
 export default function SearchResultsPage() {
@@ -72,7 +72,7 @@ function SearchResultsContent() {
       views: `${Math.floor(Math.random() * 999) + 1}K views`,
       uploadDate: `${Math.floor(Math.random() * 7) + 1} days ago`,
       channel: `ProPlayer${i + 1}`,
-      channelAvatar: THUMBNAIL_IMAGE,
+ channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
       watched: i % 3 === 0,
       player: `Player${i + 1}`,
       isPro: Math.random() > 0.7,
