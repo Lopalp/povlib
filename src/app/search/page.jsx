@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { Filter } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -14,7 +14,8 @@ const PILL_OPTIONS = [
   "recently uploaded",
 ];
 
-export default function SearchResultsPage() {
+// Component that uses useSearchParams and needs to be wrapped
+function SearchResultsContent() {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") || "";
 
@@ -185,6 +186,15 @@ export default function SearchResultsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Wrapper component with Suspense boundary
+export default function SearchResultsPage() {
+  return (
+    <Suspense fallback={<div>Loading search results...</div>}>
+      <SearchResultsContent />
+    </Suspense>
   );
 }
 
