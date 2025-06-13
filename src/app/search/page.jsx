@@ -21,7 +21,6 @@ export default function SearchResultsPage() {
   const [activePill, setActivePill] = useState("all");
   const [searchQuery, setSearchQuery] = useState(queryParam);
 
-  // Update searchQuery and reset pill when URL param changes
   useEffect(() => {
     setSearchQuery(queryParam);
     setActivePill("all");
@@ -30,7 +29,12 @@ export default function SearchResultsPage() {
   // Dummy data placeholders (replace with real fetch logic)
   const videos = useMemo(
     () =>
-      Array.from({ length: 8 }).map((_, i) => ({ id: i, title: `Video ${i + 1}`, thumbnail: `/thumbnails/video${i + 1}.jpg`, watched: i % 2 === 0 })),
+      Array.from({ length: 8 }).map((_, i) => ({
+        id: i,
+        title: `Video ${i + 1}`,
+        thumbnail: `/thumbnails/video${i + 1}.jpg`,
+        watched: i % 2 === 0,
+      })),
     []
   );
   const players = useMemo(
@@ -55,36 +59,37 @@ export default function SearchResultsPage() {
   );
 
   // Filtered lists based on search and pill
-  const filteredVideos = useMemo(() => {
-    return videos.filter((v) => v.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [videos, searchQuery]);
-
-  const filteredPlayers = useMemo(() => {
-    return players.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [players, searchQuery]);
-
-  const filteredTeams = useMemo(() => {
-    return teams.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [teams, searchQuery]);
-
-  const filteredUtils = useMemo(() => {
-    return utils.filter((u) => u.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [utils, searchQuery]);
+  const filteredVideos = useMemo(
+    () => videos.filter(v => v.title.toLowerCase().includes(searchQuery.toLowerCase())),
+    [videos, searchQuery]
+  );
+  const filteredPlayers = useMemo(
+    () => players.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [players, searchQuery]
+  );
+  const filteredTeams = useMemo(
+    () => teams.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase())),
+    [teams, searchQuery]
+  );
+  const filteredUtils = useMemo(
+    () => utils.filter(u => u.title.toLowerCase().includes(searchQuery.toLowerCase())),
+    [utils, searchQuery]
+  );
 
   // Helper to decide if section should show
-  const showSection = (type) => {
+  const showSection = type => {
     switch (type) {
       case "videos":
-        if (activePill !== "all" && activePill !== "unwatched" && activePill !== "watched") return false;
-        if (activePill === "unwatched") return filteredVideos.some((v) => !v.watched);
-        if (activePill === "watched") return filteredVideos.some((v) => v.watched);
+        if (!["all", "watched", "unwatched"].includes(activePill)) return false;
+        if (activePill === "watched") return filteredVideos.some(v => v.watched);
+        if (activePill === "unwatched") return filteredVideos.some(v => !v.watched);
         return filteredVideos.length > 0;
       case "players":
-        return (activePill === "all" || activePill === "players") && filteredPlayers.length > 0;
+        return ["all", "players"].includes(activePill) && filteredPlayers.length > 0;
       case "teams":
-        return (activePill === "all" || activePill === "teams") && filteredTeams.length > 0;
+        return ["all", "teams"].includes(activePill) && filteredTeams.length > 0;
       case "utils":
-        return (activePill === "all" || activePill === "utils") && filteredUtils.length > 0;
+        return ["all", "utils"].includes(activePill) && filteredUtils.length > 0;
       default:
         return false;
     }
@@ -102,7 +107,7 @@ export default function SearchResultsPage() {
       {/* Pills + Filter Icon */}
       <div className="flex items-center mb-8">
         <div className="flex space-x-2 overflow-x-auto">
-          {PILL_OPTIONS.map((pill) => (
+          {PILL_OPTIONS.map(pill => (
             <button
               key={pill}
               onClick={() => setActivePill(pill)}
@@ -127,18 +132,14 @@ export default function SearchResultsPage() {
           <Section title="Videos">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredVideos
-                .filter((v) =>
-                  activePill === "all"
-                    ? true
-                    : activePill === "watched"
+                .filter(v =>
+                  activePill === "watched"
                     ? v.watched
                     : activePill === "unwatched"
                     ? !v.watched
                     : true
                 )
-                .map((v) => (
-                  <VideoCard key={v.id} title={v.title} thumbnail={v.thumbnail} />
-                ))}
+                .map(v => <VideoCard key={v.id} title={v.title} thumbnail={v.thumbnail} />)}
             </div>
           </Section>
         )}
@@ -149,7 +150,7 @@ export default function SearchResultsPage() {
           <>
             <Section title="Players">
               <div className="flex space-x-6 overflow-x-auto py-2">
-                {filteredPlayers.map((p) => (
+                {filteredPlayers.map(p => (
                   <ChannelCard key={p.id} name={p.name} avatar={p.avatar} />
                 ))}
               </div>
@@ -163,7 +164,7 @@ export default function SearchResultsPage() {
           <>
             <Section title="Teams">
               <div className="flex space-x-6 overflow-x-auto py-2">
-                {filteredTeams.map((t) => (
+                {filteredTeams.map(t => (
                   <ChannelCard key={t.id} name={t.name} avatar={t.logo} />
                 ))}
               </div>
@@ -176,13 +177,8 @@ export default function SearchResultsPage() {
         {showSection("utils") && (
           <Section title="Utilities">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredUtils.map((u) => (
-                <UtilityCard
-                  key={u.id}
-                  title={u.title}
-                  radarData={u.radarData}
-                  clips={u.clips}
-                />
+              {filteredUtils.map(u => (
+                <UtilityCard key={u.id} title={u.title} radarData={u.radarData} clips={u.clips} />
               ))}
             </div>
           </Section>
@@ -193,35 +189,39 @@ export default function SearchResultsPage() {
 }
 
 // Reusable Section Wrapper
-const Section = ({ title, children }) => (
-  <div>
-    <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-    {children}
-  </div>
-);
+function Section({ title, children }) {
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+}
 
 // Video Card (Demo style)
-const VideoCard = ({ title, thumbnail }) => (
-  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
-    <img src={thumbnail} alt={title} className="w-full h-40 object-cover" />
-    <div className="p-3">
-      <h3 className="text-lg font-medium truncate">{title}</h3>
+function VideoCard({ title, thumbnail }) {
+  return (
+    <div className="bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
+      <img src={thumbnail} alt={title} className="w-full h-40 object-cover" />
+      <div className="p-3">
+        <h3 className="text-lg font-medium truncate">{title}</h3>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 // Channel Card (Players & Teams)
-const ChannelCard = ({ name, avatar }) => (
-  <div className="flex-shrink-0 w-32 text-center">
-    <img src={avatar} alt={name} className="w-24 h-24 rounded-full mx-auto object-cover" />
-    <p className="mt-2 truncate">{name}</p>
-  </div>
-);
+function ChannelCard({ name, avatar }) {
+  return (
+    <div className="flex-shrink-0 w-32 text-center">
+      <img src={avatar} alt={name} className="w-24 h-24 rounded-full mx-auto object-cover" />
+      <p className="mt-2 truncate">{name}</p>
+    </div>
+  );
+}
 
 // Utility Card
-const UtilityCard = (
-  { title, radarData, clips }
-) => {
+function UtilityCard({ title, radarData, clips }) {
   const points = radarData
     .map(
       (val, idx) =>
@@ -238,7 +238,7 @@ const UtilityCard = (
         <polygon points={points} fill="rgba(255,255,255,0.2)" stroke="#ffffff" strokeWidth="1" />
       </svg>
       <div className="space-y-2">
-        {clips.map((c) => (
+        {clips.map(c => (
           <div key={c.id} className="flex items-center space-x-3">
             <video src={c.demo} className="w-24 h-16 rounded-lg bg-black" controls />
             <p className="truncate">{c.title}</p>
@@ -247,4 +247,4 @@ const UtilityCard = (
       </div>
     </div>
   );
-};
+}
