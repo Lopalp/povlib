@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import FilterModal from "/src/components/modals/FilterModal.jsx";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { getFilteredDemos, getAllPlayers } from "@/lib/supabase";
 
 const PILL_OPTIONS = [
   { id: "all", label: "All" },
@@ -30,15 +33,26 @@ const VIDEO_THUMBNAIL_POOL = [
   '/img/v3.png',
 ];
 
+const shuffleArray = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
 export default function SearchResultsPage() {
   return (
-    <SearchResultsContent />
+    <Suspense fallback={<div className="p-6 text-center text-gray-400">Loading...</div>}>
+      <SearchResultsContent />
+    </Suspense>
   );
 }
 
 function SearchResultsContent() {
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get("query") || "";
+
   const [activePill, setActivePill] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("CS2 highlight plays");
+  const [searchQuery, setSearchQuery] = useState(queryParam);
+  const [demoResults, setDemoResults] = useState([]);
+  const [playerResults, setPlayerResults] = useState([]);
+  const shuffledDemoResults = useMemo(() => shuffleArray(demoResults), [demoResults]);
+  const shuffledPlayerResults = useMemo(() => shuffleArray(playerResults), [playerResults]);
   const [showFilters, setShowFilters] = useState(false);
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,27 +76,54 @@ function SearchResultsContent() {
   // Dummy filter options for the modal
   const filterOptions = useMemo(() => ({ maps: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"], positions: { "Dust2": ["A Site", "B Site", "Mid"], "Mirage": ["A Site", "B Site", "Mid"] }, roles: ["IGL", "Support", "Entry", "Lurk", "AWP", "Rifle"] }), []);
 
+  useEffect(() => {
+    setSearchQuery(queryParam);
+  }, [queryParam]);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const demos = await getFilteredDemos({ search: queryParam }, demoType);
+        const players = await getAllPlayers(demoType, 1, 20);
+        const queryLower = queryParam.toLowerCase();
+        const filteredPlayers = players.filter(
+          (p) =>
+            p.name.toLowerCase().includes(queryLower) ||
+            (p.team && p.team.toLowerCase().includes(queryLower))
+        );
+        setDemoResults(demos || []);
+        setPlayerResults(filteredPlayers);
+      } catch (err) {
+        console.error("Error fetching search results:", err);
+        setDemoResults([]);
+        setPlayerResults([]);
+      }
+    };
+
+    if (queryParam) fetchResults();
+  }, [queryParam, demoType]);
+
   // Base content templates
   const contentTemplates = useMemo(() => ({
-    videos: Array.from({ length: 20 }).map((_, i) => ({
+    videos: shuffledDemoResults.map((demo) => ({
       type: "video",
-      title: `${searchQuery} - Epic Gaming Moments ${i + 1}`,
- thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+      title: demo.title,
+      thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
       duration: `${Math.floor(Math.random() * 10) + 5}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
-      views: `${Math.floor(Math.random() * 999) + 1}K views`,
-      uploadDate: `${Math.floor(Math.random() * 7) + 1} days ago`,
-      channel: `ProPlayer${i + 1}`,
- channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
-      watched: i % 3 === 0,
-      player: `Player${i + 1}`,
-      isPro: Math.random() > 0.7,
-      map: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"][Math.floor(Math.random() * 5)],
+      views: `${demo.views ?? Math.floor(Math.random() * 999) + 1} views`,
+      uploadDate: demo.year || "",
+      channel: demo.players?.[0] || "Unknown",
+      channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+      watched: false,
+      player: demo.players?.[0] || "Unknown",
+      isPro: demo.is_pro,
+      map: demo.map,
     })),
-    players: Array.from({ length: 15 }).map((_, i) => ({ 
+    players: shuffledPlayerResults.map((player) => ({
       type: "player",
-      name: `ProGamer${i + 1}`, 
-      avatar: THUMBNAIL_IMAGE,
-      followers: `${Math.floor(Math.random() * 50) + 10}K subscribers`,
+      name: player.name,
+      avatar: player.avatar || THUMBNAIL_IMAGE,
+      followers: `${player.stats?.totalViews || 0} subscribers`,
       game: "Counter-Strike 2",
     })),
     teams: Array.from({ length: 10 }).map((_, i) => ({ 
@@ -139,7 +180,7 @@ function SearchResultsContent() {
         score: `16-${Math.floor(Math.random() * 15) + 1}`
       }))
     })),
-  }), [searchQuery]);
+  }), [searchQuery, shuffledDemoResults, shuffledPlayerResults]);
 
   // Smart content generation
   const generateSmartContent = useCallback((count = 10) => {
