@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Filter } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -14,8 +14,7 @@ const PILL_OPTIONS = [
   "recently uploaded",
 ];
 
-// Component that uses useSearchParams and needs to be wrapped
-function SearchResultsContent() {
+export default function SearchResultsPage() {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") || "";
 
@@ -27,7 +26,7 @@ function SearchResultsContent() {
     setActivePill("all");
   }, [queryParam]);
 
-  // Dummy data placeholders (replace with real fetch logic)
+  // Dummy data placeholders (always shown)
   const videos = useMemo(
     () =>
       Array.from({ length: 8 }).map((_, i) => ({
@@ -58,43 +57,6 @@ function SearchResultsContent() {
       })),
     []
   );
-
-  // Filtered lists based on search and pill
-  const filteredVideos = useMemo(
-    () => videos.filter(v => v.title.toLowerCase().includes(searchQuery.toLowerCase())),
-    [videos, searchQuery]
-  );
-  const filteredPlayers = useMemo(
-    () => players.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [players, searchQuery]
-  );
-  const filteredTeams = useMemo(
-    () => teams.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase())),
-    [teams, searchQuery]
-  );
-  const filteredUtils = useMemo(
-    () => utils.filter(u => u.title.toLowerCase().includes(searchQuery.toLowerCase())),
-    [utils, searchQuery]
-  );
-
-  // Helper to decide if section should show
-  const showSection = type => {
-    switch (type) {
-      case "videos":
-        if (!["all", "watched", "unwatched"].includes(activePill)) return false;
-        if (activePill === "watched") return filteredVideos.some(v => v.watched);
-        if (activePill === "unwatched") return filteredVideos.some(v => !v.watched);
-        return filteredVideos.length > 0;
-      case "players":
-        return ["all", "players"].includes(activePill) && filteredPlayers.length > 0;
-      case "teams":
-        return ["all", "teams"].includes(activePill) && filteredTeams.length > 0;
-      case "utils":
-        return ["all", "utils"].includes(activePill) && filteredUtils.length > 0;
-      default:
-        return false;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
@@ -128,73 +90,46 @@ function SearchResultsContent() {
       </div>
 
       <div className="space-y-12">
-        {/* Videos Section */}
-        {showSection("videos") && (
-          <Section title="Videos">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredVideos
-                .filter(v =>
-                  activePill === "watched"
-                    ? v.watched
-                    : activePill === "unwatched"
-                    ? !v.watched
-                    : true
-                )
-                .map(v => <VideoCard key={v.id} title={v.title} thumbnail={v.thumbnail} />)}
-            </div>
-          </Section>
-        )}
+        {/* Videos Section (always shown) */}
+        <Section title="Videos">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {videos.map(v => (
+              <VideoCard key={v.id} title={v.title} thumbnail={v.thumbnail} />
+            ))}
+          </div>
+        </Section>
         <hr className="border-gray-700" />
 
-        {/* Players Section */}
-        {showSection("players") && (
-          <>
-            <Section title="Players">
-              <div className="flex space-x-6 overflow-x-auto py-2">
-                {filteredPlayers.map(p => (
-                  <ChannelCard key={p.id} name={p.name} avatar={p.avatar} />
-                ))}
-              </div>
-            </Section>
-            <hr className="border-gray-700" />
-          </>
-        )}
+        {/* Players Section (always shown) */}
+        <Section title="Players">
+          <div className="flex space-x-6 overflow-x-auto py-2">
+            {players.map(p => (
+              <ChannelCard key={p.id} name={p.name} avatar={p.avatar} />
+            ))}
+          </div>
+        </Section>
+        <hr className="border-gray-700" />
 
-        {/* Teams Section */}
-        {showSection("teams") && (
-          <>
-            <Section title="Teams">
-              <div className="flex space-x-6 overflow-x-auto py-2">
-                {filteredTeams.map(t => (
-                  <ChannelCard key={t.id} name={t.name} avatar={t.logo} />
-                ))}
-              </div>
-            </Section>
-            <hr className="border-gray-700" />
-          </>
-        )}
+        {/* Teams Section (always shown) */}
+        <Section title="Teams">
+          <div className="flex space-x-6 overflow-x-auto py-2">
+            {teams.map(t => (
+              <ChannelCard key={t.id} name={t.name} avatar={t.logo} />
+            ))}
+          </div>
+        </Section>
+        <hr className="border-gray-700" />
 
-        {/* Utils Section */}
-        {showSection("utils") && (
-          <Section title="Utilities">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredUtils.map(u => (
-                <UtilityCard key={u.id} title={u.title} radarData={u.radarData} clips={u.clips} />
-              ))}
-            </div>
-          </Section>
-        )}
+        {/* Utilities Section (always shown) */}
+        <Section title="Utilities">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {utils.map(u => (
+              <UtilityCard key={u.id} title={u.title} radarData={u.radarData} clips={u.clips} />
+            ))}
+          </div>
+        </Section>
       </div>
     </div>
-  );
-}
-
-// Wrapper component with Suspense boundary
-export default function SearchResultsPage() {
-  return (
-    <Suspense fallback={<div>Loading search results...</div>}>
-      <SearchResultsContent />
-    </Suspense>
   );
 }
 
