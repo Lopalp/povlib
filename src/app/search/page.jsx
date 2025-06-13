@@ -1,8 +1,29 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import FilterModal from "/src/components/modals/FilterModal.jsx";
+import PlayerCard from "@/components/cards/PlayerCard";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { getFilteredDemos, getAllPlayers } from "@/lib/supabase";
+
+const THUMBNAIL_IMAGE =
+  "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"; // Placeholder
+
+const VIDEO_THUMBNAIL_POOL = [
+  "/img/1.png",
+  "/img/2.png",
+  "/img/3.png",
+  "/img/4.png",
+  "/img/5.png",
+  "/img/6.png",
+  "/img/7.png",
+  "/img/8.png",
+  "/img/v2.png",
+  "/img/v3.png",
+];
 
 const PILL_OPTIONS = [
   { id: "all", label: "All" },
@@ -15,30 +36,43 @@ const PILL_OPTIONS = [
   { id: "recent", label: "Recent" },
 ];
 
-const THUMBNAIL_IMAGE = "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"; // Placeholder
 
-const VIDEO_THUMBNAIL_POOL = [
-  '/img/1.png',
-  '/img/2.png',
-  '/img/3.png',
-  '/img/4.png',
-  '/img/5.png',
-  '/img/6.png',
-  '/img/7.png',
-  '/img/8.png',
-  '/img/v2.png',
-  '/img/v3.png',
-];
+const shuffleArray = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
 export default function SearchResultsPage() {
   return (
-    <SearchResultsContent />
+    <Suspense fallback={<div className="p-6 text-center text-gray-400">Loading...</div>}>
+      <SearchResultsContent />
+    </Suspense>
   );
 }
 
 function SearchResultsContent() {
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get("query") || "";
+
   const [activePill, setActivePill] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("CS2 highlight plays");
+  const [searchQuery, setSearchQuery] = useState(queryParam);
+  const [demoResults, setDemoResults] = useState([]);
+  const [playerResults, setPlayerResults] = useState([]);
+  const placeholderPlayers = useMemo(
+    () =>
+      Array.from({ length: 6 }).map((_, i) => ({
+        name: `Player${i + 1}`,
+        team: `Team ${i + 1}`,
+        avatar:
+          VIDEO_THUMBNAIL_POOL[
+            Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
+          ],
+        stats: {
+          totalDemos: Math.floor(Math.random() * 50) + 1,
+          totalViews: Math.floor(Math.random() * 10000) + 100,
+        },
+      })),
+    []
+  );
+  const shuffledDemoResults = useMemo(() => shuffleArray(demoResults), [demoResults]);
+  const shuffledPlayerResults = useMemo(() => shuffleArray(playerResults), [playerResults]);
   const [showFilters, setShowFilters] = useState(false);
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,32 +96,69 @@ function SearchResultsContent() {
   // Dummy filter options for the modal
   const filterOptions = useMemo(() => ({ maps: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"], positions: { "Dust2": ["A Site", "B Site", "Mid"], "Mirage": ["A Site", "B Site", "Mid"] }, roles: ["IGL", "Support", "Entry", "Lurk", "AWP", "Rifle"] }), []);
 
+  useEffect(() => {
+    setSearchQuery(queryParam);
+  }, [queryParam]);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const demos = await getFilteredDemos({ search: queryParam }, demoType);
+        const players = await getAllPlayers(demoType, 1, 20);
+        const queryLower = queryParam.toLowerCase();
+        const filteredPlayers = players.filter(
+          (p) =>
+            p.name.toLowerCase().includes(queryLower) ||
+            (p.team && p.team.toLowerCase().includes(queryLower))
+        );
+        setDemoResults(demos || []);
+        setPlayerResults(
+          filteredPlayers.length > 0 ? filteredPlayers : placeholderPlayers
+        );
+      } catch (err) {
+        console.error("Error fetching search results:", err);
+        setDemoResults([]);
+        setPlayerResults(placeholderPlayers);
+      }
+    };
+
+    if (queryParam) fetchResults();
+  }, [queryParam, demoType]);
+
   // Base content templates
   const contentTemplates = useMemo(() => ({
-    videos: Array.from({ length: 20 }).map((_, i) => ({
+    videos: shuffledDemoResults.map((demo) => ({
       type: "video",
-      title: `${searchQuery} - Epic Gaming Moments ${i + 1}`,
- thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+      demoId: demo.id,
+      title: demo.title,
+      thumbnail:
+        VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
       duration: `${Math.floor(Math.random() * 10) + 5}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
-      views: `${Math.floor(Math.random() * 999) + 1}K views`,
-      uploadDate: `${Math.floor(Math.random() * 7) + 1} days ago`,
-      channel: `ProPlayer${i + 1}`,
- channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
-      watched: i % 3 === 0,
-      player: `Player${i + 1}`,
-      isPro: Math.random() > 0.7,
-      map: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"][Math.floor(Math.random() * 5)],
+      views: `${demo.views ?? Math.floor(Math.random() * 999) + 1} views`,
+      uploadDate: demo.year || "",
+      channel: demo.players?.[0] || "Unknown",
+      channelAvatar:
+        VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+      watched: false,
+      player: demo.players?.[0] || "Unknown",
+      isPro: demo.is_pro,
+      map: demo.map,
     })),
-    players: Array.from({ length: 15 }).map((_, i) => ({ 
+    players: shuffledPlayerResults.map((player) => ({
       type: "player",
-      name: `ProGamer${i + 1}`, 
-      avatar: THUMBNAIL_IMAGE,
-      followers: `${Math.floor(Math.random() * 50) + 10}K subscribers`,
+      name: player.name,
+      avatar:
+        player.avatar ||
+        VIDEO_THUMBNAIL_POOL[
+          Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
+        ],
+      followers: `${player.stats?.totalViews ?? Math.floor(Math.random() * 5000) + 500} followers`,
       game: "Counter-Strike 2",
+      ...player,
     })),
-    teams: Array.from({ length: 10 }).map((_, i) => ({ 
+    teams: Array.from({ length: 10 }).map((_, i) => ({
       type: "team",
-      name: `Team Alpha${i + 1}`, 
+      name: `Team Alpha${i + 1}`,
       logo: THUMBNAIL_IMAGE,
       rank: `#${i + 1} Global`,
       region: ["EU", "NA", "APAC", "SA"][Math.floor(Math.random() * 4)],
@@ -139,7 +210,7 @@ function SearchResultsContent() {
         score: `16-${Math.floor(Math.random() * 15) + 1}`
       }))
     })),
-  }), [searchQuery]);
+  }), [searchQuery, shuffledDemoResults, shuffledPlayerResults]);
 
   // Smart content generation
   const generateSmartContent = useCallback((count = 10) => {
@@ -333,7 +404,13 @@ function SearchResultsContent() {
           {displayedItems.map((item) => (
             <div key={item.id}>
               {item.type === "video" && <VideoCard video={item} />}
-              {item.type === "player" && <PlayerCard player={item} />}
+              {item.type === "player" && (
+                <PlayerCard
+                  player={item}
+                  demoCount={item.stats?.totalDemos}
+                  viewCount={item.stats?.totalViews}
+                />
+              )}
               {item.type === "team" && <TeamCard team={item} />}
               {item.type === "utility" && <UtilityCard utility={item} />}
               {item.type === "event" && <EventCard event={item} />}
@@ -353,8 +430,11 @@ function SearchResultsContent() {
 }
 
 function VideoCard({ video }) {
+  const router = useRouter();
+  const handleClick = () => router.push(`/demos/${video.demoId}`);
+
   return (
-    <div className="group cursor-pointer">
+    <div className="group cursor-pointer" onClick={handleClick}>
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         {/* Thumbnail */}
         <div className="relative w-full sm:w-64 md:w-80 flex-shrink-0">
@@ -392,35 +472,11 @@ function VideoCard({ video }) {
           <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
             Player: <span className="text-gray-300">{video.player}</span> showcases professional gameplay techniques and strategies for competitive play.
           </p>
-          
+
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{video.map}</span>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function PlayerCard({ player }) {
-  return (
-    <div className="group cursor-pointer">
-      <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
-        <img 
-          src={player.avatar} 
-          alt={player.name} 
-          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover" 
-        />
-        <div className="flex-1 text-center sm:text-left">
-          <h3 className="text-white text-base sm:text-lg font-medium mb-1 group-hover:text-gray-200 transition-colors">
-            {player.name}
-          </h3>
-          <p className="text-gray-400 text-sm mb-1">{player.followers}</p>
-          <p className="text-gray-500 text-sm">{player.game}</p>
-        </div>
-        <button className="bg-white text-gray-950 px-4 sm:px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors w-full sm:w-auto">
-          Subscribe
-        </button>
       </div>
     </div>
   );
