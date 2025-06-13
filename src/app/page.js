@@ -541,7 +541,7 @@ export default function Home() {
 
   return (
     <main>
-      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white">
+      <div className="min-h-screen bg-gray-950 text-white">
         <style jsx>{`
           .bg-pattern {
             background-image: radial-gradient(
