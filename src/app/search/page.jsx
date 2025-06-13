@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { Filter } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import dynamic from 'next/dynamic';
 
 const PILL_OPTIONS = [
   "all",
@@ -15,7 +16,17 @@ const PILL_OPTIONS = [
 ];
 
 export default function SearchResultsPage() {
+  return (
+    <Suspense fallback={<div>Loading search results...</div>}>
+      <SearchResultsContent />
+    </Suspense>
+  );
+}
+
+// This component will be dynamically imported and rendered within Suspense
+function SearchResultsContent() {
   const searchParams = useSearchParams();
+  // useSearchParams is now inside a client component rendered within Suspense
   const queryParam = searchParams.get("query") || "";
 
   const [activePill, setActivePill] = useState("all");
@@ -71,7 +82,7 @@ export default function SearchResultsPage() {
       <div className="flex items-center mb-8">
         <div className="flex space-x-2 overflow-x-auto">
           {PILL_OPTIONS.map(pill => (
-            <button
+            <button // Consider using Link from 'next/link' if pills change the URL
               key={pill}
               onClick={() => setActivePill(pill)}
               className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
