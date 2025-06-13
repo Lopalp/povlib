@@ -1,32 +1,30 @@
 import React, { useState } from "react";
-import Link from "next/link";
 import {
   ArrowLeft,
   Eye,
   ThumbsUp,
   Share2,
   MoreHorizontal,
-  Tag as TagIcon,
+
   Bookmark,
   Flag,
   Download,
   FileText,
   ExternalLink,
   ChevronDown,
-  ChevronRight,
+  ChevronUp,
   Shield,
   Play,
-  X,
-  Search,
+  Clock,
+  Target,
+  Zap,
+  User,
+  Users,
+  Calendar,
+  MapPin,
+  Award,
+  TrendingUp
 } from "lucide-react";
-import YouTubeEmbed from "../media/YouTubeEmbed";
-import MatchTimeline from "./MatchTimeline";
-
-import ModalHeading from "../headings/ModalHeading";
-import SettingsHeading from "../headings/SettingsHeading";
-import Tag from "../typography/Tag";
-import { IconButton } from "../buttons";
-import ActionsMenu from "../menus/ActionsMenu";
 
 const demoMatchData = {
   rounds: [
@@ -72,328 +70,413 @@ const demoMatchData = {
   ],
 };
 
-const VideoPlayerPage = ({
-  selectedDemo,
-  relatedDemos = [],
-  onClose,
-  onLike,
-  onOpenTagModal,
-  onSelectRelatedDemo,
-  demoType = "pro",
-  setDemoType = () => {},
-  searchActive = false,
-  setSearchActive = () => {},
-  isMenuOpen = false,
-  setIsMenuOpen = () => {},
-}) => {
+const selectedDemo = {
+  id: 1,
+  title: "s1mple insane 4K clutch on Dust2 - Major Finals",
+  thumbnail: "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  views: 2847391,
+  likes: 45632,
+  year: "2024",
+  event: "PGL Major Stockholm",
+  map: "Dust2",
+  team: "NAVI",
+  players: ["s1mple", "electronic", "Perfecto"],
+  tags: ["clutch", "highlight", "major", "rifle"],
+  video_id: "dQw4w9WgXcQ",
+  positions: ["Long", "Site"],
+  uploadDate: "3 days ago",
+  duration: "12:34"
+};
+
+const relatedDemos = [
+  {
+    id: 2,
+    title: "ZywOo 1v4 clutch round Inferno - Pro League",
+    thumbnail: "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    views: 1234567,
+    likes: 23456,
+    map: "Inferno",
+    players: ["ZywOo", "apEX", "NBK"],
+    duration: "8:45"
+  },
+  {
+    id: 3,
+    title: "NiKo perfect spray control on Mirage",
+    thumbnail: "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    views: 987654,
+    likes: 18765,
+    map: "Mirage",
+    players: ["NiKo", "huNter", "nexa"],
+    duration: "6:12"
+  },
+  {
+    id: 4,
+    title: "sh1ro insane AWP shots - BLAST Premier",
+    thumbnail: "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    views: 1567890,
+    likes: 27345,
+    map: "Cache",
+    players: ["sh1ro", "Ax1Le", "interz"],
+    duration: "15:23"
+  }
+];
+
+const VideoPlayerPage = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
-  // NEU: State für das Input-Feld
   const [matchroomUrl, setMatchroomUrl] = useState("");
-
-  if (!selectedDemo) return null;
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const generateDescription = () => {
-    let desc = `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(
-      ", "
-    )} on ${selectedDemo.map}. `;
-    if (selectedDemo.team)
-      desc += `Watch how ${selectedDemo.team} players demonstrate professional `;
-    else desc += "Check out professional ";
-    if (selectedDemo.positions?.length)
-      desc += `positioning for ${selectedDemo.positions.join(" and ")}. `;
-    else desc += "positioning and game sense. ";
-    if (selectedDemo.tags?.length)
-      desc += `This POV video highlights techniques like ${selectedDemo.tags.join(
-        ", "
-      )}.`;
-    else desc += "Learn strategies and techniques directly from the pros.";
-    return desc;
+    return `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(", ")} on ${selectedDemo.map}. Watch how ${selectedDemo.team} players demonstrate professional positioning for ${selectedDemo.positions?.join(" and ")}. This POV video highlights techniques like ${selectedDemo.tags.join(", ")}. Learn strategies and techniques directly from the pros in this epic ${selectedDemo.event} moment.`;
   };
+
   const description = generateDescription();
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200">
-      {/* KORREKTUR: Padding-Top (pt) von 16 auf 24 erhöht für mehr Abstand */}
-      <main className="pt-24 pb-12">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-4 mb-8 flex-wrap">
-            <button
-              onClick={onClose}
-              className="flex items-center text-gray-400 hover:text-yellow-400 transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5 mr-2" /> Back to Overview
-            </button>
-            <Link
-              href="/videoplaypagecopy"
-              className="text-gray-400 hover:text-yellow-400 transition-colors"
-            >
-              Open Page Copy
-            </Link>
-          </div>
+    <div className="min-h-screen bg-gray-950">
+      {/* Header */}
+      <div className="sticky top-0 bg-gray-950/95 backdrop-blur-md border-b border-gray-800 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <button className="flex items-center text-gray-400 hover:text-white transition-colors">
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            <span className="text-sm font-medium">Back to Browse</span>
+          </button>
+        </div>
+      </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="w-full lg:w-8/12 space-y-6">
-              <div className="w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg ">
-                <YouTubeEmbed
-                  videoId={selectedDemo.video_id}
-                  title={selectedDemo.title}
-                  autoplay
-                  controls
-                  showInfo={false}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Video Player */}
+            <div className="relative bg-black rounded-xl overflow-hidden shadow-2xl">
+              <div className="aspect-video">
+                <img 
+                  src={selectedDemo.thumbnail} 
+                  alt={selectedDemo.title}
+                  className="w-full h-full object-cover"
                 />
-              </div>
-
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="space-y-2">
-                  <ModalHeading>{selectedDemo.title}</ModalHeading>
-                  <div className="flex flex-wrap items-center space-x-6 text-gray-400 text-sm">
-                    <div className="flex items-center">
-                      <Eye className="h-5 w-5 mr-1" />
-                      <span>{selectedDemo.views?.toLocaleString()} views</span>
-                    </div>
-                    <div>{selectedDemo.year}</div>
-                    {selectedDemo.event && (
-                      <div className="text-yellow-400">
-                        {selectedDemo.event}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <IconButton onClick={() => onLike(selectedDemo.id)}>
-                    <ThumbsUp className="h-5 w-5" />
-                    <span className="ml-1">{selectedDemo.likes}</span>
-                  </IconButton>
-                  <IconButton>
-                    <Share2 className="h-5 w-5" />
-                  </IconButton>
-                  <div className="relative">
-                    <IconButton onClick={() => setMenuOpen(!menuOpen)}>
-                      <MoreHorizontal className="h-5 w-5" />
-                    </IconButton>
-                    <ActionsMenu
-                      isOpen={menuOpen}
-                      onClose={() => setMenuOpen(false)}
-                      demo={"bottom-left"}
-                      items={[
-                        {
-                          icon: <TagIcon className="h-4 w-4 text-yellow-400" />,
-                          label: "Add Tag",
-                          onClick: () => {
-                            onOpenTagModal();
-                            setMenuOpen(false);
-                          },
-                        },
-                        {
-                          icon: (
-                            <Bookmark className="h-4 w-4 text-yellow-400" />
-                          ),
-                          label: "Save",
-                          onClick: () => setMenuOpen(false),
-                        },
-                        {
-                          icon: <Flag className="h-4 w-4 text-red-500" />,
-                          label: "Report",
-                          onClick: () => setMenuOpen(false),
-                        },
-                        {
-                          icon: (
-                            <Download className="h-4 w-4 text-yellow-400" />
-                          ),
-                          label: "Download Video",
-                          onClick: () => {
-                            window.open(selectedDemo.video_url);
-                            setMenuOpen(false);
-                          },
-                        },
-                        {
-                          icon: (
-                            <FileText className="h-4 w-4 text-yellow-400" />
-                          ),
-                          label: "Download Demo",
-                          onClick: () => {
-                            window.open(selectedDemo.dem_url);
-                            setMenuOpen(false);
-                          },
-                        },
-                        {
-                          icon: (
-                            <ExternalLink className="h-4 w-4 text-yellow-400" />
-                          ),
-                          label: "Open Matchroom",
-                          onClick: () => {
-                            window.open(selectedDemo.matchroom_url, "_blank");
-                            setMenuOpen(false);
-                          },
-                        },
-                      ]}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* KORREKTUR: Matchroom Alert mit Input-Feld */}
-              {!matchroomSubmitted && (
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-yellow-400/20 border border-yellow-400/30 text-gray-100 p-4 rounded-md">
-                  <div className="flex-shrink-0">
-                    <Shield className="h-6 w-6 text-yellow-400" />
-                  </div>
-                  <div className="flex-grow text-sm">
-                    Help us complete the matchroom! Add the link here.
-                  </div>
-                  <input
-                    type="text"
-                    value={matchroomUrl}
-                    onChange={(e) => setMatchroomUrl(e.target.value)}
-                    placeholder="Paste matchroom URL..."
-                    className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
-                  />
-                  <button
-                    onClick={() => {
-                      // Hier könnte man die URL verarbeiten, z.B. an eine API senden
-                      console.log("Submitted URL:", matchroomUrl);
-                      setMatchroomSubmitted(true);
-                    }}
-                    className="flex-shrink-0 w-full sm:w-auto bg-yellow-400 text-gray-900 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-yellow-300 transition-colors"
-                  >
-                    Submit
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <button className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
+                    <Play className="w-10 h-10 text-white ml-1" fill="currentColor" />
                   </button>
                 </div>
-              )}
-              {matchroomSubmitted && (
-                <div className="bg-gray-700 text-gray-300 px-4 py-3 rounded-md text-sm flex items-center gap-3">
-                  <Shield className="h-5 w-5 text-green-400" />
-                  <span>
-                    Thank you! Your link is being reviewed and will be added
-                    shortly.
-                  </span>
+                <div className="absolute bottom-4 right-4 bg-black/80 text-white px-2 py-1 rounded text-sm font-medium">
+                  {selectedDemo.duration}
                 </div>
-              )}
-
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h2 className="border-l-4 border-yellow-400 pl-2 mb-4 text-xl font-semibold text-white">
-                  Description
-                </h2>
-                {selectedDemo.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedDemo.tags.map((tag) => (
-                      <Tag
-                        key={tag}
-                        variant="default"
-                        className="hover:bg-yellow-400/20 transition-colors"
-                      >
-                        <TagIcon className="h-4 w-4 mr-1 text-yellow-400" />
-                        {tag}
-                      </Tag>
-                    ))}
-                  </div>
-                )}
-                <p
-                  className={`${
-                    showFullDescription ? "" : "line-clamp-4"
-                  } text-gray-300 text-lg leading-relaxed`}
-                >
-                  {description}
-                </p>
-                {description.length > 240 && !showFullDescription && (
-                  <IconButton
-                    onClick={() => setShowFullDescription(true)}
-                    className="mt-3 text-yellow-400 hover:text-yellow-300 text-sm"
-                  >
-                    Read more <ChevronDown className="ml-1 h-4 w-4" />
-                  </IconButton>
-                )}
-              </div>
-
-              <div className="flex space-x-4">
-                {selectedDemo.players.map((player, idx) => (
-                  <Link
-                    key={idx}
-                    href={`/players/${player
-                      .replace(/\s+/g, "-")
-                      .toLowerCase()}`}
-                    className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
-                      {player.charAt(0)}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-white font-medium">{player}</span>
-                      {selectedDemo.team && (
-                        <span className="text-gray-400 text-sm">
-                          {selectedDemo.team}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
-              {/* REPLACED: Old match timeline section with new MatchTimeline component */}
-              <div className="space-y-6">
-                <h2 className="border-l-4 border-yellow-400 pl-2 text-xl font-semibold text-white">
-                  Match Timeline
-                </h2>
-                <MatchTimeline matchData={demoMatchData} />
               </div>
             </div>
 
-            <div className="w-full lg:w-4/12 space-y-6">
-              <SettingsHeading>Related POVs</SettingsHeading>
-              <div className="space-y-4">
-                {relatedDemos.length ? (
-                  relatedDemos.map((d) => (
-                    <div
-                      key={d.id}
-                      onClick={() => onSelectRelatedDemo(d.id)}
-                      className="flex gap-4 cursor-pointer items-center hover:bg-gray-800 transition-colors p-2 rounded-md"
-                    >
-                      <div className="w-28 h-20 relative overflow-hidden rounded-lg group flex-shrink-0">
-                        <img
-                          src={d.thumbnail}
-                          alt={d.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                          <div className="rounded-full bg-yellow-400/80 p-2">
-                            <Play
-                              className="h-4 w-4 text-gray-900"
-                              fill="currentColor"
-                            />
-                          </div>
+            {/* Video Info */}
+            <div className="space-y-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
+                  {selectedDemo.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-gray-400 text-sm">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    <span>{selectedDemo.views.toLocaleString()} views</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>{selectedDemo.uploadDate}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Award className="w-4 h-4" />
+                    <span className="text-yellow-400 font-medium">{selectedDemo.event}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3">
+                <button 
+                  onClick={() => setLiked(!liked)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    liked 
+                      ? 'bg-blue-600 text-white' 
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  <ThumbsUp className="w-4 h-4" />
+                  <span>{(selectedDemo.likes + (liked ? 1 : 0)).toLocaleString()}</span>
+                </button>
+                
+                <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-full text-sm font-medium transition-colors">
+                  <Share2 className="w-4 h-4" />
+                  <span>Share</span>
+                </button>
+                
+                <button 
+                  onClick={() => setSaved(!saved)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    saved 
+                      ? 'bg-yellow-600 text-white' 
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
+                >
+                  <Bookmark className="w-4 h-4" />
+                  <span>{saved ? 'Saved' : 'Save'}</span>
+                </button>
+
+                <div className="relative">
+                  <button 
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 hover:bg-gray-700 rounded-full text-sm font-medium transition-colors"
+                  >
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                  
+                  {menuOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20">
+                      <div className="py-2">
+                        <button className="flex items-center gap-3 px-4 py-2 hover:bg-gray-700 text-gray-300 w-full text-left">
+                          <Download className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm">Download Video</span>
+                        </button>
+                        <button className="flex items-center gap-3 px-4 py-2 hover:bg-gray-700 text-gray-300 w-full text-left">
+                          <FileText className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm">Download Demo</span>
+                        </button>
+                        <button className="flex items-center gap-3 px-4 py-2 hover:bg-gray-700 text-gray-300 w-full text-left">
+                          <ExternalLink className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm">Open Matchroom</span>
+                        </button>
+                        <button className="flex items-center gap-3 px-4 py-2 hover:bg-gray-700 text-gray-300 w-full text-left">
+                          <Flag className="w-4 h-4 text-yellow-400" />
+                          <span className="text-sm">Report</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Community Contribution */}
+            {!matchroomSubmitted && (
+              <div className="bg-blue-600/10 border border-blue-500/30 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="text-white font-medium mb-2">Help Complete Match Data</h3>
+                    <p className="text-gray-300 text-sm mb-3">
+                      Have the matchroom link? Help the community by adding it below.
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={matchroomUrl}
+                        onChange={(e) => setMatchroomUrl(e.target.value)}
+                        placeholder="Paste matchroom URL..."
+                        className="flex-1 bg-gray-800 border border-gray-600 text-white text-sm rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <button
+                        onClick={() => {
+                          console.log("Submitted URL:", matchroomUrl);
+                          setMatchroomSubmitted(true);
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {matchroomSubmitted && (
+              <div className="bg-blue-600/20 border border-blue-500/40 rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-blue-400" />
+                  <div>
+                    <p className="text-white font-medium">Thank you!</p>
+                    <p className="text-gray-300 text-sm">Your contribution is being reviewed and will be added soon.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tags */}
+            {selectedDemo.tags && selectedDemo.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedDemo.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-full text-sm transition-colors cursor-pointer"
+                  >
+                    <TagIcon className="w-3 h-3" />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="bg-gray-900/50 rounded-xl p-6">
+              <h2 className="text-xl font-semibold text-white mb-4">About this match</h2>
+              <p className={`text-gray-300 leading-relaxed ${!showFullDescription ? 'line-clamp-3' : ''}`}>
+                {description}
+              </p>
+              {description.length > 200 && (
+                <button
+                  onClick={() => setShowFullDescription(!showFullDescription)}
+                  className="mt-3 text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1"
+                >
+                  {showFullDescription ? (
+                    <>Show less <ChevronUp className="w-4 h-4" /></>
+                  ) : (
+                    <>Show more <ChevronDown className="w-4 h-4" /></>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Players */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-white">Players</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {selectedDemo.players.map((player, idx) => (
+                  <div key={idx} className="bg-gray-900/50 rounded-xl p-4 hover:bg-gray-800/50 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {player.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="text-white font-medium">{player}</h3>
+                        <p className="text-gray-400 text-sm">{selectedDemo.team}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Match Timeline */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-white">Match Timeline</h2>
+                <button
+                  onClick={() => setShowTimeline(!showTimeline)}
+                  className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center gap-1"
+                >
+                  {showTimeline ? 'Hide' : 'Show'} Timeline
+                  {showTimeline ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+              
+              {showTimeline && (
+                <div className="bg-gray-900/50 rounded-xl p-6">
+                  <div className="space-y-4">
+                    {demoMatchData.rounds.map((round) => (
+                      <div key={round.roundNumber} className="border-l-2 border-gray-700 pl-4">
+                        <h3 className="text-white font-medium mb-2">Round {round.roundNumber}</h3>
+                        <div className="space-y-2">
+                          {round.events.map((event, idx) => (
+                            <div key={idx} className="flex items-center gap-3 text-sm">
+                              <span className="text-gray-400 w-8">{event.time}s</span>
+                              <div className={`w-2 h-2 rounded-full ${
+                                event.type === 'kill' ? 'bg-yellow-400' : 
+                                event.type === 'death' ? 'bg-red-400' : 
+                                'bg-blue-400'
+                              }`} />
+                              <span className="text-gray-300">{event.player}</span>
+                              <span className="text-gray-500 capitalize">{event.type}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Match Stats */}
+            <div className="bg-gray-900/50 rounded-xl p-6">
+              <h3 className="text-white font-semibold mb-4">Match Info</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">Map</span>
+                  </div>
+                  <span className="text-white font-medium">{selectedDemo.map}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Users className="w-4 h-4" />
+                    <span className="text-sm">Team</span>
+                  </div>
+                  <span className="text-white font-medium">{selectedDemo.team}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-sm">Year</span>
+                  </div>
+                  <span className="text-white font-medium">{selectedDemo.year}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-sm">Event</span>
+                  </div>
+                  <span className="text-yellow-400 font-medium text-sm">{selectedDemo.event}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Related Videos */}
+            <div className="space-y-4">
+              <h3 className="text-white font-semibold">Up Next</h3>
+              <div className="space-y-3">
+                {relatedDemos.map((demo) => (
+                  <div key={demo.id} className="group cursor-pointer bg-gray-900/30 hover:bg-gray-800/50 rounded-xl p-3 transition-colors">
+                    <div className="flex gap-3">
+                      <div className="relative w-32 h-18 flex-shrink-0">
+                        <img
+                          src={demo.thumbnail}
+                          alt={demo.title}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded-lg flex items-center justify-center">
+                          <Play className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" />
+                        </div>
+                        <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 py-0.5 rounded">
+                          {demo.duration}
+                        </span>
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-medium text-sm line-clamp-2">
-                          {d.title}
-                        </h3>
-                        <p className="text-gray-400 text-xs mt-1">
-                          {d.players.join(", ")}
+                        <h4 className="text-white font-medium text-sm line-clamp-2 mb-1 group-hover:text-gray-200">
+                          {demo.title}
+                        </h4>
+                        <p className="text-gray-400 text-xs mb-2">
+                          {demo.players.join(", ")}
                         </p>
-                        <div className="flex items-center text-gray-500 text-xs mt-2">
-                          <span>{d.views.toLocaleString()} views</span>
-                          <span className="mx-1">•</span>
-                          <span>{d.map}</span>
-                          <div className="ml-auto flex items-center text-yellow-400">
-                            <ThumbsUp className="h-3 w-3 mr-1" />
-                            <span>{d.likes}</span>
-                          </div>
+                        <div className="flex items-center gap-2 text-gray-500 text-xs">
+                          <span>{demo.views.toLocaleString()} views</span>
+                          <span>•</span>
+                          <span>{demo.map}</span>
                         </div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-gray-400 text-center py-8">
-                    No related videos available
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
