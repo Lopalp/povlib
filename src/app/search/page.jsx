@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import FilterModal from "/src/components/modals/FilterModal.jsx";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { getFilteredDemos, getAllPlayers } from "@/lib/supabase";
+import { mapDemoData } from "@/lib/utils";
 
 const PILL_OPTIONS = [
   { id: "all", label: "All" },
@@ -37,8 +40,11 @@ export default function SearchResultsPage() {
 }
 
 function SearchResultsContent() {
+  const searchParams = useSearchParams();
   const [activePill, setActivePill] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("CS2 highlight plays");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dbVideos, setDbVideos] = useState([]);
+  const [dbPlayers, setDbPlayers] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,35 +65,18 @@ function SearchResultsContent() {
     extraPlatforms: [],
   });
 
+  useEffect(() => {
+    const query = searchParams.get("query") || "";
+    setSearchQuery(query);
+  }, [searchParams]);
+
   // Dummy filter options for the modal
   const filterOptions = useMemo(() => ({ maps: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"], positions: { "Dust2": ["A Site", "B Site", "Mid"], "Mirage": ["A Site", "B Site", "Mid"] }, roles: ["IGL", "Support", "Entry", "Lurk", "AWP", "Rifle"] }), []);
 
-  // Base content templates
-  const contentTemplates = useMemo(() => ({
-    videos: Array.from({ length: 20 }).map((_, i) => ({
-      type: "video",
-      title: `${searchQuery} - Epic Gaming Moments ${i + 1}`,
- thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
-      duration: `${Math.floor(Math.random() * 10) + 5}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
-      views: `${Math.floor(Math.random() * 999) + 1}K views`,
-      uploadDate: `${Math.floor(Math.random() * 7) + 1} days ago`,
-      channel: `ProPlayer${i + 1}`,
- channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
-      watched: i % 3 === 0,
-      player: `Player${i + 1}`,
-      isPro: Math.random() > 0.7,
-      map: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"][Math.floor(Math.random() * 5)],
-    })),
-    players: Array.from({ length: 15 }).map((_, i) => ({ 
-      type: "player",
-      name: `ProGamer${i + 1}`, 
-      avatar: THUMBNAIL_IMAGE,
-      followers: `${Math.floor(Math.random() * 50) + 10}K subscribers`,
-      game: "Counter-Strike 2",
-    })),
-    teams: Array.from({ length: 10 }).map((_, i) => ({ 
+  const staticContent = useMemo(() => ({
+    teams: Array.from({ length: 10 }).map((_, i) => ({
       type: "team",
-      name: `Team Alpha${i + 1}`, 
+      name: `Team Alpha${i + 1}`,
       logo: THUMBNAIL_IMAGE,
       rank: `#${i + 1} Global`,
       region: ["EU", "NA", "APAC", "SA"][Math.floor(Math.random() * 4)],
@@ -138,8 +127,64 @@ function SearchResultsContent() {
         team2: `Team ${String.fromCharCode(65 + j * 2 + 1)}`,
         score: `16-${Math.floor(Math.random() * 15) + 1}`
       }))
-    })),
-  }), [searchQuery]);
+    }))
+  }), []);
+
+  const contentTemplates = useMemo(
+    () => ({
+      videos: dbVideos,
+      players: dbPlayers,
+      teams: staticContent.teams,
+      utilities: staticContent.utilities,
+      events: staticContent.events,
+    }),
+    [dbVideos, dbPlayers, staticContent]
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const demosData = await getFilteredDemos({ search: searchQuery }, demoType);
+        const mappedVideos = (demosData || []).map(mapDemoData).map((d) => ({
+          type: "video",
+          title: d.title,
+          thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+          duration: `${Math.floor(Math.random() * 10) + 5}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+          views: `${d.views || 0} views`,
+          uploadDate: d.year || "",
+          channel: d.players?.[0] || d.team || "Unknown",
+          channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+          watched: false,
+          player: d.players?.[0] || "",
+          isPro: d.isPro,
+          map: d.map,
+        }));
+
+        const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+        setDbVideos(shuffle(mappedVideos));
+
+        let playersData = await getAllPlayers(demoType, 1, 50, {});
+        playersData = playersData.filter(
+          (p) =>
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (p.team && p.team.toLowerCase().includes(searchQuery.toLowerCase()))
+        );
+        const mappedPlayers = playersData.map((p) => ({
+          type: "player",
+          name: p.name,
+          avatar: THUMBNAIL_IMAGE,
+          followers: `${Math.floor(Math.random() * 50) + 10}K subscribers`,
+          game: "Counter-Strike 2",
+        }));
+        setDbPlayers(shuffle(mappedPlayers));
+      } catch (err) {
+        console.error("Error fetching search results:", err);
+      }
+    };
+
+    fetchData();
+  }, [searchQuery, demoType]);
+
 
   // Smart content generation
   const generateSmartContent = useCallback((count = 10) => {
