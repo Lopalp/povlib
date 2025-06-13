@@ -890,6 +890,28 @@ export async function getAllPlayers(
   }
 }
 
+// Search players by name or team
+export async function searchPlayers(
+  searchQuery,
+  type = "pro",
+  limit = 20
+) {
+  try {
+    const allPlayers = await getAllPlayers(type, 1, 200, {});
+    if (!allPlayers) return [];
+    const query = searchQuery.toLowerCase();
+    const filtered = allPlayers.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        (p.team && p.team.toLowerCase().includes(query))
+    );
+    return filtered.slice(0, limit);
+  } catch (error) {
+    console.error("Error searching players:", error);
+    return [];
+  }
+}
+
 export async function getAllMaps() {
   try {
     const { data, error } = await supabase
