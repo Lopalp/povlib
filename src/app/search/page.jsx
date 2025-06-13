@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Filter, Play, Users, Trophy, Zap } from "lucide-react";
+import { Filter } from "lucide-react";
 
 const PILL_OPTIONS = [
   { id: "all", label: "All" },
@@ -40,7 +40,7 @@ function SearchResultsContent() {
       channel: `ProPlayer${i + 1}`,
       channelAvatar: THUMBNAIL_IMAGE,
       watched: i % 3 === 0,
-      quality: "HD",
+      quality: "4K",
       map: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"][Math.floor(Math.random() * 5)],
       team: `Team${i + 1}`,
       year: "2024",
@@ -50,7 +50,7 @@ function SearchResultsContent() {
       type: "player",
       name: `ProGamer${i + 1}`, 
       avatar: THUMBNAIL_IMAGE,
-      followers: `${Math.floor(Math.random() * 50) + 10}K followers`,
+      followers: `${Math.floor(Math.random() * 50) + 10}K subscribers`,
       game: "Counter-Strike 2",
       rank: `Global Elite`,
       winRate: `${Math.floor(Math.random() * 20) + 70}%`,
@@ -86,7 +86,6 @@ function SearchResultsContent() {
     let result = [];
     
     if (activePill !== "all") {
-      // For specific filters, just return that content type
       let content = [];
       switch (activePill) {
         case "videos":
@@ -114,7 +113,7 @@ function SearchResultsContent() {
       }));
     }
 
-    // Smart logic for "all" - create logical groups
+    // Smart logic for "all"
     const { videos, players, teams, utilities } = contentTemplates;
     let itemsGenerated = 0;
 
@@ -122,7 +121,6 @@ function SearchResultsContent() {
       const randomType = Math.random();
       
       if (randomType < 0.3 && players.length > 0) {
-        // Player block: Player + 2 Videos + Line
         const player = players[Math.floor(Math.random() * players.length)];
         const relatedVideos = videos.slice(0, 2);
         
@@ -150,7 +148,6 @@ function SearchResultsContent() {
         }
         
       } else if (randomType < 0.5 && teams.length > 0) {
-        // Team block: Team + Videos + Featured Players + Line
         const team = teams[Math.floor(Math.random() * teams.length)];
         const teamVideos = videos.slice(0, 2);
         const featuredPlayers = players.slice(0, 2);
@@ -190,7 +187,6 @@ function SearchResultsContent() {
         }
         
       } else {
-        // Random single items
         const allItems = [...videos, ...utilities];
         const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
         
@@ -205,12 +201,10 @@ function SearchResultsContent() {
     return result.slice(0, count);
   }, [activePill, contentTemplates]);
 
-  // Initialize content
   useEffect(() => {
     setDisplayedItems(generateSmartContent(15));
   }, [activePill, generateSmartContent]);
 
-  // Infinite scroll logic
   useEffect(() => {
     const handleScroll = () => {
       if (isLoading) return;
@@ -237,30 +231,31 @@ function SearchResultsContent() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      {/* Fixed Header with space for modal navbar */}
-      <div className="fixed top-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700 z-30 pt-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-4">
-          {searchQuery && (
-            <div className="mb-4">
-              <h1 className="text-2xl font-normal">
-                <span className="text-gray-400">Search results for</span>{" "}
-                <span className="text-white font-medium">"{searchQuery}"</span>
-              </h1>
-              <p className="text-gray-500 text-sm mt-1">About 1,240 results</p>
-            </div>
-          )}
+      {/* Space for modal navbar */}
+      <div className="h-16"></div>
+      
+      {/* Search Results Header */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <h1 className="text-xl font-normal mb-1">
+          <span className="text-gray-400">Search results for</span>{" "}
+          <span className="text-white font-medium">"{searchQuery}"</span>
+        </h1>
+        <p className="text-gray-500 text-sm">About 1,240 results</p>
+      </div>
 
-          {/* Filter Pills */}
+      {/* Fixed Filter Bar */}
+      <div className="sticky top-0 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 z-20">
+        <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               {PILL_OPTIONS.map(pill => (
                 <button
                   key={pill.id}
                   onClick={() => setActivePill(pill.id)}
-                  className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-200 ${
+                  className={`px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-200 ${
                     activePill === pill.id
-                      ? "bg-yellow-500/60 text-gray-900"
-                      : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+                      ? "bg-white text-gray-900"
+                      : "bg-gray-800 hover:bg-gray-700 text-gray-300"
                   }`}
                 >
                   {pill.label}
@@ -268,23 +263,22 @@ function SearchResultsContent() {
               ))}
             </div>
             
-            {/* Different Filter Design */}
-            <div className="relative">
+            <div className="relative ml-4">
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-200 border border-gray-600"
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-full transition-all duration-200"
               >
-                <Filter size={16} />
-                <span className="text-sm font-medium hidden sm:inline">Advanced</span>
+                <Filter size={14} />
+                <span className="text-sm font-medium hidden sm:inline">Filters</span>
               </button>
               
               {showFilters && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-800 border border-gray-600 rounded-lg shadow-xl p-4">
+                <div className="absolute top-full right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-4 z-30">
                   <h3 className="text-white font-medium mb-3">Filters</h3>
                   <div className="space-y-3">
                     <div>
                       <label className="text-gray-300 text-sm">Upload date</label>
-                      <select className="w-full mt-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                      <select className="w-full mt-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white">
                         <option>Any time</option>
                         <option>Last hour</option>
                         <option>Today</option>
@@ -293,7 +287,7 @@ function SearchResultsContent() {
                     </div>
                     <div>
                       <label className="text-gray-300 text-sm">Duration</label>
-                      <select className="w-full mt-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm">
+                      <select className="w-full mt-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white">
                         <option>Any duration</option>
                         <option>Under 4 minutes</option>
                         <option>4-20 minutes</option>
@@ -308,9 +302,9 @@ function SearchResultsContent() {
         </div>
       </div>
 
-      {/* Content with top padding for fixed header */}
-      <div className="pt-48 max-w-5xl mx-auto px-4 sm:px-6 py-6">
-        <div className="space-y-6">
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="space-y-4">
           {displayedItems.map((item, index) => (
             <div key={item.id}>
               {item.type === "video" && <VideoCard video={item} />}
@@ -318,15 +312,14 @@ function SearchResultsContent() {
               {item.type === "team" && <TeamCard team={item} />}
               {item.type === "utility" && <UtilityCard utility={item} />}
               {item.type === "separator" && (
-                <div className="border-t border-gray-700 my-8"></div>
+                <div className="border-t border-gray-800 my-6"></div>
               )}
             </div>
           ))}
           
-          {/* Loading indicator */}
           {isLoading && (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
             </div>
           )}
         </div>
@@ -336,59 +329,59 @@ function SearchResultsContent() {
 }
 
 function VideoCard({ video }) {
-  const mockKDA = `${Math.floor(Math.random() * 30) + 10}/${Math.floor(Math.random() * 10) + 1}/${Math.floor(Math.random() * 15) + 5}`;
-
   return (
-    <div className="flex gap-6 p-6 rounded-xl hover:bg-gray-800/20 transition-all duration-200 cursor-pointer">
-      {/* Larger Thumbnail */}
-      <div className="relative w-60 sm:w-72 md:w-80 flex-shrink-0">
+    <div className="flex gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-2">
+      {/* Large Thumbnail like YouTube */}
+      <div className="relative w-96 flex-shrink-0">
         <img 
           src={video.thumbnail} 
           alt={video.title} 
-          className="w-full aspect-video object-cover rounded-xl shadow-lg" 
+          className="w-full aspect-video object-cover rounded-lg" 
         />
         {/* Duration Badge */}
-        <div className="absolute bottom-3 right-3 bg-black/90 text-white text-sm px-2 py-1 rounded-lg font-medium">
+        <div className="absolute bottom-2 right-2 bg-black/90 text-white text-xs px-1.5 py-0.5 rounded font-medium">
           {video.duration}
         </div>
-        {/* Watched Indicator */}
-        {video.watched && (
-          <div className="absolute bottom-0 left-0 w-full h-1.5 bg-yellow-500/70 rounded-b-xl"></div>
-        )}
         {/* Quality Badge */}
-        <div className="absolute top-3 left-3 bg-yellow-500/80 text-gray-900 text-xs px-2 py-1 rounded-lg font-bold">
+        <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded font-medium">
           {video.quality}
         </div>
+        {/* Watched Progress */}
+        {video.watched && (
+          <div className="absolute bottom-0 left-0 w-3/4 h-1 bg-red-600 rounded-b-lg"></div>
+        )}
       </div>
       
       {/* Content */}
-      <div className="flex-1 min-w-0 py-2">
-        <h3 className="text-white font-semibold text-lg sm:text-xl leading-tight line-clamp-2 mb-3">
+      <div className="flex-1 min-w-0 py-1">
+        <h3 className="text-white font-medium text-base leading-5 line-clamp-2 mb-2">
           {video.title}
         </h3>
         
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-2 mb-1">
           <img 
             src={video.channelAvatar} 
             alt={video.channel} 
-            className="w-8 h-8 rounded-full ring-2 ring-gray-700" 
+            className="w-6 h-6 rounded-full" 
           />
-          <span className="text-gray-300 text-base font-medium">{video.channel}</span>
+          <span className="text-gray-400 text-sm">{video.channel}</span>
+          <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
+          <span className="text-gray-500 text-sm">Verified</span>
         </div>
         
-        <div className="flex items-center gap-3 text-gray-400 text-base mb-4">
+        <div className="flex items-center gap-1 text-gray-500 text-sm mb-2">
           <span>{video.views}</span>
-          <span>•</span>
+          <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
           <span>{video.uploadDate}</span>
         </div>
 
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-gray-400">K/D/A:</span>
-            <span className="text-yellow-400 font-bold text-base">{mockKDA}</span>
-          </div>
-          <span className="text-gray-600">•</span>
-          <span className="text-gray-300 bg-gray-800 px-3 py-1 rounded-lg">{video.map}</span>
+        <p className="text-gray-400 text-sm line-clamp-2 leading-5">
+          In this video, I'll show you how a 3k ELO player - a "pro" - thinks during the game. Want to get coached? Get a free trial session...
+        </p>
+        
+        <div className="flex items-center gap-2 mt-2">
+          <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded">New</span>
+          <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded">{video.quality}</span>
         </div>
       </div>
     </div>
@@ -397,87 +390,90 @@ function VideoCard({ video }) {
 
 function PlayerCard({ player }) {
   return (
-    <div className="flex items-center gap-6 p-6 rounded-xl hover:bg-gray-800/20 transition-all duration-200 cursor-pointer">
-      <img 
-        src={player.avatar} 
-        alt={player.name} 
-        className="w-24 h-24 rounded-full object-cover ring-4 ring-gray-700 shadow-lg" 
-      />
-      <div className="flex-1">
-        <h3 className="text-white font-bold text-2xl mb-2">{player.name}</h3>
-        <p className="text-gray-300 text-lg mb-2">{player.followers}</p>
-        <div className="flex items-center gap-6">
-          <span className="text-gray-400 text-base">{player.game}</span>
-          <span className="text-gray-600">•</span>
-          <span className="text-yellow-400 font-bold text-lg bg-yellow-500/20 px-3 py-1 rounded-lg">{player.rank}</span>
-          <span className="text-gray-600">•</span>
-          <span className="text-gray-300 text-base">Win Rate: <span className="text-green-400 font-bold">{player.winRate}</span></span>
+    <div className="flex items-center gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-3">
+      <div className="relative">
+        <img 
+          src={player.avatar} 
+          alt={player.name} 
+          className="w-20 h-20 rounded-full object-cover" 
+        />
+        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
+          <div className="w-3 h-3 bg-white rounded-full"></div>
         </div>
       </div>
+      <div className="flex-1">
+        <h3 className="text-white font-medium text-lg">{player.name}</h3>
+        <p className="text-gray-400 text-sm">{player.followers}</p>
+        <p className="text-gray-500 text-sm">{player.game}</p>
+      </div>
+      <button className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+        Subscribe
+      </button>
     </div>
   );
 }
 
 function TeamCard({ team }) {
   return (
-    <div className="flex items-center gap-6 p-6 rounded-xl hover:bg-gray-800/20 transition-all duration-200 cursor-pointer">
-      <img 
-        src={team.logo} 
-        alt={team.name} 
-        className="w-24 h-24 rounded-lg object-cover ring-4 ring-gray-700 shadow-lg" 
-      />
-      <div className="flex-1">
-        <h3 className="text-white font-bold text-2xl mb-2">{team.name}</h3>
-        <p className="text-gray-300 text-lg mb-2">{team.members}</p>
-        <div className="flex items-center gap-6">
-          <span className="text-yellow-400 font-bold text-lg bg-yellow-500/20 px-3 py-1 rounded-lg">{team.rank}</span>
-          <span className="text-gray-600">•</span>
-          <span className="text-blue-400 font-medium text-base bg-blue-500/20 px-3 py-1 rounded-lg">{team.region}</span>
-          <span className="text-gray-600">•</span>
-          <span className="text-gray-300 text-base">Win Rate: <span className="text-green-400 font-bold">{team.winRate}</span></span>
+    <div className="flex items-center gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-3">
+      <div className="relative">
+        <img 
+          src={team.logo} 
+          alt={team.name} 
+          className="w-20 h-20 rounded-lg object-cover" 
+        />
+        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+          <div className="w-3 h-3 bg-white rounded-full"></div>
         </div>
       </div>
+      <div className="flex-1">
+        <h3 className="text-white font-medium text-lg">{team.name}</h3>
+        <p className="text-gray-400 text-sm">{team.members}</p>
+        <p className="text-gray-500 text-sm">{team.region} • {team.rank}</p>
+      </div>
+      <button className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+        Follow
+      </button>
     </div>
   );
 }
 
 function UtilityCard({ utility }) {
   return (
-    <div className="p-6 rounded-xl hover:bg-gray-800/20 transition-all duration-200 cursor-pointer">
-      <div className="flex gap-6 mb-4">
+    <div className="hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-3">
+      <div className="flex gap-4 mb-3">
         <img 
           src={utility.thumbnail} 
           alt={utility.title} 
-          className="w-32 h-20 rounded-lg object-cover flex-shrink-0 shadow-lg" 
+          className="w-28 h-16 rounded-lg object-cover flex-shrink-0" 
         />
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-bold text-xl mb-2">{utility.title}</h3>
-          <p className="text-gray-300 text-base mb-3 line-clamp-2">{utility.description}</p>
-          <div className="flex items-center gap-6 text-base">
-            <span className="text-yellow-400 font-bold">★ {utility.rating}</span>
-            <span className="text-gray-300">{utility.downloads}</span>
-            <span className="text-gray-600">•</span>
-            <span className="text-green-400 bg-green-500/20 px-3 py-1 rounded-lg font-medium">{utility.category}</span>
+          <h3 className="text-white font-medium text-base mb-1">{utility.title}</h3>
+          <p className="text-gray-400 text-sm line-clamp-2 mb-2">{utility.description}</p>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-yellow-400">★ {utility.rating}</span>
+            <span className="text-gray-500">{utility.downloads}</span>
+            <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded">{utility.category}</span>
           </div>
         </div>
       </div>
       
-      <div className="space-y-3">
-        <h4 className="text-gray-200 text-base font-semibold">Related Clips</h4>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+      <div className="space-y-2">
+        <h4 className="text-gray-300 text-sm font-medium">Related training clips</h4>
+        <div className="flex gap-2 overflow-x-auto">
           {utility.clips.map(clip => (
-            <div key={clip.id} className="flex-shrink-0 w-32">
+            <div key={clip.id} className="flex-shrink-0 w-24">
               <div className="relative">
                 <img 
                   src={clip.thumbnail} 
                   alt={clip.title} 
-                  className="w-full h-18 rounded-lg object-cover shadow-md" 
+                  className="w-full h-14 rounded object-cover" 
                 />
-                <div className="absolute bottom-2 right-2 bg-black/90 text-white text-xs px-1.5 py-0.5 rounded">
+                <div className="absolute bottom-1 right-1 bg-black/90 text-white text-[10px] px-1 py-0.5 rounded">
                   {clip.duration}
                 </div>
               </div>
-              <p className="text-gray-400 text-xs mt-2 truncate">{clip.title}</p>
+              <p className="text-gray-500 text-[10px] mt-1 truncate">{clip.title}</p>
             </div>
           ))}
         </div>
