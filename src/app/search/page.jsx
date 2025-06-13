@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import FilterModal from "/src/components/modals/FilterModal.jsx";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
 
 const PILL_OPTIONS = [
@@ -28,6 +29,25 @@ function SearchResultsContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [demoType, setDemoType] = useState("pro");
+  const [filtersApplied, setFiltersApplied] = useState({
+    demoType: "pro",
+    map: "",
+    position: "",
+    player: "",
+    team: "",
+    year: "",
+    event: "",
+    platform: "",
+    eloMin: 0,
+    eloMax: 5000,
+    roles: [],
+    povlib: false,
+    extraPlatforms: [],
+  });
+
+  // Dummy filter options for the modal
+  const filterOptions = useMemo(() => ({ maps: ["Dust2", "Mirage", "Inferno", "Cache", "Overpass"], positions: { "Dust2": ["A Site", "B Site", "Mid"], "Mirage": ["A Site", "B Site", "Mid"] }, roles: ["IGL", "Support", "Entry", "Lurk", "AWP", "Rifle"] }), []);
 
   // Base content templates
   const contentTemplates = useMemo(() => ({
@@ -223,6 +243,20 @@ function SearchResultsContent() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [generateSmartContent, isLoading]);
 
+  const handleFilterChange = (newFilters) => {
+    setFiltersApplied(prev => ({ ...prev, ...newFilters }));
+  };
+
+  const handleResetFilters = () => {
+    setFiltersApplied({ demoType: "pro", map: "", position: "", player: "", team: "", year: "", event: "", platform: "", eloMin: 0, eloMax: 5000, roles: [], povlib: false, extraPlatforms: [] });
+  };
+
+  const handleApplyFilters = () => {
+    // In a real application, you would apply these filters to your search logic
+    console.log("Applied Filters:", filtersApplied);
+    setShowFilters(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-950">
       {/* Space for modal navbar */}
@@ -265,34 +299,19 @@ function SearchResultsContent() {
                 <span className="text-xs sm:text-sm font-medium">Filters</span>
               </button>
               
-              {showFilters && (
-                <div className="absolute top-full right-0 mt-2 w-full sm:w-72 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 sm:p-6 z-30">
-                  <h3 className="text-white font-medium mb-4">Advanced Filters</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-gray-300 text-sm mb-2 block">Upload date</label>
-                      <select className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-gray-500 focus:outline-none">
-                        <option>Any time</option>
-                        <option>Last hour</option>
-                        <option>Today</option>
-                        <option>This week</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-gray-300 text-sm mb-2 block">Duration</label>
-                      <select className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:border-gray-500 focus:outline-none">
-                        <option>Any duration</option>
-                        <option>Under 4 minutes</option>
-                        <option>4-20 minutes</option>
-                        <option>Over 20 minutes</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
+        {showFilters && (
+          <FilterModal
+            filterOptions={filterOptions}
+            filtersApplied={filtersApplied}
+            onClose={() => setShowFilters(false)}
+            onFilterChange={handleFilterChange}
+            onResetFilters={handleResetFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+        )}
       </div>
 
       {/* Content */}
