@@ -67,7 +67,6 @@ function SearchResultsContent() {
     videos: Array.from({ length: 20 }).map((_, i) => ({
       type: "video",
       title: `${searchQuery} - Epic Gaming Moments ${i + 1}`,
-      thumbnail: THUMBNAIL_IMAGE,
  thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
       duration: `${Math.floor(Math.random() * 10) + 5}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
       views: `${Math.floor(Math.random() * 999) + 1}K views`,
