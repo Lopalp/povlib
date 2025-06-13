@@ -77,6 +77,10 @@ export default function Home() {
   // -------------------------------------
   const [isUnderConstructionOpen, setIsUnderConstructionOpen] = useState(false);
 
+  useEffect(() => {
+    setIsUnderConstructionOpen(true);
+  }, []);
+
   // -------------------------------------
   // Plan state for comparison module
   // -------------------------------------

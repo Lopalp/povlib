@@ -106,7 +106,7 @@ const UnderConstructionModal = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300"
+      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40 p-4 transition-all duration-300"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="relative w-full max-w-5xl h-[80vh] md:h-[75vh] rounded-3xl overflow-hidden shadow-2xl transform transition-all duration-500">
