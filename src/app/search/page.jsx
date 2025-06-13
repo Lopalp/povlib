@@ -267,13 +267,13 @@ function SearchResultsContent() {
   }, [generateSmartContent, isLoading]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
       {/* Space for modal navbar */}
       <div className="h-16"></div>
       
       {/* Search Results Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <h1 className="text-lg sm:text-xl font-normal mb-1">
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <h1 className="text-xl font-normal mb-1">
           <span className="text-gray-400">Search results for</span>{" "}
           <span className="text-white font-medium">"{searchQuery}"</span>
         </h1>
@@ -340,8 +340,8 @@ function SearchResultsContent() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="space-y-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
+        <div className="space-y-4 sm:space-y-6">
           {displayedItems.map((item, index) => (
             <div key={item.id}>
               {item.type === "video" && <VideoCard video={item} />}
@@ -350,13 +350,13 @@ function SearchResultsContent() {
               {item.type === "utility" && <UtilityCard utility={item} />}
               {item.type === "event" && <EventCard event={item} />}
               {item.type === "separator" && (
-                <div className="border-t border-gray-800 my-6"></div>
+                <div className="border-t border-gray-800 my-6 sm:my-8"></div>
               )}
             </div>
           ))}
           
           {isLoading && (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-6 sm:py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
             </div>
           )}
@@ -368,8 +368,8 @@ function SearchResultsContent() {
 
 function VideoCard({ video }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-2">
-      {/* Large Thumbnail - responsive sizing */}
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-2 sm:p-2">
+      {/* Large Thumbnail like YouTube */}
       <div className="relative w-full sm:w-80 md:w-96 flex-shrink-0">
         <img 
           src={video.thumbnail} 
@@ -400,24 +400,24 @@ function VideoCard({ video }) {
           <img 
             src={video.channelAvatar} 
             alt={video.channel} 
-            className="w-6 h-6 rounded-full" 
+            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full" 
           />
-          <span className="text-gray-400 text-sm">{video.channel}</span>
+          <span className="text-gray-400 text-xs sm:text-sm">{video.channel}</span>
           {video.isPro && (
             <>
               <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-              <span className="text-blue-400 text-sm font-medium">Pro</span>
+              <span className="text-blue-400 text-xs sm:text-sm font-medium">Pro</span>
             </>
           )}
         </div>
         
-        <div className="flex items-center gap-1 text-gray-500 text-sm mb-2">
+        <div className="flex items-center gap-1 text-gray-500 text-xs sm:text-sm mb-2">
           <span>{video.views}</span>
           <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
           <span>{video.uploadDate}</span>
         </div>
 
-        <p className="text-gray-400 text-sm line-clamp-2 leading-5 mb-2 hidden sm:block">
+        <p className="text-gray-400 text-xs sm:text-sm line-clamp-2 leading-4 sm:leading-5 mb-2">
           Player: <span className="text-gray-300 font-medium">{video.player}</span> showcases professional gameplay techniques and strategies. Perfect for learning advanced mechanics and game sense.
         </p>
         
@@ -433,23 +433,23 @@ function VideoCard({ video }) {
 
 function PlayerCard({ player }) {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-3">
+    <div className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 hover:bg-gray-800/30 rounded-lg transition-all duration-200 cursor-pointer p-3 sm:p-3">
       <div className="relative">
         <img 
           src={player.avatar} 
           alt={player.name} 
           className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover" 
         />
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-red-600 rounded-full flex items-center justify-center border-2 border-gray-900">
-          <div className="w-2 h-2 bg-white rounded-full"></div>
+        <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-red-600 rounded-full flex items-center justify-center">
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-white rounded-full"></div>
         </div>
       </div>
-      <div className="flex-1 w-full sm:w-auto">
-        <h3 className="text-white font-medium text-lg">{player.name}</h3>
+      <div className="flex-1 text-center sm:text-left">
+        <h3 className="text-white font-medium text-base sm:text-lg">{player.name}</h3>
         <p className="text-gray-400 text-sm">{player.followers}</p>
         <p className="text-gray-500 text-sm">{player.game}</p>
       </div>
-      <button className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors w-full sm:w-auto">
+      <button className="w-full sm:w-auto bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
         Subscribe
       </button>
     </div>
@@ -458,71 +458,59 @@ function PlayerCard({ player }) {
 
 function TeamCard({ team }) {
   return (
-    <div className="bg-gray-800/20 rounded-xl p-4 sm:p-6 hover:bg-gray-800/30 transition-all duration-200 cursor-pointer border border-gray-700/30">
+    <div className="bg-gray-800/30 rounded-xl p-4 sm:p-6 hover:bg-gray-800/40 transition-all duration-200 cursor-pointer">
       {/* Team Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-6">
         <div className="relative">
           <img 
             src={team.logo} 
             alt={team.name} 
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover" 
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover" 
           />
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center border-2 border-gray-900">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+            <div className="w-3 h-3 bg-white rounded-full"></div>
           </div>
         </div>
-        <div className="flex-1">
-          <h3 className="text-white font-bold text-lg sm:text-xl mb-1">{team.name}</h3>
-          <p className="text-gray-300 text-sm mb-2">{team.members} • {team.region}</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs font-medium border border-yellow-400/30">{team.rank}</span>
-            <span className="text-gray-400 text-sm">Win Rate: <span className="text-green-400 font-medium">{team.winRate}</span></span>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-white font-bold text-xl sm:text-2xl mb-2">{team.name}</h3>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-base mb-3">
+            <span className="text-gray-300">{team.members}</span>
+            <span className="text-gray-500">•</span>
+            <span className="text-yellow-400 font-bold bg-yellow-500/20 px-3 py-1 rounded-full">{team.rank}</span>
+            <span className="text-gray-500">•</span>
+            <span className="text-blue-400 bg-blue-500/20 px-3 py-1 rounded-full">{team.region}</span>
+          </div>
+          <div className="text-sm text-gray-400">
+            Win Rate: <span className="text-green-400 font-bold">{team.winRate}</span>
           </div>
         </div>
-        <button className="bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors w-full sm:w-auto">
+        <button className="w-full sm:w-auto bg-white text-gray-900 px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
           Follow Team
         </button>
       </div>
 
-      {/* Team Players - Responsive Layout */}
-      <div className="space-y-3">
-        <h4 className="text-white font-medium text-base">Active Roster</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* Active Roster - Horizontal List */}
+      <div>
+        <h4 className="text-white font-semibold text-base mb-4">Active Roster</h4>
+        <div className="space-y-3">
           {team.players.map((player, index) => (
-            <div key={index} className="bg-gray-800/40 rounded-lg p-3 hover:bg-gray-700/40 transition-colors">
-              <div className="flex sm:flex-col items-center sm:items-center gap-3 sm:gap-2">
-                <img 
-                  src={player.avatar} 
-                  alt={player.name} 
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0" 
-                />
-                <div className="min-w-0 flex-1 sm:flex-none sm:text-center">
-                  <p className="text-white text-sm font-medium truncate">{player.name}</p>
-                  <p className="text-gray-400 text-xs">{player.role}</p>
+            <div key={index} className="flex items-center gap-4 p-3 bg-gray-800/40 rounded-lg hover:bg-gray-700/40 transition-colors">
+              <img 
+                src={player.avatar} 
+                alt={player.name} 
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0" 
+              />
+              <div className="flex-1 min-w-0">
+                <h5 className="text-white font-medium text-sm sm:text-base">{player.name}</h5>
+                <p className="text-gray-400 text-xs sm:text-sm">{player.role}</p>
+              </div>
+              <div className="text-right">
+                <div className="text-yellow-400 text-xs font-medium bg-yellow-500/20 px-2 py-1 rounded">
+                  {player.role}
                 </div>
               </div>
             </div>
           ))}
-        </div>
-        
-        {/* Team Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-gray-700/50">
-          <div className="text-center">
-            <p className="text-white font-bold text-lg">{team.winRate}</p>
-            <p className="text-gray-400 text-xs">Win Rate</p>
-          </div>
-          <div className="text-center">
-            <p className="text-white font-bold text-lg">{Math.floor(Math.random() * 20) + 15}</p>
-            <p className="text-gray-400 text-xs">Tournaments</p>
-          </div>
-          <div className="text-center">
-            <p className="text-white font-bold text-lg">#{Math.floor(Math.random() * 10) + 1}</p>
-            <p className="text-gray-400 text-xs">World Rank</p>
-          </div>
-          <div className="text-center">
-            <p className="text-white font-bold text-lg">${Math.floor(Math.random() * 500) + 100}K</p>
-            <p className="text-gray-400 text-xs">Prize Money</p>
-          </div>
         </div>
       </div>
     </div>
@@ -531,74 +519,85 @@ function TeamCard({ team }) {
 
 function EventCard({ event }) {
   return (
-    <div className="bg-gradient-to-r from-gray-800/40 to-gray-700/40 rounded-xl p-4 sm:p-6 hover:from-gray-800/50 hover:to-gray-700/50 transition-all duration-200 cursor-pointer border border-gray-600/30">
+    <div className="bg-gray-800/30 rounded-xl p-4 sm:p-6 hover:bg-gray-800/40 transition-all duration-200 cursor-pointer">
       {/* Event Header */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
         <img 
           src={event.thumbnail} 
           alt={event.title} 
-          className="w-full sm:w-40 h-24 sm:h-24 rounded-lg object-cover flex-shrink-0" 
+          className="w-full sm:w-40 h-24 sm:h-28 rounded-lg object-cover flex-shrink-0" 
         />
         <div className="flex-1">
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">● LIVE</span>
-            <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs font-medium border border-yellow-400/30">{event.prizePool}</span>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-3">
+            <div>
+              <h3 className="text-white font-bold text-xl sm:text-2xl mb-2">{event.title}</h3>
+              <p className="text-gray-300 text-sm sm:text-base">{event.description}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs sm:text-sm font-bold">LIVE</span>
+              <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs sm:text-sm font-bold">{event.prizePool}</span>
+            </div>
           </div>
-          <h3 className="text-white font-bold text-lg sm:text-xl mb-2">{event.title}</h3>
-          <p className="text-gray-300 text-sm mb-2">{event.description}</p>
-          <p className="text-gray-400 text-sm">{event.startDate} - {event.endDate}</p>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-gray-400">
+            <span>{event.startDate} - {event.endDate}</span>
+            <span>•</span>
+            <span>{event.teams.length} teams</span>
+            <span>•</span>
+            <span>{event.videos.length} highlights</span>
+          </div>
         </div>
       </div>
 
-      {/* Teams Grid */}
+      {/* Teams Section */}
       <div className="mb-6">
-        <h4 className="text-white font-medium text-base mb-3">Participating Teams</h4>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {event.teams.slice(0, 4).map((team, index) => (
-            <div key={index} className="bg-gray-800/50 rounded-lg p-3 text-center hover:bg-gray-700/50 transition-colors">
+        <h4 className="text-white font-semibold text-base mb-3">Participating Teams</h4>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          {event.teams.slice(0, 8).map((team, index) => (
+            <div key={index} className="text-center">
               <img 
                 src={team.logo} 
                 alt={team.name} 
-                className="w-10 h-10 rounded object-cover mx-auto mb-2" 
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover mx-auto mb-2" 
               />
-              <h5 className="text-white text-xs font-medium truncate">{team.name}</h5>
-              <p className="text-gray-400 text-xs">{team.rank}</p>
+              <p className="text-white text-xs font-medium truncate">{team.name}</p>
+              <p className="text-gray-400 text-[10px]">{team.rank}</p>
             </div>
           ))}
         </div>
-        {event.teams.length > 4 && (
-          <div className="text-center mt-3">
-            <span className="text-gray-400 text-sm">+{event.teams.length - 4} more teams</span>
-          </div>
-        )}
       </div>
 
-      {/* Videos Grid */}
+      {/* Videos Section */}
       <div>
-        <h4 className="text-white font-medium text-base mb-3">Latest Highlights</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <h4 className="text-white font-semibold text-base mb-3">Latest Highlights</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {event.videos.slice(0, 3).map((video, index) => (
-            <div key={index} className="bg-gray-800/40 rounded-lg overflow-hidden hover:bg-gray-700/40 transition-colors">
+            <div key={index} className="bg-gray-800/50 rounded-lg overflow-hidden hover:bg-gray-700/50 transition-colors">
               <div className="relative">
                 <img 
                   src={video.thumbnail} 
                   alt={video.title} 
-                  className="w-full h-20 object-cover" 
+                  className="w-full h-20 sm:h-24 object-cover" 
                 />
-                <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
                   {video.duration}
                 </div>
-                <div className="absolute top-1 left-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded font-medium">
+                <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded font-medium">
                   LIVE
                 </div>
               </div>
-              <div className="p-2">
-                <h5 className="text-white text-sm font-medium line-clamp-2 mb-1">{video.title}</h5>
+              <div className="p-3">
+                <h5 className="text-white font-medium text-sm line-clamp-2 mb-1">{video.title}</h5>
                 <p className="text-gray-400 text-xs">{video.views}</p>
               </div>
             </div>
           ))}
         </div>
+        
+        {event.videos.length > 3 && (
+          <button className="w-full mt-4 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+            View all {event.videos.length} highlights
+          </button>
+        )}
       </div>
     </div>
   );
@@ -606,47 +605,43 @@ function EventCard({ event }) {
 
 function UtilityCard({ utility }) {
   return (
-    <div className="bg-gray-800/20 rounded-xl p-4 sm:p-6 hover:bg-gray-800/30 transition-all duration-200 cursor-pointer">
-      {/* Utility Header */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        {/* Large Radar Map */}
-        <div className="w-full sm:w-48 h-32 sm:h-32 rounded-lg bg-gray-900 border border-gray-700 p-3 flex-shrink-0">
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            {/* Map Border */}
-            <rect width="100" height="100" fill="none" stroke="#4b5563" strokeWidth="0.8" rx="2"/>
+    <div className="bg-gray-800/30 rounded-xl p-4 sm:p-6 hover:bg-gray-800/40 transition-all duration-200 cursor-pointer">
+      {/* Header with larger presence */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
+        {/* Large Radar Map SVG - only lines */}
+        <div className="w-full sm:w-48 h-32 sm:h-36 rounded-lg bg-gray-900 flex-shrink-0 p-4 border border-gray-700">
+          <svg viewBox="0 0 120 120" className="w-full h-full">
+            {/* Map Outline - only lines */}
+            <rect width="120" height="120" fill="none" stroke="#6b7280" strokeWidth="1" rx="4"/>
             
-            {/* Map Sections - Only Lines */}
-            {/* A Site */}
-            <rect x="10" y="10" width="35" height="25" fill="none" stroke="#6b7280" strokeWidth="0.6" rx="1"/>
-            <text x="27" y="25" fill="#9ca3af" fontSize="5" textAnchor="middle" fontWeight="bold">A</text>
+            {/* Map Sections - wireframe style */}
+            <line x1="20" y1="20" x2="55" y2="20" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="55" y1="20" x2="55" y2="45" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="55" y1="45" x2="20" y2="45" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="20" y1="45" x2="20" y2="20" stroke="#9ca3af" strokeWidth="0.8"/>
             
-            {/* B Site */}
-            <rect x="55" y="10" width="35" height="25" fill="none" stroke="#6b7280" strokeWidth="0.6" rx="1"/>
-            <text x="72" y="25" fill="#9ca3af" fontSize="5" textAnchor="middle" fontWeight="bold">B</text>
+            <line x1="65" y1="20" x2="100" y2="20" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="100" y1="20" x2="100" y2="45" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="100" y1="45" x2="65" y2="45" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="65" y1="45" x2="65" y2="20" stroke="#9ca3af" strokeWidth="0.8"/>
             
-            {/* Mid */}
-            <rect x="10" y="45" width="80" height="15" fill="none" stroke="#6b7280" strokeWidth="0.6" rx="1"/>
-            <text x="50" y="55" fill="#9ca3af" fontSize="5" textAnchor="middle" fontWeight="bold">MID</text>
+            <line x1="20" y1="55" x2="100" y2="55" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="20" y1="70" x2="100" y2="70" stroke="#9ca3af" strokeWidth="0.8"/>
             
-            {/* Long */}
-            <rect x="10" y="70" width="35" height="25" fill="none" stroke="#6b7280" strokeWidth="0.6" rx="1"/>
-            <text x="27" y="85" fill="#9ca3af" fontSize="4" textAnchor="middle">LONG</text>
+            <line x1="20" y1="80" x2="55" y2="80" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="55" y1="80" x2="55" y2="100" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="55" y1="100" x2="20" y2="100" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="20" y1="100" x2="20" y2="80" stroke="#9ca3af" strokeWidth="0.8"/>
             
-            {/* Short */}
-            <rect x="55" y="70" width="35" height="25" fill="none" stroke="#6b7280" strokeWidth="0.6" rx="1"/>
-            <text x="72" y="85" fill="#9ca3af" fontSize="4" textAnchor="middle">SHORT</text>
-            
-            {/* Connection Lines */}
-            <line x1="45" y1="22" x2="55" y2="22" stroke="#6b7280" strokeWidth="0.4"/>
-            <line x1="27" y1="35" x2="27" y2="45" stroke="#6b7280" strokeWidth="0.4"/>
-            <line x1="72" y1="35" x2="72" y2="45" stroke="#6b7280" strokeWidth="0.4"/>
-            <line x1="27" y1="60" x2="27" y2="70" stroke="#6b7280" strokeWidth="0.4"/>
-            <line x1="72" y1="60" x2="72" y2="70" stroke="#6b7280" strokeWidth="0.4"/>
+            <line x1="65" y1="80" x2="100" y2="80" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="100" y1="80" x2="100" y2="100" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="100" y1="100" x2="65" y2="100" stroke="#9ca3af" strokeWidth="0.8"/>
+            <line x1="65" y1="100" x2="65" y2="80" stroke="#9ca3af" strokeWidth="0.8"/>
             
             {/* Landing Spot (Large Red Circle) */}
             <circle 
-              cx={utility.landingSpot.x} 
-              cy={utility.landingSpot.y} 
+              cx={utility.landingSpot.x + 10} 
+              cy={utility.landingSpot.y + 10} 
               r="4" 
               fill="#ef4444" 
               stroke="#ffffff" 
@@ -657,87 +652,94 @@ function UtilityCard({ utility }) {
             {utility.throwSpots.map((spot, index) => (
               <circle 
                 key={index}
-                cx={spot.x} 
-                cy={spot.y} 
-                r="2.5" 
+                cx={spot.x + 10} 
+                cy={spot.y + 10} 
+                r="3" 
                 fill="#3b82f6" 
                 stroke="#ffffff" 
                 strokeWidth="0.8"
               />
             ))}
             
-            {/* Trajectory Lines */}
+            {/* Trajectory lines */}
             {utility.throwSpots.map((spot, index) => (
               <line 
                 key={index}
-                x1={spot.x} 
-                y1={spot.y} 
-                x2={utility.landingSpot.x} 
-                y2={utility.landingSpot.y} 
+                x1={spot.x + 10} 
+                y1={spot.y + 10} 
+                x2={utility.landingSpot.x + 10} 
+                y2={utility.landingSpot.y + 10} 
                 stroke="#fbbf24" 
-                strokeWidth="0.8" 
-                strokeDasharray="2,1"
+                strokeWidth="1.5" 
+                strokeDasharray="3,2"
+                opacity="0.8"
               />
             ))}
+            
+            {/* Map Labels */}
+            <text x="37" y="35" fill="#e5e7eb" fontSize="6" textAnchor="middle" fontWeight="bold">A SITE</text>
+            <text x="82" y="35" fill="#e5e7eb" fontSize="6" textAnchor="middle" fontWeight="bold">B SITE</text>
+            <text x="60" y="65" fill="#e5e7eb" fontSize="6" textAnchor="middle" fontWeight="bold">MID</text>
           </svg>
         </div>
         
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h3 className="text-white font-bold text-lg sm:text-xl mb-2">{utility.title}</h3>
           <p className="text-gray-300 text-sm sm:text-base mb-3">{utility.description}</p>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-yellow-400 font-medium">★ {utility.rating}</span>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm sm:text-base mb-4">
+            <span className="text-yellow-400 font-bold">★ {utility.rating}</span>
             <span className="text-gray-400">{utility.downloads}</span>
-            <span className="bg-green-600/20 text-green-400 px-3 py-1 rounded-full text-xs font-medium border border-green-500/30">{utility.category}</span>
-            <span className="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">{utility.map}</span>
+            <span className="bg-yellow-500/20 border border-yellow-400/30 text-yellow-400 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">{utility.category}</span>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full border border-white"></div>
+              <span className="text-gray-300">Landing spot</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
+              <span className="text-gray-300">Throw positions ({utility.throwSpots.length})</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-0.5 bg-yellow-400 opacity-80"></div>
+              <span className="text-gray-300">Trajectory</span>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 mb-4 text-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-500 rounded-full border border-white"></div>
-          <span className="text-gray-300">Landing spot</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-          <span className="text-gray-300">Throw positions ({utility.throwSpots.length})</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-0.5 bg-yellow-400 border-dashed"></div>
-          <span className="text-gray-300">Trajectory</span>
-        </div>
-      </div>
 
-      {/* Related Videos */}
+      {/* Videos Section */}
       <div className="space-y-3">
-        <h4 className="text-white font-medium text-base">Tutorial Videos ({utility.videoCount})</h4>
+        <h4 className="text-white font-semibold text-base">Related Videos ({utility.videoCount})</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="bg-gray-800/40 rounded-lg p-3 hover:bg-gray-700/40 transition-colors">
-              <div className="relative mb-2">
-                <img 
-                  src={THUMBNAIL_IMAGE} 
-                  alt={`Tutorial ${index + 1}`} 
-                  className="w-full h-20 rounded object-cover" 
-                />
-                <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                  {Math.floor(Math.random() * 3) + 2}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}
+          {Array.from({ length: Math.min(3, utility.videoCount) }).map((_, index) => (
+            <div key={index} className="bg-gray-800/50 rounded-lg p-3 hover:bg-gray-700/50 transition-colors">
+              <div className="flex gap-3">
+                <div className="relative w-16 sm:w-20 h-10 sm:h-12 flex-shrink-0">
+                  <img 
+                    src={utility.thumbnail} 
+                    alt={`Throw ${index + 1}`} 
+                    className="w-full h-full rounded object-cover" 
+                  />
+                  <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1 py-0.5 rounded">
+                    {Math.floor(Math.random() * 3) + 2}:{String(Math.floor(Math.random() * 60)).padStart(2, '0')}
+                  </div>
                 </div>
-                <div className="absolute top-1 left-1 bg-green-600 text-white text-xs px-1.5 py-0.5 rounded font-medium">
-                  HD
+                <div className="flex-1 min-w-0">
+                  <h5 className="text-white font-medium text-sm line-clamp-2">Position {index + 1}: {utility.title}</h5>
+                  <p className="text-gray-400 text-xs mt-1">{Math.floor(Math.random() * 50) + 10}K views</p>
                 </div>
               </div>
-              <h5 className="text-white text-sm font-medium line-clamp-2 mb-1">
-                {["Setup Tutorial", "Advanced Lineup", "Pro Tips"][index]} - {utility.map}
-              </h5>
-              <p className="text-gray-400 text-xs">
-                {Math.floor(Math.random() * 50) + 10}K views • {Math.floor(Math.random() * 7) + 1} days ago
-              </p>
             </div>
           ))}
         </div>
+        
+        {utility.videoCount > 3 && (
+          <button className="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+            View all {utility.videoCount} videos
+          </button>
+        )}
       </div>
     </div>
   );
