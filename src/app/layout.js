@@ -1,6 +1,7 @@
 import "./globals.css";
 import UserProvider from "../../context/UserProvider";
 import GlobalLayout from "../components/layout/GlobalLayout";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata = {
   title: "POVlib - CS2 Pro-POV Library",
