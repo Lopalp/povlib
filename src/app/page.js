@@ -329,7 +329,7 @@ export default function Home() {
         )}
         
         {/* Tag Bar */}
-        <div className="bg-gray-950 border-b border-gray-800 sticky top-0 z-20">
+        <div className="bg-gray-950 border-b border-gray-800">
           <div className="max-w-full mx-auto px-3 sm:px-5 py-4">
             <div className="flex gap-3 overflow-x-auto scrollbar-hide">
               {dynamicTags.map((tag) => (
@@ -353,7 +353,7 @@ export default function Home() {
         
         {/* Main Content */}
         <div className="max-w-full mx-auto px-3 sm:px-5 py-6 sm:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-5 lg:gap-y-10">
             {displayedVideos.map((video) => (
               <VideoCard 
                 key={video.id} 
