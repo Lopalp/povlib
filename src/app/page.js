@@ -124,10 +124,33 @@ export default function Home() {
   const [displayedItems, setDisplayedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [activeTag, setActiveTag] = useState(null);
+  const [selectedDemo, setSelectedDemo] = useState(null);
+  const [activeVideoId, setActiveVideoId] = useState("");
 
   // Shuffled results for variety
   const shuffledDemoResults = useMemo(() => shuffleArray([...filteredDemos, ...trendingDemos, ...latestDemos]), [filteredDemos, trendingDemos, latestDemos]);
   const shuffledPlayerResults = useMemo(() => shuffleArray(playerResults), [playerResults]);
+
+  // Dynamic Tags for tag bar
+  const dynamicTags = useMemo(() => {
+    const tagsSet = new Set();
+    shuffledDemoResults.forEach((demo) => {
+      demo.tags.forEach((tag) => tagsSet.add(tag));
+    });
+    
+    // Add some static popular tags
+    ["Maps", "Players", "Teams", "Pro Matches", "Highlights", "Clutches", "Aces"].forEach(tag => tagsSet.add(tag));
+    
+    const allTags = Array.from(tagsSet);
+    // Shuffle and take first 8-10 tags
+    const shuffled = shuffleArray(allTags);
+    return shuffled.slice(0, 9);
+  }, [shuffledDemoResults]);
+
+  const handleTagClick = (tag) => {
+    setActiveTag(activeTag === tag ? null : tag);
+  };
 
   // User Authentication Effect
   useEffect(() => {
@@ -331,99 +354,76 @@ export default function Home() {
       itemsGenerated++;
       tagIndex++;
 
-      // Add 3-6 items for this section
-      const itemsInSection = Math.floor(Math.random() * 4) + 3; // 3-6 items
+      // Determine section type
       const sectionType = Math.random();
       
-      for (let i = 0; i < itemsInSection && itemsGenerated < count; i++) {
-        if (sectionType < 0.6) {
-          // Mostly videos
+      if (sectionType < 0.7) {
+        // Video sections (most common) - always add videos in groups of 3
+        const videosToAdd = Math.min(6, Math.floor((count - itemsGenerated) / 3) * 3); // Ensure multiple of 3
+        const sectionVideos = [];
+        
+        for (let i = 0; i < videosToAdd && itemsGenerated < count; i++) {
           const video = videos[Math.floor(Math.random() * videos.length)];
           if (video) {
-            result.push({
+            sectionVideos.push({
               ...video,
               id: `video-${Date.now()}-${itemsGenerated}`,
             });
             itemsGenerated++;
           }
-        } else if (sectionType < 0.75) {
-          // Some players
-          const player = players[Math.floor(Math.random() * players.length)];
-          if (player && i === 0) { // Only add player as first item in section
+        }
+        
+        // Group videos in sets of 3
+        for (let i = 0; i < sectionVideos.length; i += 3) {
+          const videoGroup = sectionVideos.slice(i, i + 3);
+          if (videoGroup.length > 0) {
             result.push({
-              ...player,
-              id: `player-${Date.now()}-${itemsGenerated}`,
+              type: "video_group",
+              id: `video-group-${Date.now()}-${i}`,
+              videos: videoGroup
             });
-            itemsGenerated++;
-          } else {
-            // Fill with videos
-            const video = videos[Math.floor(Math.random() * videos.length)];
-            if (video) {
-              result.push({
-                ...video,
-                id: `video-${Date.now()}-${itemsGenerated}`,
-              });
-              itemsGenerated++;
-            }
           }
-        } else if (sectionType < 0.85) {
-          // Some teams
-          const team = teams[Math.floor(Math.random() * teams.length)];
-          if (team && i === 0) { // Only add team as first item in section
-            result.push({
-              ...team,
-              id: `team-${Date.now()}-${itemsGenerated}`,
-            });
-            itemsGenerated++;
-          } else {
-            // Fill with videos
-            const video = videos[Math.floor(Math.random() * videos.length)];
-            if (video) {
-              result.push({
-                ...video,
-                id: `video-${Date.now()}-${itemsGenerated}`,
-              });
-              itemsGenerated++;
-            }
-          }
-        } else if (sectionType < 0.95) {
-          // Some utilities
-          const utility = utilities[Math.floor(Math.random() * utilities.length)];
-          if (utility && i === 0) {
-            result.push({
-              ...utility,
-              id: `utility-${Date.now()}-${itemsGenerated}`,
-            });
-            itemsGenerated++;
-          } else {
-            const video = videos[Math.floor(Math.random() * videos.length)];
-            if (video) {
-              result.push({
-                ...video,
-                id: `video-${Date.now()}-${itemsGenerated}`,
-              });
-              itemsGenerated++;
-            }
-          }
-        } else {
-          // Rare events
-          const event = events[Math.floor(Math.random() * events.length)];
-          if (event && i === 0) {
-            result.push({
-              ...event,
-              id: `event-${Date.now()}-${itemsGenerated}`,
-            });
-            itemsGenerated++;
-          } else {
-            const video = videos[Math.floor(Math.random() * videos.length)];
-            if (video) {
-              result.push({
-                ...video,
-                id: `video-${Date.now()}-${itemsGenerated}`,
-              });
-              itemsGenerated++;
-            }
-          }
+        }
+        
+      } else if (sectionType < 0.8) {
+        // Player section
+        const player = players[Math.floor(Math.random() * players.length)];
+        if (player && itemsGenerated < count) {
+          result.push({
+            ...player,
+            id: `player-${Date.now()}-${itemsGenerated}`,
+          });
+          itemsGenerated++;
+        }
+      } else if (sectionType < 0.9) {
+        // Team section
+        const team = teams[Math.floor(Math.random() * teams.length)];
+        if (team && itemsGenerated < count) {
+          result.push({
+            ...team,
+            id: `team-${Date.now()}-${itemsGenerated}`,
+          });
+          itemsGenerated++;
+        }
+      } else if (sectionType < 0.95) {
+        // Utility section
+        const utility = utilities[Math.floor(Math.random() * utilities.length)];
+        if (utility && itemsGenerated < count) {
+          result.push({
+            ...utility,
+            id: `utility-${Date.now()}-${itemsGenerated}`,
+          });
+          itemsGenerated++;
+        }
+      } else {
+        // Event section
+        const event = events[Math.floor(Math.random() * events.length)];
+        if (event && itemsGenerated < count) {
+          result.push({
+            ...event,
+            id: `event-${Date.now()}-${itemsGenerated}`,
+          });
+          itemsGenerated++;
         }
       }
     }
@@ -478,8 +478,43 @@ export default function Home() {
   return (
     <main>
       <div className="min-h-screen bg-gray-950 text-white">
-        {/* Space for navbar */}
-        <div className="h-16"></div>
+        {/* Featured Hero */}
+        {filteredDemos.length > 0 && (
+          <FeaturedHero
+            demo={filteredDemos[0]}
+            autoplayVideo={true}
+            setSelectedDemo={onSelectDemo}
+            setActiveVideoId={setActiveVideoId}
+            setIsFilterModalOpen={() => {}}
+            user={user}
+            session={session}
+          />
+        )}
+        
+        {/* Tag Bar */}
+        <div className="bg-gray-950 border-b border-gray-800 sticky top-0 z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {dynamicTags.map((tag) => (
+                <Tag
+                  key={tag}
+                  variant={activeTag === tag ? "primary" : "secondary"}
+                  size="sm"
+                  className="cursor-pointer hover:border-yellow-400 transition-colors whitespace-nowrap flex-shrink-0"
+                  onClick={() => handleTagClick(tag)}
+                >
+                  {tag}
+                </Tag>
+              ))}
+              <Link
+                href="/demos"
+                className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors whitespace-nowrap flex-shrink-0 px-3 py-2"
+              >
+                View All Demos
+              </Link>
+            </div>
+          </div>
+        </div>
         
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -492,32 +527,34 @@ export default function Home() {
                   </div>
                 )}
                 
-                {item.type === "video" && (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-                    <VideoCard video={item} onSelectDemo={onSelectDemo} />
+                {item.type === "video_group" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-6">
+                    {item.videos.map((video) => (
+                      <VideoCard key={video.id} video={video} onSelectDemo={onSelectDemo} />
+                    ))}
                   </div>
                 )}
                 
                 {item.type === "player" && (
-                  <div className="col-span-full mb-6">
+                  <div className="mb-6">
                     <PlayerCard player={item} />
                   </div>
                 )}
                 
                 {item.type === "team" && (
-                  <div className="col-span-full mb-6">
+                  <div className="mb-6">
                     <TeamCard team={item} />
                   </div>
                 )}
                 
                 {item.type === "utility" && (
-                  <div className="col-span-full mb-6">
+                  <div className="mb-6">
                     <UtilityCard utility={item} />
                   </div>
                 )}
                 
                 {item.type === "event" && (
-                  <div className="col-span-full mb-6">
+                  <div className="mb-6">
                     <EventCard event={item} />
                   </div>
                 )}
