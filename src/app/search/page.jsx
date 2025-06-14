@@ -5,7 +5,8 @@ import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import FilterModal from "/src/components/modals/FilterModal.jsx";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
-import { getFilteredDemos, getAllPlayers } from "@/lib/supabase";
+import { getFilteredDemos } from "@/lib/db/demos";
+import { getAllPlayers } from "@/lib/db/players";
 import Link from "next/link";
 
 const THUMBNAIL_IMAGE =

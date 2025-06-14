@@ -17,11 +17,11 @@ import ErrorDisplay from "../../../components/error/ErrorDisplay";
 
 import {
   getDemosByMap,
-  getFilterOptions,
   updateDemoStats,
   updateDemoTags,
   updateDemoPositions,
-} from "@/lib/supabase";
+} from "@/lib/db/demos";
+import { getFilterOptions } from "@/lib/db/filters";
 
 const MapPage = ({ params }) => {
   const { mapName } = React.use(params);
