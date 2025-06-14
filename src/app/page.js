@@ -23,7 +23,6 @@ import { getFilterOptions } from "../lib/db/filters";
 import { getPlayerInfo } from "../lib/db/players";
 import { useRouter } from "next/navigation";
 import FeaturedHero from "../components/features/FeaturedHero";
-import { Tag } from "../components/tags";
 import { UserContext } from "../../context/UserContext.js";
 import { createSupabaseBrowserClient } from "../lib/supabaseClient.js";
 import { useNavbar } from "../context/NavbarContext";
@@ -331,32 +330,30 @@ export default function Home() {
         
         {/* Tag Bar */}
         <div className="bg-gray-950 border-b border-gray-800 sticky top-0 z-20">
-          <div className="max-w-full mx-auto px-2 sm:px-4 py-4">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          <div className="max-w-full mx-auto px-3 sm:px-5 py-4">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide">
               {dynamicTags.map((tag) => (
-                <Tag
+                <button
                   key={tag}
-                  variant={activeTag === tag ? "primary" : "secondary"}
-                  size="sm"
-                  className="cursor-pointer hover:border-yellow-400 transition-colors whitespace-nowrap flex-shrink-0"
+                  className={`
+                    px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200
+                    ${activeTag === tag 
+                      ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-300' 
+                      : 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 hover:border-gray-600'
+                    }
+                  `}
                   onClick={() => handleTagClick(tag)}
                 >
                   {tag}
-                </Tag>
+                </button>
               ))}
-              <Link
-                href="/demos"
-                className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors whitespace-nowrap flex-shrink-0 px-3 py-2"
-              >
-                View All Demos
-              </Link>
             </div>
           </div>
         </div>
         
         {/* Main Content */}
-        <div className="max-w-full mx-auto px-2 sm:px-4 py-6 sm:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6">
+        <div className="max-w-full mx-auto px-3 sm:px-5 py-6 sm:py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {displayedVideos.map((video) => (
               <VideoCard 
                 key={video.id} 
