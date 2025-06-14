@@ -3,10 +3,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import FilterModal from "/src/components/modals/FilterModal.jsx";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
-import { getFilteredDemos, getAllPlayers } from "@/lib/supabase";
+import { getFilteredDemos } from "@/lib/db/demos";
+import { getAllPlayers } from "@/lib/db/players";
+import Link from "next/link";
 
 const THUMBNAIL_IMAGE =
   "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"; // Placeholder
@@ -54,22 +55,6 @@ function SearchResultsContent() {
   const [searchQuery, setSearchQuery] = useState(queryParam);
   const [demoResults, setDemoResults] = useState([]);
   const [playerResults, setPlayerResults] = useState([]);
-  const placeholderPlayers = useMemo(
-    () =>
-      Array.from({ length: 6 }).map((_, i) => ({
-        name: `Player${i + 1}`,
-        team: `Team ${i + 1}`,
-        avatar:
-          VIDEO_THUMBNAIL_POOL[
-            Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
-          ],
-        stats: {
-          totalDemos: Math.floor(Math.random() * 50) + 1,
-          totalViews: Math.floor(Math.random() * 10000) + 100,
-        },
-      })),
-    []
-  );
   const shuffledDemoResults = useMemo(() => shuffleArray(demoResults), [demoResults]);
   const shuffledPlayerResults = useMemo(() => shuffleArray(playerResults), [playerResults]);
   const [showFilters, setShowFilters] = useState(false);
@@ -111,13 +96,11 @@ function SearchResultsContent() {
             (p.team && p.team.toLowerCase().includes(queryLower))
         );
         setDemoResults(demos || []);
-        setPlayerResults(
-          filteredPlayers.length > 0 ? filteredPlayers : placeholderPlayers
-        );
+        setPlayerResults(filteredPlayers);
       } catch (err) {
         console.error("Error fetching search results:", err);
         setDemoResults([]);
-        setPlayerResults(placeholderPlayers);
+        setPlayerResults([]);
       }
     };
 
@@ -471,7 +454,7 @@ function VideoCard({ video }) {
           <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
             Player: <span className="text-gray-300">{video.player}</span> showcases professional gameplay techniques and strategies for competitive play.
           </p>
-          
+
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{video.map}</span>
           </div>
@@ -484,7 +467,7 @@ function VideoCard({ video }) {
 function PlayerCard({ player }) {
   const playerUrlName = player.name.replace(/\s+/g, "-").toLowerCase();
   return (
-    <Link href={`/players/${playerUrlName}`} className="group cursor-pointer">
+    <Link href={`/players/${playerUrlName}`} className="group cursor-pointer block">
       <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
         {/* Avatar */}
         <img
@@ -911,3 +894,4 @@ function EventCard({ event }) {
     </div>
   );
 }
+

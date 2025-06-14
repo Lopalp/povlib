@@ -8,7 +8,7 @@ import FilterModal from "../../components/modals/FilterModal";
 import HeroHeading from "../../components/headings/HeroHeading";
 import ErrorDisplay from "../../components/error/ErrorDisplay";
 
-import { getFilterOptions } from "@/lib/supabase";
+import { getFilterOptions } from "@/lib/db/filters";
 
 /* export const metadata = {
   title: "CS2 Maps | POVlib",

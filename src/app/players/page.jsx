@@ -9,7 +9,8 @@ import FilterModal from "../../components/modals/FilterModal";
 import HeroHeading from "../../components/headings/HeroHeading";
 import ErrorDisplay from "../../components/error/ErrorDisplay";
 
-import { getAllPlayers, getFilterOptions } from "@/lib/supabase";
+import { getAllPlayers } from "@/lib/db/players";
+import { getFilterOptions } from "@/lib/db/filters";
 
 const PlayersIndex = () => {
   const { demoType, handleSwitchDemoType } = useNavbar();
