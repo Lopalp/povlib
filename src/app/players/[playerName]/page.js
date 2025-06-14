@@ -30,13 +30,12 @@ import CategorySectionFeatured from "../../../components/sections/CategorySectio
 import CategoryCarousel from "../../../components/features/CategoryCarousel";
 
 import {
-  getPlayerInfo,
-  getDemosByPlayer,
-  getFilterOptions,
   updateDemoStats,
   updateDemoTags,
   updateDemoPositions,
-} from "@/lib/supabase";
+} from "@/lib/db/demos";
+import { getPlayerInfo, getDemosByPlayer } from "@/lib/db/players";
+import { getFilterOptions } from "@/lib/db/filters";
 
 import SettingsHeading from "../../../components/headings/SettingsHeading";
 import { PrimaryButton } from "../../../components/buttons";
