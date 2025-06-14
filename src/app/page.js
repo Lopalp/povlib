@@ -22,6 +22,8 @@ import {
 import { getFilterOptions } from "../lib/db/filters";
 import { getPlayerInfo } from "../lib/db/players";
 import { useRouter } from "next/navigation";
+import FeaturedHero from "../components/features/FeaturedHero";
+import { Tag } from "../components/tags";
 import { UserContext } from "../../context/UserContext.js";
 import { createSupabaseBrowserClient } from "../lib/supabaseClient.js";
 import { useNavbar } from "../context/NavbarContext";
