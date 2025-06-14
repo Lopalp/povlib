@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { X } from "lucide-react";
 
-const SidebarMenuItem = ({ item, isActive, onClose, index }) => {
+const NavbarMenuItem = ({ item, isActive, onClose, index }) => {
   const baseClasses =
-    "block px-6 py-4 text-sm transition-colors duration-200 hover:text-yellow-400 relative overflow-hidden m-0 border-b border-gray-700/30";
+    "block px-6 py-3 text-sm transition-colors duration-200 hover:text-yellow-400 relative overflow-hidden m-0";
 
   const getItemClasses = () => {
     if (isActive) {
@@ -17,7 +16,7 @@ const SidebarMenuItem = ({ item, isActive, onClose, index }) => {
   };
 
   const getButtonClasses = () => {
-    return `w-full text-left px-6 py-4 text-sm transition-colors duration-200 hover:text-yellow-400 relative overflow-hidden m-0 group border-b border-gray-700/30 ${
+    return `w-full text-left px-6 py-3 text-sm transition-colors duration-200 hover:text-yellow-400 relative overflow-hidden m-0 group ${
       item.primary ? "text-white" : "text-gray-200"
     }`;
   };
@@ -31,6 +30,7 @@ const SidebarMenuItem = ({ item, isActive, onClose, index }) => {
           onClose();
         }}
         className={getItemClasses()}
+        style={{}}
       >
         {item.backgroundImage && (
           <>
@@ -50,9 +50,9 @@ const SidebarMenuItem = ({ item, isActive, onClose, index }) => {
             />
           </>
         )}
-        <div className="relative z-10 flex items-center space-x-3">
-          {item.icon && <span className="flex-shrink-0 text-lg">{item.icon}</span>}
-          <span className="font-medium">{item.label}</span>
+        <div className="relative z-10 flex items-center space-x-2">
+          {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
+          <span>{item.label}</span>
         </div>
       </Link>
     );
@@ -65,6 +65,7 @@ const SidebarMenuItem = ({ item, isActive, onClose, index }) => {
         onClose();
       }}
       className={getButtonClasses()}
+      style={{}}
     >
       {item.backgroundImage && (
         <>
@@ -84,26 +85,43 @@ const SidebarMenuItem = ({ item, isActive, onClose, index }) => {
           />
         </>
       )}
-      <div className="relative z-10 flex items-center space-x-3">
-        {item.icon && <span className="flex-shrink-0 text-lg">{item.icon}</span>}
-        <span className="font-medium">{item.label}</span>
+      <div className="relative z-10 flex items-center space-x-2">
+        {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
+        <span>{item.label}</span>
       </div>
     </button>
   );
 };
 
-export default function SidebarOverlay({
+export default function NavbarMenu({
   isOpen,
   onClose,
   items,
-  title = "Navigation",
+  position = "bottom left",
+  triggerRef,
   className = "",
 }) {
-  const sidebarRef = useRef(null);
+  const menuRef = useRef(null);
   const pathname = usePathname();
 
   useEffect(() => {
     if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      // Don't close if clicking on the trigger button
+      if (
+        triggerRef &&
+        triggerRef.current &&
+        triggerRef.current.contains(event.target)
+      ) {
+        return;
+      }
+
+      // Don't close if clicking inside the menu
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
@@ -111,16 +129,36 @@ export default function SidebarOverlay({
       }
     };
 
+    document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEscape);
-    
-    // Prevent body scroll when sidebar is open
-    document.body.style.overflow = "hidden";
 
     return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, triggerRef]);
+
+  if (!isOpen) return null;
+
+  // Position classes based on position prop
+  const getPositionClasses = () => {
+    switch (position) {
+      case "top left":
+      case "top-left":
+        return "right-0 mb-2 bottom-full";
+      case "top right":
+      case "top-right":
+        return "left-0 mb-2 bottom-full";
+      case "bottom left":
+      case "bottom-left":
+        return "right-0 mt-2";
+      case "bottom right":
+      case "bottom-right":
+        return "left-0 mt-2";
+      default:
+        return "left-0 mt-2";
+    }
+  };
 
   const isActiveItem = (href) => {
     if (href === "/maps" && pathname === "/maps") return true;
@@ -128,85 +166,28 @@ export default function SidebarOverlay({
     return false;
   };
 
-  if (!isOpen) return null;
-
   return (
-    <>
-      {/* Backdrop Overlay */}
-      <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
-        onClick={onClose}
-      />
+    <div
+      ref={menuRef}
+      className={`absolute ${getPositionClasses()} w-auto min-w-52 bg-black/50 backdrop-blur-lg border border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden ${className}`}
+    >
+      {items.map((item, index) => {
+        if (item.type === "divider") {
+          return <div key={index} className="border-t border-gray-600 m-0" />;
+        }
 
-      {/* Sidebar */}
-      <div
-        ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full w-80 bg-black/70 backdrop-blur-xl border-r border-gray-700 shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } ${className}`}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <h2 className="text-xl font-bold text-white">{title}</h2>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors duration-200 rounded-lg hover:bg-white/10"
-          >
-            <X size={20} />
-          </button>
-        </div>
+        const isActive = isActiveItem(item.href);
 
-        {/* Menu Items */}
-        <div className="overflow-y-auto h-full pb-20">
-          <div className="py-2">
-            {items.map((item, index) => {
-              if (item.type === "divider") {
-                return (
-                  <div key={index} className="border-t border-gray-600 my-2 mx-6" />
-                );
-              }
-
-              if (item.type === "section") {
-                return (
-                  <div key={index} className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    {item.label}
-                  </div>
-                );
-              }
-
-              const isActive = isActiveItem(item.href);
-
-              return (
-                <SidebarMenuItem
-                  key={index}
-                  item={item}
-                  isActive={isActive}
-                  onClose={onClose}
-                  index={index}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </>
+        return (
+          <NavbarMenuItem
+            key={index}
+            item={item}
+            isActive={isActive}
+            onClose={onClose}
+            index={index}
+          />
+        );
+      })}
+    </div>
   );
-}
-
-// Hook für einfache Verwendung
-export function useSidebar() {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const openSidebar = () => setIsOpen(true);
-  const closeSidebar = () => setIsOpen(false);
-  const toggleSidebar = () => setIsOpen(!isOpen);
-
-  return {
-    isOpen,
-    openSidebar,
-    closeSidebar,
-    toggleSidebar,
-  };
 }
