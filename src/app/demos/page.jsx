@@ -12,7 +12,8 @@ import DemoGrid from "../../components/sections/DemoGrid";
 import FilterTags from "../../components/misc/FilterTags";
 import MapQuickFilters from "../../components/misc/MapQuickFilters";
 
-import { getFilteredDemos, getFilterOptions } from "@/lib/supabase";
+import { getFilteredDemos } from "@/lib/db/demos";
+import { getFilterOptions } from "@/lib/db/filters";
 import {
   mapDemoData,
   filterDemosBySearchQuery,

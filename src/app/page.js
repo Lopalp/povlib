@@ -15,12 +15,12 @@ import {
   getLatestDemos,
   getDemosByMap,
   getDemosByPosition,
-  getFilterOptions,
   updateDemoStats,
   updateDemoTags,
   updateDemoPositions,
-  getPlayerInfo,
-} from "../lib/supabase";
+} from "../lib/db/demos";
+import { getFilterOptions } from "../lib/db/filters";
+import { getPlayerInfo } from "../lib/db/players";
 import { useRouter } from "next/navigation";
 import VideoPlayerPage from "../components/features/VideoPlayerPage";
 import TaggingModal from "../components/modals/TaggingModal";
