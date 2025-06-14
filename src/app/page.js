@@ -8,8 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Search, Filter, X, Menu, ChevronLeft, ChevronRight, Play, Star, TrendingUp, Users, Trophy, Zap, ArrowRight, Eye, Heart, Share2, Bookmark, Clock } from "lucide-react";
+import { Search, Filter, X, Menu, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   getFilteredDemos,
   getTrendingDemos,
@@ -79,40 +78,6 @@ const ALL_TAGS = [
   "Must Watch", "Community Favorites", "Editor's Pick", "Viral Clips", "Reaction Worthy"
 ];
 
-const WELCOME_STATS = [
-  { icon: Users, label: "Active Players", value: "150K+", color: "text-blue-400" },
-  { icon: Play, label: "Demo Videos", value: "25K+", color: "text-green-400" },
-  { icon: Trophy, label: "Pro Matches", value: "5K+", color: "text-yellow-400" },
-  { icon: TrendingUp, label: "Daily Views", value: "1M+", color: "text-purple-400" },
-];
-
-const FEATURE_HIGHLIGHTS = [
-  {
-    icon: Play,
-    title: "Pro Player POVs",
-    description: "Watch the world's best players from their perspective",
-    color: "from-blue-500 to-cyan-500"
-  },
-  {
-    icon: TrendingUp,
-    title: "Skill Analysis",
-    description: "Learn from every move with detailed breakdowns",
-    color: "from-purple-500 to-pink-500"
-  },
-  {
-    icon: Users,
-    title: "Community Driven",
-    description: "Discover content curated by the CS2 community",
-    color: "from-green-500 to-emerald-500"
-  },
-  {
-    icon: Zap,
-    title: "Instant Learning",
-    description: "Master techniques with frame-by-frame analysis",
-    color: "from-orange-500 to-red-500"
-  }
-];
-
 const shuffleArray = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
 const mapDemo = (demo) => ({
@@ -162,7 +127,6 @@ export default function Home() {
   const [activeTag, setActiveTag] = useState(null);
   const [selectedDemo, setSelectedDemo] = useState(null);
   const [activeVideoId, setActiveVideoId] = useState("");
-  const [showWelcomeSection, setShowWelcomeSection] = useState(true);
 
   // Shuffled results for variety
   const shuffledDemoResults = useMemo(() => shuffleArray([...filteredDemos, ...trendingDemos, ...latestDemos]), [filteredDemos, trendingDemos, latestDemos]);
@@ -176,10 +140,10 @@ export default function Home() {
     });
     
     // Add some static popular tags
-    ["🔥 Trending", "⭐ Featured", "🎯 Pro Plays", "💥 Highlights", "🏆 Tournaments", "📈 Popular", "⚡ New", "🎮 Community", "🔝 Top Rated"].forEach(tag => tagsSet.add(tag));
+    ["Maps", "Players", "Teams", "Pro Matches", "Highlights", "Clutches", "Aces"].forEach(tag => tagsSet.add(tag));
     
     const allTags = Array.from(tagsSet);
-    // Shuffle and take first 9 tags
+    // Shuffle and take first 8-10 tags
     const shuffled = shuffleArray(allTags);
     return shuffled.slice(0, 9);
   }, [shuffledDemoResults]);
@@ -217,7 +181,7 @@ export default function Home() {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, []);
 
   // Load initial data
   useEffect(() => {
@@ -305,9 +269,6 @@ export default function Home() {
       isPro: demo.isPro,
       map: demo.map,
       tags: demo.tags || [],
-      likes: demo.likes || Math.floor(Math.random() * 500) + 50,
-      timestamp: "2 hours ago",
-      quality: demo.isPro ? "4K" : "HD",
     })),
     players: shuffledPlayerResults.map((player) => ({
       type: "player",
@@ -500,16 +461,15 @@ export default function Home() {
 
   // Video selection
   const onSelectDemo = (demo) => {
-    router.push(`/demos/${demo.demoId || demo.id}`);
+    router.push(`/demos/${demo.demoId}`);
   };
 
   if (isInitialLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-6"></div>
-          <h2 className="text-white text-xl font-bold mb-2">Loading Epic Content</h2>
-          <p className="text-gray-400">Preparing the best CS2 demos for you...</p>
+          <div className="w-12 h-12 border-2 border-gray-600 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading content...</p>
         </div>
       </div>
     );
@@ -518,93 +478,6 @@ export default function Home() {
   return (
     <main>
       <div className="min-h-screen bg-gray-950 text-white">
-        {/* Enhanced Welcome Hero Section */}
-        {showWelcomeSection && !user && (
-          <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:20px_20px]"></div>
-            
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-yellow-400/10 to-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
-              <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/10 to-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-            </div>
-
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-              <div className="text-center mb-16">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-2 rounded-full text-sm font-bold">
-                    🔥 #1 CS2 Demo Platform
-                  </div>
-                </div>
-                
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
-                  Master CS2 with
-                  <span className="block bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                    Pro Player POVs
-                  </span>
-                </h1>
-                
-                <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                  Watch, learn, and dominate with exclusive first-person perspectives from the world&apos;s best CS2 players
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-                  <button 
-                    onClick={() => setShowWelcomeSection(false)}
-                    className="group bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105 flex items-center gap-3"
-                  >
-                    <Play className="w-5 h-5" />
-                    Start Watching Now
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  
-                  <Link
-                    href="/demos"
-                    className="group text-white border-2 border-gray-600 hover:border-yellow-400 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:bg-yellow-400/5 flex items-center gap-3"
-                  >
-                    <Search className="w-5 h-5" />
-                    Browse All Demos
-                  </Link>
-                </div>
-
-                {/* Stats Row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                  {WELCOME_STATS.map((stat, index) => (
-                    <div key={index} className="text-center group">
-                      <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gray-800/50 border border-gray-700 mb-3 group-hover:border-gray-600 transition-colors ${stat.color}`}>
-                        <stat.icon className="w-6 h-6" />
-                      </div>
-                      <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-1`}>
-                        {stat.value}
-                      </div>
-                      <div className="text-gray-400 text-sm">
-                        {stat.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Feature Highlights */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {FEATURE_HIGHLIGHTS.map((feature, index) => (
-                  <div key={index} className="group relative bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-gray-600 transition-all duration-300 hover:transform hover:scale-105">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} text-white mb-4`}>
-                      <feature.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-white text-lg font-bold mb-2">{feature.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{feature.description}</p>
-                    
-                    {/* Hover Effect */}
-                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Featured Hero */}
         {filteredDemos.length > 0 && (
           <FeaturedHero
@@ -618,16 +491,16 @@ export default function Home() {
           />
         )}
         
-        {/* Enhanced Tag Bar */}
-        <div className="bg-gray-950/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-20">
+        {/* Tag Bar */}
+        <div className="bg-gray-950 border-b border-gray-800 sticky top-0 z-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-            <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               {dynamicTags.map((tag) => (
                 <Tag
                   key={tag}
                   variant={activeTag === tag ? "primary" : "secondary"}
                   size="sm"
-                  className="cursor-pointer hover:border-yellow-400 hover:bg-yellow-400/5 transition-all duration-200 whitespace-nowrap flex-shrink-0 transform hover:scale-105"
+                  className="cursor-pointer hover:border-yellow-400 transition-colors whitespace-nowrap flex-shrink-0"
                   onClick={() => handleTagClick(tag)}
                 >
                   {tag}
@@ -635,9 +508,9 @@ export default function Home() {
               ))}
               <Link
                 href="/demos"
-                className="text-yellow-400 text-sm underline hover:text-yellow-300 transition-colors whitespace-nowrap flex-shrink-0 px-3 py-2 hover:bg-yellow-400/5 rounded-lg"
+                className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors whitespace-nowrap flex-shrink-0 px-3 py-2"
               >
-                View All Demos →
+                View All Demos
               </Link>
             </div>
           </div>
@@ -649,47 +522,39 @@ export default function Home() {
             {displayedItems.map((item) => (
               <div key={item.id}>
                 {item.type === "section_header" && (
-                  <div className="mb-6 group">
-                    <div className="flex items-center gap-3 mb-4">
-                      <h2 className="text-xl sm:text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">
-                        {item.title}
-                      </h2>
-                      <div className="flex-1 h-px bg-gradient-to-r from-gray-700 to-transparent"></div>
-                      <button className="text-gray-400 hover:text-yellow-400 transition-colors text-sm font-medium">
-                        View All
-                      </button>
-                    </div>
+                  <div className="mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">{item.title}</h2>
                   </div>
                 )}
                 
                 {item.type === "video_group" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 mb-6">
                     {item.videos.map((video) => (
-                      <EnhancedVideoCard key={video.id} video={video} onSelectDemo={onSelectDemo} />
+                      <VideoCard key={video.id} video={video} onSelectDemo={onSelectDemo} />
                     ))}
                   </div>
                 )}
                 
                 {item.type === "player" && (
-                  <div className="mb-8">
-                    <EnhancedPlayerCard player={item} />
+                  <div className="mb-6">
+                    <PlayerCard player={item} />
                   </div>
                 )}
                 
                 {item.type === "team" && (
-                  <div className="mb-8">
-                    <EnhancedTeamCard team={item} />
+                  <div className="mb-6">
+                    <TeamCard team={item} />
                   </div>
                 )}
                 
                 {item.type === "utility" && (
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <UtilityCard utility={item} />
                   </div>
                 )}
                 
                 {item.type === "event" && (
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <EventCard event={item} />
                   </div>
                 )}
@@ -697,11 +562,8 @@ export default function Home() {
             ))}
             
             {isLoading && (
-              <div className="flex justify-center py-12">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 border-2 border-gray-600 border-t-yellow-400 rounded-full animate-spin" />
-                  <span className="text-gray-400">Loading more amazing content...</span>
-                </div>
+              <div className="flex justify-center py-8 sm:py-12">
+                <div className="w-6 h-6 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
               </div>
             )}
           </div>
@@ -711,279 +573,139 @@ export default function Home() {
   );
 }
 
-// Enhanced Video Card Component
-function EnhancedVideoCard({ video, onSelectDemo }) {
-  const [isHovered, setIsHovered] = useState(false);
-
+// Component implementations from Search Results page
+function VideoCard({ video, onSelectDemo }) {
   const handleClick = () => onSelectDemo(video);
 
   return (
-    <div 
-      className="group cursor-pointer transform hover:scale-[1.02] transition-all duration-300" 
-      onClick={handleClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="group cursor-pointer" onClick={handleClick}>
       <div className="space-y-3">
-        {/* Enhanced Thumbnail */}
-        <div className="relative w-full overflow-hidden rounded-xl bg-gray-800">
-          <Image 
+        {/* Thumbnail */}
+        <div className="relative w-full">
+          <img 
             src={video.thumbnail} 
             alt={video.title} 
-            width={400}
-            height={225}
-            className="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-110" 
+            className="w-full aspect-video object-cover rounded-xl" 
           />
-          
-          {/* Overlay with multiple elements */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                <Play className="w-8 h-8 text-white ml-1" />
-              </div>
-            </div>
-          </div>
-          
-          {/* Duration Badge */}
-          <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md font-medium">
+          <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
             {video.duration}
           </div>
-          
-          {/* Quality Badge */}
-          {video.quality && (
-            <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-xs px-2 py-1 rounded-md font-bold">
-              {video.quality}
-            </div>
-          )}
-          
-          {/* Pro Badge */}
-          {video.isPro && (
-            <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-md font-bold">
-              PRO
-            </div>
-          )}
-          
-          {/* Progress Bar for watched videos */}
           {video.watched && (
-            <div className="absolute bottom-0 left-0 w-2/3 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-br-xl" />
+            <div className="absolute bottom-0 left-0 w-2/3 h-1 bg-blue-500 rounded-b-xl" />
           )}
         </div>
         
-        {/* Enhanced Content */}
-        <div className="space-y-3">
+        {/* Content */}
+        <div className="space-y-2">
           <div className="flex gap-3">
-            <Image 
-              src={video.channelAvatar} 
-              alt={video.channel} 
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full flex-shrink-0 border-2 border-gray-700 group-hover:border-yellow-400 transition-colors" 
-            />
+            <img src={video.channelAvatar} alt={video.channel} className="w-9 h-9 rounded-full flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <h3 className="text-white text-sm font-semibold leading-5 mb-2 group-hover:text-yellow-400 transition-colors line-clamp-2">
+              <h3 className="text-white text-sm font-medium leading-5 mb-1 group-hover:text-gray-200 transition-colors line-clamp-2">
                 {video.title}
               </h3>
               
               <div className="space-y-1">
-                <p className="text-gray-400 text-xs hover:text-white transition-colors cursor-pointer">
-                  {video.channel}
-                </p>
-                <div className="flex items-center gap-2 text-gray-500 text-xs">
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3 h-3" />
-                    <span>{video.views}</span>
-                  </div>
+                <p className="text-gray-400 text-xs">{video.channel}</p>
+                <div className="flex items-center gap-1 text-gray-500 text-xs">
+                  <span>{video.views}</span>
                   <span>•</span>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{video.timestamp || video.uploadDate}</span>
-                  </div>
+                  <span>{video.uploadDate}</span>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Tags and Actions */}
-          <div className="flex items-center justify-between">
+          {video.isPro && (
             <div className="flex gap-2">
-              {video.map && (
-                <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-md hover:bg-gray-700 transition-colors">
-                  {video.map}
-                </span>
-              )}
-              {video.isPro && (
-                <span className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded-md">
-                  Professional
-                </span>
-              )}
+              <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">Pro</span>
+              <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{video.map}</span>
             </div>
-            
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button className="p-1 hover:bg-gray-800 rounded text-gray-400 hover:text-red-400 transition-colors">
-                <Heart className="w-4 h-4" />
-              </button>
-              <button className="p-1 hover:bg-gray-800 rounded text-gray-400 hover:text-blue-400 transition-colors">
-                <Share2 className="w-4 h-4" />
-              </button>
-              <button className="p-1 hover:bg-gray-800 rounded text-gray-400 hover:text-yellow-400 transition-colors">
-                <Bookmark className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-// Enhanced Player Card Component
-function EnhancedPlayerCard({ player }) {
+function PlayerCard({ player }) {
   const playerUrlName = player.name.replace(/\s+/g, "-").toLowerCase();
-  
   return (
     <Link href={`/players/${playerUrlName}`} className="group cursor-pointer block">
-      <div className="relative bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-yellow-400/50 hover:bg-gray-800/50 transition-all duration-300 overflow-hidden">
-        {/* Background Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        
-        <div className="relative flex items-center gap-6">
-          <div className="relative">
-            <Image
-              src={player.avatar}
-              alt={player.name}
-              width={80}
-              height={80}
-              className="w-20 h-20 rounded-2xl object-cover border-3 border-gray-600 group-hover:border-yellow-400 transition-all duration-300"
-            />
-            <div className="absolute -top-2 -right-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-              LIVE
-            </div>
-          </div>
-          
-          <div className="flex-1">
-            <h3 className="text-white text-xl font-bold mb-2 group-hover:text-yellow-400 transition-colors">
-              {player.name}
-            </h3>
-            <div className="flex items-center gap-4 mb-3">
-              <span className="text-gray-400 text-sm">{player.followers}</span>
-              <span className="text-gray-600">•</span>
-              <span className="text-gray-300 text-sm">{player.game}</span>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <div className="text-yellow-400 font-bold text-lg">{player.stats?.totalDemos || '50+'}</div>
-                <div className="text-gray-500 text-xs">Demos</div>
-              </div>
-              <div className="text-center">
-                <div className="text-blue-400 font-bold text-lg">{Math.floor((player.stats?.totalViews || 25000) / 1000)}K</div>
-                <div className="text-gray-500 text-xs">Views</div>
-              </div>
-              <div className="text-center">
-                <div className="text-green-400 font-bold text-lg">#{Math.floor(Math.random() * 20) + 1}</div>
-                <div className="text-gray-500 text-xs">Rank</div>
-              </div>
-            </div>
-          </div>
-          
-          <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-6 py-3 rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300 transform group-hover:scale-105">
-            Follow
-          </button>
+      <div className="flex items-center gap-4 p-4 bg-gray-900/30 rounded-xl hover:bg-gray-900/50 transition-all duration-200">
+        <img
+          src={player.avatar}
+          alt={player.name}
+          className="w-16 h-16 rounded-full object-cover"
+        />
+        <div className="flex-1">
+          <h3 className="text-white text-lg font-medium mb-1 group-hover:text-gray-200 transition-colors">
+            {player.name}
+          </h3>
+          <p className="text-gray-400 text-sm mb-1">{player.followers}</p>
+          <p className="text-gray-500 text-sm">{player.game}</p>
         </div>
+        <button className="bg-white text-gray-950 px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+          Subscribe
+        </button>
       </div>
     </Link>
   );
 }
 
-// Enhanced Team Card Component
-function EnhancedTeamCard({ team }) {
+function TeamCard({ team }) {
   const [showRoster, setShowRoster] = useState(false);
   
   return (
-    <div className="group cursor-pointer bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 hover:border-yellow-400/50 transition-all duration-300">
+    <div className="group cursor-pointer bg-gray-900/30 rounded-xl p-6 hover:bg-gray-900/50 transition-all duration-200">
       <div className="space-y-6">
         <div className="flex items-center gap-6">
-          <div className="relative">
-            <Image 
-              src={team.logo} 
-              alt={team.name} 
-              width={96}
-              height={96}
-              className="w-24 h-24 rounded-2xl object-cover border-3 border-gray-600 group-hover:border-yellow-400 transition-colors" 
-            />
-            <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-              {team.region}
-            </div>
-          </div>
-          
+          <img 
+            src={team.logo} 
+            alt={team.name} 
+            className="w-20 h-20 rounded-xl object-cover" 
+          />
           <div className="flex-1">
-            <h3 className="text-white text-2xl font-bold mb-3 group-hover:text-yellow-400 transition-colors">
+            <h3 className="text-white text-lg font-medium mb-2 group-hover:text-gray-200 transition-colors">
               {team.name}
             </h3>
-            <div className="flex items-center gap-6 text-sm mb-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-yellow-400" />
-                <span className="text-gray-300">{team.rank}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-400" />
-                <span className="text-gray-300">{team.players.length} Players</span>
-              </div>
-            </div>
-            
-            <div className="flex gap-3">
-              <div className="text-center bg-gray-800/50 rounded-lg px-4 py-2">
-                <div className="text-green-400 font-bold">85%</div>
-                <div className="text-gray-500 text-xs">Win Rate</div>
-              </div>
-              <div className="text-center bg-gray-800/50 rounded-lg px-4 py-2">
-                <div className="text-yellow-400 font-bold">1.42</div>
-                <div className="text-gray-500 text-xs">K/D Ratio</div>
-              </div>
-              <div className="text-center bg-gray-800/50 rounded-lg px-4 py-2">
-                <div className="text-purple-400 font-bold">16</div>
-                <div className="text-gray-500 text-xs">Tournaments</div>
-              </div>
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-gray-400">{team.region}</span>
+              <span className="text-gray-600">•</span>
+              <span className="text-gray-300">{team.rank}</span>
             </div>
           </div>
-          
-          <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-6 py-3 rounded-xl text-sm font-bold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300 transform group-hover:scale-105">
-            Follow Team
+          <button className="bg-white text-gray-950 px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
+            Follow
           </button>
         </div>
 
         <div className="space-y-3">
           <button 
             onClick={() => setShowRoster(!showRoster)}
-            className="flex items-center justify-between w-full text-left group/button"
+            className="flex items-center justify-between w-full text-left"
           >
-            <h4 className="text-white text-lg font-semibold group-hover/button:text-yellow-400 transition-colors">
-              Active Roster ({team.players.length})
-            </h4>
-            <ChevronRight 
-              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showRoster ? 'rotate-90' : ''}`} 
-            />
+            <h4 className="text-white text-sm font-medium">Active Roster ({team.players.length})</h4>
+            <svg 
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showRoster ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </button>
           
           {showRoster && (
-            <div className="grid grid-cols-1 gap-3 animate-in slide-in-from-top-2 duration-200">
+            <div className="grid grid-cols-1 gap-2 animate-in slide-in-from-top-2 duration-200">
               {team.players.map((player, index) => (
-                <div key={index} className="flex items-center gap-4 p-4 bg-gray-800/30 rounded-xl hover:bg-gray-700/30 transition-colors">
-                  <Image 
-                    src={player.avatar} 
-                    alt={player.name} 
-                    width={48}
-                    height={48}
-                    className="w-12 h-12 rounded-xl object-cover" 
-                  />
+                <div key={index} className="flex items-center gap-4 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
+                  <img src={player.avatar} alt={player.name} className="w-12 h-12 rounded-full object-cover" />
                   <div className="flex-1">
-                    <p className="text-white text-sm font-semibold">{player.name}</p>
+                    <p className="text-white text-sm font-medium">{player.name}</p>
                     <p className="text-gray-400 text-xs">{player.role}</p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-blue-400 text-xs font-medium bg-blue-500/20 px-3 py-1 rounded-full">
-                      {player.role}
-                    </div>
+                  <div className="text-blue-400 text-xs font-medium bg-blue-500/20 px-2 py-1 rounded">
+                    {player.role}
                   </div>
                 </div>
               ))}
@@ -995,7 +717,6 @@ function EnhancedTeamCard({ team }) {
   );
 }
 
-// Keep existing UtilityCard and EventCard components from previous version
 function UtilityCard({ utility }) {
   return (
     <div className="group cursor-pointer bg-gray-900/30 rounded-xl p-6 hover:bg-gray-900/50 transition-all duration-200">
@@ -1062,11 +783,9 @@ function EventCard({ event }) {
     <div className="group cursor-pointer bg-gray-900/30 rounded-xl p-6 hover:bg-gray-900/50 transition-all duration-200">
       <div className="space-y-6">
         <div className="flex gap-6">
-          <Image 
+          <img 
             src={event.thumbnail} 
             alt={event.title} 
-            width={128}
-            height={80}
             className="w-32 h-20 rounded-xl object-cover flex-shrink-0" 
           />
           <div className="flex-1">
