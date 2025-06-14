@@ -8,6 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Filter, X, Menu, ChevronLeft, ChevronRight, Play, Star, TrendingUp, Users, Trophy, Zap, ArrowRight, Eye, Heart, Share2, Bookmark, Clock } from "lucide-react";
 import {
   getFilteredDemos,
@@ -216,7 +217,7 @@ export default function Home() {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase.auth]);
 
   // Load initial data
   useEffect(() => {
@@ -545,7 +546,7 @@ export default function Home() {
                 </h1>
                 
                 <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                  Watch, learn, and dominate with exclusive first-person perspectives from the world's best CS2 players
+                  Watch, learn, and dominate with exclusive first-person perspectives from the world&apos;s best CS2 players
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -726,9 +727,11 @@ function EnhancedVideoCard({ video, onSelectDemo }) {
       <div className="space-y-3">
         {/* Enhanced Thumbnail */}
         <div className="relative w-full overflow-hidden rounded-xl bg-gray-800">
-          <img 
+          <Image 
             src={video.thumbnail} 
             alt={video.title} 
+            width={400}
+            height={225}
             className="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-110" 
           />
           
@@ -769,9 +772,11 @@ function EnhancedVideoCard({ video, onSelectDemo }) {
         {/* Enhanced Content */}
         <div className="space-y-3">
           <div className="flex gap-3">
-            <img 
+            <Image 
               src={video.channelAvatar} 
               alt={video.channel} 
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full flex-shrink-0 border-2 border-gray-700 group-hover:border-yellow-400 transition-colors" 
             />
             <div className="flex-1 min-w-0">
@@ -843,9 +848,11 @@ function EnhancedPlayerCard({ player }) {
         
         <div className="relative flex items-center gap-6">
           <div className="relative">
-            <img
+            <Image
               src={player.avatar}
               alt={player.name}
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-2xl object-cover border-3 border-gray-600 group-hover:border-yellow-400 transition-all duration-300"
             />
             <div className="absolute -top-2 -right-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold">
@@ -897,9 +904,11 @@ function EnhancedTeamCard({ team }) {
       <div className="space-y-6">
         <div className="flex items-center gap-6">
           <div className="relative">
-            <img 
+            <Image 
               src={team.logo} 
               alt={team.name} 
+              width={96}
+              height={96}
               className="w-24 h-24 rounded-2xl object-cover border-3 border-gray-600 group-hover:border-yellow-400 transition-colors" 
             />
             <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
@@ -960,7 +969,13 @@ function EnhancedTeamCard({ team }) {
             <div className="grid grid-cols-1 gap-3 animate-in slide-in-from-top-2 duration-200">
               {team.players.map((player, index) => (
                 <div key={index} className="flex items-center gap-4 p-4 bg-gray-800/30 rounded-xl hover:bg-gray-700/30 transition-colors">
-                  <img src={player.avatar} alt={player.name} className="w-12 h-12 rounded-xl object-cover" />
+                  <Image 
+                    src={player.avatar} 
+                    alt={player.name} 
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-xl object-cover" 
+                  />
                   <div className="flex-1">
                     <p className="text-white text-sm font-semibold">{player.name}</p>
                     <p className="text-gray-400 text-xs">{player.role}</p>
@@ -1047,9 +1062,11 @@ function EventCard({ event }) {
     <div className="group cursor-pointer bg-gray-900/30 rounded-xl p-6 hover:bg-gray-900/50 transition-all duration-200">
       <div className="space-y-6">
         <div className="flex gap-6">
-          <img 
+          <Image 
             src={event.thumbnail} 
             alt={event.title} 
+            width={128}
+            height={80}
             className="w-32 h-20 rounded-xl object-cover flex-shrink-0" 
           />
           <div className="flex-1">
