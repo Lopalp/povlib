@@ -220,11 +220,11 @@ function SearchResultsContent() {
       description: "Professional utility lineup for competitive play and site control",
       thumbnail: THUMBNAIL_IMAGE,
       map: ["Mirage", "Dust2", "Inferno"][Math.floor(Math.random() * 3)],
-      difficulty: ["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)],
-      successRate: Math.floor(Math.random() * 20) + 80,
-      videos: Array.from({ length: Math.floor(Math.random() * 4) + 3 }).map((__, j) => ({
+      usageRate: Math.floor(Math.random() * 30) + 60,
+      positions: Math.floor(Math.random() * 4) + 3,
+      videos: Array.from({ length: Math.floor(Math.random() * 6) + 4 }).map((__, j) => ({
         id: j,
-        title: `Position ${j + 1}: ${["Window", "Connector", "Stairs", "Default", "Deep"][j] || "Alternative"}`,
+        title: `Position ${j + 1}: ${["Window", "Connector", "Stairs", "Default", "Deep", "Alternative", "Boost", "Solo"][j] || `Setup ${j + 1}`}`,
         thumbnail: THUMBNAIL_IMAGE,
         duration: `${Math.floor(Math.random() * 3) + 1}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
         views: `${Math.floor(Math.random() * 50) + 5}K`
@@ -593,9 +593,6 @@ function MapCard({ map }) {
             alt={map.name} 
             className="w-full aspect-video object-cover rounded-xl" 
           />
-          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
-            {map.popularity}% Popular
-          </div>
         </div>
         
         {/* Content */}
@@ -694,46 +691,98 @@ function TeamCard({ team }) {
 }
 
 function UtilityCard({ utility }) {
+  const [showVideos, setShowVideos] = useState(false);
+  
   return (
-    <div className="group cursor-pointer">
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-        {/* Thumbnail */}
-        <div className="relative w-full sm:w-64 md:w-80 flex-shrink-0">
-          <img 
-            src={utility.thumbnail} 
-            alt={utility.title} 
-            className="w-full aspect-video object-cover rounded-xl" 
-          />
-          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
-            {utility.difficulty}
+    <div className="group cursor-pointer bg-gray-900/30 rounded-xl p-4 sm:p-6 hover:bg-gray-900/50 transition-all duration-200 border border-gray-800/50">
+      <div className="space-y-4 sm:space-y-6">
+        {/* Main Content */}
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+          {/* Thumbnail */}
+          <div className="relative w-full sm:w-64 md:w-80 flex-shrink-0">
+            <img 
+              src={utility.thumbnail} 
+              alt={utility.title} 
+              className="w-full aspect-video object-cover rounded-xl" 
+            />
+            <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+              {utility.positions} pos
+            </div>
+            <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-blue-600/90 text-white text-xs px-2 py-1 rounded font-medium">
+              {utility.usageRate}%
+            </div>
           </div>
-          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-green-600/90 text-white text-xs px-2 py-1 rounded font-medium">
-            {utility.successRate}%
+          
+          {/* Content */}
+          <div className="flex-1 py-1">
+            <h3 className="text-white text-base sm:text-lg font-medium leading-5 sm:leading-6 mb-2 sm:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2">
+              {utility.title}
+            </h3>
+            
+            <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
+              {utility.description}
+            </p>
+
+            <div className="flex items-center gap-4 mb-3 text-xs sm:text-sm text-gray-500">
+              <span>{utility.positions} positions</span>
+              <span className="text-gray-600">•</span>
+              <span className="text-blue-400">{utility.usageRate}% usage</span>
+              <span className="text-gray-600">•</span>
+              <span>{utility.videos.length} videos</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{utility.map}</span>
+              <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">Utility Guide</span>
+            </div>
           </div>
         </div>
-        
-        {/* Content */}
-        <div className="flex-1 py-1">
-          <h3 className="text-white text-base sm:text-lg font-medium leading-5 sm:leading-6 mb-2 sm:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2">
-            {utility.title}
-          </h3>
+
+        {/* Videos Toggle */}
+        <div className="space-y-3">
+          <button 
+            onClick={() => setShowVideos(!showVideos)}
+            className="flex items-center justify-between w-full text-left p-2 hover:bg-gray-800/50 rounded-lg transition-colors"
+          >
+            <h4 className="text-white text-sm font-medium">Training Videos ({utility.videos.length})</h4>
+            <svg 
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showVideos ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
           
-          <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
-            {utility.description}
-          </p>
-
-          <div className="flex items-center gap-4 mb-3 text-xs sm:text-sm text-gray-500">
-            <span>{utility.videos.length} positions</span>
-            <span className="text-gray-600">•</span>
-            <span className="text-green-400">{utility.successRate}% success</span>
-            <span className="text-gray-600">•</span>
-            <span>{utility.difficulty} difficulty</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{utility.map}</span>
-            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">Utility Guide</span>
-          </div>
+          {showVideos && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-in slide-in-from-top-2 duration-200">
+              {utility.videos.map((video, index) => (
+                <div key={index} className="group bg-gray-800/50 rounded-lg overflow-hidden hover:bg-gray-700/50 transition-all duration-200 cursor-pointer">
+                  <div className="relative">
+                    <img src={video.thumbnail} alt="" className="w-full h-20 sm:h-24 object-cover" />
+                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+                      {video.duration}
+                    </div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
+                      <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <svg className="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h5 className="text-white text-sm font-medium line-clamp-1 mb-2">{video.title}</h5>
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>{video.views} views</span>
+                      <span className="bg-gray-700 px-2 py-1 rounded text-xs">#{index + 1}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
