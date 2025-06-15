@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import Link from "next/link";
-import { Search, Filter, X, Menu, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
+import { Search, Filter, X, Menu, ChevronLeft, ChevronRight, MoreVertical, Map, Grid3X3 } from "lucide-react";
 import {
   getFilteredDemos,
   getTrendingDemos,
@@ -41,6 +41,90 @@ const VIDEO_THUMBNAIL_POOL = [
 ];
 
 const THUMBNAIL_IMAGE = "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
+// Map information with thumbnails and stats
+const MAPS_INFO = {
+  "Mirage": {
+    name: "Mirage",
+    thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=225&fit=crop",
+    description: "Classic three-lane map with Middle control focus",
+    positions: ["A Site", "B Site", "Middle", "Connector", "Palace", "Ramp"],
+    difficulty: "Medium",
+    competitivePool: true
+  },
+  "Dust2": {
+    name: "Dust2",
+    thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop",
+    description: "Iconic desert map with long-range duels",
+    positions: ["A Site", "B Site", "Middle", "Long", "Short", "Tunnels"],
+    difficulty: "Easy",
+    competitivePool: true
+  },
+  "Inferno": {
+    name: "Inferno",
+    thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=225&fit=crop",
+    description: "Close-quarters Italian village setting",
+    positions: ["A Site", "B Site", "Apartments", "Balcony", "Arch", "Banana"],
+    difficulty: "Hard",
+    competitivePool: true
+  },
+  "Cache": {
+    name: "Cache",
+    thumbnail: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400&h=225&fit=crop",
+    description: "Industrial map with central focus",
+    positions: ["A Site", "B Site", "Middle", "Quad", "Checkers", "Sun Room"],
+    difficulty: "Medium",
+    competitivePool: true
+  },
+  "Overpass": {
+    name: "Overpass",
+    thumbnail: "https://images.unsplash.com/photo-1586953983027-d7508e87d878?w=400&h=225&fit=crop",
+    description: "Vertical map with park and restroom control",
+    positions: ["A Site", "B Site", "Bathrooms", "Park", "Monster", "Heaven"],
+    difficulty: "Hard",
+    competitivePool: true
+  },
+  "Vertigo": {
+    name: "Vertigo",
+    thumbnail: "https://images.unsplash.com/photo-1576075796033-848c2a5b3e98?w=400&h=225&fit=crop",
+    description: "Skyscraper map with height advantages",
+    positions: ["A Site", "B Site", "Ramp", "Stairs", "Mid", "CT Spawn"],
+    difficulty: "Hard",
+    competitivePool: true
+  },
+  "Nuke": {
+    name: "Nuke",
+    thumbnail: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=225&fit=crop",
+    description: "Nuclear facility with upper/lower levels",
+    positions: ["A Site", "B Site", "Upper", "Lower", "Ramp", "Hut"],
+    difficulty: "Very Hard",
+    competitivePool: true
+  },
+  "Train": {
+    name: "Train",
+    thumbnail: "https://images.unsplash.com/photo-1583143112904-06c49f7b3b71?w=400&h=225&fit=crop",
+    description: "Industrial train yard setting",
+    positions: ["A Site", "B Site", "Inner", "Outer", "Connector", "Ivy"],
+    difficulty: "Hard",
+    competitivePool: false
+  },
+  "Ancient": {
+    name: "Ancient",
+    thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=225&fit=crop",
+    description: "Aztec-themed archaeological site",
+    positions: ["A Site", "B Site", "Middle", "Temple", "Pit", "Donut"],
+    difficulty: "Medium",
+    competitivePool: true
+  },
+  "Anubis": {
+    name: "Anubis",
+    thumbnail: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400&h=225&fit=crop",
+    description: "Egyptian temple complex",
+    positions: ["A Site", "B Site", "Mid", "Palace", "Connector", "Temple"],
+    difficulty: "Medium",
+    competitivePool: true
+  }
+};
 
 // Comprehensive tag list for sections
 const ALL_TAGS = [
@@ -127,6 +211,13 @@ export default function Home() {
   const [activeVideoId, setActiveVideoId] = useState("");
   const [videoModal, setVideoModal] = useState({ isOpen: false, video: null });
 
+  // -------------------------------------
+  // Maps-specific states
+  // -------------------------------------
+  const [selectedMap, setSelectedMap] = useState(null);
+  const [showMapsView, setShowMapsView] = useState(false);
+  const [mapDemos, setMapDemos] = useState({});
+
   // Shuffled results for variety
   const shuffledDemoResults = useMemo(() => shuffleArray([...filteredDemos, ...trendingDemos, ...latestDemos]), [filteredDemos, trendingDemos, latestDemos]);
 
@@ -137,7 +228,7 @@ export default function Home() {
       demo.tags.forEach((tag) => tagsSet.add(tag));
     });
     
-    // Add some static popular tags
+    // Add some static popular tags including Maps
     ["Maps", "Players", "Teams", "Pro Matches", "Highlights", "Clutches", "Aces"].forEach(tag => tagsSet.add(tag));
     
     const allTags = Array.from(tagsSet);
@@ -146,8 +237,41 @@ export default function Home() {
     return shuffled.slice(0, 9);
   }, [shuffledDemoResults]);
 
+  // Filter demos by selected map
+  const filteredByMap = useMemo(() => {
+    if (!selectedMap) return displayedVideos;
+    return displayedVideos.filter(video => video.map === selectedMap);
+  }, [displayedVideos, selectedMap]);
+
+  // Map statistics
+  const mapStats = useMemo(() => {
+    const stats = {};
+    shuffledDemoResults.forEach(demo => {
+      if (demo.map) {
+        if (!stats[demo.map]) {
+          stats[demo.map] = { count: 0, views: 0, likes: 0 };
+        }
+        stats[demo.map].count++;
+        stats[demo.map].views += demo.views;
+        stats[demo.map].likes += demo.likes;
+      }
+    });
+    return stats;
+  }, [shuffledDemoResults]);
+
   const handleTagClick = (tag) => {
-    setActiveTag(activeTag === tag ? null : tag);
+    if (tag === "Maps") {
+      setShowMapsView(!showMapsView);
+      setActiveTag(activeTag === tag ? null : tag);
+    } else {
+      setActiveTag(activeTag === tag ? null : tag);
+      setShowMapsView(false);
+    }
+  };
+
+  const handleMapSelect = (mapName) => {
+    setSelectedMap(selectedMap === mapName ? null : mapName);
+    setShowMapsView(false);
   };
 
   // User Authentication Effect
@@ -201,7 +325,7 @@ export default function Home() {
             title: `${["Epic Ace", "Insane Clutch", "Perfect Spray", "Lucky Shot", "Team Wipe"][Math.floor(Math.random() * 5)]} on ${["Mirage", "Dust2", "Inferno", "Cache"][Math.floor(Math.random() * 4)]}`,
             thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
             video_id: "dQw4w9WgXcQ",
-            map: ["Mirage", "Dust2", "Inferno", "Cache", "Overpass"][Math.floor(Math.random() * 5)],
+            map: Object.keys(MAPS_INFO)[Math.floor(Math.random() * Object.keys(MAPS_INFO).length)],
             positions: [["A Site", "B Site", "Mid"][Math.floor(Math.random() * 3)]],
             tags: shuffleArray(ALL_TAGS).slice(0, Math.floor(Math.random() * 5) + 2),
             players: [["s1mple", "ZywOo", "sh1ro", "electroNic", "Ax1Le"][Math.floor(Math.random() * 5)]],
@@ -336,7 +460,7 @@ export default function Home() {
                 <button
                   key={tag}
                   className={`
-                    px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200
+                    px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 flex items-center gap-2
                     ${activeTag === tag 
                       ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-300' 
                       : 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 hover:border-gray-600'
@@ -344,22 +468,73 @@ export default function Home() {
                   `}
                   onClick={() => handleTagClick(tag)}
                 >
+                  {tag === "Maps" && <Map className="w-4 h-4" />}
                   {tag}
                 </button>
               ))}
             </div>
           </div>
         </div>
+
+        {/* Map Selection Bar */}
+        {selectedMap && (
+          <div className="bg-gray-900 border-b border-gray-700">
+            <div className="max-w-full mx-auto px-3 sm:px-5 py-3">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-yellow-400">
+                  <Map className="w-4 h-4" />
+                  <span className="text-sm font-medium">Filtered by:</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full">
+                  <span className="text-sm text-white">{selectedMap}</span>
+                  <button 
+                    onClick={() => setSelectedMap(null)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                <span className="text-xs text-gray-400">
+                  {filteredByMap.length} demos found
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Maps Overview */}
+        {showMapsView && (
+          <div className="bg-gray-900 border-b border-gray-700">
+            <div className="max-w-full mx-auto px-3 sm:px-5 py-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Grid3X3 className="w-5 h-5 text-yellow-400" />
+                <h2 className="text-lg font-semibold text-white">Browse by Maps</h2>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Object.entries(MAPS_INFO).map(([mapName, mapInfo]) => (
+                  <MapCard 
+                    key={mapName}
+                    mapInfo={mapInfo}
+                    stats={mapStats[mapName]}
+                    isSelected={selectedMap === mapName}
+                    onClick={() => handleMapSelect(mapName)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Main Content */}
         <div className="max-w-full mx-auto px-3 sm:px-5 py-6 sm:py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-5 lg:gap-y-10">
-            {displayedVideos.map((video) => (
+            {(selectedMap ? filteredByMap : displayedVideos).map((video) => (
               <VideoCard 
                 key={video.id} 
                 video={video} 
                 onSelectDemo={onSelectDemo}
                 onMenuClick={handleVideoMenuClick}
+                showMapBadge={!selectedMap}
               />
             ))}
           </div>
@@ -383,8 +558,55 @@ export default function Home() {
   );
 }
 
-// Simplified Video Card Component
-function VideoCard({ video, onSelectDemo, onMenuClick }) {
+// Map Card Component
+function MapCard({ mapInfo, stats, isSelected, onClick }) {
+  return (
+    <div 
+      className={`
+        cursor-pointer rounded-lg overflow-hidden transition-all duration-200 border-2
+        ${isSelected 
+          ? 'border-yellow-400 bg-gray-800 shadow-lg shadow-yellow-400/20' 
+          : 'border-gray-700 bg-gray-800 hover:border-gray-600 hover:bg-gray-750'
+        }
+      `}
+      onClick={onClick}
+    >
+      <div className="aspect-video w-full">
+        <img 
+          src={mapInfo.thumbnail}
+          alt={mapInfo.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="p-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-semibold text-white">{mapInfo.name}</h3>
+          {mapInfo.competitivePool && (
+            <div className="w-2 h-2 bg-green-400 rounded-full" title="Active Duty"></div>
+          )}
+        </div>
+        <p className="text-xs text-gray-400 mb-2">{mapInfo.description}</p>
+        {stats && (
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span>{stats.count} demos</span>
+            <span className={`
+              px-2 py-1 rounded text-xs
+              ${mapInfo.difficulty === 'Easy' ? 'bg-green-900 text-green-300' :
+                mapInfo.difficulty === 'Medium' ? 'bg-yellow-900 text-yellow-300' :
+                mapInfo.difficulty === 'Hard' ? 'bg-orange-900 text-orange-300' :
+                'bg-red-900 text-red-300'}
+            `}>
+              {mapInfo.difficulty}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Enhanced Video Card Component
+function VideoCard({ video, onSelectDemo, onMenuClick, showMapBadge = true }) {
   const handleClick = () => onSelectDemo(video);
 
   return (
@@ -400,6 +622,12 @@ function VideoCard({ video, onSelectDemo, onMenuClick }) {
           <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
             {video.duration}
           </div>
+          {showMapBadge && video.map && (
+            <div className="absolute top-2 left-2 bg-gray-900/90 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+              <Map className="w-3 h-3" />
+              {video.map}
+            </div>
+          )}
           {video.watched && (
             <div className="absolute bottom-0 left-0 w-2/3 h-1 bg-blue-500 rounded-b-xl" />
           )}
