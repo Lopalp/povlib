@@ -156,50 +156,62 @@ function SearchResultsContent() {
       { 
         type: "map", 
         name: "Dust2", 
-        thumbnail: "/maps/dust2.jpg",
+        thumbnail: "/img/maps/dust2.png",
         description: "The most iconic Counter-Strike map featuring two bomb sites connected by long corridors",
         demos: Math.floor(Math.random() * 500) + 200,
         popularity: 95,
         layout: "Classic",
-        lastUpdate: "2024",
-        keyPositions: ["Long A", "Catwalk", "B Tunnels", "Mid Doors"],
         proMatches: Math.floor(Math.random() * 100) + 50
       },
       { 
         type: "map", 
         name: "Mirage", 
-        thumbnail: "/maps/mirage.jpg",
+        thumbnail: "/img/maps/mirage.png",
         description: "A balanced three-lane map perfect for tactical gameplay and team coordination",
         demos: Math.floor(Math.random() * 400) + 150,
         popularity: 88,
         layout: "Balanced",
-        lastUpdate: "2024",
-        keyPositions: ["A Site", "Connector", "B Apps", "Mid Window"],
         proMatches: Math.floor(Math.random() * 90) + 40
       },
       { 
         type: "map", 
         name: "Inferno", 
-        thumbnail: "/maps/inferno.jpg",
+        thumbnail: "/img/maps/inferno.png",
         description: "Close-quarters combat map with narrow chokepoints and vertical gameplay",
         demos: Math.floor(Math.random() * 350) + 120,
         popularity: 82,
         layout: "Close Range",
-        lastUpdate: "2023",
-        keyPositions: ["Banana", "Apps", "Pit", "Arch"],
         proMatches: Math.floor(Math.random() * 80) + 35
       },
       { 
         type: "map", 
-        name: "Cache", 
-        thumbnail: "/maps/cache.jpg",
-        description: "Mid-focused map with strategic control points and multiple rotation options",
+        name: "Ancient", 
+        thumbnail: "/img/maps/ancient.png",
+        description: "Ancient temple-themed map with unique vertical elements and strategic positioning",
         demos: Math.floor(Math.random() * 300) + 100,
         popularity: 75,
-        layout: "Mid Control",
-        lastUpdate: "2023",
-        keyPositions: ["Mid", "A Main", "B Main", "Quad"],
+        layout: "Vertical",
         proMatches: Math.floor(Math.random() * 70) + 30
+      },
+      { 
+        type: "map", 
+        name: "Anubis", 
+        thumbnail: "/img/maps/anubis.png",
+        description: "Egyptian-themed map with tight angles and connector-based rotations",
+        demos: Math.floor(Math.random() * 250) + 80,
+        popularity: 68,
+        layout: "Connector",
+        proMatches: Math.floor(Math.random() * 60) + 25
+      },
+      { 
+        type: "map", 
+        name: "Nuke", 
+        thumbnail: "/img/maps/nuke.png",
+        description: "Multi-level nuclear facility with complex vertical gameplay mechanics",
+        demos: Math.floor(Math.random() * 200) + 60,
+        popularity: 62,
+        layout: "Vertical",
+        proMatches: Math.floor(Math.random() * 50) + 20
       }
     ],
     utilities: Array.from({ length: 8 }).map((_, i) => ({
@@ -573,63 +585,40 @@ function PlayerCard({ player }) {
 function MapCard({ map }) {
   return (
     <div className="group cursor-pointer">
-      <div className="bg-gray-900/30 rounded-xl overflow-hidden hover:bg-gray-900/50 transition-all duration-200">
-        <div className="relative">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        {/* Thumbnail */}
+        <div className="relative w-full sm:w-64 md:w-80 flex-shrink-0">
           <img 
             src={map.thumbnail} 
             alt={map.name} 
-            className="w-full h-48 sm:h-56 object-cover" 
+            className="w-full aspect-video object-cover rounded-xl" 
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-white text-xl sm:text-2xl font-bold">{map.name}</h3>
-              <div className="flex items-center gap-2 text-yellow-400">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <span className="text-sm font-medium">{map.popularity}% Popular</span>
-              </div>
-            </div>
+          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+            {map.popularity}% Popular
           </div>
         </div>
         
-        <div className="p-4 sm:p-6">
-          <p className="text-gray-400 text-sm mb-4">{map.description}</p>
+        {/* Content */}
+        <div className="flex-1 py-1">
+          <h3 className="text-white text-base sm:text-lg font-medium leading-5 sm:leading-6 mb-2 sm:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2">
+            {map.name}
+          </h3>
           
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-              <div className="text-white font-medium text-sm sm:text-base">{map.demos}</div>
-              <div className="text-gray-400 text-xs">Demos</div>
-            </div>
-            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-              <div className="text-blue-400 font-medium text-sm sm:text-base">{map.proMatches}</div>
-              <div className="text-gray-400 text-xs">Pro Matches</div>
-            </div>
-            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-              <div className="text-green-400 font-medium text-sm sm:text-base">{map.layout}</div>
-              <div className="text-gray-400 text-xs">Layout</div>
-            </div>
-            <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-              <div className="text-gray-300 font-medium text-sm sm:text-base">{map.lastUpdate}</div>
-              <div className="text-gray-400 text-xs">Updated</div>
-            </div>
+          <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
+            {map.description}
+          </p>
+
+          <div className="flex items-center gap-4 mb-3 text-xs sm:text-sm text-gray-500">
+            <span>{map.demos} demos</span>
+            <span className="text-gray-600">•</span>
+            <span>{map.proMatches} pro matches</span>
+            <span className="text-gray-600">•</span>
+            <span className="text-blue-400">{map.layout}</span>
           </div>
 
-          <div className="space-y-3">
-            <h4 className="text-white text-sm font-medium flex items-center gap-2">
-              <MapPin size={14} />
-              Key Positions
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {map.keyPositions.map((position, index) => (
-                <span 
-                  key={index}
-                  className="text-xs text-gray-300 bg-gray-800 px-2 py-1 rounded"
-                >
-                  {position}
-                </span>
-              ))}
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{map.name}</span>
+            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">Map Guide</span>
           </div>
         </div>
       </div>
@@ -706,156 +695,45 @@ function TeamCard({ team }) {
 
 function UtilityCard({ utility }) {
   return (
-    <div className="group cursor-pointer bg-gray-900/30 rounded-xl p-4 sm:p-6 hover:bg-gray-900/50 transition-all duration-200">
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-          <div className="w-full lg:w-80">
-            <div className="aspect-video bg-gray-900 rounded-xl p-4 sm:p-6 border border-gray-800">
-              <div className="w-full h-full flex flex-col">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-white font-medium text-sm">{utility.map}</h4>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-green-400 text-xs font-medium">{utility.successRate}% Success</span>
-                  </div>
-                </div>
-                
-                <div className="flex-1 bg-gray-800 rounded-lg p-4 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-red-500/10"></div>
-                  
-                  <div className="relative w-full h-full">
-                    <div className="absolute top-2 left-2 w-8 h-6 border border-gray-600 rounded text-[8px] text-gray-400 flex items-center justify-center">
-                      A
-                    </div>
-                    <div className="absolute top-2 right-2 w-8 h-6 border border-gray-600 rounded text-[8px] text-gray-400 flex items-center justify-center">
-                      B
-                    </div>
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-6 border border-gray-600 rounded text-[8px] text-gray-400 flex items-center justify-center">
-                      MID
-                    </div>
-                    
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-lg"></div>
-                      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] text-yellow-400 font-medium whitespace-nowrap">
-                        Landing
-                      </div>
-                    </div>
-                    
-                    <div className="absolute bottom-4 left-4">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-                      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-[8px] text-blue-400 whitespace-nowrap">
-                        Pos 1
-                      </div>
-                    </div>
-                    <div className="absolute top-4 right-8">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-                      <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-[8px] text-blue-400 whitespace-nowrap">
-                        Pos 2
-                      </div>
-                    </div>
-                    
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                      <defs>
-                        <marker id="arrowhead" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
-                          <polygon points="0 0, 6 2, 0 4" fill="#fbbf24" />
-                        </marker>
-                      </defs>
-                      <path
-                        d="M 20 90 Q 60 40 50 50"
-                        stroke="#fbbf24"
-                        strokeWidth="1.5"
-                        fill="none"
-                        strokeDasharray="3,2"
-                        markerEnd="url(#arrowhead)"
-                        opacity="0.8"
-                      />
-                      <path
-                        d="M 85 25 Q 70 30 50 50"
-                        stroke="#fbbf24"
-                        strokeWidth="1.5"
-                        fill="none"
-                        strokeDasharray="3,2"
-                        markerEnd="url(#arrowhead)"
-                        opacity="0.8"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="group cursor-pointer">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        {/* Thumbnail */}
+        <div className="relative w-full sm:w-64 md:w-80 flex-shrink-0">
+          <img 
+            src={utility.thumbnail} 
+            alt={utility.title} 
+            className="w-full aspect-video object-cover rounded-xl" 
+          />
+          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+            {utility.difficulty}
           </div>
-          
-          <div className="flex-1">
-            <h3 className="text-white text-lg sm:text-xl font-medium mb-2 sm:mb-3 group-hover:text-gray-200 transition-colors">
-              {utility.title}
-            </h3>
-            <p className="text-gray-400 text-sm mb-3 sm:mb-4">{utility.description}</p>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                <div className="text-white font-medium text-sm sm:text-base">{utility.difficulty}</div>
-                <div className="text-gray-400 text-xs">Difficulty</div>
-              </div>
-              <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                <div className="text-blue-400 font-medium text-sm sm:text-base">{utility.successRate}%</div>
-                <div className="text-gray-400 text-xs">Success Rate</div>
-              </div>
-              <div className="text-center p-3 bg-gray-800/50 rounded-lg">
-                <div className="text-blue-400 font-medium text-sm sm:text-base">{utility.videos.length}</div>
-                <div className="text-gray-400 text-xs">Positions</div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                <span>Landing Spot</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Throw Positions</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-0.5 bg-yellow-400 opacity-80"></div>
-                <span>Trajectory</span>
-              </div>
-            </div>
+          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-green-600/90 text-white text-xs px-2 py-1 rounded font-medium">
+            {utility.successRate}%
           </div>
         </div>
+        
+        {/* Content */}
+        <div className="flex-1 py-1">
+          <h3 className="text-white text-base sm:text-lg font-medium leading-5 sm:leading-6 mb-2 sm:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2">
+            {utility.title}
+          </h3>
+          
+          <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
+            {utility.description}
+          </p>
 
-        <div className="space-y-3 sm:space-y-4">
-          <h4 className="text-white text-sm font-medium">Training Videos ({utility.videos.length})</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {utility.videos.slice(0, 4).map((video, index) => (
-              <div key={index} className="group bg-gray-800/50 rounded-lg overflow-hidden hover:bg-gray-700/50 transition-all duration-200 cursor-pointer">
-                <div className="relative">
-                  <img src={video.thumbnail} alt="" className="w-full h-24 sm:h-28 object-cover" />
-                  <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
-                    {video.duration}
-                  </div>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <svg className="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3">
-                  <h5 className="text-white text-sm font-medium line-clamp-2 mb-2">{video.title}</h5>
-                  <div className="flex items-center justify-between text-xs text-gray-400">
-                    <span>{video.views} views</span>
-                    <span className="bg-gray-700 px-2 py-1 rounded text-xs">Position {index + 1}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center gap-4 mb-3 text-xs sm:text-sm text-gray-500">
+            <span>{utility.videos.length} positions</span>
+            <span className="text-gray-600">•</span>
+            <span className="text-green-400">{utility.successRate}% success</span>
+            <span className="text-gray-600">•</span>
+            <span>{utility.difficulty} difficulty</span>
           </div>
-          {utility.videos.length > 4 && (
-            <button className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-lg text-sm font-medium transition-colors">
-              View all {utility.videos.length} training videos
-            </button>
-          )}
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{utility.map}</span>
+            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">Utility Guide</span>
+          </div>
         </div>
       </div>
     </div>
@@ -863,159 +741,45 @@ function UtilityCard({ utility }) {
 }
 
 function EventCard({ event }) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const totalSlides = Math.ceil(event.matches.length / 4);
-  
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  };
-  
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
-
   return (
     <div className="group cursor-pointer">
-      <div className="bg-gray-900/30 rounded-xl overflow-hidden hover:bg-gray-900/50 transition-all duration-200">
-        {/* Event Header with Hero Image */}
-        <div className="relative h-48 sm:h-64">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        {/* Thumbnail */}
+        <div className="relative w-full sm:w-64 md:w-80 flex-shrink-0">
           <img 
             src={event.thumbnail} 
             alt={event.title} 
-            className="w-full h-full object-cover" 
+            className="w-full aspect-video object-cover rounded-xl" 
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          
-          <div className="absolute bottom-6 left-6 right-6">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <h3 className="text-white text-2xl sm:text-3xl font-bold mb-2 group-hover:text-gray-200 transition-colors">
-                  {event.title}
-                </h3>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-300">
-                  <span>{event.location}</span>
-                  <span className="text-gray-500">•</span>
-                  <span>{event.startDate} - {event.endDate}</span>
-                  <span className="text-gray-500">•</span>
-                  <span>{event.format}</span>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <div className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
-                  {event.status}
-                </div>
-                <div className="bg-yellow-500/20 text-yellow-400 px-4 py-2 rounded-lg text-sm font-bold border border-yellow-500/30">
-                  {event.prizePool}
-                </div>
-              </div>
-            </div>
+          <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+            {event.prizePool}
+          </div>
+          <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-blue-600 text-white text-xs px-2 py-1 rounded font-medium">
+            {event.status}
           </div>
         </div>
+        
+        {/* Content */}
+        <div className="flex-1 py-1">
+          <h3 className="text-white text-base sm:text-lg font-medium leading-5 sm:leading-6 mb-2 sm:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2">
+            {event.title}
+          </h3>
+          
+          <p className="text-gray-400 text-xs sm:text-sm leading-4 sm:leading-5 mb-3 sm:mb-4 line-clamp-2">
+            {event.description}
+          </p>
 
-        <div className="p-6 space-y-6">
-          {/* Event Description */}
-          <p className="text-gray-400 text-sm leading-relaxed">{event.description}</p>
-
-          {/* Teams Grid */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-white text-lg font-medium">Participating Teams</h4>
-              <span className="text-gray-400 text-sm">{event.teams.length} teams</span>
-            </div>
-            
-            <div className="bg-gray-800/30 rounded-lg p-4">
-              <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-12 gap-3">
-                {event.teams.slice(0, 12).map((team, index) => (
-                  <div key={index} className="group text-center cursor-pointer">
-                    <div className="relative mb-2">
-                      <img 
-                        src={team.logo} 
-                        alt={team.name} 
-                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover mx-auto border border-gray-700 group-hover:border-gray-500 transition-colors" 
-                      />
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-[10px] font-bold">{index + 1}</span>
-                      </div>
-                    </div>
-                    <p className="text-white text-[10px] sm:text-xs font-medium truncate group-hover:text-gray-200 transition-colors">
-                      {team.name}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              {event.teams.length > 12 && (
-                <div className="mt-4 text-center">
-                  <button className="text-gray-400 hover:text-white text-sm transition-colors">
-                    View all {event.teams.length} teams →
-                  </button>
-                </div>
-              )}
-            </div>
+          <div className="flex items-center gap-4 mb-3 text-xs sm:text-sm text-gray-500">
+            <span>{event.location}</span>
+            <span className="text-gray-600">•</span>
+            <span>{event.startDate}</span>
+            <span className="text-gray-600">•</span>
+            <span className="text-blue-400">{event.teams.length} teams</span>
           </div>
 
-          {/* Featured Matches */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="text-white text-lg font-medium">Featured Matches</h4>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={prevSlide}
-                  disabled={totalSlides <= 1}
-                  className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
-                >
-                  <ChevronLeft size={16} className="text-white" />
-                </button>
-                <span className="text-gray-400 text-xs px-2">{currentSlide + 1}/{totalSlides}</span>
-                <button 
-                  onClick={nextSlide}
-                  disabled={totalSlides <= 1}
-                  className="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
-                >
-                  <ChevronRight size={16} className="text-white" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-              >
-                {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-                  <div key={slideIndex} className="w-full flex-shrink-0">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {event.matches.slice(slideIndex * 4, (slideIndex + 1) * 4).map((match, index) => (
-                        <div key={index} className="bg-gray-800/50 rounded-lg overflow-hidden hover:bg-gray-700/50 transition-all duration-200 cursor-pointer">
-                          <div className="relative">
-                            <img src={match.thumbnail} alt={match.title} className="w-full h-24 object-cover" />
-                            <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded font-medium">
-                              LIVE
-                            </div>
-                            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
-                              {match.duration}
-                            </div>
-                          </div>
-                          <div className="p-3">
-                            <div className="text-center mb-2">
-                              <div className="text-xs text-gray-400 mb-1">{match.title}</div>
-                              <div className="text-sm text-white font-medium">
-                                {match.team1} <span className="text-gray-500">vs</span> {match.team2}
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-gray-400">{match.map}</span>
-                              <span className="text-yellow-400 font-bold">{match.score}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">{event.format}</span>
+            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">Tournament</span>
           </div>
         </div>
       </div>
