@@ -3,7 +3,15 @@
 import React, { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Menu, X, BellRing, LogIn } from "lucide-react";
+import {
+  Search,
+  Menu,
+  X,
+  BellRing,
+  LogIn,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 import { UserContext } from "../../../context/UserContext";
 import LogoHeading from "../brand/LogoHeading";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
@@ -15,6 +23,8 @@ export default function Navbar({
   setSearchActive = () => {},
   setIsMenuOpen = () => {},
   isMenuOpen = false,
+  isSidebarCollapsed = false,
+  setIsSidebarCollapsed = () => {},
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -62,12 +72,24 @@ export default function Navbar({
 
   return (
     <header className={`fixed top-0 w-full z-50 ${glassBg}`}>
-      <div className="container mx-auto px-4 md:px-8">
+      <div className="w-full px-2 md:px-4">
         <div className="flex items-center justify-between py-3">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <LogoHeading size={1.5} />
-          </Link>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsSidebarCollapsed((c) => !c)}
+              className="hidden md:flex p-2 text-gray-100 hover:text-yellow-400"
+            >
+              {isSidebarCollapsed ? (
+                <PanelLeftOpen className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
+            </button>
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <LogoHeading size={1.5} />
+            </Link>
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex flex-grow items-center justify-center space-x-6">

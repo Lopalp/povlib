@@ -9,8 +9,6 @@ import {
   Users,
   Map,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { useNavbar } from "../../context/NavbarContext";
 
@@ -58,16 +56,6 @@ export default function Sidebar({ items }) {
           isSidebarCollapsed ? "w-16 p-2" : "w-64 p-6"
         }`}
       >
-        <button
-          onClick={() => setIsSidebarCollapsed((c) => !c)}
-          className="self-end p-2 text-gray-200 hover:text-yellow-400"
-        >
-          {isSidebarCollapsed ? (
-            <ChevronRight className="h-5 w-5" />
-          ) : (
-            <ChevronLeft className="h-5 w-5" />
-          )}
-        </button>
         <nav
           className={`flex flex-col mt-4 space-y-4 ${
             isSidebarCollapsed ? "items-center" : ""

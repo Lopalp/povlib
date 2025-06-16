@@ -15,6 +15,7 @@ function GlobalLayoutContent({ children }) {
     isMenuOpen,
     setIsMenuOpen,
     isSidebarCollapsed,
+    setIsSidebarCollapsed,
     demoType,
     handleSwitchDemoType,
   } = useNavbar();
@@ -33,6 +34,8 @@ function GlobalLayoutContent({ children }) {
           setSearchActive={setSearchActive}
           setIsMenuOpen={setIsMenuOpen}
           isMenuOpen={isMenuOpen}
+          isSidebarCollapsed={isSidebarCollapsed}
+          setIsSidebarCollapsed={setIsSidebarCollapsed}
         />
       )}
 
