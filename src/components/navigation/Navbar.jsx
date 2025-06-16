@@ -72,12 +72,12 @@ export default function Navbar({
 
   return (
     <header className={`fixed top-0 w-full z-50 ${glassBg}`}>
-      <div className="w-full px-2 md:px-4">
-        <div className="flex items-center justify-between py-3">
+      <div className="w-full px-4 md:px-6">
+        <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsSidebarCollapsed((c) => !c)}
-              className="hidden md:flex p-2 text-gray-100 hover:text-yellow-400"
+              className="hidden md:flex p-2 text-gray-100 hover:text-brand-yellow"
             >
               {isSidebarCollapsed ? (
                 <PanelLeftOpen className="h-5 w-5" />
@@ -104,7 +104,7 @@ export default function Navbar({
                   className="px-4 py-2 rounded-full bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none w-full"
                 />
                 <button type="submit" className="ml-2">
-                  <Search className="h-5 w-5 text-gray-100 hover:text-yellow-400" />
+                  <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
                 </button>
               </form>
             </div>
@@ -112,7 +112,7 @@ export default function Navbar({
             {/* Notifications */}
             {isLoggedIn && (
               <Link href="/user">
-                <button className="p-2 relative text-gray-300 hover:text-yellow-400">
+                <button className="p-2 relative text-gray-300 hover:text-brand-yellow">
                   <BellRing className="h-5 w-5" />
                   <span className="absolute top-0 right-0 h-2 w-2 bg-yellow-400 rounded-full" />
                 </button>
@@ -191,7 +191,7 @@ export default function Navbar({
               className="flex-grow py-2 bg-transparent placeholder-gray-400 text-white focus:outline-none"
             />
             <button type="submit">
-              <Search className="h-5 w-5 text-gray-100 hover:text-yellow-400" />
+              <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
             </button>
           </form>
         </div>
@@ -200,7 +200,7 @@ export default function Navbar({
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg overflow-y-auto">
-          <div className="container mx-auto px-4 py-6">
+          <div className="container mx-auto px-4 md:px-6 py-6">
             <nav className="flex flex-col space-y-6">
               <form onSubmit={handleSearchSubmit} className="flex items-center">
                 <input
@@ -211,14 +211,14 @@ export default function Navbar({
                   className="px-4 py-2 rounded-full bg-gray-700 text-gray-100 placeholder-gray-400 w-full focus:outline-none"
                 />
                 <button type="submit" className="ml-2">
-                  <Search className="h-5 w-5 text-gray-100 hover:text-yellow-400" />
+                  <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
                 </button>
               </form>
 
               {user ? (
                 <button
                   onClick={handleSignOut}
-                  className="text-left text-gray-200 hover:text-yellow-400"
+                  className="text-left text-gray-200 hover:text-brand-yellow"
                 >
                   Sign Out
                 </button>

@@ -53,7 +53,7 @@ export default function Sidebar({ items }) {
       {/* Desktop sidebar */}
       <aside
         className={`hidden md:flex fixed top-16 left-0 bottom-0 z-40 flex-col border-r border-gray-700 bg-black/50 backdrop-blur-lg transition-all duration-300 ${
-          isSidebarCollapsed ? "w-16 p-2" : "w-64 p-6"
+          isSidebarCollapsed ? "w-16 p-3" : "w-64 p-6"
         }`}
       >
         <nav
@@ -65,7 +65,7 @@ export default function Sidebar({ items }) {
             <Link
               key={index}
               href={item.href}
-              className={`flex items-center text-gray-200 hover:text-yellow-400 transition-colors ${
+              className={`flex items-center text-sm font-medium text-gray-200 hover:text-brand-yellow transition-colors ${
                 isSidebarCollapsed ? "justify-center" : "space-x-3"
               }`}
             >
@@ -84,7 +84,7 @@ export default function Sidebar({ items }) {
                 <ul className="space-y-1 text-xs">
                   {section.items.map((it) => (
                     <li key={it}>
-                      <a href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                      <a href="#" className="text-gray-400 hover:text-brand-yellow transition-colors">
                         {it}
                       </a>
                     </li>
@@ -94,7 +94,7 @@ export default function Sidebar({ items }) {
             ))}
             <div className="flex space-x-3 pt-4">
               {[1, 2, 3].map((n) => (
-                <a key={n} href="#" className="text-gray-400 hover:text-yellow-400 transition-colors">
+                <a key={n} href="#" className="text-gray-400 hover:text-brand-yellow transition-colors">
                   <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
                     <img
                       src="https://www.rnd.de/resizer/v2/7ZPVUSAZTJCCPNBTCAANTGZZVQ.jpg?auth=872c3046d03f56a91fa0b0a7faedad3feaa83153dc60fdd489e4f43c7903000e&quality=70&width=1441&height=1081&smart=true"
@@ -115,7 +115,7 @@ export default function Sidebar({ items }) {
           <div className="w-64 bg-gray-900/90 backdrop-blur p-6 space-y-4">
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="p-2 text-gray-100 hover:text-yellow-400"
+              className="p-2 text-gray-100 hover:text-brand-yellow"
             >
               <X className="h-6 w-6" />
             </button>
@@ -125,7 +125,7 @@ export default function Sidebar({ items }) {
                   key={index}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center space-x-3 text-gray-200 hover:text-yellow-400"
+                  className="flex items-center space-x-3 text-sm font-medium text-gray-200 hover:text-brand-yellow"
                 >
                   {item.icon}
                   <span>{item.label}</span>

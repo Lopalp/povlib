@@ -3,6 +3,21 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand-yellow: #FBBF24;
+  --gray-900: #181a20;
+  --gray-800: #23272f;
+  --gray-700: #374151;
+}
+
+/* Brand utility classes */
+.text-brand-yellow {
+  color: var(--brand-yellow);
+}
+.bg-brand-yellow {
+  background-color: var(--brand-yellow);
+}
+.border-brand-yellow {
+  border-color: var(--brand-yellow);
 }
 
 @theme inline {
@@ -22,6 +37,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
 }
 
 /* Global cursor styles */

@@ -3,8 +3,8 @@ import LogoHeading from "../brand/LogoHeading";
 import { Caption } from "../typography";
 
 const Footer = () => (
-  <footer className="bg-gray-800 py-10 border-t border-gray-700">
-    <div className="container mx-auto px-6">
+  <footer className="bg-gray-800 border-t border-gray-700 py-8">
+    <div className="container mx-auto px-4 md:px-6">
       <div className="flex flex-col md:flex-row justify-between items-center mb-10">
         <div className="mb-8 md:mb-0">
           <LogoHeading size={1.5} />
@@ -18,7 +18,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Home
                 </a>
@@ -26,7 +26,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Maps
                 </a>
@@ -34,7 +34,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Players
                 </a>
@@ -42,7 +42,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Events
                 </a>
@@ -56,7 +56,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   About
                 </a>
@@ -64,7 +64,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Contact
                 </a>
@@ -72,7 +72,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   FAQ
                 </a>
@@ -80,7 +80,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Support
                 </a>
@@ -94,7 +94,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                    className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Privacy Policy
                 </a>
@@ -102,7 +102,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                    className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Terms of Service
                 </a>
@@ -110,7 +110,7 @@ const Footer = () => (
               <li>
                 <a
                   href="#"
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                    className="text-gray-400 hover:text-brand-yellow transition-colors"
                 >
                   Cookie Policy
                 </a>
@@ -127,7 +127,7 @@ const Footer = () => (
         <div className="flex space-x-4">
           <a
             href="#"
-            className="text-gray-400 hover:text-yellow-400 transition-colors"
+            className="text-gray-400 hover:text-brand-yellow transition-colors"
           >
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
               <img
@@ -139,7 +139,7 @@ const Footer = () => (
           </a>
           <a
             href="#"
-            className="text-gray-400 hover:text-yellow-400 transition-colors"
+            className="text-gray-400 hover:text-brand-yellow transition-colors"
           >
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
               <img
@@ -151,7 +151,7 @@ const Footer = () => (
           </a>
           <a
             href="#"
-            className="text-gray-400 hover:text-yellow-400 transition-colors"
+            className="text-gray-400 hover:text-brand-yellow transition-colors"
           >
             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600">
               <img
