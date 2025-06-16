@@ -73,7 +73,7 @@ export default function Navbar({
   return (
     <header className={`fixed top-0 w-full z-50 ${glassBg}`}>
       <div className="w-full px-4 md:px-6">
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between py-4 gap-4">
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setIsSidebarCollapsed((c) => !c)}
@@ -91,24 +91,24 @@ export default function Navbar({
             </Link>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex flex-grow items-center justify-end space-x-6">
-            {/* Search Bar */}
-            <div className="flex-grow max-w-xl">
-              <form onSubmit={handleSearchSubmit} className="relative w-full">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search demos, players, teams, utilities..."
-                  className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none"
-                />
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
-                </button>
-              </form>
-            </div>
+          {/* Desktop search */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <form onSubmit={handleSearchSubmit} className="relative w-full max-w-xl">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search demos, players, teams, utilities..."
+                className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none"
+              />
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+                <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
+              </button>
+            </form>
+          </div>
 
+          {/* Desktop nav icons */}
+          <nav className="hidden md:flex items-center space-x-6">
             {/* Notifications */}
             {isLoggedIn && (
               <Link href="/user">
