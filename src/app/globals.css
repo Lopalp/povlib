@@ -19,6 +19,15 @@
 .border-brand-yellow {
   border-color: var(--brand-yellow);
 }
+.hover\:text-brand-yellow:hover {
+  color: var(--brand-yellow);
+}
+.hover\:bg-brand-yellow:hover {
+  background-color: var(--brand-yellow);
+}
+.hover\:border-brand-yellow:hover {
+  border-color: var(--brand-yellow);
+}
 
 @theme inline {
   --color-background: var(--background);

@@ -468,7 +468,7 @@ const PlayerPage = ({ params }) => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-brand-yellow rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg font-medium">
             Loading player data...
           </p>
@@ -547,9 +547,9 @@ const PlayerPage = ({ params }) => {
           </div>
 
           {/* Content */}
-          <div className="relative z-30 container mx-auto h-full flex items-center justify-center px-6">
+          <div className="relative z-30 container mx-auto h-full flex items-center justify-center px-4 md:px-6">
             <div className="text-center max-w-xl space-y-4">
-              <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-full border-4 border-yellow-400/50 shadow-lg">
+              <div className="relative w-32 h-32 mx-auto overflow-hidden rounded-full border-4 border-brand-yellow/50 shadow-lg">
                 {player.image_url ? (
                   <img
                     src={player.image_url}
@@ -557,7 +557,7 @@ const PlayerPage = ({ params }) => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center text-yellow-400 text-5xl font-bold">
+                  <div className="w-full h-full bg-gray-800 flex items-center justify-center text-brand-yellow text-5xl font-bold">
                     {playerName.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -569,7 +569,7 @@ const PlayerPage = ({ params }) => {
               <p className="text-gray-300 text-lg">{player.real_name}</p>
 
               {player.current_team?.name && (
-                <div className="inline-flex items-center bg-gray-800/60 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium">
+                <div className="inline-flex items-center bg-gray-800/60 px-3 py-1 rounded-full text-brand-yellow text-sm font-medium">
                   <Shield className="w-4 h-4 mr-2" />
                   {player.current_team.name}
                 </div>
@@ -581,7 +581,7 @@ const PlayerPage = ({ params }) => {
                     href={`https://twitter.com/${player.twitter}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-yellow-400"
+                    className="hover:text-brand-yellow"
                   >
                     <Twitter className="w-6 h-6" />
                   </a>
@@ -669,7 +669,7 @@ const PlayerPage = ({ params }) => {
               <div>
                 <div className="text-gray-400 text-xs">Favorite Map</div>
                 <div className="flex items-center text-white">
-                  <MapPin className="w-5 h-5 mr-1 text-yellow-400" />
+                  <MapPin className="w-5 h-5 mr-1 text-brand-yellow" />
                   {player.favorite_map}
                 </div>
               </div>
@@ -678,7 +678,7 @@ const PlayerPage = ({ params }) => {
                   <div className="text-gray-400 text-xs">Liquipedia</div>
                   <button
                     onClick={() => setTeamHistoryOpen(!teamHistoryOpen)}
-                    className="flex items-center text-gray-400 text-xs space-x-1 hover:text-yellow-400"
+                    className="flex items-center text-gray-400 text-xs space-x-1 hover:text-brand-yellow"
                   >
                     <span>Team History</span>
                     {teamHistoryOpen ? (
@@ -701,7 +701,7 @@ const PlayerPage = ({ params }) => {
                             {entry.start_date} &ndash; {entry.end_date}
                           </div>
                         </div>
-                        <Shield className="w-5 h-5 text-yellow-400" />
+                        <Shield className="w-5 h-5 text-brand-yellow" />
                       </li>
                     ))}
                   </ul>
@@ -714,7 +714,7 @@ const PlayerPage = ({ params }) => {
         {/* Utility Book Section */}
         <div className="max-w-4xl mx-auto mt-6 sm:mt-10 bg-gray-900/80 backdrop-blur-lg rounded-xl p-4 sm:p-6">
           <div className="flex items-center mb-4">
-            <BookOpen className="w-6 h-6 text-yellow-400 mr-2" />
+            <BookOpen className="w-6 h-6 text-brand-yellow mr-2" />
             <h2 className="text-xl font-bold text-white">
               {playerName}&apos;s Utility Book
             </h2>
@@ -747,7 +747,7 @@ const PlayerPage = ({ params }) => {
                 className="bg-gray-800/60 p-4 rounded-lg flex flex-col"
               >
                 <div className="flex items-center mb-2">
-                  <MapPin className="w-5 h-5 text-yellow-400 mr-2" />
+                  <MapPin className="w-5 h-5 text-brand-yellow mr-2" />
                   <span className="text-white font-semibold">{util.map}</span>
                 </div>
                 <div className="text-white font-bold">{util.title}</div>
@@ -771,9 +771,9 @@ const PlayerPage = ({ params }) => {
                     setActiveVideoId(util.videoId);
                     setIsFullScreenPlayer(true);
                   }}
-                  className="mt-auto self-start flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-yellow-400 transition"
+                  className="mt-auto self-start flex items-center gap-2 px-4 py-2 rounded-md border border-gray-600 text-white hover:border-brand-yellow transition"
                 >
-                  <Play className="w-4 h-4 text-yellow-400" />
+                  <Play className="w-4 h-4 text-brand-yellow" />
                   <span className="text-sm">View Utility</span>
                 </button>
               </div>
@@ -788,12 +788,12 @@ const PlayerPage = ({ params }) => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 bg-pattern relative z-10">
+      <main className="container mx-auto px-4 md:px-6 py-8 sm:py-12 bg-pattern relative z-10">
         {/* == Best Game of All Time == */}
         {player?.best_game && (
           <section className="mb-16">
             <div className="flex items-center mb-4">
-              <Star className="w-6 h-6 text-yellow-400 mr-2" />
+              <Star className="w-6 h-6 text-brand-yellow mr-2" />
               <h2 className="text-2xl font-bold text-white">
                 {playerName}&apos;s Best Game of All Time
               </h2>

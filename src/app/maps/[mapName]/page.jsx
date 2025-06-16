@@ -588,7 +588,7 @@ const MapPage = ({ params }) => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-brand-yellow rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg font-medium">Loading map data...</p>
         </div>
       </div>
@@ -645,7 +645,7 @@ const MapPage = ({ params }) => {
         </div>
 
         {/* Content */}
-        <div className="relative z-30 container mx-auto h-full flex items-center justify-center px-6">
+        <div className="relative z-30 container mx-auto h-full flex items-center justify-center px-4 md:px-6">
           <div className="text-center">
             <HeroHeading>{formattedMapName}</HeroHeading>
           </div>
@@ -657,7 +657,7 @@ const MapPage = ({ params }) => {
 
       {/* Tab Navigation */}
       <div className="bg-gray-900 border-b border-gray-800 sticky top-16 z-30">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="flex overflow-x-auto custom-scrollbar">
             <ToggleButton
               active={activeTab === "callouts"}
@@ -689,14 +689,14 @@ const MapPage = ({ params }) => {
 
       {/* Main Content */}
       <main
-        className="container mx-auto px-6 py-12 bg-pattern"
+        className="container mx-auto px-4 md:px-6 py-12 bg-pattern"
         ref={mapSectionRef}
       >
         {/* Callouts Tab */}
         {activeTab === "callouts" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
-              <span className="border-l-4 border-yellow-400 pl-3 py-1">
+              <span className="border-l-4 border-brand-yellow pl-3 py-1">
                 Callouts
               </span>
             </h2>
@@ -717,7 +717,7 @@ const MapPage = ({ params }) => {
         {activeTab === "positions" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
-              <span className="border-l-4 border-yellow-400 pl-3 py-1">
+              <span className="border-l-4 border-brand-yellow pl-3 py-1">
                 Positions
               </span>
             </h2>
@@ -791,7 +791,7 @@ const MapPage = ({ params }) => {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">
-                <span className="border-l-4 border-yellow-400 pl-3 py-1">
+                <span className="border-l-4 border-brand-yellow pl-3 py-1">
                   {formattedMapName}'s All POVs
                 </span>
               </h2>
@@ -817,7 +817,7 @@ const MapPage = ({ params }) => {
         {activeTab === "strategies" && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">
-              <span className="border-l-4 border-yellow-400 pl-3 py-1">
+              <span className="border-l-4 border-brand-yellow pl-3 py-1">
                 Strategies
               </span>
             </h2>

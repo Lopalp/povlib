@@ -263,7 +263,7 @@ const MapsIndex = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-brand-yellow rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg font-medium">Loading maps...</p>
         </div>
       </div>
@@ -282,7 +282,7 @@ const MapsIndex = () => {
       {/* Hero Header */}
       <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
-        <div className="container mx-auto px-6 text-center">
+        <div className="container mx-auto px-4 md:px-6 text-center">
           <HeroHeading>CS2 Maps</HeroHeading>
           <p className="text-gray-300 max-w-2xl mx-auto mb-8">
             Browse all official CS2 maps and watch POV demos for specific
@@ -297,14 +297,14 @@ const MapsIndex = () => {
                 placeholder="Search maps or positions..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full p-4 pl-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-400"
+                className="w-full p-4 pl-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-brand-yellow"
               />
               <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
 
               <button
                 type="button"
                 onClick={() => setIsFilterModalOpen(true)}
-                className="absolute right-3 top-3 p-1 bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 rounded-lg transition-colors"
+                className="absolute right-3 top-3 p-1 bg-gray-700 hover:bg-brand-yellow hover:text-gray-900 rounded-lg transition-colors"
               >
                 <Filter className="h-5 w-5" />
               </button>
@@ -314,7 +314,7 @@ const MapsIndex = () => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-4 md:px-6 py-12">
         {/* Map Grid */}
         {filteredMaps.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -324,7 +324,7 @@ const MapsIndex = () => {
                 href={`/maps/${map.name.toLowerCase()}`}
                 className="block group"
               >
-                <div className="relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg border border-gray-700 hover:border-yellow-400/30 h-full">
+                <div className="relative flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br from-gray-800 to-gray-900 shadow-lg border border-gray-700 hover:border-brand-yellow h-full">
                   {/* Map Image */}
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -336,7 +336,7 @@ const MapsIndex = () => {
 
                     {/* Map name overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h2 className="text-white font-bold text-xl group-hover:text-yellow-400 transition-colors">
+                      <h2 className="text-white font-bold text-xl group-hover:text-brand-yellow transition-colors">
                         {map.name}
                       </h2>
                     </div>
@@ -349,7 +349,7 @@ const MapsIndex = () => {
                     </p>
 
                     <div className="flex justify-between items-center mb-3">
-                      <div className="flex items-center text-yellow-400">
+                      <div className="flex items-center text-brand-yellow">
                         <MapPin className="h-4 w-4 mr-1" />
                         <span className="text-sm font-medium">
                           {map.positions.length} positions
@@ -367,7 +367,7 @@ const MapsIndex = () => {
                       {map.positions.slice(0, 3).map((position, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-yellow-400 hover:text-gray-900 transition-colors"
+                          className="text-xs bg-gray-700 px-2 py-0.5 rounded hover:bg-brand-yellow hover:text-gray-900 transition-colors"
                         >
                           {position}
                         </span>
@@ -380,7 +380,7 @@ const MapsIndex = () => {
                     </div>
 
                     {/* View button */}
-                    <button className="w-full mt-4 py-2 bg-gray-700 hover:bg-yellow-400 text-white hover:text-gray-900 rounded-lg text-sm font-medium transition-colors">
+                    <button className="w-full mt-4 py-2 bg-gray-700 hover:bg-brand-yellow text-white hover:text-gray-900 rounded-lg text-sm font-medium transition-colors">
                       View Map Details
                     </button>
                   </div>
@@ -390,7 +390,7 @@ const MapsIndex = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64 bg-gray-800/50 rounded-xl border border-gray-700">
-            <div className="text-yellow-400 text-6xl mb-4">
+            <div className="text-brand-yellow text-6xl mb-4">
               <MapPin />
             </div>
             <h3 className="text-white text-xl font-bold mb-2">No maps found</h3>
@@ -398,7 +398,7 @@ const MapsIndex = () => {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
+                className="mt-4 px-4 py-2 bg-brand-yellow text-gray-900 font-bold rounded-lg"
               >
                 Clear Search
               </button>
