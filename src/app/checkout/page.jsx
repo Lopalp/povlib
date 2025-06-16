@@ -53,30 +53,38 @@ function CheckoutPageContent() {
   const planKey = searchParams.get("plan") || "basic";
 
   const plan = useMemo(() => plans.find((p) => p.key === planKey) || plans[0], [
-    planKey
+    planKey,
   ]);
 
   return (
     <main className="min-h-screen pt-24 pb-12 bg-gray-900 text-gray-200">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="max-w-lg mx-auto bg-gray-800/50 border border-gray-700 rounded-xl p-8 shadow-lg">
-          <h1 className="text-3xl font-bold text-white mb-2">Checkout</h1>
-          <p className="text-sm text-gray-400 mb-6">
-            You are upgrading to the <span className="text-yellow-400 font-semibold">{plan.name}</span> plan.
-          </p>
-          <p className="text-4xl font-extrabold text-yellow-400 mb-6">{plan.priceLabel}</p>
-          <ul className="text-left space-y-2 mb-6 text-gray-300 text-sm">
-            {plan.features.map((feat, idx) => (
-              <li key={idx} className="flex items-start">
-                <span className="mr-2 text-xs">•</span>
-                <span>{feat}</span>
-              </li>
-            ))}
-          </ul>
-          <PrimaryButton className="w-full mb-3">Proceed to Payment</PrimaryButton>
-          <Link href="/">
-            <SecondaryButton className="w-full">Cancel</SecondaryButton>
-          </Link>
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">Checkout</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Benefits */}
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-8 shadow-lg">
+            <h2 className="text-xl font-semibold text-white mb-4">Benefits of {plan.name}</h2>
+            <ul className="space-y-2 text-gray-300 text-sm">
+              {plan.features.map((feat, idx) => (
+                <li key={idx} className="flex items-start">
+                  <span className="mr-2 text-xs">•</span>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Invoice & payment */}
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-8 shadow-lg">
+            <h2 className="text-xl font-semibold text-white mb-4">Your Order</h2>
+            <p className="text-gray-400 text-sm">Plan</p>
+            <p className="text-2xl font-bold text-white mb-2">{plan.name}</p>
+            <p className="text-4xl font-extrabold text-yellow-400 mb-6">{plan.priceLabel}</p>
+            <PrimaryButton className="w-full mb-3">Proceed to Payment</PrimaryButton>
+            <Link href="/">
+              <SecondaryButton className="w-full">Cancel</SecondaryButton>
+            </Link>
+          </div>
         </div>
       </div>
     </main>
