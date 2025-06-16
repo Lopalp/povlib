@@ -4,6 +4,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import Navbar from "../navigation/Navbar";
 import Footer from "../navigation/Footer";
+import Sidebar from "../navigation/Sidebar";
 import { NavbarProvider, useNavbar } from "../../context/NavbarContext";
 
 function GlobalLayoutContent({ children }) {
@@ -34,7 +35,10 @@ function GlobalLayoutContent({ children }) {
         />
       )}
 
-      <main>{children}</main>
+      <div className="flex">
+        {shouldShowNavigation && <Sidebar />}
+        <main className={`flex-1 ${shouldShowNavigation ? "md:ml-64" : ""}`}>{children}</main>
+      </div>
 
       {shouldShowNavigation && <Footer />}
     </>
