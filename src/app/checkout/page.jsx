@@ -1,8 +1,8 @@
 "use client";
+import { Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PrimaryButton, SecondaryButton } from "../../components/buttons";
-import React, { useMemo } from "react";
 
 const plans = [
   {
@@ -48,11 +48,13 @@ const plans = [
   },
 ];
 
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const searchParams = useSearchParams();
   const planKey = searchParams.get("plan") || "basic";
 
-  const plan = useMemo(() => plans.find((p) => p.key === planKey) || plans[0], [planKey]);
+  const plan = useMemo(() => plans.find((p) => p.key === planKey) || plans[0], [
+    planKey
+  ]);
 
   return (
     <main className="min-h-screen pt-24 pb-12 bg-gray-900 text-gray-200">
@@ -78,5 +80,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-gray-400">Loading...</div>}>
+      <CheckoutPageContent />
+    </Suspense>
   );
 }
