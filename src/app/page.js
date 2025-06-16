@@ -330,7 +330,7 @@ export default function Home() {
         
         {/* Tag Bar */}
         <div className="bg-gray-950 border-b border-gray-800">
-          <div className="max-w-full mx-auto px-3 sm:px-5 py-4">
+          <div className="container mx-auto px-4 md:px-6 py-4">
             <div className="flex gap-3 overflow-x-auto scrollbar-hide">
               {dynamicTags.map((tag) => (
                 <button
@@ -338,7 +338,7 @@ export default function Home() {
                   className={`
                     px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200
                     ${activeTag === tag 
-                      ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-300' 
+                      ? 'bg-brand-yellow text-gray-900 hover:bg-brand-yellow'
                       : 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 hover:border-gray-600'
                     }
                   `}
@@ -352,7 +352,7 @@ export default function Home() {
         </div>
         
         {/* Main Content */}
-        <div className="max-w-full mx-auto px-3 sm:px-5 py-6 sm:py-8">
+        <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-5 lg:gap-y-10">
             {displayedVideos.map((video) => (
               <VideoCard 

@@ -404,7 +404,7 @@ function SearchResultsContent() {
     <div className="min-h-screen bg-gray-950">
       <div className="h-16"></div>
       
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8">
         <h1 className="text-lg sm:text-xl text-white font-medium mb-1">
           Search results for <span className="font-normal">"{searchQuery}"</span>
         </h1>
@@ -412,7 +412,7 @@ function SearchResultsContent() {
       </div>
 
       <div className="sticky top-0 bg-gray-950/95 backdrop-blur-md border-b border-gray-800 z-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="container mx-auto px-4 md:px-6 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide w-full sm:w-auto pb-1">
               {PILL_OPTIONS.map(pill => (
@@ -453,7 +453,7 @@ function SearchResultsContent() {
         )}
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8">
         <div className="space-y-6 sm:space-y-8">
           {displayedItems.map((item) => (
             <div key={item.id}>
@@ -566,7 +566,7 @@ function PlayerCard({ player }) {
               <span>ELO {player.faceit_elo}</span>
             </div>
             {player.fpl_rank && (
-              <div className="flex items-center gap-1 text-yellow-400">
+              <div className="flex items-center gap-1 text-brand-yellow">
                 <Users size={12} />
                 <span>{player.fpl_rank}</span>
               </div>
