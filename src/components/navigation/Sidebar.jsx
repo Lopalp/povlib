@@ -111,8 +111,8 @@ export default function Sidebar({ items }) {
         }`}
       >
         {!isSidebarCollapsed && (
-          <div className="bg-brand-yellow text-gray-900 rounded p-3 text-center font-bold text-sm mb-4">
-            Upgrade to Pro for $6.99/mo
+          <div className="border border-brand-yellow text-brand-yellow rounded p-3 text-center text-xs mb-4">
+            Upgrade to Pro for <span className="font-bold">$6.99/mo</span>
           </div>
         )}
         <nav
@@ -134,7 +134,8 @@ export default function Sidebar({ items }) {
           ))}
           {!isSidebarCollapsed && (
             <>
-              <h3 className="mt-6 mb-2 text-xs font-bold uppercase text-gray-400">You</h3>
+              <hr className="border-gray-700 my-4" />
+              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">You</h3>
               {youItems.map((item) => (
                 <Link
                   key={item.label}
@@ -145,8 +146,8 @@ export default function Sidebar({ items }) {
                   <span>{item.label}</span>
                 </Link>
               ))}
-
-              <h3 className="mt-6 mb-2 text-xs font-bold uppercase text-gray-400">Analytics</h3>
+              <hr className="border-gray-700 my-4" />
+              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">Analytics</h3>
               {analyticsItems.map((item) => (
                 <Link
                   key={item.label}
@@ -198,15 +199,15 @@ export default function Sidebar({ items }) {
       {/* Mobile overlay */}
         {isMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
-          <div className="w-64 bg-gray-900/90 backdrop-blur p-6 space-y-4">
+          <div className="w-64 bg-gray-900/90 backdrop-blur p-6 space-y-4 overflow-y-auto sidebar-scrollbar">
             <button
               onClick={() => setIsMenuOpen(false)}
               className="p-2 text-gray-100 hover:text-brand-yellow"
             >
               <X className="h-6 w-6" />
             </button>
-            <div className="bg-brand-yellow text-gray-900 rounded p-3 text-center font-bold text-sm">
-              Upgrade to Pro for $6.99/mo
+            <div className="border border-brand-yellow text-brand-yellow rounded p-3 text-center text-xs">
+              Upgrade to Pro for <span className="font-bold">$6.99/mo</span>
             </div>
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item, index) => (
@@ -220,7 +221,8 @@ export default function Sidebar({ items }) {
                   <span>{item.label}</span>
                 </Link>
               ))}
-              <h3 className="mt-6 mb-2 text-xs font-bold uppercase text-gray-400">You</h3>
+              <hr className="border-gray-700 my-4" />
+              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">You</h3>
               {youItems.map((item) => (
                 <Link
                   key={item.label}
@@ -232,8 +234,8 @@ export default function Sidebar({ items }) {
                   <span>{item.label}</span>
                 </Link>
               ))}
-
-              <h3 className="mt-6 mb-2 text-xs font-bold uppercase text-gray-400">Analytics</h3>
+              <hr className="border-gray-700 my-4" />
+              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">Analytics</h3>
               {analyticsItems.map((item) => (
                 <Link
                   key={item.label}

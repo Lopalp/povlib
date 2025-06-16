@@ -92,18 +92,18 @@ export default function Navbar({
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex flex-grow items-center justify-center space-x-6">
+          <nav className="hidden md:flex flex-grow items-center justify-end space-x-6">
             {/* Search Bar */}
             <div className="flex-grow max-w-xl">
-              <form onSubmit={handleSearchSubmit} className="flex items-center w-full">
+              <form onSubmit={handleSearchSubmit} className="relative w-full">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search demos, players, teams, utilities..."
-                  className="px-4 py-2 rounded-full bg-gray-800 text-gray-100 placeholder-gray-400 focus:outline-none w-full"
+                  className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none"
                 />
-                <button type="submit" className="ml-2">
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
                   <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
                 </button>
               </form>
@@ -181,16 +181,16 @@ export default function Navbar({
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <form
             onSubmit={handleSearchSubmit}
-            className="w-full max-w-md flex items-center bg-gray-800 rounded-full px-4"
+            className="w-full max-w-md relative"
           >
             <input
               type="text"
               value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search demos, players, teams, utilities..."
-              className="flex-grow py-2 bg-transparent placeholder-gray-400 text-white focus:outline-none"
+              className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent placeholder-gray-400 text-white focus:outline-none"
             />
-            <button type="submit">
+            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
               <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
             </button>
           </form>
@@ -202,15 +202,15 @@ export default function Navbar({
         <div className="fixed inset-0 z-40 bg-black/90 backdrop-blur-lg overflow-y-auto">
           <div className="container mx-auto px-4 md:px-6 py-6">
             <nav className="flex flex-col space-y-6">
-              <form onSubmit={handleSearchSubmit} className="flex items-center">
+              <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search demos, players, teams, utilities..."
-                  className="px-4 py-2 rounded-full bg-gray-700 text-gray-100 placeholder-gray-400 w-full focus:outline-none"
+                  className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none"
                 />
-                <button type="submit" className="ml-2">
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
                   <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
                 </button>
               </form>
