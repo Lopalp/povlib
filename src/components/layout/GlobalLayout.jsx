@@ -14,6 +14,7 @@ function GlobalLayoutContent({ children }) {
     setSearchActive,
     isMenuOpen,
     setIsMenuOpen,
+    isSidebarCollapsed,
     demoType,
     handleSwitchDemoType,
   } = useNavbar();
@@ -37,7 +38,17 @@ function GlobalLayoutContent({ children }) {
 
       <div className="flex">
         {shouldShowNavigation && <Sidebar />}
-        <main className={`flex-1 ${shouldShowNavigation ? "md:ml-64" : ""}`}>{children}</main>
+        <main
+          className={`flex-1 ${
+            shouldShowNavigation
+              ? isSidebarCollapsed
+                ? "md:ml-16"
+                : "md:ml-64"
+              : ""
+          }`}
+        >
+          {children}
+        </main>
       </div>
 
       {shouldShowNavigation && <Footer />}
