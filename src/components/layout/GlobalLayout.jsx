@@ -4,6 +4,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import Navbar from "../navigation/Navbar";
 import Footer from "../navigation/Footer";
+import Sidebar from "../navigation/Sidebar";
 import { NavbarProvider, useNavbar } from "../../context/NavbarContext";
 
 function GlobalLayoutContent({ children }) {
@@ -45,6 +46,7 @@ export default function GlobalLayout({ children }) {
   return (
     <NavbarProvider>
       <GlobalLayoutContent>{children}</GlobalLayoutContent>
+      <Sidebar />
     </NavbarProvider>
   );
 }
