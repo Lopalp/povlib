@@ -236,17 +236,25 @@ export default function Home() {
   }, [demoType]);
 
   // Generate video content
-  const generateVideoContent = useCallback((count = 20) => {
-    const allVideos = shuffledDemoResults.map((demo) => ({
+  const buildVideoObjects = useCallback(() => {
+    return shuffledDemoResults.map((demo) => ({
       type: "video",
       demoId: demo.id,
       title: demo.title,
-      thumbnail: demo.thumbnail || VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
-      duration: `${Math.floor(Math.random() * 10) + 5}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+      thumbnail:
+        VIDEO_THUMBNAIL_POOL[
+          Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
+        ],
+      duration: `${Math.floor(Math.random() * 10) + 5}:${String(
+        Math.floor(Math.random() * 60)
+      ).padStart(2, "0")}`,
       views: `${demo.views ?? Math.floor(Math.random() * 999) + 1} views`,
       uploadDate: demo.year || "2024",
       channel: demo.players?.[0] || "Unknown",
-      channelAvatar: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+      channelAvatar:
+        VIDEO_THUMBNAIL_POOL[
+          Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
+        ],
       watched: false,
       player: demo.players?.[0] || "Unknown",
       isPro: demo.isPro,
@@ -254,14 +262,69 @@ export default function Home() {
       tags: demo.tags || [],
       id: `video-${demo.id}-${Date.now()}`,
     }));
-
-    return shuffleArray(allVideos).slice(0, count);
   }, [shuffledDemoResults]);
+
+  const generateVideoContent = useCallback(
+    (count = 20, structured = false) => {
+      const videos = shuffleArray(buildVideoObjects());
+
+      if (!structured) {
+        return videos.slice(0, count);
+      }
+
+      const tagCount = {};
+      shuffledDemoResults.forEach((demo) => {
+        (demo.tags || []).forEach((t) => {
+          tagCount[t] = (tagCount[t] || 0) + 1;
+        });
+      });
+      const eligibleTags = Object.keys(tagCount).filter((t) => tagCount[t] >= 3);
+
+      const pickTag = () => {
+        if (eligibleTags.length === 0) return null;
+        const idx = Math.floor(Math.random() * eligibleTags.length);
+        const tag = eligibleTags[idx];
+        eligibleTags.splice(idx, 1);
+        return tag;
+      };
+
+      const result = [];
+
+      result.push(...videos.splice(0, 6));
+
+      const tag1 = pickTag();
+      if (tag1) {
+        result.push({ type: "category", tag: tag1, id: `cat-${tag1}-1` });
+        const tagVideos1 = shuffleArray(
+          buildVideoObjects().filter((v) => v.tags.includes(tag1))
+        ).slice(0, 3);
+        result.push(...tagVideos1);
+      }
+
+      result.push(...videos.splice(0, 9));
+
+      const tag2 = pickTag();
+      if (tag2) {
+        result.push({ type: "category", tag: tag2, id: `cat-${tag2}-2` });
+        const tagVideos2 = shuffleArray(
+          buildVideoObjects().filter((v) => v.tags.includes(tag2))
+        ).slice(0, 3);
+        result.push(...tagVideos2);
+      }
+
+      if (result.length < count) {
+        result.push(...videos.slice(0, count - result.length));
+      }
+
+      return result.slice(0, count);
+    },
+    [buildVideoObjects, shuffledDemoResults]
+  );
 
   // Initialize content
   useEffect(() => {
     if (!isInitialLoading && shuffledDemoResults.length > 0) {
-      setDisplayedVideos(generateVideoContent(30));
+      setDisplayedVideos(generateVideoContent(30, true));
     }
   }, [isInitialLoading, generateVideoContent, shuffledDemoResults.length]);
 
@@ -335,13 +398,11 @@ export default function Home() {
               {dynamicTags.map((tag) => (
                 <button
                   key={tag}
-                  className={`
-                    px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200
-                    ${activeTag === tag 
+                  className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                    activeTag === tag
                       ? 'bg-brand-yellow text-gray-900 hover:bg-brand-yellow'
-                      : 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700 hover:border-gray-600'
-                    }
-                  `}
+                      : 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
+                  }`}
                   onClick={() => handleTagClick(tag)}
                 >
                   {tag}
@@ -354,13 +415,22 @@ export default function Home() {
         {/* Main Content */}
         <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-5 lg:gap-y-10">
-            {displayedVideos.map((video) => (
-              <VideoCard 
-                key={video.id} 
-                video={video} 
-                onSelectDemo={onSelectDemo}
-                onMenuClick={handleVideoMenuClick}
-              />
+            {displayedVideos.map((item) => (
+              item.type === "category" ? (
+                <h2
+                  key={item.id}
+                  className="col-span-full text-lg font-semibold text-white mt-2"
+                >
+                  {item.tag}
+                </h2>
+              ) : (
+                <VideoCard
+                  key={item.id}
+                  video={item}
+                  onSelectDemo={onSelectDemo}
+                  onMenuClick={handleVideoMenuClick}
+                />
+              )
             ))}
           </div>
           
