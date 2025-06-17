@@ -97,9 +97,12 @@ export default function Sidebar({ items }) {
         }`}
       >
         {!isSidebarCollapsed && (
-          <div className="border border-brand-yellow text-brand-yellow rounded-lg p-3 text-center text-sm font-medium mb-4">
+          <Link
+            href="/checkout?plan=pro"
+            className="border border-brand-yellow text-brand-yellow rounded-lg p-3 text-center text-sm font-medium mb-4 hover:bg-brand-yellow/10"
+          >
             Upgrade to Pro for <span className="font-bold">$6.99/mo</span>
-          </div>
+          </Link>
         )}
         <nav
           className={`flex flex-col space-y-4 ${
@@ -174,9 +177,13 @@ export default function Sidebar({ items }) {
             >
               <X className="h-6 w-6" />
             </button>
-            <div className="border border-brand-yellow text-brand-yellow rounded-lg p-3 text-center text-sm font-medium">
+            <Link
+              href="/checkout?plan=pro"
+              onClick={() => setIsMenuOpen(false)}
+              className="border border-brand-yellow text-brand-yellow rounded-lg p-3 text-center text-sm font-medium hover:bg-brand-yellow/10"
+            >
               Upgrade to Pro for <span className="font-bold">$6.99/mo</span>
-            </div>
+            </Link>
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item, index) => (
                 <Link
