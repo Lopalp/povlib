@@ -15,6 +15,7 @@ export const useNavbar = () => {
 export const NavbarProvider = ({ children }) => {
   const [searchActive, setSearchActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [demoType, setDemoType] = useState("pro");
 
   const handleSwitchDemoType = (newType) => {
@@ -26,6 +27,8 @@ export const NavbarProvider = ({ children }) => {
     setSearchActive,
     isMenuOpen,
     setIsMenuOpen,
+    isSidebarCollapsed,
+    setIsSidebarCollapsed,
     demoType,
     setDemoType,
     handleSwitchDemoType,

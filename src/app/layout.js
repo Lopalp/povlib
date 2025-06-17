@@ -1,6 +1,5 @@
 import "./globals.css";
 import UserProvider from "../../context/UserProvider";
-import { Poppins } from "next/font/google";
 import GlobalLayout from "../components/layout/GlobalLayout";
 import { CookieConsentProvider } from "../context/CookieConsentContext";
 import CookieConsentBanner from "../components/CookieConsentBanner";
@@ -21,7 +20,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`dark ${poppins.className}`}>
+    <html lang="en" className="dark">
       <body className="bg-gray-900 text-white">
         <UserProvider>
           <CookieConsentProvider>

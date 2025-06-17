@@ -9,7 +9,8 @@ import FilterModal from "../../components/modals/FilterModal";
 import HeroHeading from "../../components/headings/HeroHeading";
 import ErrorDisplay from "../../components/error/ErrorDisplay";
 
-import { getAllPlayers, getFilterOptions } from "@/lib/supabase";
+import { getAllPlayers } from "@/lib/db/players";
+import { getFilterOptions } from "@/lib/db/filters";
 
 const PlayersIndex = () => {
   const { demoType, handleSwitchDemoType } = useNavbar();
@@ -156,7 +157,7 @@ const PlayersIndex = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-brand-yellow rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg font-medium">Loading players...</p>
         </div>
       </div>
@@ -175,7 +176,7 @@ const PlayersIndex = () => {
       {/* Hero Header */}
       <div className="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>
-        <div className="container mx-auto px-6 text-center">
+        <div className="container mx-auto px-4 md:px-6 text-center">
           <div className="mt-20"></div>
           <HeroHeading>CS2 Pro Players</HeroHeading>
           <p className="text-gray-300 max-w-2xl mx-auto mb-8">
@@ -191,14 +192,14 @@ const PlayersIndex = () => {
                 placeholder="Search players by name or team..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full p-4 pl-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-yellow-400"
+                className="w-full p-4 pl-12 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-brand-yellow"
               />
               <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
 
               <button
                 type="button"
                 onClick={() => setIsFilterModalOpen(true)}
-                className="absolute right-3 top-3 p-1 bg-gray-700 hover:bg-yellow-400 hover:text-gray-900 rounded-lg transition-colors"
+                className="absolute right-3 top-3 p-1 bg-gray-700 hover:bg-brand-yellow hover:text-gray-900 rounded-lg transition-colors"
               >
                 <Filter className="h-5 w-5" />
               </button>
@@ -208,18 +209,18 @@ const PlayersIndex = () => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-4 md:px-6 py-12">
         {/* Filter tags */}
         {filtersApplied.team && (
           <div className="mb-8 flex items-center">
             <span className="text-gray-400 mr-2">Filtered by:</span>
-            <div className="bg-gray-800 px-3 py-1 rounded-full text-yellow-400 text-sm font-medium flex items-center">
+            <div className="bg-gray-800 px-3 py-1 rounded-full text-brand-yellow text-sm font-medium flex items-center">
               Team: {filtersApplied.team}
               <button
                 onClick={() =>
                   setFiltersApplied((prev) => ({ ...prev, team: "" }))
                 }
-                className="ml-2 text-gray-400 hover:text-yellow-400"
+                className="ml-2 text-gray-400 hover:text-brand-yellow"
               >
                 &times;
               </button>
@@ -261,7 +262,7 @@ const PlayersIndex = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64 bg-gray-800/50 rounded-xl border border-gray-700">
-            <div className="text-yellow-400 text-6xl mb-4">
+            <div className="text-brand-yellow text-6xl mb-4">
               <Users />
             </div>
             <h3 className="text-white text-xl font-bold mb-2">
@@ -271,7 +272,7 @@ const PlayersIndex = () => {
             {(searchQuery || filtersApplied.team) && (
               <button
                 onClick={handleResetFilters}
-                className="mt-4 px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
+                className="mt-4 px-4 py-2 bg-brand-yellow text-gray-900 font-bold rounded-lg"
               >
                 Reset Filters
               </button>
@@ -281,7 +282,7 @@ const PlayersIndex = () => {
 
         {isLoading && (
           <div className="flex justify-center mt-8">
-            <div className="w-10 h-10 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-gray-600 border-t-brand-yellow rounded-full animate-spin"></div>
           </div>
         )}
 

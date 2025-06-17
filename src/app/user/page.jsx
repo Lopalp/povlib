@@ -8,7 +8,7 @@ import ComparePlansModal from "../../components/modals/ComparePlansModal";
 import CreateDemoModal from "../../components/modals/CreateDemoModal";
 import { CategorySection } from "../../components/features/CategorySection";
 import UtilityBook from "../../components/features/UtilityBook";
-import { getFilteredDemos } from "@/lib/supabase";
+import { getFilteredDemos } from "@/lib/db/demos";
 import { UserContext } from "../../../context/UserContext";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
 import { PrimaryButton } from "../../components/buttons";

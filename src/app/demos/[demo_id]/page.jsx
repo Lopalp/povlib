@@ -8,12 +8,12 @@ import { LoadingFullscreen } from "../../../components/loading/LoadingFullscreen
 import ErrorDisplay from "../../../components/error/ErrorDisplay";
 import {
   getDemoById,
-  getFilterOptions,
   updateDemoStats,
   updateDemoTags,
   updateDemoPositions,
   getFilteredDemos,
-} from "../../../lib/supabase";
+} from "@/lib/db/demos";
+import { getFilterOptions } from "@/lib/db/filters";
 
 // Map demo data to the format expected by VideoPlayerPage
 const mapDemoData = (demo) => ({

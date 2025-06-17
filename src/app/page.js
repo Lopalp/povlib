@@ -8,35 +8,76 @@ import React, {
   useCallback,
 } from "react";
 import Link from "next/link";
-import { Search, Filter, X, Menu } from "lucide-react";
+import { Search, Filter, X, Menu, ChevronLeft, ChevronRight, MoreVertical } from "lucide-react";
 import {
   getFilteredDemos,
   getTrendingDemos,
   getLatestDemos,
   getDemosByMap,
   getDemosByPosition,
-  getFilterOptions,
   updateDemoStats,
   updateDemoTags,
   updateDemoPositions,
-  getPlayerInfo,
-} from "../lib/supabase";
+} from "../lib/db/demos";
+import { getFilterOptions } from "../lib/db/filters";
+import { getPlayerInfo } from "../lib/db/players";
 import { useRouter } from "next/navigation";
-import VideoPlayerPage from "../components/features/VideoPlayerPage";
-import TaggingModal from "../components/modals/TaggingModal";
-import FilterModal from "../components/modals/FilterModal";
-
-import CompetitionModule from "../components/features/CompetitionModule";
 import FeaturedHero from "../components/features/FeaturedHero";
-import SelectedFilters from "../components/misc/SelectedFilters";
-import { CategorySection } from "../components/features/CategorySection";
-import { LoadingFullscreen } from "../components/loading/LoadingFullscreen";
-import PlanComparisonModule from "../components/features/PlanComparisonModule";
-import UnderConstructionModal from "../components/modals/UnderConstructionModal";
-import { Tag } from "../components/tags";
 import { UserContext } from "../../context/UserContext.js";
 import { createSupabaseBrowserClient } from "../lib/supabaseClient.js";
 import { useNavbar } from "../context/NavbarContext";
+
+const VIDEO_THUMBNAIL_POOL = [
+  "/img/1.png",
+  "/img/2.png",
+  "/img/3.png",
+  "/img/4.png",
+  "/img/5.png",
+  "/img/6.png",
+  "/img/7.png",
+  "/img/8.png",
+  "/img/v2.png",
+  "/img/v3.png",
+];
+
+const THUMBNAIL_IMAGE = "https://images.unsplash.com/photo-1749731630653-d9b3f00573ed?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
+// Comprehensive tag list for sections
+const ALL_TAGS = [
+  // Gameplay Tags
+  "Ace", "Clutch", "1v5", "1v4", "1v3", "1v2", "Spray Control", "Flick Shots", "Quick Scope",
+  "No Scope", "Wallbang", "Headshot", "Multi Kill", "Team Wipe", "Comeback", "Highlight",
+  
+  // Map Specific
+  "Mirage", "Dust2", "Inferno", "Cache", "Overpass", "Vertigo", "Nuke", "Train", "Cobblestone",
+  "Ancient", "Anubis", "A Site", "B Site", "Mid Control", "Connector", "Apps", "Palace",
+  
+  // Position Based
+  "CT Side", "T Side", "Retake", "Site Execute", "Rush", "Eco Round", "Force Buy", "Anti-Eco",
+  "Save Round", "Pistol Round", "Bomb Plant", "Defuse", "Rotate", "Stack", "Split",
+  
+  // Utility
+  "Smoke Lineup", "Flash Bang", "HE Grenade", "Molotov", "Incendiary", "Pop Flash", "One Way",
+  "Crossfire", "Trade Kill", "Bait", "Support", "Entry Frag", "Lurk Play",
+  
+  // Professional
+  "Pro Match", "Major", "Tournament", "BLAST", "ESL", "IEM", "FACEIT", "HLTV Top 20",
+  "MVP Performance", "Legendary Play", "Historic Moment", "Championship", "Finals",
+  
+  // Skill Level
+  "Global Elite", "Supreme", "Legendary Eagle", "Distinguished Master", "FACEIT Level 10",
+  "Professional", "Semi-Pro", "Rising Star", "Upcoming Talent", "Veteran",
+  
+  // Teams
+  "NAVI", "Astralis", "FaZe", "G2", "Vitality", "NIP", "Fnatic", "Cloud9", "Liquid",
+  "ENCE", "Heroic", "Complexity", "MIBR", "Dignitas", "Mouz", "BIG", "Spirit",
+  
+  // Special
+  "Insane Shots", "Lucky Plays", "Funny Moments", "Fails", "Best of 2024", "Trending Now",
+  "Must Watch", "Community Favorites", "Editor's Pick", "Viral Clips", "Reaction Worthy"
+];
+
+const shuffleArray = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
 const mapDemo = (demo) => ({
   id: demo.id,
@@ -133,61 +174,39 @@ export default function Home() {
   const [filteredDemos, setFilteredDemos] = useState([]);
   const [trendingDemos, setTrendingDemos] = useState([]);
   const [latestDemos, setLatestDemos] = useState([]);
-  const [mapDemos, setMapDemos] = useState({});
-  const [positionDemos, setPositionDemos] = useState({});
-  const [filterOptions, setFilterOptions] = useState({
-    maps: [],
-    positions: {},
-    teams: [],
-    years: [],
-    events: [],
-    results: [],
-    players: [],
-  });
-  const [filtersApplied, setFiltersApplied] = useState({
-    map: "",
-    position: "",
-    player: "",
-    team: "",
-    year: "",
-    event: "",
-    result: "",
-    search: searchQuery,
-  });
+  const [displayedVideos, setDisplayedVideos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [activeTag, setActiveTag] = useState(null);
+  const [selectedDemo, setSelectedDemo] = useState(null);
+  const [activeVideoId, setActiveVideoId] = useState("");
+  const [videoModal, setVideoModal] = useState({ isOpen: false, video: null });
 
-  // Dynamische Tags
+  // Shuffled results for variety
+  const shuffledDemoResults = useMemo(() => shuffleArray([...filteredDemos, ...trendingDemos, ...latestDemos]), [filteredDemos, trendingDemos, latestDemos]);
+
+  // Dynamic Tags for tag bar
   const dynamicTags = useMemo(() => {
     const tagsSet = new Set();
-    filteredDemos.forEach((demo) => {
+    shuffledDemoResults.forEach((demo) => {
       demo.tags.forEach((tag) => tagsSet.add(tag));
     });
-    tagsSet.add("Maps");
-    tagsSet.add("Players");
-    tagsSet.add("Teams");
-    tagsSet.add("Map + CT Position");
+    
+    // Add some static popular tags
+    ["Maps", "Players", "Teams", "Pro Matches", "Highlights", "Clutches", "Aces"].forEach(tag => tagsSet.add(tag));
+    
     const allTags = Array.from(tagsSet);
+    // Shuffle and take first 8-10 tags
+    const shuffled = shuffleArray(allTags);
+    return shuffled.slice(0, 9);
+  }, [shuffledDemoResults]);
 
-    // Shuffle the array randomly
-    for (let i = allTags.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [allTags[i], allTags[j]] = [allTags[j], allTags[i]];
-    }
-    return allTags.slice(0, 5); // Take only the first 5 elements
-  }, [filteredDemos]);
-
-  // Helper functions for Map/Positions filters
-  const getFilteredDemosByMap = useCallback(
-    (map) => mapDemos[map] || [],
-    [mapDemos]
-  );
-  const getFilteredDemosByPosition = useCallback(
-    (position) => positionDemos[position] || [],
-    [positionDemos]
-  );
+  const handleTagClick = (tag) => {
+    setActiveTag(activeTag === tag ? null : tag);
+  };
 
   // User Authentication Effect
   useEffect(() => {
-    // Attempt to get the session on initial load
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
@@ -200,7 +219,6 @@ export default function Home() {
         setLoading(false);
       });
 
-    // Listen for auth state changes (login, logout)
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session) {
@@ -213,516 +231,374 @@ export default function Home() {
       }
     );
 
-    // Cleanup listener on component unmount
     return () => {
       authListener?.subscription.unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      console.debug("User changed:", user);
-    }
-  }, [user]);
 
   // Load initial data
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         console.log("Starting to load initial data...");
-        setIsLoading(true);
-        const options = await getFilterOptions();
-        setFilterOptions(options);
-        console.log("Filter options loaded:", options);
+        setIsInitialLoading(true);
 
         const [demos, trending, latest] = await Promise.all([
-          getFilteredDemos(filtersApplied, demoType),
-          getTrendingDemos(5, demoType),
-          getLatestDemos(5, demoType),
+          getFilteredDemos({}, demoType),
+          getTrendingDemos(20, demoType),
+          getLatestDemos(20, demoType),
         ]);
 
-        console.log("Raw demos from Supabase:", demos);
-        console.log("Raw trending:", trending);
-        console.log("Raw latest:", latest);
-
-        // If no demos from database, use fallback data
         if (!demos || demos.length === 0) {
           console.warn("No demos found in database, using fallback data");
-          const fallbackDemos = [
-            {
-              id: 999,
-              title: "Fallback Demo - s1mple Ace on Mirage",
-              thumbnail: "/img/1.png",
-              video_id: "dQw4w9WgXcQ",
-              map: "Mirage",
-              positions: ["A Site", "Connector"],
-              tags: ["ace", "clutch"],
-              players: ["s1mple"],
-              team: "NAVI",
-              year: "2024",
-              event: "BLAST Premier",
-              result: "Win",
-              views: 15420,
-              likes: 892,
-              is_pro: true,
-            },
-          ];
+          const fallbackDemos = Array.from({ length: 50 }).map((_, i) => ({
+            id: 1000 + i,
+            title: `${["Epic Ace", "Insane Clutch", "Perfect Spray", "Lucky Shot", "Team Wipe"][Math.floor(Math.random() * 5)]} on ${["Mirage", "Dust2", "Inferno", "Cache"][Math.floor(Math.random() * 4)]}`,
+            thumbnail: VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)],
+            video_id: "dQw4w9WgXcQ",
+            map: ["Mirage", "Dust2", "Inferno", "Cache", "Overpass"][Math.floor(Math.random() * 5)],
+            positions: [["A Site", "B Site", "Mid"][Math.floor(Math.random() * 3)]],
+            tags: shuffleArray(ALL_TAGS).slice(0, Math.floor(Math.random() * 5) + 2),
+            players: [["s1mple", "ZywOo", "sh1ro", "electroNic", "Ax1Le"][Math.floor(Math.random() * 5)]],
+            team: ["NAVI", "Vitality", "FaZe", "G2", "Astralis"][Math.floor(Math.random() * 5)],
+            year: "2024",
+            event: ["BLAST Premier", "IEM Katowice", "ESL Pro League"][Math.floor(Math.random() * 3)],
+            result: ["Win", "Loss"][Math.floor(Math.random() * 2)],
+            views: Math.floor(Math.random() * 50000) + 1000,
+            likes: Math.floor(Math.random() * 1000) + 100,
+            is_pro: Math.random() > 0.3,
+          }));
+          
           setFilteredDemos(fallbackDemos.map(mapDemo));
-          setTrendingDemos(fallbackDemos.map(mapDemo));
-          setLatestDemos(fallbackDemos.map(mapDemo));
+          setTrendingDemos(fallbackDemos.slice(0, 15).map(mapDemo));
+          setLatestDemos(fallbackDemos.slice(15, 30).map(mapDemo));
         } else {
           const mappedDemos = demos.map(mapDemo);
-          console.log("Mapped demos:", mappedDemos);
           setFilteredDemos(mappedDemos);
-
-          const mappedTrending = trending.map(mapDemo);
-          console.log("Mapped trending:", mappedTrending);
-          setTrendingDemos(mappedTrending);
-
-          const mappedLatest = latest.map(mapDemo);
-          setLatestDemos(mappedLatest);
+          setTrendingDemos(trending.map(mapDemo));
+          setLatestDemos(latest.map(mapDemo));
         }
 
-        setIsLoading(false);
+        setIsInitialLoading(false);
         console.log("Initial data loading completed");
       } catch (error) {
         console.error("Error loading initial data:", error);
-
-        // Use fallback data on error
-        console.warn("Database error occurred, using fallback data");
-        const fallbackDemos = [
-          {
-            id: 998,
-            title: "Error Fallback - Test Video",
-            thumbnail: "/img/1.png",
-            video_id: "dQw4w9WgXcQ",
-            map: "Mirage",
-            positions: ["A Site"],
-            tags: ["test"],
-            players: ["TestPlayer"],
-            team: "TestTeam",
-            year: "2024",
-            event: "Test Event",
-            result: "Win",
-            views: 1000,
-            likes: 50,
-            is_pro: true,
-          },
-        ];
-        setFilteredDemos(fallbackDemos.map(mapDemo));
-        setTrendingDemos(fallbackDemos.map(mapDemo));
-        setLatestDemos(fallbackDemos.map(mapDemo));
-
-        setError(`Database connection failed: ${error.message}`);
-        setIsLoading(false);
+        setIsInitialLoading(false);
       }
     };
 
     loadInitialData();
   }, [demoType]);
 
-  // Watch for filter changes and update demos
+  // Generate video content
+  const buildVideoObjects = useCallback(() => {
+    return shuffledDemoResults.map((demo) => ({
+      type: "video",
+      demoId: demo.id,
+      title: demo.title,
+      thumbnail:
+        VIDEO_THUMBNAIL_POOL[
+          Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
+        ],
+      duration: `${Math.floor(Math.random() * 10) + 5}:${String(
+        Math.floor(Math.random() * 60)
+      ).padStart(2, "0")}`,
+      views: `${demo.views ?? Math.floor(Math.random() * 999) + 1} views`,
+      uploadDate: demo.year || "2024",
+      channel: demo.players?.[0] || "Unknown",
+      channelAvatar:
+        VIDEO_THUMBNAIL_POOL[
+          Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)
+        ],
+      watched: false,
+      player: demo.players?.[0] || "Unknown",
+      isPro: demo.isPro,
+      map: demo.map,
+      tags: demo.tags || [],
+      id: `video-${demo.id}-${Date.now()}`,
+    }));
+  }, [shuffledDemoResults]);
+
+  const generateVideoContent = useCallback(
+    (count = 20, structured = false) => {
+      const videos = shuffleArray(buildVideoObjects());
+
+      if (!structured) {
+        return videos.slice(0, count);
+      }
+
+      const tagCount = {};
+      shuffledDemoResults.forEach((demo) => {
+        (demo.tags || []).forEach((t) => {
+          tagCount[t] = (tagCount[t] || 0) + 1;
+        });
+      });
+      const eligibleTags = Object.keys(tagCount).filter((t) => tagCount[t] >= 3);
+
+      const pickTag = () => {
+        if (eligibleTags.length === 0) return null;
+        const idx = Math.floor(Math.random() * eligibleTags.length);
+        const tag = eligibleTags[idx];
+        eligibleTags.splice(idx, 1);
+        return tag;
+      };
+
+      const result = [];
+
+      result.push(...videos.splice(0, 6));
+
+      const tag1 = pickTag();
+      if (tag1) {
+        result.push({ type: "category", tag: tag1, id: `cat-${tag1}-1` });
+        const tagVideos1 = shuffleArray(
+          buildVideoObjects().filter((v) => v.tags.includes(tag1))
+        ).slice(0, 3);
+        result.push(...tagVideos1);
+      }
+
+      result.push(...videos.splice(0, 9));
+
+      const tag2 = pickTag();
+      if (tag2) {
+        result.push({ type: "category", tag: tag2, id: `cat-${tag2}-2` });
+        const tagVideos2 = shuffleArray(
+          buildVideoObjects().filter((v) => v.tags.includes(tag2))
+        ).slice(0, 3);
+        result.push(...tagVideos2);
+      }
+
+      if (result.length < count) {
+        result.push(...videos.slice(0, count - result.length));
+      }
+
+      return result.slice(0, count);
+    },
+    [buildVideoObjects, shuffledDemoResults]
+  );
+
+  // Initialize content
   useEffect(() => {
-    const updateFilteredDemos = async () => {
-      try {
-        const demos = await getFilteredDemos(filtersApplied, demoType);
-        const mappedDemos = demos.map(mapDemo);
-        setFilteredDemos(mappedDemos);
-        if (mappedDemos.length > 0 && !activeVideoId) {
-          setActiveVideoId(mappedDemos[0].videoId);
-        }
-      } catch (err) {
-        console.error("Error updating filtered demos:", err);
+    if (!isInitialLoading && shuffledDemoResults.length > 0) {
+      setDisplayedVideos(generateVideoContent(30, true));
+    }
+  }, [isInitialLoading, generateVideoContent, shuffledDemoResults.length]);
+
+  // Infinite scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isLoading || isInitialLoading) return;
+      
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const documentHeight = document.documentElement.offsetHeight;
+      
+      if (scrollPosition >= documentHeight - 1000) {
+        setIsLoading(true);
+        setTimeout(() => {
+          setDisplayedVideos(prev => [...prev, ...generateVideoContent(20)]);
+          setIsLoading(false);
+        }, 500);
       }
     };
 
-    updateFilteredDemos();
-  }, [filtersApplied, demoType, activeVideoId]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [generateVideoContent, isLoading, isInitialLoading]);
 
-  // Load map-specific demos
-  const loadMapDemos = async (map) => {
-    try {
-      const demos = await getDemosByMap(map, demoType);
-      const mappedDemos = demos.map(mapDemo);
-      setMapDemos((prev) => ({
-        ...prev,
-        [map]: mappedDemos,
-      }));
-    } catch (err) {
-      console.error(`Error loading demos for map ${map}:`, err);
-    }
-  };
-
-  // Load position-specific demos
-  const loadPositionDemos = async (position) => {
-    try {
-      const demos = await getDemosByPosition(position, demoType);
-      const mappedDemos = demos.map(mapDemo);
-      setPositionDemos((prev) => ({
-        ...prev,
-        [position]: mappedDemos,
-      }));
-    } catch (err) {
-      console.error(`Error loading demos for position ${position}:`, err);
-    }
-  };
-
-  // Load demos for maps we want to display
-  useEffect(() => {
-    if (!filtersApplied.map) {
-      loadMapDemos("Mirage");
-      loadMapDemos("Inferno");
-    }
-  }, [filtersApplied.map, demoType]);
-
-  // Update views for active video
-  useEffect(() => {
-    if (activeVideoId && filteredDemos.length > 0) {
-      const updateViews = async () => {
-        try {
-          // Find the demo with the matching video ID
-          const demo = filteredDemos.find((d) => d.videoId === activeVideoId);
-          if (demo) {
-            await updateDemoStats(demo.id, "views");
-            const updateList = (list) =>
-              list.map((demo) =>
-                demo.videoId === activeVideoId
-                  ? { ...demo, views: demo.views + 1 }
-                  : demo
-              );
-            setFilteredDemos(updateList);
-            setTrendingDemos(updateList);
-            setLatestDemos(updateList);
-          }
-        } catch (err) {
-          console.error("Error updating views:", err);
-        }
-      };
-      updateViews();
-    }
-  }, [activeVideoId, filteredDemos.length]);
-
-  // Generic function to update demo across all lists
-  const handleDemoUpdate = async (demoId, updateFn, updater) => {
-    try {
-      await updateFn(demoId);
-      const updateList = (list) =>
-        list.map((demo) => (demo.id === demoId ? updater(demo) : demo));
-
-      setFilteredDemos(updateList);
-      setTrendingDemos(updateList);
-      setLatestDemos(updateList);
-      setMapDemos((prev) => {
-        const updated = {};
-        Object.keys(prev).forEach((key) => {
-          updated[key] = updateList(prev[key]);
-        });
-        return updated;
-      });
-    } catch (err) {
-      console.error("Error updating demo:", err);
-    }
-  };
-
-  const handleLikeDemo = async (demoId) => {
-    await handleDemoUpdate(
-      demoId,
-      (id) => updateDemoStats(id, "likes"),
-      (demo) => ({ ...demo, likes: demo.likes + 1 })
-    );
-  };
-
-  const handleUpdateTags = async (demoId, tags) => {
-    await handleDemoUpdate(
-      demoId,
-      (id) => updateDemoTags(id, tags),
-      (demo) => ({ ...demo, tags })
-    );
-    const updateList = (list) =>
-      list.map((demo) => (demo.id === demoId ? { ...demo, tags } : demo));
-
-    setFilteredDemos(updateList);
-    setTrendingDemos(updateList);
-    setLatestDemos(updateList);
-    setMapDemos((prev) => {
-      const updated = {};
-      Object.keys(prev).forEach((key) => {
-        updated[key] = updateList(prev[key]);
-      });
-      return updated;
-    });
-  };
-
-  const handleUpdatePositions = async (demoId, positions) => {
-    await handleDemoUpdate(
-      demoId,
-      (id) => updateDemoPositions(id, positions),
-      (demo) => ({ ...demo, positions })
-    );
-    const updateList = (list) =>
-      list.map((demo) => (demo.id === demoId ? { ...demo, positions } : demo));
-
-    setFilteredDemos(updateList);
-    setTrendingDemos(updateList);
-    setLatestDemos(updateList);
-    setPositionDemos((prev) => {
-      const updated = {};
-      Object.keys(prev).forEach((key) => {
-        updated[key] = updateList(prev[key]);
-      });
-      return updated;
-    });
-  };
-
-  const recentlyAddedDemos = useMemo(() => {
-    if (activeTag === null) {
-      return filteredDemos.slice(0, 12);
-    } else {
-      return filteredDemos.filter((demo) => demo.tags.includes(activeTag));
-    }
-  }, [activeTag, filteredDemos]);
-
-  // Video selection and navigation
+  // Video selection
   const onSelectDemo = (demo) => {
-    router.push(`/demos/${demo.id}`);
+    router.push(`/demos/${demo.demoId}`);
   };
 
-  const onCloseVideoPlayer = () => {
-    setSelectedDemo(null);
-    setActiveVideoId("");
-    setIsVideoPlayerPage(false);
+  // Video modal handlers
+  const handleVideoMenuClick = (video, event) => {
+    event.stopPropagation();
+    setVideoModal({ isOpen: true, video });
   };
 
-  if (isLoading && !filteredDemos.length) {
-    return <LoadingFullscreen />;
-  }
+  const closeVideoModal = () => {
+    setVideoModal({ isOpen: false, video: null });
+  };
 
-  if (error) {
+  if (isInitialLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6 bg-gray-800 rounded-xl shadow-lg">
-          <div className="text-red-500 text-5xl mb-4">!</div>
-          <h2 className="text-white text-2xl font-bold mb-2">
-            Error Loading Data
-          </h2>
-          <p className="text-gray-300 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-yellow-400 text-gray-900 font-bold rounded-lg"
-          >
-            Retry
-          </button>
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-2 border-gray-600 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading content...</p>
         </div>
       </div>
-    );
-  }
-
-  if (isVideoPlayerPage && selectedDemo) {
-    return (
-      <>
-        <VideoPlayerPage
-          selectedDemo={selectedDemo}
-          onClose={onCloseVideoPlayer}
-          onLike={handleLikeDemo}
-          onOpenTagModal={() => setIsTaggingModalOpen(true)}
-          user={user}
-          session={session}
-        />
-        {isTaggingModalOpen && selectedDemo && (
-          <TaggingModal
-            selectedDemo={selectedDemo}
-            filterOptions={filterOptions}
-            onClose={() => setIsTaggingModalOpen(false)}
-            onUpdateTags={handleUpdateTags}
-            onUpdatePositions={handleUpdatePositions}
-            user={user}
-            session={session}
-          />
-        )}
-      </>
     );
   }
 
   return (
     <main>
-      <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 text-white">
-        <style jsx>{`
-          .bg-pattern {
-            background-image: radial-gradient(
-              rgba(255, 255, 255, 0.05) 1px,
-              transparent 1px
-            );
-            background-size: 20px 20px;
-          }
-        `}</style>
-
-        <UnderConstructionModal
-          isOpen={isUnderConstructionOpen}
-          onClose={() => setIsUnderConstructionOpen(false)}
-        />
-
-        {filteredDemos.length > 0 && !selectedDemo && (
+      <div className="min-h-screen bg-gray-950 text-white">
+        {/* Featured Hero */}
+        {filteredDemos.length > 0 && (
           <FeaturedHero
             demo={filteredDemos[0]}
-            autoplayVideo={autoplayVideo}
+            autoplayVideo={true}
             setSelectedDemo={onSelectDemo}
             setActiveVideoId={setActiveVideoId}
-            setIsFilterModalOpen={setIsFilterModalOpen}
+            setIsFilterModalOpen={() => {}}
             user={user}
             session={session}
           />
         )}
-
-        <div className="container mx-auto px-6 pt-8 pb-12 bg-pattern">
-          <SelectedFilters
-            filtersApplied={filtersApplied}
-            setFiltersApplied={setFiltersApplied}
-            searchQuery={searchQuery}
-          />
-          {/* Filter Icon + Tag Bar */}
-          <div className="flex items-center gap-2 mb-4">
-            <Filter
-              onClick={() => setIsFilterModalOpen(true)}
-              className="text-yellow-400 cursor-pointer"
-            />
-            <div className="flex flex-wrap items-center gap-2">
+        
+        {/* Tag Bar */}
+        <div className="bg-gray-950 border-b border-gray-800">
+          <div className="container mx-auto px-4 md:px-6 py-4">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide">
               {dynamicTags.map((tag) => (
-                <Tag
+                <button
                   key={tag}
-                  variant="secondary"
-                  size="xs"
-                  className="cursor-pointer hover:border-yellow-400 transition-colors"
+                  className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all duration-200 ${
+                    activeTag === tag
+                      ? 'bg-brand-yellow text-gray-900 hover:bg-brand-yellow'
+                      : 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
+                  }`}
                   onClick={() => handleTagClick(tag)}
                 >
                   {tag}
-                </Tag>
+                </button>
               ))}
-              <Link
-                href="/demos"
-                className="text-yellow-400 text-sm underline hover:text-yellow-500 transition-colors"
-              >
-                View All Demos
-              </Link>
             </div>
           </div>
-          {/* Category Sections */}
-          <CategorySection
-            title={activeTag === null ? "Recently Added" : activeTag}
-            demos={recentlyAddedDemos}
-            onSelectDemo={onSelectDemo}
-            onTagClick={handleTagClick}
-            user={user}
-            session={session}
-          />
-          {/* Competition Module */}
-          <div className="mt-8">
-            <CompetitionModule user={user} session={session} />
+        </div>
+        
+        {/* Main Content */}
+        <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 lg:gap-x-5 lg:gap-y-10">
+            {displayedVideos.map((item) => (
+              item.type === "category" ? (
+                <h2
+                  key={item.id}
+                  className="col-span-full text-lg font-semibold text-white mt-2"
+                >
+                  {item.tag}
+                </h2>
+              ) : (
+                <VideoCard
+                  key={item.id}
+                  video={item}
+                  onSelectDemo={onSelectDemo}
+                  onMenuClick={handleVideoMenuClick}
+                />
+              )
+            ))}
           </div>
-          {/* Plan Comparison Module inserted directly under CompetitionModule */}
-          <div className="mt-8">
-            <PlanComparisonModule
-              currentPlan={currentPlan}
-              onUpgrade={handleUpgrade}
-              user={user}
-              session={session}
-            />
-          </div>
-          {!filtersApplied.map && (
-            <>
-              <CategorySection
-                title="Mirage POVs"
-                demos={getFilteredDemosByMap("Mirage")}
-                onSelectDemo={onSelectDemo}
-                user={user}
-                session={session}
-              />
-              <CategorySection
-                title="Inferno POVs"
-                demos={getFilteredDemosByMap("Inferno")}
-                onSelectDemo={onSelectDemo}
-                user={user}
-                session={session}
-              />
-            </>
+          
+          {isLoading && (
+            <div className="flex justify-center py-8 sm:py-12">
+              <div className="w-6 h-6 border-2 border-gray-600 border-t-white rounded-full animate-spin" />
+            </div>
           )}
-          {/* Revised Navigation Cards Below */}
-          <section className="mt-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <Link
-                href="/players"
-                className="relative block rounded-2xl overflow-hidden shadow-lg group"
-              >
-                <img
-                  src="/images/players-example.png"
-                  alt="Players"
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold group-hover:underline">
-                    Players
-                  </h3>
-                  <p className="text-gray-300">View all players</p>
-                </div>
-              </Link>
-              <Link
-                href="/maps"
-                className="relative block rounded-2xl overflow-hidden shadow-lg group"
-              >
-                <img
-                  src="/img/maps.png"
-                  alt="Maps"
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                  <h3 className="text-white text-2xl font-bold group-hover:underline">
-                    Maps
-                  </h3>
-                  <p className="text-gray-300 text-center">View all maps</p>
-                </div>
-              </Link>
-            </div>
-          </section>
         </div>
 
-        {isFilterModalOpen && (
-          <FilterModal
-            demoType={demoType}
-            filterOptions={filterOptions}
-            filtersApplied={filtersApplied}
-            onClose={() => setIsFilterModalOpen(false)}
-            onFilterChange={(changed) =>
-              setFiltersApplied((prev) => ({ ...prev, ...changed }))
-            }
-            onResetFilters={() =>
-              setFiltersApplied({
-                map: "",
-                position: "",
-                player: "",
-                team: "",
-                year: "",
-                event: "",
-                result: "",
-                search: searchQuery,
-              })
-            }
-            onApplyFilters={() => setIsFilterModalOpen(false)}
-            user={user}
-            session={session}
-          />
-        )}
-
-        {isTaggingModalOpen && selectedDemo && (
-          <TaggingModal
-            selectedDemo={selectedDemo}
-            filterOptions={filterOptions}
-            onClose={() => setIsTaggingModalOpen(false)}
-            onUpdateTags={handleUpdateTags}
-            onUpdatePositions={handleUpdatePositions}
-            user={user}
-            session={session}
+        {/* Video Modal */}
+        {videoModal.isOpen && (
+          <VideoModal 
+            video={videoModal.video} 
+            onClose={closeVideoModal} 
           />
         )}
       </div>
     </main>
+  );
+}
+
+// Simplified Video Card Component
+function VideoCard({ video, onSelectDemo, onMenuClick }) {
+  const handleClick = () => onSelectDemo(video);
+
+  return (
+    <div className="group cursor-pointer">
+      <div className="space-y-3">
+        {/* Thumbnail */}
+        <div className="relative w-full" onClick={handleClick}>
+          <img 
+            src={video.thumbnail} 
+            alt={video.title} 
+            className="w-full aspect-video object-cover rounded-xl" 
+          />
+          <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
+            {video.duration}
+          </div>
+          {video.watched && (
+            <div className="absolute bottom-0 left-0 w-2/3 h-1 bg-blue-500 rounded-b-xl" />
+          )}
+        </div>
+        
+        {/* Content */}
+        <div className="space-y-2">
+          <div className="flex gap-3">
+            <img 
+              src={video.channelAvatar} 
+              alt={video.channel} 
+              className="w-9 h-9 rounded-full flex-shrink-0" 
+              onClick={handleClick}
+            />
+            <div className="flex-1 min-w-0" onClick={handleClick}>
+              <h3 className="text-white text-sm font-medium leading-5 mb-1 group-hover:text-gray-200 transition-colors line-clamp-2">
+                {video.title}
+              </h3>
+              
+              <div className="space-y-1">
+                <div className="flex items-center gap-1 text-gray-500 text-xs">
+                  <span>{video.views}</span>
+                  <span>•</span>
+                  <span>{video.uploadDate}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Three Dots Menu */}
+            <button 
+              className="p-1 hover:bg-gray-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+              onClick={(e) => onMenuClick(video, e)}
+            >
+              <MoreVertical className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Video Modal Component
+function VideoModal({ video, onClose }) {
+  const menuItems = [
+    { icon: "📋", label: "Add to queue" },
+    { icon: "🕒", label: "Save to Watch Later" },
+    { icon: "📁", label: "Save to playlist" },
+    { icon: "📤", label: "Share" },
+    { icon: "🚫", label: "Not interested" },
+    { icon: "❌", label: "Don't recommend channel" },
+    { icon: "🚨", label: "Report" },
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-900 rounded-lg min-w-[200px] max-w-[300px] overflow-hidden">
+        {menuItems.map((item, index) => (
+          <button
+            key={index}
+            className="w-full px-4 py-3 text-left text-white hover:bg-gray-800 transition-colors flex items-center gap-3 text-sm"
+            onClick={onClose}
+          >
+            <span className="text-base">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </div>
+      
+      {/* Click outside to close */}
+      <div 
+        className="absolute inset-0 -z-10" 
+        onClick={onClose}
+      />
+    </div>
   );
 }

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { PlayCircle, Info, X } from "lucide-react";
-import { getFilteredDemos } from "@/lib/supabase";
+import { getFilteredDemos } from "@/lib/db/demos";
 import {
   ResponsiveContainer,
   BarChart,
