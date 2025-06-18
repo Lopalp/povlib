@@ -47,6 +47,7 @@ const VideoPlayerPage = ({
   const [helpExpanded, setHelpExpanded] = useState(false);
   const [matchroomUrl, setMatchroomUrl] = useState("");
   const [showKeyOverlay, setShowKeyOverlay] = useState(false);
+  const [selectedRound, setSelectedRound] = useState(null);
   const [activeKeys, setActiveKeys] = useState({
     w: false,
     a: false,
@@ -221,14 +222,6 @@ const VideoPlayerPage = ({
                           },
                         },
                         {
-                          icon: <FileText className="h-4 w-4 text-yellow-400" />,
-                          label: "Download Demo",
-                          onClick: () => {
-                            window.open(selectedDemo.dem_url);
-                            setMenuOpen(false);
-                          },
-                        },
-                        {
                           icon: <ExternalLink className="h-4 w-4 text-yellow-400" />,
                           label: "Open Matchroom",
                           onClick: () => {
@@ -358,26 +351,84 @@ const VideoPlayerPage = ({
                 )}
               </div>
 
-              {/* Match Timeline - 25 Runden */}
+              {/* Match Timeline - 25 Runden mit Custom Scrollbar */}
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
                 <h2 className="text-xl font-semibold text-white flex items-center mb-6">
                   <div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>
                   Match Timeline
                 </h2>
                 
-                <div className="relative overflow-x-auto">
+                <style jsx>{`
+                  .custom-scrollbar::-webkit-scrollbar {
+                    height: 8px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #374151;
+                    border-radius: 4px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #facc15;
+                    border-radius: 4px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #eab308;
+                  }
+                `}</style>
+                
+                <div className="relative overflow-x-auto custom-scrollbar">
                   <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full min-w-full"></div>
                   <div className="relative flex justify-between min-w-max gap-4 pb-4">
                     {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
                       <div key={round} className="flex flex-col items-center flex-shrink-0">
-                        <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-xs font-medium border-2 border-gray-700 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer">
+                        <button 
+                          onClick={() => setSelectedRound(selectedRound === round ? null : round)}
+                          className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}
+                        >
                           {round}
-                        </div>
+                        </button>
                         <span className="text-xs text-gray-500 mt-2 whitespace-nowrap">Round {round}</span>
                       </div>
                     ))}
                   </div>
                 </div>
+
+                {/* Round Details */}
+                {selectedRound && (
+                  <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700 animate-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-white">Round {selectedRound} Details</h3>
+                      <button 
+                        onClick={() => setSelectedRound(null)}
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-gray-900/50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">Round Type</div>
+                        <div className="text-white font-medium">
+                          {selectedRound <= 15 ? 'First Half' : selectedRound === 16 ? 'Side Switch' : 'Second Half'}
+                        </div>
+                      </div>
+                      <div className="bg-gray-900/50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">Economy</div>
+                        <div className="text-yellow-400 font-medium">
+                          {Math.random() > 0.5 ? 'Force Buy' : 'Full Buy'}
+                        </div>
+                      </div>
+                      <div className="bg-gray-900/50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">Duration</div>
+                        <div className="text-white font-medium">
+                          {Math.floor(Math.random() * 60 + 30)}s
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 text-sm text-gray-300">
+                      Detailed round analysis and key moments will be displayed here when available.
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Related POVs */}
