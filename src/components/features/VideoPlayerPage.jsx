@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Eye,
   ThumbsUp,
   Share2,
   MoreHorizontal,
@@ -14,7 +13,6 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Shield,
   Play,
   X,
   Upload,
@@ -126,30 +124,28 @@ const VideoPlayerPage = ({
                   showInfo={false}
                 />
                 
-                {/* Key Overlay */}
+                {/* Key Overlay - ohne Abdunklung und Hintergrund, größer */}
                 {showKeyOverlay && (
-                  <div className="absolute inset-0 bg-black/60 flex items-start justify-start p-8 pointer-events-none">
-                    <div className="bg-gray-900/90 backdrop-blur-sm p-4 rounded-lg">
-                      <div className="grid grid-cols-3 gap-2 w-32">
-                        <div className="col-start-2">
-                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.w ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
-                            W
-                          </div>
+                  <div className="absolute top-8 left-8 pointer-events-none">
+                    <div className="grid grid-cols-3 gap-3 w-40">
+                      <div className="col-start-2">
+                        <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-900/80 border-gray-600 text-gray-300'} flex items-center justify-center font-bold text-lg transition-all duration-200 backdrop-blur-sm`}>
+                          W
                         </div>
-                        <div className="col-start-1 row-start-2">
-                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.a ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
-                            A
-                          </div>
+                      </div>
+                      <div className="col-start-1 row-start-2">
+                        <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-900/80 border-gray-600 text-gray-300'} flex items-center justify-center font-bold text-lg transition-all duration-200 backdrop-blur-sm`}>
+                          A
                         </div>
-                        <div className="col-start-2 row-start-2">
-                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.s ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
-                            S
-                          </div>
+                      </div>
+                      <div className="col-start-2 row-start-2">
+                        <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-900/80 border-gray-600 text-gray-300'} flex items-center justify-center font-bold text-lg transition-all duration-200 backdrop-blur-sm`}>
+                          S
                         </div>
-                        <div className="col-start-3 row-start-2">
-                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.d ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
-                            D
-                          </div>
+                      </div>
+                      <div className="col-start-3 row-start-2">
+                        <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-900/80 border-gray-600 text-gray-300'} flex items-center justify-center font-bold text-lg transition-all duration-200 backdrop-blur-sm`}>
+                          D
                         </div>
                       </div>
                     </div>
@@ -163,7 +159,6 @@ const VideoPlayerPage = ({
                   <ModalHeading className="text-2xl">{selectedDemo.title}</ModalHeading>
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-500 text-sm">
                     <div className="flex items-center">
-                      <Eye className="h-4 w-4 mr-1.5" />
                       <span>{selectedDemo.views?.toLocaleString()} views</span>
                     </div>
                     <div>{selectedDemo.year}</div>
@@ -178,10 +173,15 @@ const VideoPlayerPage = ({
                   <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className="bg-gray-800 hover:bg-gray-700">
                     <Keyboard className="h-5 w-5" />
                   </IconButton>
-                  <IconButton onClick={() => onLike(selectedDemo.id)} className="bg-gray-800 hover:bg-gray-700">
-                    <ThumbsUp className="h-5 w-5" />
-                    <span className="ml-2">{selectedDemo.likes}</span>
-                  </IconButton>
+                  <button 
+                    onClick={() => onLike(selectedDemo.id)} 
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M7.493 18.75c-.425 0-.82-.236-.975-.632A7.48 7.48 0 016 15.375c0-1.75.599-3.358 1.602-4.634.151-.192.373-.309.6-.397.473-.183.89-.514 1.212-.924a9.042 9.042 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558-.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.230l-3.114-1.04a4.501 4.501 0 00-1.423-.23h-.777zM2.331 10.977a11.969 11.969 0 00-.831 4.398 12 12 0 00.52 3.507c.26.85 1.084 1.368 1.973 1.368H4.9c.445 0 .72-.498.523-.898a8.963 8.963 0 01-.924-3.977c0-1.708.476-3.305 1.302-4.666.245-.403-.028-.959-.5-.959H4.25c-.832 0-1.612.453-1.918 1.227z"/>
+                    </svg>
+                    <span>{selectedDemo.likes}</span>
+                  </button>
                   <IconButton className="bg-gray-800 hover:bg-gray-700">
                     <Share2 className="h-5 w-5" />
                   </IconButton>
@@ -242,21 +242,21 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* Players */}
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              {/* Players - cleaner ohne Hintergrund */}
+              <div className="flex gap-4 overflow-x-auto pb-2">
                 {selectedDemo.players.map((player, idx) => (
                   <Link
                     key={idx}
                     href={`/players/${player.replace(/\s+/g, "-").toLowerCase()}`}
-                    className="flex-shrink-0 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 flex items-center gap-3 hover:bg-gray-800 hover:border-gray-700 transition-all group"
+                    className="flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-900/50 transition-all group border border-transparent hover:border-gray-800"
                   >
-                    <div className="w-10 h-10 rounded-full bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-yellow-400 font-bold text-sm group-hover:bg-yellow-400/20 transition-colors">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center text-gray-900 font-bold text-lg shadow-lg">
                       {player.charAt(0)}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-white font-medium">{player}</span>
+                      <span className="text-white font-semibold text-lg">{player}</span>
                       {selectedDemo.team && (
-                        <span className="text-gray-500 text-xs">
+                        <span className="text-gray-400 text-sm font-medium">
                           {selectedDemo.team}
                         </span>
                       )}
@@ -265,20 +265,26 @@ const VideoPlayerPage = ({
                 ))}
               </div>
 
-              {/* Description Section */}
+              {/* Description Section - mit Views, Upload-Datum und Event statt "Description" */}
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-white flex items-center">
-                    <div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>
-                    Description
-                  </h2>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-400 text-sm">
+                    <div className="flex items-center">
+                      <span>{selectedDemo.views?.toLocaleString()} views</span>
+                    </div>
+                    <div>{selectedDemo.year}</div>
+                    {selectedDemo.event && (
+                      <div className="text-yellow-400 font-medium">
+                        {selectedDemo.event}
+                      </div>
+                    )}
+                  </div>
                   
                   {/* Help Section */}
                   <button
                     onClick={() => setHelpExpanded(!helpExpanded)}
                     className="flex items-center gap-2 text-sm text-gray-400 hover:text-yellow-400 transition-colors"
                   >
-                    <Shield className="h-4 w-4" />
                     <span className="hidden sm:inline">Help us improve</span>
                     {helpExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </button>
@@ -352,22 +358,22 @@ const VideoPlayerPage = ({
                 )}
               </div>
 
-              {/* Match Timeline */}
+              {/* Match Timeline - 25 Runden */}
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
                 <h2 className="text-xl font-semibold text-white flex items-center mb-6">
                   <div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>
                   Match Timeline
                 </h2>
                 
-                <div className="relative">
-                  <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full"></div>
-                  <div className="relative flex justify-between">
-                    {[1, 2, 3, 4, 5].map((round) => (
-                      <div key={round} className="flex flex-col items-center">
+                <div className="relative overflow-x-auto">
+                  <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full min-w-full"></div>
+                  <div className="relative flex justify-between min-w-max gap-4 pb-4">
+                    {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
+                      <div key={round} className="flex flex-col items-center flex-shrink-0">
                         <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-xs font-medium border-2 border-gray-700 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer">
                           {round}
                         </div>
-                        <span className="text-xs text-gray-500 mt-2">Round {round}</span>
+                        <span className="text-xs text-gray-500 mt-2 whitespace-nowrap">Round {round}</span>
                       </div>
                     ))}
                   </div>
