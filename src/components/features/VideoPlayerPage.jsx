@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -6,71 +6,29 @@ import {
   ThumbsUp,
   Share2,
   MoreHorizontal,
-  Tag as TagIcon,
+  Tag as LucideTag,
   Bookmark,
   Flag,
   Download,
   FileText,
   ExternalLink,
   ChevronDown,
-  ChevronRight,
+  ChevronUp,
   Shield,
   Play,
   X,
-  Search,
+  Upload,
+  Link2,
+  Keyboard,
+  Circle,
 } from "lucide-react";
 import YouTubeEmbed from "../media/YouTubeEmbed";
-import MatchTimeline from "./MatchTimeline";
 
 import ModalHeading from "../headings/ModalHeading";
 import SettingsHeading from "../headings/SettingsHeading";
 import Tag from "../typography/Tag";
 import { IconButton } from "../buttons";
 import ActionsMenu from "../menus/ActionsMenu";
-
-const demoMatchData = {
-  rounds: [
-    {
-      roundNumber: 1,
-      events: [
-        { type: "utility", time: 10, player: "PlayerA" },
-        { type: "kill", time: 45, player: "PlayerB" },
-        { type: "death", time: 46, player: "PlayerA" },
-        { type: "kill", time: 55, player: "PlayerC" },
-        { type: "utility", time: 60, player: "PlayerA" },
-      ],
-    },
-    {
-      roundNumber: 2,
-      events: [
-        { type: "utility", time: 5, player: "PlayerC" },
-        { type: "kill", time: 30, player: "PlayerA" },
-        { type: "death", time: 30, player: "PlayerB" },
-        { type: "utility", time: 40, player: "PlayerA" },
-        { type: "kill", time: 50, player: "PlayerC" },
-      ],
-    },
-    {
-      roundNumber: 3,
-      events: [
-        { type: "kill", time: 15, player: "PlayerB" },
-        { type: "utility", time: 25, player: "PlayerA" },
-        { type: "death", time: 35, player: "PlayerC" },
-        { type: "kill", time: 45, player: "PlayerA" },
-      ],
-    },
-    {
-      roundNumber: 4,
-      events: [
-        { type: "utility", time: 8, player: "PlayerB" },
-        { type: "kill", time: 20, player: "PlayerA" },
-        { type: "death", time: 25, player: "PlayerB" },
-        { type: "utility", time: 35, player: "PlayerC" },
-        { type: "kill", time: 50, player: "PlayerC" },
-      ],
-    },
-  ],
-};
 
 const VideoPlayerPage = ({
   selectedDemo,
@@ -88,9 +46,37 @@ const VideoPlayerPage = ({
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [matchroomSubmitted, setMatchroomSubmitted] = useState(false);
-  // NEU: State für das Input-Feld
+  const [helpExpanded, setHelpExpanded] = useState(false);
   const [matchroomUrl, setMatchroomUrl] = useState("");
+  const [showKeyOverlay, setShowKeyOverlay] = useState(false);
+  const [activeKeys, setActiveKeys] = useState({
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+  });
+
+  // Random key lighting effect
+  useEffect(() => {
+    if (!showKeyOverlay) return;
+
+    const interval = setInterval(() => {
+      const keys = ["w", "a", "s", "d"];
+      const randomKey = keys[Math.floor(Math.random() * keys.length)];
+      
+      setActiveKeys(prev => {
+        const newState = { w: false, a: false, s: false, d: false };
+        newState[randomKey] = true;
+        return newState;
+      });
+
+      setTimeout(() => {
+        setActiveKeys({ w: false, a: false, s: false, d: false });
+      }, 300);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [showKeyOverlay]);
 
   if (!selectedDemo) return null;
 
@@ -114,28 +100,24 @@ const VideoPlayerPage = ({
   const description = generateDescription();
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-200">
-      {/* KORREKTUR: Padding-Top (pt) von 16 auf 24 erhöht für mehr Abstand */}
-      <main className="pt-24 pb-12">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-4 mb-8 flex-wrap">
+    <div className="min-h-screen bg-gray-950 text-gray-200">
+      <main className="pt-20 pb-0">
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Back Button */}
+          <div className="mb-6">
             <button
               onClick={onClose}
-              className="flex items-center text-gray-400 hover:text-yellow-400 transition-colors"
+              className="flex items-center text-gray-500 hover:text-yellow-400 transition-colors text-sm"
             >
-              <ArrowLeft className="h-5 w-5 mr-2" /> Back to Overview
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Overview
             </button>
-            <Link
-              href="/videoplaypagecopy"
-              className="text-gray-400 hover:text-yellow-400 transition-colors"
-            >
-              Open Page Copy
-            </Link>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="w-full lg:w-8/12 space-y-6">
-              <div className="w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg ">
+          <div className="flex flex-col gap-8">
+            {/* Main Content */}
+            <div className="w-full space-y-6">
+              {/* Video Player - Larger and more prominent */}
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black shadow-2xl">
                 <YouTubeEmbed
                   videoId={selectedDemo.video_id}
                   title={selectedDemo.title}
@@ -143,34 +125,68 @@ const VideoPlayerPage = ({
                   controls
                   showInfo={false}
                 />
+                
+                {/* Key Overlay */}
+                {showKeyOverlay && (
+                  <div className="absolute inset-0 bg-black/60 flex items-start justify-start p-8 pointer-events-none">
+                    <div className="bg-gray-900/90 backdrop-blur-sm p-4 rounded-lg">
+                      <div className="grid grid-cols-3 gap-2 w-32">
+                        <div className="col-start-2">
+                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.w ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
+                            W
+                          </div>
+                        </div>
+                        <div className="col-start-1 row-start-2">
+                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.a ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
+                            A
+                          </div>
+                        </div>
+                        <div className="col-start-2 row-start-2">
+                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.s ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
+                            S
+                          </div>
+                        </div>
+                        <div className="col-start-3 row-start-2">
+                          <div className={`w-10 h-10 rounded-md border-2 ${activeKeys.d ? 'bg-yellow-400 border-yellow-400 text-gray-900' : 'bg-gray-800 border-gray-600 text-gray-400'} flex items-center justify-center font-bold transition-all duration-200`}>
+                            D
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
+              {/* Title and Actions */}
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="space-y-2">
-                  <ModalHeading>{selectedDemo.title}</ModalHeading>
-                  <div className="flex flex-wrap items-center space-x-6 text-gray-400 text-sm">
+                <div className="space-y-3">
+                  <ModalHeading className="text-2xl">{selectedDemo.title}</ModalHeading>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-500 text-sm">
                     <div className="flex items-center">
-                      <Eye className="h-5 w-5 mr-1" />
+                      <Eye className="h-4 w-4 mr-1.5" />
                       <span>{selectedDemo.views?.toLocaleString()} views</span>
                     </div>
                     <div>{selectedDemo.year}</div>
                     {selectedDemo.event && (
-                      <div className="text-yellow-400">
+                      <div className="text-yellow-400 font-medium">
                         {selectedDemo.event}
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <IconButton onClick={() => onLike(selectedDemo.id)}>
-                    <ThumbsUp className="h-5 w-5" />
-                    <span className="ml-1">{selectedDemo.likes}</span>
+                <div className="flex items-center gap-3">
+                  <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className="bg-gray-800 hover:bg-gray-700">
+                    <Keyboard className="h-5 w-5" />
                   </IconButton>
-                  <IconButton>
+                  <IconButton onClick={() => onLike(selectedDemo.id)} className="bg-gray-800 hover:bg-gray-700">
+                    <ThumbsUp className="h-5 w-5" />
+                    <span className="ml-2">{selectedDemo.likes}</span>
+                  </IconButton>
+                  <IconButton className="bg-gray-800 hover:bg-gray-700">
                     <Share2 className="h-5 w-5" />
                   </IconButton>
                   <div className="relative">
-                    <IconButton onClick={() => setMenuOpen(!menuOpen)}>
+                    <IconButton onClick={() => setMenuOpen(!menuOpen)} className="bg-gray-800 hover:bg-gray-700">
                       <MoreHorizontal className="h-5 w-5" />
                     </IconButton>
                     <ActionsMenu
@@ -179,7 +195,7 @@ const VideoPlayerPage = ({
                       demo={"bottom-left"}
                       items={[
                         {
-                          icon: <TagIcon className="h-4 w-4 text-yellow-400" />,
+                          icon: <LucideTag className="h-4 w-4 text-yellow-400" />,
                           label: "Add Tag",
                           onClick: () => {
                             onOpenTagModal();
@@ -187,9 +203,7 @@ const VideoPlayerPage = ({
                           },
                         },
                         {
-                          icon: (
-                            <Bookmark className="h-4 w-4 text-yellow-400" />
-                          ),
+                          icon: <Bookmark className="h-4 w-4 text-yellow-400" />,
                           label: "Save",
                           onClick: () => setMenuOpen(false),
                         },
@@ -199,9 +213,7 @@ const VideoPlayerPage = ({
                           onClick: () => setMenuOpen(false),
                         },
                         {
-                          icon: (
-                            <Download className="h-4 w-4 text-yellow-400" />
-                          ),
+                          icon: <Download className="h-4 w-4 text-yellow-400" />,
                           label: "Download Video",
                           onClick: () => {
                             window.open(selectedDemo.video_url);
@@ -209,9 +221,7 @@ const VideoPlayerPage = ({
                           },
                         },
                         {
-                          icon: (
-                            <FileText className="h-4 w-4 text-yellow-400" />
-                          ),
+                          icon: <FileText className="h-4 w-4 text-yellow-400" />,
                           label: "Download Demo",
                           onClick: () => {
                             window.open(selectedDemo.dem_url);
@@ -219,9 +229,7 @@ const VideoPlayerPage = ({
                           },
                         },
                         {
-                          icon: (
-                            <ExternalLink className="h-4 w-4 text-yellow-400" />
-                          ),
+                          icon: <ExternalLink className="h-4 w-4 text-yellow-400" />,
                           label: "Open Matchroom",
                           onClick: () => {
                             window.open(selectedDemo.matchroom_url, "_blank");
@@ -234,95 +242,21 @@ const VideoPlayerPage = ({
                 </div>
               </div>
 
-              {/* KORREKTUR: Matchroom Alert mit Input-Feld */}
-              {!matchroomSubmitted && (
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-yellow-400/20 border border-yellow-400/30 text-gray-100 p-4 rounded-md">
-                  <div className="flex-shrink-0">
-                    <Shield className="h-6 w-6 text-yellow-400" />
-                  </div>
-                  <div className="flex-grow text-sm">
-                    Help us complete the matchroom! Add the link here.
-                  </div>
-                  <input
-                    type="text"
-                    value={matchroomUrl}
-                    onChange={(e) => setMatchroomUrl(e.target.value)}
-                    placeholder="Paste matchroom URL..."
-                    className="w-full sm:w-auto flex-grow bg-gray-800 border border-gray-600 text-gray-200 text-sm rounded-md px-3 py-1.5 focus:ring-yellow-400 focus:border-yellow-400"
-                  />
-                  <button
-                    onClick={() => {
-                      // Hier könnte man die URL verarbeiten, z.B. an eine API senden
-                      console.log("Submitted URL:", matchroomUrl);
-                      setMatchroomSubmitted(true);
-                    }}
-                    className="flex-shrink-0 w-full sm:w-auto bg-yellow-400 text-gray-900 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-yellow-300 transition-colors"
-                  >
-                    Submit
-                  </button>
-                </div>
-              )}
-              {matchroomSubmitted && (
-                <div className="bg-gray-700 text-gray-300 px-4 py-3 rounded-md text-sm flex items-center gap-3">
-                  <Shield className="h-5 w-5 text-green-400" />
-                  <span>
-                    Thank you! Your link is being reviewed and will be added
-                    shortly.
-                  </span>
-                </div>
-              )}
-
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h2 className="border-l-4 border-yellow-400 pl-2 mb-4 text-xl font-semibold text-white">
-                  Description
-                </h2>
-                {selectedDemo.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedDemo.tags.map((tag) => (
-                      <Tag
-                        key={tag}
-                        variant="default"
-                        className="hover:bg-yellow-400/20 transition-colors"
-                      >
-                        <TagIcon className="h-4 w-4 mr-1 text-yellow-400" />
-                        {tag}
-                      </Tag>
-                    ))}
-                  </div>
-                )}
-                <p
-                  className={`${
-                    showFullDescription ? "" : "line-clamp-4"
-                  } text-gray-300 text-lg leading-relaxed`}
-                >
-                  {description}
-                </p>
-                {description.length > 240 && !showFullDescription && (
-                  <IconButton
-                    onClick={() => setShowFullDescription(true)}
-                    className="mt-3 text-yellow-400 hover:text-yellow-300 text-sm"
-                  >
-                    Read more <ChevronDown className="ml-1 h-4 w-4" />
-                  </IconButton>
-                )}
-              </div>
-
-              <div className="flex space-x-4">
+              {/* Players */}
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {selectedDemo.players.map((player, idx) => (
                   <Link
                     key={idx}
-                    href={`/players/${player
-                      .replace(/\s+/g, "-")
-                      .toLowerCase()}`}
-                    className="min-w-[120px] flex-shrink-0 bg-gray-800 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors"
+                    href={`/players/${player.replace(/\s+/g, "-").toLowerCase()}`}
+                    className="flex-shrink-0 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 flex items-center gap-3 hover:bg-gray-800 hover:border-gray-700 transition-all group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-yellow-400 font-semibold text-lg">
+                    <div className="w-10 h-10 rounded-full bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-yellow-400 font-bold text-sm group-hover:bg-yellow-400/20 transition-colors">
                       {player.charAt(0)}
                     </div>
                     <div className="flex flex-col">
                       <span className="text-white font-medium">{player}</span>
                       {selectedDemo.team && (
-                        <span className="text-gray-400 text-sm">
+                        <span className="text-gray-500 text-xs">
                           {selectedDemo.team}
                         </span>
                       )}
@@ -331,69 +265,191 @@ const VideoPlayerPage = ({
                 ))}
               </div>
 
-              {/* REPLACED: Old match timeline section with new MatchTimeline component */}
-              <div className="space-y-6">
-                <h2 className="border-l-4 border-yellow-400 pl-2 text-xl font-semibold text-white">
-                  Match Timeline
-                </h2>
-                <MatchTimeline matchData={demoMatchData} />
-              </div>
-            </div>
+              {/* Description Section */}
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-white flex items-center">
+                    <div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>
+                    Description
+                  </h2>
+                  
+                  {/* Help Section */}
+                  <button
+                    onClick={() => setHelpExpanded(!helpExpanded)}
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-yellow-400 transition-colors"
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span className="hidden sm:inline">Help us improve</span>
+                    {helpExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </button>
+                </div>
 
-            <div className="w-full lg:w-4/12 space-y-6">
-              <SettingsHeading>Related POVs</SettingsHeading>
-              <div className="space-y-4">
-                {relatedDemos.length ? (
-                  relatedDemos.map((d) => (
-                    <div
-                      key={d.id}
-                      onClick={() => onSelectRelatedDemo(d.id)}
-                      className="flex gap-4 cursor-pointer items-center hover:bg-gray-800 transition-colors p-2 rounded-md"
-                    >
-                      <div className="w-28 h-20 relative overflow-hidden rounded-lg group flex-shrink-0">
-                        <img
-                          src={d.thumbnail}
-                          alt={d.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                          <div className="rounded-full bg-yellow-400/80 p-2">
-                            <Play
-                              className="h-4 w-4 text-gray-900"
-                              fill="currentColor"
-                            />
-                          </div>
+                {/* Expandable Help Content */}
+                {helpExpanded && (
+                  <div className="mb-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                          <Link2 className="h-4 w-4" />
+                          Add Matchroom URL
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={matchroomUrl}
+                            onChange={(e) => setMatchroomUrl(e.target.value)}
+                            placeholder="Paste matchroom URL..."
+                            className="flex-1 bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg px-3 py-2 focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"
+                          />
+                          <button className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-yellow-300 transition-colors">
+                            Submit
+                          </button>
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-medium text-sm line-clamp-2">
-                          {d.title}
-                        </h3>
-                        <p className="text-gray-400 text-xs mt-1">
-                          {d.players.join(", ")}
-                        </p>
-                        <div className="flex items-center text-gray-500 text-xs mt-2">
-                          <span>{d.views.toLocaleString()} views</span>
-                          <span className="mx-1">•</span>
-                          <span>{d.map}</span>
-                          <div className="ml-auto flex items-center text-yellow-400">
-                            <ThumbsUp className="h-3 w-3 mr-1" />
-                            <span>{d.likes}</span>
-                          </div>
+                      
+                      <div>
+                        <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                          <Upload className="h-4 w-4" />
+                          Upload Demo File
+                        </label>
+                        <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center hover:border-gray-500 transition-colors cursor-pointer">
+                          <input type="file" accept=".dem" className="hidden" id="demo-upload" />
+                          <label htmlFor="demo-upload" className="cursor-pointer">
+                            <Upload className="h-8 w-8 mx-auto mb-2 text-gray-500" />
+                            <p className="text-sm text-gray-400">Drop .dem file here or click to browse</p>
+                          </label>
                         </div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-gray-400 text-center py-8">
-                    No related videos available
                   </div>
                 )}
+
+                {selectedDemo.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {selectedDemo.tags.map((tag) => (
+                      <Tag
+                        key={tag}
+                        variant="default"
+                        className="bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all"
+                      >
+                        <LucideTag className="h-3.5 w-3.5 mr-1.5 text-yellow-400" />
+                        {tag}
+                      </Tag>
+                    ))}
+                  </div>
+                )}
+                
+                <p className={`${showFullDescription ? "" : "line-clamp-3"} text-gray-300 leading-relaxed`}>
+                  {description}
+                </p>
+                {description.length > 200 && !showFullDescription && (
+                  <button
+                    onClick={() => setShowFullDescription(true)}
+                    className="mt-3 text-yellow-400 hover:text-yellow-300 text-sm font-medium"
+                  >
+                    Read more
+                  </button>
+                )}
+              </div>
+
+              {/* Match Timeline */}
+              <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+                <h2 className="text-xl font-semibold text-white flex items-center mb-6">
+                  <div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>
+                  Match Timeline
+                </h2>
+                
+                <div className="relative">
+                  <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full"></div>
+                  <div className="relative flex justify-between">
+                    {[1, 2, 3, 4, 5].map((round) => (
+                      <div key={round} className="flex flex-col items-center">
+                        <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-xs font-medium border-2 border-gray-700 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer">
+                          {round}
+                        </div>
+                        <span className="text-xs text-gray-500 mt-2">Round {round}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Related POVs */}
+              <div className="mt-12">
+                <SettingsHeading className="mb-6">Related POVs</SettingsHeading>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {relatedDemos.length ? (
+                    relatedDemos.map((d) => (
+                      <div
+                        key={d.id}
+                        onClick={() => onSelectRelatedDemo(d.id)}
+                        className="group cursor-pointer bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-700 transition-all"
+                      >
+                        <div className="relative aspect-video overflow-hidden">
+                          <img
+                            src={d.thumbnail}
+                            alt={d.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div className="rounded-full bg-yellow-400 p-3 transform scale-0 group-hover:scale-100 transition-transform duration-300">
+                              <Play className="h-5 w-5 text-gray-900" fill="currentColor" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <h3 className="text-white font-medium text-sm line-clamp-2 mb-2">
+                            {d.title}
+                          </h3>
+                          <p className="text-gray-500 text-xs mb-2">
+                            {d.players.join(", ")}
+                          </p>
+                          <div className="flex items-center justify-between text-gray-600 text-xs">
+                            <span>{d.views.toLocaleString()} views</span>
+                            <div className="flex items-center gap-2">
+                              <span>{d.map}</span>
+                              <div className="flex items-center text-yellow-400">
+                                <ThumbsUp className="h-3 w-3 mr-1" />
+                                <span>{d.likes}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-full text-gray-500 text-center py-12">
+                      No related videos available
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="mt-24 bg-gray-900 border-t border-gray-800">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-gray-500 text-sm">
+              © 2024 CS2 POV Hub. All rights reserved.
+            </div>
+            <div className="flex items-center gap-6 text-sm">
+              <Link href="/privacy" className="text-gray-500 hover:text-yellow-400 transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="text-gray-500 hover:text-yellow-400 transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/contact" className="text-gray-500 hover:text-yellow-400 transition-colors">
+                Contact
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
