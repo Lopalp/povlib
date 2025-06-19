@@ -45,10 +45,11 @@ const VideoPlayerPage = ({
   // States
   const [menuOpen, setMenuOpen] = useState(false);
   const [showKeyOverlay, setShowKeyOverlay] = useState(false);
-  const [showMatchTimeline, setShowMatchTimeline] = useState(false);
+  const [isHovering, setIsHovering] = useState(false); // Hover-State ist wieder da
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [selectedRound, setSelectedRound] = useState(null);
 
   // Refs
   const playerRef = useRef(null);
@@ -70,17 +71,20 @@ const VideoPlayerPage = ({
     setIsPlaying(isCurrentlyPlaying);
 
     if (isCurrentlyPlaying) {
+      // Wenn das Video läuft, starte den Intervall, um die Zeit zu aktualisieren
       progressIntervalRef.current = setInterval(() => {
         if (playerRef.current) {
           setCurrentTime(playerRef.current.getCurrentTime());
         }
       }, 500);
     } else {
+      // Wenn das Video pausiert oder endet, lösche den Intervall
       clearInterval(progressIntervalRef.current);
     }
   };
 
   useEffect(() => {
+    // Cleanup-Effekt für den Intervall
     return () => clearInterval(progressIntervalRef.current);
   }, []);
 
@@ -97,12 +101,14 @@ const VideoPlayerPage = ({
     playerRef.current.seekTo(newTime, true);
   };
   
+  // Logik für die Sichtbarkeit aller UI-Overlays
+  const areControlsVisible = !isPlaying || isHovering;
+  
   // (Restliche Logik bleibt gleich)
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [helpExpanded, setHelpExpanded] = useState(false);
   const [matchroomUrl, setMatchroomUrl] = useState("");
   const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
-  const [selectedRound, setSelectedRound] = useState(null);
   useEffect(() => {
     if (!showKeyOverlay) return;
     const interval = setInterval(() => {
@@ -121,8 +127,11 @@ const VideoPlayerPage = ({
   return (
     <div className="min-h-screen bg-gray-950 text-gray-200 pt-24">
       <main className="pb-0">
-        {/* Die Hover-Events onMouseEnter/Leave wurden von diesem Container entfernt */}
-        <div className="relative w-full bg-black">
+        <div
+          className="relative w-full bg-black"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
           <div className="aspect-video">
             <div className="absolute top-0 left-0 w-full h-full">
               <YouTubeEmbed
@@ -140,40 +149,66 @@ const VideoPlayerPage = ({
             ></div>
           </div>
           
-          {/* === GEÄNDERT: Verbreiterte Notch, Buttons sichtbar bei Pause === */}
+          {/* === Notch Toolbar oben rechts (vereinfacht) === */}
           <div className="absolute top-0 right-0 z-20">
-            <div className="w-40 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-              <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${!isPlaying ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="w-auto bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
+              <div className={`flex items-center justify-end p-2 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
                 <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
-                <IconButton onClick={() => setShowMatchTimeline(!showMatchTimeline)} className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
               </div>
             </div>
           </div>
 
-          {/* === GEÄNDERT: Timeline etwas tiefer, sichtbar bei Pause === */}
+          {/* === GEÄNDERT: Die neue, kombinierte Steuerleiste unten === */}
           <div 
-            className={`absolute bottom-2 left-0 right-0 px-4 z-20 transition-opacity duration-300 ${!isPlaying ? 'opacity-100' : 'opacity-0'}`}
-            style={{ pointerEvents: !isPlaying ? 'auto' : 'none' }} 
+            className={`absolute bottom-0 left-0 right-0 px-4 pt-8 pb-4 z-20 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}
+            style={{ pointerEvents: areControlsVisible ? 'auto' : 'none' }} 
           >
-            <div className="flex items-center gap-4 text-white">
+            {/* Pop-up für Rundendetails (erscheint über der Leiste) */}
+            {selectedRound && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-80">
+                    <div className="bg-gray-900/80 backdrop-blur-sm rounded-xl p-4 border border-gray-700 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                      <div className="flex items-center justify-between mb-3"><h3 className="text-lg font-semibold text-white">Round {selectedRound} Details</h3><button onClick={() => setSelectedRound(null)} className="text-gray-400 hover:text-white transition-colors"><X className="h-4 w-4" /></button></div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2"><div className="bg-gray-900/50 p-2 rounded-lg"><div className="text-xs text-gray-400 mb-1">Round Type</div><div className="text-white font-medium text-sm">{selectedRound <= 15 ? 'First Half' : 'Second Half'}</div></div><div className="bg-gray-900/50 p-2 rounded-lg"><div className="text-xs text-gray-400 mb-1">Economy</div><div className="text-yellow-400 font-medium text-sm">{Math.random() > 0.5 ? 'Force Buy' : 'Full Buy'}</div></div><div className="bg-gray-900/50 p-2 rounded-lg"><div className="text-xs text-gray-400 mb-1">Duration</div><div className="text-white font-medium text-sm">{Math.floor(Math.random() * 60 + 30)}s</div></div></div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Zeit-Slider mit Runden-Markern */}
+            <div className="relative w-full">
+                {/* Container für die Runden-Marker */}
+                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 flex items-center">
+                    {Array.from({ length: 24 }, (_, i) => i + 1).map((round) => (
+                        <div key={round} className="relative h-full" style={{ width: `${100 / 24}%` }}>
+                            <button 
+                                onClick={() => setSelectedRound(round)}
+                                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white/30 hover:bg-yellow-400 rounded-full transition-colors"
+                                title={`Show Round ${round} Details`}
+                            ></button>
+                        </div>
+                    ))}
+                </div>
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={duration > 0 ? (currentTime / duration) * 100 : 0}
+                    onChange={handleSeek}
+                    className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400 relative z-10"
+                />
+            </div>
+            
+            {/* Play/Pause und Zeitanzeige */}
+            <div className="flex items-center gap-4 text-white mt-2">
               <IconButton onClick={togglePlayPause} className="hover:bg-white/20">
-                {/* Zeigt immer ein Play-Icon, da die Leiste nur bei Pause sichtbar ist */}
-                <Play className="h-6 w-6" />
+                {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
               </IconButton>
               <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={duration > 0 ? (currentTime / duration) * 100 : 0}
-                onChange={handleSeek}
-                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400"
-              />
+              <div className="flex-grow"></div> {/* Leerer Spacer */}
               <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
             </div>
           </div>
-
-          {/* WASD-Overlay (Position ist relativ zur neuen Timeline) */}
+          
+          {/* WASD-Overlay */}
           {showKeyOverlay && (
             <div className="absolute bottom-24 left-8 pointer-events-none z-30">
               <div className="grid grid-cols-3 gap-3 w-40">
@@ -181,34 +216,6 @@ const VideoPlayerPage = ({
                 <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
                 <div className="col-start-2 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>S</div></div>
                 <div className="col-start-3 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>D</div></div>
-              </div>
-            </div>
-          )}
-
-          {/* === GEÄNDERT: Inhalt der Match Timeline wiederhergestellt === */}
-          {showMatchTimeline && (
-            <div className="absolute bottom-20 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-auto z-30">
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-gray-800 animate-in slide-in-from-bottom-5 duration-300">
-                <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
-                <style jsx>{`.custom-scrollbar::-webkit-scrollbar { height: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #374151; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #eab308; }`}</style>
-                <div className="relative overflow-x-auto custom-scrollbar">
-                  <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full min-w-full"></div>
-                  <div className="relative flex justify-between min-w-max gap-4 pb-4">
-                    {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
-                      <div key={round} className="flex flex-col items-center flex-shrink-0">
-                        <button onClick={() => setSelectedRound(selectedRound === round ? null : round)} className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}>{round}</button>
-                        <span className="text-xs text-gray-500 mt-2 whitespace-nowrap">Round {round}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {selectedRound && (
-                  <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700 animate-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center justify-between mb-3"><h3 className="text-lg font-semibold text-white">Round {selectedRound} Details</h3><button onClick={() => setSelectedRound(null)} className="text-gray-400 hover:text-white transition-colors"><X className="h-4 w-4" /></button></div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4"><div className="bg-gray-900/50 p-3 rounded-lg"><div className="text-xs text-gray-400 mb-1">Round Type</div><div className="text-white font-medium">{selectedRound <= 15 ? 'First Half' : 'Second Half'}</div></div><div className="bg-gray-900/50 p-3 rounded-lg"><div className="text-xs text-gray-400 mb-1">Economy</div><div className="text-yellow-400 font-medium">{Math.random() > 0.5 ? 'Force Buy' : 'Full Buy'}</div></div><div className="bg-gray-900/50 p-3 rounded-lg"><div className="text-xs text-gray-400 mb-1">Duration</div><div className="text-white font-medium">{Math.floor(Math.random() * 60 + 30)}s</div></div></div>
-                    <div className="mt-3 text-sm text-gray-300">Detailed round analysis and key moments will be displayed here when available.</div>
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -232,26 +239,9 @@ const VideoPlayerPage = ({
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <button onClick={() => onLike(selectedDemo.id)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"><ThumbsUp className="w-5 h-5"/><span>{selectedDemo.likes}</span></button>
                   <IconButton className="bg-gray-800 hover:bg-gray-700"><Share2 className="h-5 w-5" /></IconButton>
-                  
                   <div className="relative">
-                    <IconButton 
-                      onClick={() => setMenuOpen(!menuOpen)}
-                      className="bg-gray-800 hover:bg-gray-700"
-                    >
-                      <MoreHorizontal className="h-5 w-5" />
-                    </IconButton>
-                    <ActionsMenu 
-                      isOpen={menuOpen} 
-                      onClose={() => setMenuOpen(false)} 
-                      demo={"bottom-left"} 
-                      items={[
-                        { icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }},
-                        { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) }, 
-                        { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) }, 
-                        { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }},
-                        { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}
-                      ]}
-                    />
+                    <IconButton onClick={() => setMenuOpen(!menuOpen)} className="bg-gray-800 hover:bg-gray-700"><MoreHorizontal className="h-5 w-5" /></IconButton>
+                    <ActionsMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} demo={"bottom-left"} items={[{ icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }}, { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) }, { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) }, { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }}, { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}]}/>
                   </div>
                 </div>
               </div>
