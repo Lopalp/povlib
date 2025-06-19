@@ -18,7 +18,7 @@ import {
   Keyboard,
   ListVideo,
 } from "lucide-react";
-import YouTubeEmbed from "../media/YouTubeEmbed";
+import YouTubeEmbed from "../media/YouTubeEmbed"; // Ihre angepasste Komponente
 import ModalHeading from "../headings/ModalHeading";
 import SettingsHeading from "../headings/SettingsHeading";
 import Tag from "../typography/Tag";
@@ -43,19 +43,20 @@ const VideoPlayerPage = ({
   const [selectedRound, setSelectedRound] = useState(null);
   const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
   
-  const playerRef = useRef(null); // Ref to store the YouTube player instance
+  const playerRef = useRef(null); // Ref zum Speichern der YouTube-Player-Instanz
 
-  // This function gets called when the YouTube player is ready
+  // Diese Funktion wird aufgerufen, wenn der YouTube-Player bereit ist
   const handlePlayerReady = (event) => {
+    // Speichert die Player-Instanz in der Ref für späteren Zugriff
     playerRef.current = event.target;
   };
 
-  // This function handles clicks on the round buttons
+  // Diese Funktion behandelt Klicks auf die Runden-Buttons
   const handleRoundClick = (round) => {
-    // Toggle the display of round details
+    // Schaltet die Anzeige der Rundendetails um
     setSelectedRound(selectedRound === round ? null : round);
 
-    // If the player is ready, seek to a random time in the video
+    // Wenn der Player bereit ist, springe zu einer zufälligen Zeit im Video
     if (playerRef.current && typeof playerRef.current.getDuration === 'function') {
       const duration = playerRef.current.getDuration();
       if (duration > 0) {
@@ -65,7 +66,7 @@ const VideoPlayerPage = ({
     }
   };
 
-  // Random key lighting effect
+  // Effekt für die zufällige Tastenbeleuchtung
   useEffect(() => {
     if (!showKeyOverlay) return;
     const interval = setInterval(() => {
@@ -95,13 +96,14 @@ const VideoPlayerPage = ({
             <YouTubeEmbed
               videoId={selectedDemo.video_id}
               title={selectedDemo.title}
-              onReady={handlePlayerReady}
+              onReady={handlePlayerReady} // Wichtig: Übergibt die Funktion an Ihre Komponente
               autoplay
               controls
               showInfo={false}
             />
           </div>
 
+          {/* Overlays (WASD, Timeline, Toolbar) */}
           {showKeyOverlay && (
             <div className="absolute top-8 left-8 pointer-events-none">
               <div className="grid grid-cols-3 gap-3 w-40">
