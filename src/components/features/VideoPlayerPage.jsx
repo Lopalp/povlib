@@ -18,8 +18,8 @@ import {
   Link2,
   Keyboard,
   ListVideo,
-  Maximize, // NEU: Fullscreen-Icons
-  Minimize, // NEU: Fullscreen-Icons
+  Maximize,
+  Minimize,
 } from "lucide-react";
 import YouTubeEmbed from "../media/YouTubeEmbed";
 import ModalHeading from "../headings/ModalHeading";
@@ -52,12 +52,12 @@ const VideoPlayerPage = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false); // NEU: State für Fullscreen
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Refs
   const playerRef = useRef(null);
   const progressIntervalRef = useRef(null);
-  const playerContainerRef = useRef(null); // NEU: Ref für den Player-Container
+  const playerContainerRef = useRef(null);
 
   // Player-Events
   const handlePlayerReady = (event) => {
@@ -85,34 +85,29 @@ const VideoPlayerPage = ({
     }
   };
 
-  // --- NEUE LOGIK FÜR FULLSCREEN ---
   const handleFullscreen = () => {
     if (!playerContainerRef.current) return;
-
     if (!document.fullscreenElement) {
-      playerContainerRef.current.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-      });
+      playerContainerRef.current.requestFullscreen().catch(err => console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`));
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
+      if (document.exitFullscreen) document.exitFullscreen();
     }
   };
 
   useEffect(() => {
-    const onFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
+    const onFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
-  // --- ENDE FULLSCREEN LOGIK ---
-
+  
   useEffect(() => {
     return () => clearInterval(progressIntervalRef.current);
   }, []);
-  
+
+  useEffect(() => {
+    if (!isPlaying) setShowMatchTimeline(true);
+  }, [isPlaying]);
+
   // Steuerungsfunktionen
   const togglePlayPause = () => {
     if (!playerRef.current) return;
@@ -149,103 +144,105 @@ const VideoPlayerPage = ({
   const description = `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(", ")} on ${selectedDemo.map}. Watch how ${selectedDemo.team || "professional"} players demonstrate professional positioning for ${selectedDemo.positions?.join(" and ") || "various scenarios"}. This POV video highlights techniques like ${selectedDemo.tags?.join(", ") || "advanced strategies"}.`;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 pt-24">
-      <main className="pb-0">
-        <div
-          ref={playerContainerRef} // Ref für Fullscreen an den Hauptcontainer
-          className="relative w-full bg-black"
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-        >
-          <div className="aspect-video">
-            <div className="absolute top-0 left-0 w-full h-full">
-              <YouTubeEmbed
-                videoId={selectedDemo.video_id}
-                title={selectedDemo.title}
-                onReady={handlePlayerReady}
-                onStateChange={handlePlayerStateChange}
-                autoplay
-              />
-            </div>
-            <div className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer" onClick={togglePlayPause}></div>
-          </div>
-          
-          <div className="absolute top-0 right-0 z-20">
-            <div className="w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-              <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
-                <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
-                {/* === GEÄNDERT: Timeline-Button ist bei Pause deaktiviert === */}
-                <IconButton 
-                    onClick={() => setShowMatchTimeline(!showMatchTimeline)} 
-                    className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'} disabled:opacity-50 disabled:cursor-not-allowed`}
-                    tooltip="Toggle Match Timeline"
-                    disabled={!isPlaying}
-                >
-                    <ListVideo className="h-5 w-5" />
-                </IconButton>
+    <div className="min-h-screen bg-gray-950 text-gray-200">
+      <main className="pt-24 pb-12">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex flex-col gap-8">
+            
+            {/* === VIDEOSEKTION (JETZT WIEDER IM CONTAINER) === */}
+            <div
+              ref={playerContainerRef}
+              className="relative w-full bg-black rounded-2xl overflow-hidden shadow-2xl" // Abgerundete Ecken & Schatten für den neuen Look
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <div className="aspect-video">
+                <div className="absolute top-0 left-0 w-full h-full">
+                  <YouTubeEmbed
+                    videoId={selectedDemo.video_id}
+                    title={selectedDemo.title}
+                    onReady={handlePlayerReady}
+                    onStateChange={handlePlayerStateChange}
+                    autoplay
+                  />
+                </div>
+                <div className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer" onClick={togglePlayPause}></div>
               </div>
-            </div>
-          </div>
+              
+              {/* Overlays (Notch, Timelines, etc.) funktionieren weiterhin relativ zu diesem Container */}
+              <div className="absolute top-0 right-0 z-20">
+                <div className="w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
+                  <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                    <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
+                    <IconButton 
+                        onClick={() => setShowMatchTimeline(!showMatchTimeline)} 
+                        className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                        tooltip="Toggle Match Timeline"
+                        disabled={!isPlaying}
+                    >
+                        <ListVideo className="h-5 w-5" />
+                    </IconButton>
+                  </div>
+                </div>
+              </div>
 
-          <div 
-            className={`absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}
-            style={{ pointerEvents: areControlsVisible ? 'auto' : 'none' }} 
-          >
-            {/* === GEÄNDERT: Rendert die große Timeline, wenn pausiert ist ODER sie manuell eingeschaltet wurde === */}
-            {(!isPlaying || showMatchTimeline) ? (
-              <div className="bg-gradient-to-t from-black/90 via-black/80 to-transparent">
-                <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-4 md:p-6">
-                  <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
-                  <style jsx>{`.custom-scrollbar::-webkit-scrollbar { height: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #374151; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #eab308; }`}</style>
-                  <div className="relative overflow-x-auto custom-scrollbar">
-                    <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full min-w-full"></div>
-                    <div className="relative flex justify-between min-w-max gap-4 pb-4">
-                      {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
-                        <div key={round} className="flex flex-col items-center flex-shrink-0">
-                          <button onClick={() => setSelectedRound(selectedRound === round ? null : round)} className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}>{round}</button>
-                          <span className="text-xs text-gray-500 mt-2 whitespace-nowrap">Round {round}</span>
+              <div 
+                className={`absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}
+                style={{ pointerEvents: areControlsVisible ? 'auto' : 'none' }} 
+              >
+                {(!isPlaying || showMatchTimeline) ? (
+                  <div className="bg-gradient-to-t from-black/90 via-black/80 to-transparent">
+                    <div className="bg-gray-900/60 backdrop-blur-sm p-4 md:p-6">
+                      <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
+                      <style jsx>{`.custom-scrollbar::-webkit-scrollbar { height: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #374151; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #eab308; }`}</style>
+                      <div className="relative overflow-x-auto custom-scrollbar">
+                        <div className="absolute left-0 right-0 h-1 bg-gray-800 top-4 rounded-full min-w-full"></div>
+                        <div className="relative flex justify-between min-w-max gap-4 pb-4">
+                          {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
+                            <div key={round} className="flex flex-col items-center flex-shrink-0">
+                              <button onClick={() => setSelectedRound(selectedRound === round ? null : round)} className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}>{round}</button>
+                              <span className="text-xs text-gray-500 mt-2 whitespace-nowrap">Round {round}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                      {selectedRound && ( <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700 animate-in slide-in-from-top-2 duration-300">{/* ...Runden-Details... */}</div> )}
+                      
+                      <div className="flex items-center gap-4 text-white pt-6">
+                        <IconButton onClick={togglePlayPause} className="hover:bg-white/20">{isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}</IconButton>
+                        <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
+                        <input type="range" min="0" max="100" value={duration > 0 ? (currentTime / duration) * 100 : 0} onChange={handleSeek} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400" />
+                        <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
+                        <IconButton onClick={handleFullscreen} className="hover:bg-white/20">{isFullscreen ? <Minimize className="h-6 w-6"/> : <Maximize className="h-6 w-6"/>}</IconButton>
+                      </div>
                     </div>
                   </div>
-                  {selectedRound && ( <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700 animate-in slide-in-from-top-2 duration-300">{/* ...Runden-Details... */}</div> )}
-                  
-                  <div className="flex items-center gap-4 text-white pt-6">
-                    <IconButton onClick={togglePlayPause} className="hover:bg-white/20">{isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}</IconButton>
-                    <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
-                    <input type="range" min="0" max="100" value={duration > 0 ? (currentTime / duration) * 100 : 0} onChange={handleSeek} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400" />
-                    <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
-                    <IconButton onClick={handleFullscreen} className="hover:bg-white/20">{isFullscreen ? <Minimize className="h-6 w-6"/> : <Maximize className="h-6 w-6"/>}</IconButton>
+                ) : (
+                  <div className="p-4">
+                    <div className="flex items-center gap-4 text-white">
+                      <IconButton onClick={togglePlayPause} className="hover:bg-white/20">{isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}</IconButton>
+                      <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
+                      <input type="range" min="0" max="100" value={duration > 0 ? (currentTime / duration) * 100 : 0} onChange={handleSeek} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400"/>
+                      <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
+                      <IconButton onClick={handleFullscreen} className="hover:bg-white/20">{isFullscreen ? <Minimize className="h-6 w-6"/> : <Maximize className="h-6 w-6"/>}</IconButton>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {showKeyOverlay && (
+                <div className="absolute bottom-72 left-8 pointer-events-none z-30">
+                  <div className="grid grid-cols-3 gap-3 w-40">
+                    <div className="col-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div></div>
+                    <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
+                    <div className="col-start-2 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>S</div></div>
+                    <div className="col-start-3 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>D</div></div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="p-4">
-                <div className="flex items-center gap-4 text-white">
-                  <IconButton onClick={togglePlayPause} className="hover:bg-white/20">{isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}</IconButton>
-                  <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
-                  <input type="range" min="0" max="100" value={duration > 0 ? (currentTime / duration) * 100 : 0} onChange={handleSeek} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400"/>
-                  <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
-                  <IconButton onClick={handleFullscreen} className="hover:bg-white/20">{isFullscreen ? <Minimize className="h-6 w-6"/> : <Maximize className="h-6 w-6"/>}</IconButton>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {showKeyOverlay && (
-            <div className="absolute bottom-72 left-8 pointer-events-none z-30">
-              <div className="grid grid-cols-3 gap-3 w-40">
-                <div className="col-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div></div>
-                <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
-                <div className="col-start-2 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>S</div></div>
-                <div className="col-start-3 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>D</div></div>
-              </div>
+              )}
             </div>
-          )}
-        </div>
-        
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-col gap-8 pt-12">
+            
+            {/* INHALT UNTER DEM VIDEO */}
             <div className="w-full space-y-6">
               <ModalHeading className="text-2xl lg:text-3xl">{selectedDemo.title}</ModalHeading>
               
