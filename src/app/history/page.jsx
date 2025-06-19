@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
-import { createSupabaseBrowserClient } from '../lib/supabaseClient';
-import { getFilteredDemos } from '../lib/db/demos';
+import { createSupabaseBrowserClient } from '@/lib/supabaseClient';
+import { getFilteredDemos } from '@/lib/db/demos';
 import { Trash2 } from 'lucide-react';
 
 // Es ist am besten, diese Komponente in eine eigene Datei auszulagern: /components/VideoCard.js
