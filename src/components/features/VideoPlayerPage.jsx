@@ -18,6 +18,8 @@ import {
   Link2,
   Keyboard,
   ListVideo,
+  Maximize, // NEU: Fullscreen-Icons
+  Minimize, // NEU: Fullscreen-Icons
 } from "lucide-react";
 import YouTubeEmbed from "../media/YouTubeEmbed";
 import ModalHeading from "../headings/ModalHeading";
@@ -50,10 +52,12 @@ const VideoPlayerPage = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false); // NEU: State für Fullscreen
 
   // Refs
   const playerRef = useRef(null);
   const progressIntervalRef = useRef(null);
+  const playerContainerRef = useRef(null); // NEU: Ref für den Player-Container
 
   // Player-Events
   const handlePlayerReady = (event) => {
@@ -81,17 +85,34 @@ const VideoPlayerPage = ({
     }
   };
 
+  // --- NEUE LOGIK FÜR FULLSCREEN ---
+  const handleFullscreen = () => {
+    if (!playerContainerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      playerContainerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+  // --- ENDE FULLSCREEN LOGIK ---
+
   useEffect(() => {
     return () => clearInterval(progressIntervalRef.current);
   }, []);
-
-  // === NEU: useEffect, der die große Timeline bei jeder Pause automatisch öffnet ===
-  useEffect(() => {
-    if (!isPlaying) {
-      setShowMatchTimeline(true);
-    }
-  }, [isPlaying]);
-
+  
   // Steuerungsfunktionen
   const togglePlayPause = () => {
     if (!playerRef.current) return;
@@ -131,6 +152,7 @@ const VideoPlayerPage = ({
     <div className="min-h-screen bg-gray-950 text-gray-200 pt-24">
       <main className="pb-0">
         <div
+          ref={playerContainerRef} // Ref für Fullscreen an den Hauptcontainer
           className="relative w-full bg-black"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
@@ -148,12 +170,19 @@ const VideoPlayerPage = ({
             <div className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer" onClick={togglePlayPause}></div>
           </div>
           
-          {/* === GEÄNDERT: Noch breitere Notch === */}
           <div className="absolute top-0 right-0 z-20">
             <div className="w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
               <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
                 <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
-                <IconButton onClick={() => setShowMatchTimeline(!showMatchTimeline)} className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
+                {/* === GEÄNDERT: Timeline-Button ist bei Pause deaktiviert === */}
+                <IconButton 
+                    onClick={() => setShowMatchTimeline(!showMatchTimeline)} 
+                    className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                    tooltip="Toggle Match Timeline"
+                    disabled={!isPlaying}
+                >
+                    <ListVideo className="h-5 w-5" />
+                </IconButton>
               </div>
             </div>
           </div>
@@ -162,8 +191,8 @@ const VideoPlayerPage = ({
             className={`absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}
             style={{ pointerEvents: areControlsVisible ? 'auto' : 'none' }} 
           >
-            {showMatchTimeline ? (
-              /* === GEÄNDERT: "Große Timeline" schließt jetzt bündig ab (kein Padding außen) === */
+            {/* === GEÄNDERT: Rendert die große Timeline, wenn pausiert ist ODER sie manuell eingeschaltet wurde === */}
+            {(!isPlaying || showMatchTimeline) ? (
               <div className="bg-gradient-to-t from-black/90 via-black/80 to-transparent">
                 <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-4 md:p-6">
                   <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
@@ -186,6 +215,7 @@ const VideoPlayerPage = ({
                     <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
                     <input type="range" min="0" max="100" value={duration > 0 ? (currentTime / duration) * 100 : 0} onChange={handleSeek} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400" />
                     <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
+                    <IconButton onClick={handleFullscreen} className="hover:bg-white/20">{isFullscreen ? <Minimize className="h-6 w-6"/> : <Maximize className="h-6 w-6"/>}</IconButton>
                   </div>
                 </div>
               </div>
@@ -196,12 +226,12 @@ const VideoPlayerPage = ({
                   <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
                   <input type="range" min="0" max="100" value={duration > 0 ? (currentTime / duration) * 100 : 0} onChange={handleSeek} className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400"/>
                   <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
+                  <IconButton onClick={handleFullscreen} className="hover:bg-white/20">{isFullscreen ? <Minimize className="h-6 w-6"/> : <Maximize className="h-6 w-6"/>}</IconButton>
                 </div>
               </div>
             )}
           </div>
 
-          {/* === GEÄNDERT: WASD-Overlay über der großen Timeline positioniert === */}
           {showKeyOverlay && (
             <div className="absolute bottom-72 left-8 pointer-events-none z-30">
               <div className="grid grid-cols-3 gap-3 w-40">
