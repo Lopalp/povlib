@@ -27,8 +27,6 @@ const FeaturedHero = ({
     return null;
   }
 
-  // Erwartet ein Objekt wie: demo.stats = { kills: 21, deaths: 5, assists: 12 }
-  // Stellt einen Platzhalter bereit, falls die Daten nicht vorhanden sind.
   const statsString = demo.stats
     ? `${demo.stats.kills} / ${demo.stats.deaths} / ${demo.stats.assists}`
     : "K / D / A";
@@ -95,20 +93,19 @@ const FeaturedHero = ({
             isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          {/* === NEUER INFORMATIONSBLOCK START === */}
+          {/* === INFORMATIONSBLOCK (GRÖSSER SKALIERT) START === */}
           <div className="mb-6">
-            <p className="text-white uppercase font-semibold text-2xl md:text-3xl">
+            <p className="text-white uppercase font-semibold text-3xl md:text-4xl">
               {demo.map || "MAP"}
             </p>
-            <h1 className="text-5xl md:text-6xl font-bold text-yellow-400 uppercase leading-none my-1">
-              {/* Zeigt den ersten Spieler aus dem Array an oder einen Platzhalter */}
+            <h1 className="text-6xl md:text-7xl font-bold text-yellow-400 uppercase leading-none my-1">
               {demo.players?.[0] || "PLAYER"}
             </h1>
-            <p className="text-white font-medium text-xl md:text-2xl tracking-wider">
+            <p className="text-white font-medium text-2xl md:text-3xl tracking-wider">
               {statsString}
             </p>
           </div>
-          {/* === NEUER INFORMATIONSBLOCK ENDE === */}
+          {/* === INFORMATIONSBLOCK ENDE === */}
 
           {/* Buttons */}
           <div className="flex items-center gap-4">
