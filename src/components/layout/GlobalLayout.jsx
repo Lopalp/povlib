@@ -42,7 +42,7 @@ function GlobalLayoutContent({ children }) {
       <div className="flex relative">
         {shouldShowNavigation && <Sidebar />}
         <main
-          className={`flex-1 ${
+          className={`flex-1 transition-all duration-300 ${
             shouldShowNavigation
               ? isSidebarCollapsed
                 ? "md:ml-16 pt-16"

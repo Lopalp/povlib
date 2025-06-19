@@ -16,8 +16,13 @@ import {
   BrainCircuit,
   Activity,
   Trophy,
-  PanelLeftOpen,
-  PanelLeftClose,
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  Mail,
+  Shield,
+  FileText,
+  Settings,
 } from "lucide-react";
 import { useNavbar } from "../../context/NavbarContext";
 
@@ -92,8 +97,8 @@ export default function Sidebar({ items }) {
     <>
       {/* Desktop sidebar */}
       <aside
-        className={`hidden md:flex fixed left-0 bottom-0 z-40 flex-col border-r border-gray-700 transition-all duration-300 overflow-y-auto sidebar-scrollbar ${
-          isSidebarCollapsed ? "w-16 p-3" : "w-64 p-6"
+        className={`hidden md:flex fixed left-0 bottom-0 z-40 flex-col border-r border-gray-700 transition-all duration-300 overflow-y-auto sidebar-scrollbar p-3 ${
+          isSidebarCollapsed ? "w-16" : "w-64"
         }`}
         style={{
           top: "4rem",
@@ -102,70 +107,124 @@ export default function Sidebar({ items }) {
           backgroundColor: "#030712",
         }}
       >
-        {/* Sidebar toggle button */}
-        <button
-          onClick={() => setIsSidebarCollapsed((c) => !c)}
-          className="flex items-center justify-center mb-4 p-2 text-gray-100 hover:text-brand-yellow w-full"
-        >
-          {isSidebarCollapsed ? (
-            <PanelLeftOpen className="h-5 w-5" />
-          ) : (
-            <PanelLeftClose className="h-5 w-5" />
-          )}
-        </button>
-        {!isSidebarCollapsed && (
-          <Link
-            href="/checkout?plan=pro"
-            className="border border-brand-yellow text-brand-yellow rounded-lg p-3 text-center text-sm font-medium mb-4 hover:bg-brand-yellow/10"
-          >
-            Upgrade to Pro for <span className="font-bold">$6.99/mo</span>
-          </Link>
-        )}
         <nav
-          className={`flex flex-col space-y-4 ${
-            isSidebarCollapsed ? "items-center" : "mt-4"
-          }`}
+          className="flex flex-col space-y-6"
         >
+          {/* Sidebar toggle button - now styled like other entries */}
+          <button
+            onClick={() => setIsSidebarCollapsed((c) => !c)}
+            className={`flex items-center text-sm font-medium text-gray-400 hover:text-brand-yellow transition-colors ${
+              isSidebarCollapsed ? "justify-center" : "space-x-3 pl-3"
+            }`}
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <ChevronLeft className="h-5 w-5" />
+            )}
+            {!isSidebarCollapsed && (
+              <span className={`transition-opacity duration-300 ${
+                isSidebarCollapsed ? 'opacity-0' : 'opacity-100'
+              }`} style={{
+                transitionDelay: isSidebarCollapsed ? '0ms' : '300ms'
+              }}>
+                Collapse
+              </span>
+            )}
+          </button>
+
           {menuItems.map((item, index) => (
             <Link
               key={index}
               href={item.href}
               className={`flex items-center text-sm font-medium text-gray-200 hover:text-brand-yellow transition-colors ${
-                isSidebarCollapsed ? "justify-center" : "space-x-3"
+                isSidebarCollapsed ? "justify-center" : "space-x-3 pl-3"
               }`}
+              title={isSidebarCollapsed ? item.label : undefined}
             >
               {item.icon}
-              {!isSidebarCollapsed && <span>{item.label}</span>}
+              {!isSidebarCollapsed && (
+                <span className={`transition-opacity duration-300 ${
+                  isSidebarCollapsed ? 'opacity-0' : 'opacity-100'
+                }`} style={{
+                  transitionDelay: isSidebarCollapsed ? '0ms' : '300ms'
+                }}>
+                  {item.label}
+                </span>
+              )}
             </Link>
           ))}
-          {!isSidebarCollapsed && (
+          {isSidebarCollapsed ? (
             <>
-              <hr className="border-gray-700 my-4" />
-              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">
+              <hr className="border-gray-700 my-6" />
+              <h3 className="mb-4 text-sm font-bold uppercase text-gray-400 opacity-0">
                 You
               </h3>
               {youItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center space-x-3 text-sm text-gray-200 hover:text-brand-yellow"
+                  className="flex items-center justify-center text-sm text-gray-200 hover:text-brand-yellow transition-colors"
+                  title={item.label}
                 >
                   {item.icon}
-                  <span>{item.label}</span>
                 </Link>
               ))}
-              <hr className="border-gray-700 my-4" />
-              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">
+              <hr className="border-gray-700 my-6" />
+              <h3 className="mb-4 text-sm font-bold uppercase text-gray-400 opacity-0">
                 Analytics
               </h3>
               {analyticsItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center space-x-3 text-sm text-gray-200 hover:text-brand-yellow"
+                  className="flex items-center justify-center text-sm text-gray-200 hover:text-brand-yellow transition-colors"
+                  title={item.label}
                 >
                   {item.icon}
-                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </>
+          ) : (
+            <>
+              <hr className="border-gray-700 my-6" />
+              <h3 className="mb-4 text-sm font-bold uppercase text-gray-400">
+                You
+              </h3>
+              {youItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center space-x-3 pl-3 text-sm text-gray-200 hover:text-brand-yellow transition-colors"
+                >
+                  {item.icon}
+                  <span className={`transition-opacity duration-300 ${
+                    isSidebarCollapsed ? 'opacity-0' : 'opacity-100'
+                  }`} style={{
+                    transitionDelay: isSidebarCollapsed ? '0ms' : '300ms'
+                  }}>
+                    {item.label}
+                  </span>
+                </Link>
+              ))}
+              <hr className="border-gray-700 my-6" />
+              <h3 className="mb-4 text-sm font-bold uppercase text-gray-400">
+                Analytics
+              </h3>
+              {analyticsItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center space-x-3 pl-3 text-sm text-gray-200 hover:text-brand-yellow transition-colors"
+                >
+                  {item.icon}
+                  <span className={`transition-opacity duration-300 ${
+                    isSidebarCollapsed ? 'opacity-0' : 'opacity-100'
+                  }`} style={{
+                    transitionDelay: isSidebarCollapsed ? '0ms' : '300ms'
+                  }}>
+                    {item.label}
+                  </span>
                 </Link>
               ))}
             </>
@@ -173,53 +232,53 @@ export default function Sidebar({ items }) {
         </nav>
         {!isSidebarCollapsed && (
           <>
-            <hr className="border-gray-700 my-4" />
-            <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">
+            <hr className="border-gray-700 my-6" />
+            <h3 className="mb-4 text-sm font-bold uppercase text-gray-400">
               Resources
             </h3>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               About
             </Link>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               Contact
             </Link>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               FAQ
             </Link>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               Support
             </Link>
-            <hr className="border-gray-700 my-4" />
-            <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">
+            <hr className="border-gray-700 my-6" />
+            <h3 className="mb-4 text-sm font-bold uppercase text-gray-400">
               Legal
             </h3>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               Terms of Service
             </Link>
             <Link
               href="#"
-              className="text-sm text-gray-200 hover:text-brand-yellow"
+              className="text-sm text-gray-200 hover:text-brand-yellow transition-colors"
             >
               Cookie Policy
             </Link>
@@ -237,13 +296,6 @@ export default function Sidebar({ items }) {
             >
               <X className="h-6 w-6" />
             </button>
-            <Link
-              href="/checkout?plan=pro"
-              onClick={() => setIsMenuOpen(false)}
-              className="border border-brand-yellow text-brand-yellow rounded-lg p-3 text-center text-sm font-medium hover:bg-brand-yellow/10"
-            >
-              Upgrade to Pro for <span className="font-bold">$6.99/mo</span>
-            </Link>
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item, index) => (
                 <Link
@@ -272,7 +324,7 @@ export default function Sidebar({ items }) {
                 </Link>
               ))}
               <hr className="border-gray-700 my-4" />
-              <h3 className="mb-2 text-xs font-bold uppercase text-gray-400">
+              <h3 className="mb-6 text-sm font-bold uppercase text-gray-400">
                 Analytics
               </h3>
               {analyticsItems.map((item) => (
@@ -325,14 +377,22 @@ export default function Sidebar({ items }) {
 
       <style jsx>{`
         .sidebar-scrollbar::-webkit-scrollbar {
-          width: 8px;
+          width: 8px !important;
         }
         .sidebar-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
+          background: transparent !important;
         }
         .sidebar-scrollbar::-webkit-scrollbar-thumb {
-          background: #374151;
-          border-radius: 4px;
+          background-color: #9ca3af !important;
+          border-radius: 4px !important;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: #d1d5db !important;
+        }
+        /* Firefox scrollbar */
+        .sidebar-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #9ca3af transparent;
         }
       `}</style>
     </>
