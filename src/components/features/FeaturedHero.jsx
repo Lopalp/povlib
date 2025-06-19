@@ -27,6 +27,12 @@ const FeaturedHero = ({
     return null;
   }
 
+  // Erwartet ein Objekt wie: demo.stats = { kills: 21, deaths: 5, assists: 12 }
+  // Stellt einen Platzhalter bereit, falls die Daten nicht vorhanden sind.
+  const statsString = demo.stats
+    ? `${demo.stats.kills} / ${demo.stats.deaths} / ${demo.stats.assists}`
+    : "K / D / A";
+
   if (!demo.videoId) {
     return (
       <div className="relative overflow-hidden bg-gray-800 group w-full aspect-[16/9] max-h-[75vh] h-auto">
@@ -43,16 +49,13 @@ const FeaturedHero = ({
     <div className="relative overflow-hidden bg-black group w-full aspect-[16/9] max-h-[75vh] h-auto">
       {/* Hintergrund-Video */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Halbtransparenter Schwarz-Overlay (optional) */}
         <div className="absolute inset-0 bg-black/15 z-10 pointer-events-none" />
-
-        {/* Das YouTubeEmbed mit verbesserter Skalierung für vollständige Abdeckung */}
         <div className="absolute inset-0 w-full h-full">
           <div
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
             style={{
-              width: "177.78vh", // 16:9 ratio calculated as 100vh * 16/9
-              height: "56.25vw", // 16:9 ratio calculated as 100vw * 9/16
+              width: "177.78vh",
+              height: "56.25vw",
               minWidth: "100%",
               minHeight: "100%",
             }}
@@ -68,7 +71,6 @@ const FeaturedHero = ({
           </div>
         </div>
 
-        {/* Play Button Overlay - separate from iframe container */}
         {showPlayButton && (
           <div
             className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-20 cursor-pointer"
@@ -86,37 +88,29 @@ const FeaturedHero = ({
         )}
       </div>
 
-      {/* Inhalt: Titel, Tags, Buttons */}
+      {/* Inhalt: Neuer Info-Block und Buttons */}
       <div className="relative z-30 container mx-auto h-full flex items-end justify-start px-6 pb-8">
         <div
-          className={`max-w-2xl transition-all duration-700 ${
+          className={`transition-all duration-700 ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          {/* Titel */}
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight line-clamp-2 md:line-clamp-none">
-            {demo.title}
-          </h1>
-
-          {/* Tags – nur ab sm sichtbar */}
-          <div className="hidden sm:flex flex-wrap gap-2 mb-4">
-            {[
-              demo.map,
-              demo.team,
-              demo.event,
-              demo.year,
-              ...demo.players,
-              ...(demo.positions || []),
-            ]
-              .filter(Boolean)
-              .map((tag, i) => (
-                <Tag key={i} variant="secondary" size="xs">
-                  {tag}
-                </Tag>
-              ))}
+          {/* === NEUER INFORMATIONSBLOCK START === */}
+          <div className="mb-6">
+            <p className="text-white uppercase font-semibold text-2xl md:text-3xl">
+              {demo.map || "MAP"}
+            </p>
+            <h1 className="text-5xl md:text-6xl font-bold text-yellow-400 uppercase leading-none my-1">
+              {/* Zeigt den ersten Spieler aus dem Array an oder einen Platzhalter */}
+              {demo.players?.[0] || "PLAYER"}
+            </h1>
+            <p className="text-white font-medium text-xl md:text-2xl tracking-wider">
+              {statsString}
+            </p>
           </div>
+          {/* === NEUER INFORMATIONSBLOCK ENDE === */}
 
-          {/* Buttons – bleiben mit Text sichtbar */}
+          {/* Buttons */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
