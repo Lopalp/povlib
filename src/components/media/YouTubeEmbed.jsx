@@ -5,13 +5,12 @@ const YouTubeEmbed = ({
   videoId,
   title,
   autoplay = false,
-  className = "", // className wird nun direkt an die Komponente weitergegeben
   controls = true,
   showInfo = false,
   onReady,
 }) => {
   const opts = {
-    // Höhe und Breite werden von CSS gesteuert, nicht mehr hier
+    // Höhe und Breite werden von CSS im Elternelement gesteuert
     playerVars: {
       autoplay: autoplay ? 1 : 0,
       controls: controls ? 1 : 0,
@@ -22,15 +21,16 @@ const YouTubeEmbed = ({
     },
   };
 
-  // Diese Komponente rendert nun einen einfachen, sauberen YouTube-Player.
-  // Das Styling (Positionierung & Größe) wird von der Eltern-Komponente über `className` gesteuert.
+  // Die 'className' sorgt dafür, dass der von react-youtube erstellte
+  // Container und der iframe darin 100% des Elternelements ausfüllen.
   return (
     <YouTube
       videoId={videoId}
       opts={opts}
       onReady={onReady}
       title={title || "YouTube video player"}
-      className={className} // Wendet die übergebenen Klassen direkt an
+      className="w-full h-full"
+      iframeClassName="w-full h-full"
     />
   );
 };
