@@ -50,19 +50,23 @@ function CheckoutPageContent() {
 
   return (
     <main className="min-h-screen bg-[#0E0E10] text-[#f3f3f3]">
-       {/* The 'jsx' and 'global' attributes have been removed to fix the React warning. */}
        <style>{`
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0E0E10;
-            background-image: radial-gradient(ellipse at top, rgba(29, 78, 216, 0.15), transparent 60%),
-                              radial-gradient(ellipse at bottom, rgba(59, 130, 246, 0.1), transparent 70%);
+            /* The blue background gradients have been made more prominent */
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(29, 78, 216, 0.3), transparent 50%),
+                              radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.2), transparent 50%);
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        .fade-in { 
+            /* Set initial opacity to 0, so it's invisible before animation starts */
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards; 
+        }
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
@@ -99,7 +103,7 @@ function CheckoutPageContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           
           {/* Free Plan */}
-          <div className="bg-[#1a1a21] border border-gray-700 rounded-2xl p-8 flex flex-col fade-in delay-2 opacity-0">
+          <div className="bg-[#1a1a21] border border-gray-700 rounded-2xl p-8 flex flex-col fade-in delay-2">
             <h3 className="text-2xl font-bold text-white mb-2">{plansData.free.name}</h3>
             <p className="text-gray-400 mb-6 h-10">{plansData.free.description}</p>
             <p className="text-5xl font-extrabold text-white mb-6">Free</p>
@@ -119,7 +123,7 @@ function CheckoutPageContent() {
           </div>
 
           {/* Basic Plan (Most Popular) */}
-          <div className="relative p-px rounded-2xl fade-in delay-3 opacity-0" style={{background: 'linear-gradient(to bottom, #facc15, rgba(250, 204, 21, 0.1))'}}>
+          <div className="relative p-px rounded-2xl fade-in delay-3" style={{background: 'linear-gradient(to bottom, #facc15, rgba(250, 204, 21, 0.1))'}}>
             <div className="bg-[#1a1a21] rounded-[15px] p-8 flex flex-col h-full">
               <div className="absolute top-4 right-4">
                    <span className="bg-yellow-400 text-black text-xs font-bold px-3 py-1 rounded-full uppercase">Most Popular</span>
@@ -145,7 +149,7 @@ function CheckoutPageContent() {
           </div>
 
           {/* Pro Plan */}
-          <div className="bg-[#1a1a21] border border-gray-700 rounded-2xl p-8 flex flex-col relative fade-in delay-4 opacity-0">
+          <div className="bg-[#1a1a21] border border-gray-700 rounded-2xl p-8 flex flex-col relative fade-in delay-4">
               <h3 className="text-2xl font-bold text-white mb-2">{plansData.pro.name}</h3>
               <p className="text-gray-400 mb-6 h-10">{plansData.pro.description}</p>
                <div className="mb-6">
