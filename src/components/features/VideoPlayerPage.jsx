@@ -46,7 +46,7 @@ const VideoPlayerPage = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [showKeyOverlay, setShowKeyOverlay] = useState(false);
   const [showMatchTimeline, setShowMatchTimeline] = useState(false);
-  const [isHovering, setIsHovering] = useState(false); // Hover-State ist wieder da
+  const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -85,6 +85,13 @@ const VideoPlayerPage = ({
     return () => clearInterval(progressIntervalRef.current);
   }, []);
 
+  // === NEU: useEffect, der die große Timeline bei jeder Pause automatisch öffnet ===
+  useEffect(() => {
+    if (!isPlaying) {
+      setShowMatchTimeline(true);
+    }
+  }, [isPlaying]);
+
   // Steuerungsfunktionen
   const togglePlayPause = () => {
     if (!playerRef.current) return;
@@ -115,8 +122,6 @@ const VideoPlayerPage = ({
     return () => clearInterval(interval);
   }, [showKeyOverlay]);
   
-  // === NEU: Eine Variable für die Sichtbarkeit der Steuerelemente ===
-  // Sichtbar, wenn Video pausiert ist ODER wenn man mit der Maus darüber fährt
   const areControlsVisible = !isPlaying || isHovering;
 
   if (!selectedDemo) return null;
@@ -140,16 +145,12 @@ const VideoPlayerPage = ({
                 autoplay
               />
             </div>
-
-            <div
-              className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer"
-              onClick={togglePlayPause}
-            ></div>
+            <div className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer" onClick={togglePlayPause}></div>
           </div>
           
+          {/* === GEÄNDERT: Noch breitere Notch === */}
           <div className="absolute top-0 right-0 z-20">
-            <div className="w-40 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-               {/* Die Sichtbarkeit der Notch-Buttons wird jetzt durch die neue Logik gesteuert */}
+            <div className="w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
               <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
                 <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
                 <IconButton onClick={() => setShowMatchTimeline(!showMatchTimeline)} className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
@@ -157,15 +158,14 @@ const VideoPlayerPage = ({
             </div>
           </div>
 
-          {/* #--- NEUE STRUKTUR: Ein Container für BEIDE Timelines am unteren Rand ---# */}
           <div 
             className={`absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}
             style={{ pointerEvents: areControlsVisible ? 'auto' : 'none' }} 
           >
             {showMatchTimeline ? (
-              /* #--- ANSICHT 1: Die "Große Timeline", wenn showMatchTimeline true ist ---# */
-              <div className="p-4 md:p-6 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
-                <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-gray-800">
+              /* === GEÄNDERT: "Große Timeline" schließt jetzt bündig ab (kein Padding außen) === */
+              <div className="bg-gradient-to-t from-black/90 via-black/80 to-transparent">
+                <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-4 md:p-6">
                   <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
                   <style jsx>{`.custom-scrollbar::-webkit-scrollbar { height: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #374151; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #eab308; }`}</style>
                   <div className="relative overflow-x-auto custom-scrollbar">
@@ -181,7 +181,6 @@ const VideoPlayerPage = ({
                   </div>
                   {selectedRound && ( <div className="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700 animate-in slide-in-from-top-2 duration-300">{/* ...Runden-Details... */}</div> )}
                   
-                  {/* Die kleine Steuerungsleiste ist HIER INTEGRIERT */}
                   <div className="flex items-center gap-4 text-white pt-6">
                     <IconButton onClick={togglePlayPause} className="hover:bg-white/20">{isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}</IconButton>
                     <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
@@ -191,7 +190,6 @@ const VideoPlayerPage = ({
                 </div>
               </div>
             ) : (
-              /* #--- ANSICHT 2: Die "Kleine Timeline", wenn showMatchTimeline false ist ---# */
               <div className="p-4">
                 <div className="flex items-center gap-4 text-white">
                   <IconButton onClick={togglePlayPause} className="hover:bg-white/20">{isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}</IconButton>
@@ -203,8 +201,9 @@ const VideoPlayerPage = ({
             )}
           </div>
 
+          {/* === GEÄNDERT: WASD-Overlay über der großen Timeline positioniert === */}
           {showKeyOverlay && (
-            <div className="absolute bottom-24 left-8 pointer-events-none z-30">
+            <div className="absolute bottom-72 left-8 pointer-events-none z-30">
               <div className="grid grid-cols-3 gap-3 w-40">
                 <div className="col-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div></div>
                 <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
@@ -215,7 +214,6 @@ const VideoPlayerPage = ({
           )}
         </div>
         
-        {/* Seiteninhalt unter dem Video */}
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col gap-8 pt-12">
             <div className="w-full space-y-6">
@@ -231,7 +229,7 @@ const VideoPlayerPage = ({
                   ))}
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
-                  <button onClick={() => onLike(selectedDemo.id)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"><ThumbsUp className="w-5 h-5"/><span>{selectedDemo.likes}</span></button>
+                  <button onClick={() => onLike(selectedDemo.id)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"><ThumbsUp className="h-5 w-5"/><span>{selectedDemo.likes}</span></button>
                   <IconButton className="bg-gray-800 hover:bg-gray-700"><Share2 className="h-5 w-5" /></IconButton>
                   
                   <div className="relative">
