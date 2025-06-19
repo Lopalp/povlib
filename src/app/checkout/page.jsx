@@ -50,7 +50,8 @@ function CheckoutPageContent() {
 
   return (
     <main className="min-h-screen bg-[#0E0E10] text-[#f3f3f3]">
-       <style jsx global>{`
+       {/* The 'jsx' and 'global' attributes have been removed to fix the React warning. */}
+       <style>{`
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0E0E10;
