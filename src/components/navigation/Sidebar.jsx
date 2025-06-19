@@ -41,7 +41,6 @@ export default function Sidebar({ items }) {
     ];
 
   const youItems = [
-    { label: "History", href: "/history", icon: <Clock className="h-5 w-5" /> },
     {
       label: "Your Matches",
       href: "/matches",
@@ -51,6 +50,11 @@ export default function Sidebar({ items }) {
       label: "Your Demos",
       href: "/your-demos",
       icon: <Film className="h-5 w-5" />,
+    },
+    {
+      label: "History",
+      href: "/history",
+      icon: <Clock className="h-5 w-5" />,
     },
     {
       label: "Watch Later",
@@ -86,7 +90,6 @@ export default function Sidebar({ items }) {
       icon: <Trophy className="h-5 w-5" />,
     },
   ];
-
 
   return (
     <>
@@ -168,7 +171,7 @@ export default function Sidebar({ items }) {
       </aside>
 
       {/* Mobile overlay */}
-        {isMenuOpen && (
+      {isMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div className="w-64 bg-gray-900/90 backdrop-blur p-6 space-y-4 overflow-y-auto sidebar-scrollbar">
             <button

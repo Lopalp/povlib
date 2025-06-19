@@ -93,15 +93,15 @@ const FeaturedHero = ({
             isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
           }`}
         >
-          {/* === INFORMATIONSBLOCK (GRÖSSER SKALIERT) START === */}
-          <div className="mb-6">
-            <p className="text-white uppercase font-semibold text-3xl md:text-4xl">
+          {/* === INFORMATIONSBLOCK (SEHR GROSS SKALIERT) START === */}
+          <div className="mb-8">
+            <p className="text-white uppercase font-semibold text-4xl md:text-5xl">
               {demo.map || "MAP"}
             </p>
-            <h1 className="text-6xl md:text-7xl font-bold text-yellow-400 uppercase leading-none my-1">
+            <h1 className="text-7xl md:text-8xl font-bold text-yellow-400 uppercase leading-none my-1">
               {demo.players?.[0] || "PLAYER"}
             </h1>
-            <p className="text-white font-medium text-2xl md:text-3xl tracking-wider">
+            <p className="text-white font-medium text-3xl md:text-4xl tracking-wider">
               {statsString}
             </p>
           </div>
