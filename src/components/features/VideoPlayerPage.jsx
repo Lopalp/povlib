@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   ThumbsUp,
@@ -41,45 +41,50 @@ const VideoPlayerPage = ({
   const [showTimeline, setShowTimeline] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
   const [selectedRound, setSelectedRound] = useState(null);
-  const [activeKeys, setActiveKeys] = useState({
-    w: false,
-    a: false,
-    s: false,
-    d: false,
-  });
+  const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
+  
+  const playerRef = useRef(null); // Ref to store the YouTube player instance
+
+  // This function gets called when the YouTube player is ready
+  const handlePlayerReady = (event) => {
+    playerRef.current = event.target;
+  };
+
+  // This function handles clicks on the round buttons
+  const handleRoundClick = (round) => {
+    // Toggle the display of round details
+    setSelectedRound(selectedRound === round ? null : round);
+
+    // If the player is ready, seek to a random time in the video
+    if (playerRef.current && typeof playerRef.current.getDuration === 'function') {
+      const duration = playerRef.current.getDuration();
+      if (duration > 0) {
+        const randomTime = Math.random() * duration;
+        playerRef.current.seekTo(randomTime, true);
+      }
+    }
+  };
 
   // Random key lighting effect
   useEffect(() => {
     if (!showKeyOverlay) return;
-
     const interval = setInterval(() => {
       const keys = ["w", "a", "s", "d"];
       const randomKey = keys[Math.floor(Math.random() * keys.length)];
-
       setActiveKeys((prev) => ({ ...{ w: false, a: false, s: false, d: false }, [randomKey]: true }));
-
       setTimeout(() => {
         setActiveKeys({ w: false, a: false, s: false, d: false });
       }, 300);
     }, 500);
-
     return () => clearInterval(interval);
   }, [showKeyOverlay]);
 
   if (!selectedDemo) return null;
 
-  const description = `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(
-    ", "
-  )} on ${selectedDemo.map}. Watch how ${
-    selectedDemo.team || "professional"
-  } players demonstrate professional positioning for ${
-    selectedDemo.positions?.join(" and ") || "various scenarios"
-  }. This POV video highlights techniques like ${
-    selectedDemo.tags?.join(", ") || "advanced strategies"
-  }.`;
+  const description = `Experience top-tier CS2 gameplay with ${selectedDemo.players.join(", ")} on ${selectedDemo.map}. Watch how ${selectedDemo.team || "professional"} players demonstrate professional positioning for ${selectedDemo.positions?.join(" and ") || "various scenarios"}. This POV video highlights techniques like ${selectedDemo.tags?.join(", ") || "advanced strategies"}.`;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200">
+    <div className="min-h-screen bg-gray-950 text-gray-200 pt-24">
       <main className="pb-0">
         <div
           className="relative w-full bg-black"
@@ -90,6 +95,7 @@ const VideoPlayerPage = ({
             <YouTubeEmbed
               videoId={selectedDemo.video_id}
               title={selectedDemo.title}
+              onReady={handlePlayerReady}
               autoplay
               controls
               showInfo={false}
@@ -99,18 +105,10 @@ const VideoPlayerPage = ({
           {showKeyOverlay && (
             <div className="absolute top-8 left-8 pointer-events-none">
               <div className="grid grid-cols-3 gap-3 w-40">
-                <div className="col-start-2">
-                  <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div>
-                </div>
-                <div className="col-start-1 row-start-2">
-                  <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div>
-                </div>
-                <div className="col-start-2 row-start-2">
-                  <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>S</div>
-                </div>
-                <div className="col-start-3 row-start-2">
-                  <div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>D</div>
-                </div>
+                <div className="col-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div></div>
+                <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
+                <div className="col-start-2 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>S</div></div>
+                <div className="col-start-3 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>D</div></div>
               </div>
             </div>
           )}
@@ -134,7 +132,7 @@ const VideoPlayerPage = ({
                     {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
                       <div key={round} className="flex flex-col items-center flex-shrink-0">
                         <button
-                          onClick={() => setSelectedRound(selectedRound === round ? null : round)}
+                          onClick={() => handleRoundClick(round)}
                           className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}
                         >
                           {round}
@@ -153,18 +151,18 @@ const VideoPlayerPage = ({
                       </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                       <div className="bg-gray-900/50 p-3 rounded-lg">
-                         <div className="text-xs text-gray-400 mb-1">Round Type</div>
-                         <div className="text-white font-medium">{selectedRound <= 15 ? 'First Half' : selectedRound === 16 ? 'Side Switch' : 'Second Half'}</div>
-                       </div>
-                       <div className="bg-gray-900/50 p-3 rounded-lg">
-                         <div className="text-xs text-gray-400 mb-1">Economy</div>
-                         <div className="text-yellow-400 font-medium">{Math.random() > 0.5 ? 'Force Buy' : 'Full Buy'}</div>
-                       </div>
-                       <div className="bg-gray-900/50 p-3 rounded-lg">
-                         <div className="text-xs text-gray-400 mb-1">Duration</div>
-                         <div className="text-white font-medium">{Math.floor(Math.random() * 60 + 30)}s</div>
-                       </div>
+                      <div className="bg-gray-900/50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">Round Type</div>
+                        <div className="text-white font-medium">{selectedRound <= 15 ? 'First Half' : selectedRound === 16 ? 'Side Switch' : 'Second Half'}</div>
+                      </div>
+                      <div className="bg-gray-900/50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">Economy</div>
+                        <div className="text-yellow-400 font-medium">{Math.random() > 0.5 ? 'Force Buy' : 'Full Buy'}</div>
+                      </div>
+                      <div className="bg-gray-900/50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-400 mb-1">Duration</div>
+                        <div className="text-white font-medium">{Math.floor(Math.random() * 60 + 30)}s</div>
+                      </div>
                     </div>
                     <div className="mt-3 text-sm text-gray-300">Detailed round analysis and key moments will be displayed here when available.</div>
                   </div>
@@ -176,17 +174,13 @@ const VideoPlayerPage = ({
           <div
             className={`absolute bottom-4 right-4 flex items-center gap-3 bg-gray-900/70 backdrop-blur-sm border border-gray-700 rounded-lg p-2 transition-opacity duration-300 pointer-events-auto ${isToolbarVisible ? "opacity-100" : "opacity-0"}`}
           >
-            <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle WASD Overlay">
-              <Keyboard className="h-5 w-5" />
-            </IconButton>
-            <IconButton onClick={() => setShowTimeline(!showTimeline)} className={`${showTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle Match Timeline">
-              <ListVideo className="h-5 w-5" />
-            </IconButton>
+            <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
+            <IconButton onClick={() => setShowTimeline(!showTimeline)} className={`${showTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
           </div>
         </div>
-
-        <div className="container mx-auto px-4 max-w-7xl pt-24">
-          <div className="flex flex-col gap-8">
+        
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex flex-col gap-8 pt-12">
             <div className="w-full space-y-6">
               <ModalHeading className="text-2xl lg:text-3xl">{selectedDemo.title}</ModalHeading>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -206,11 +200,11 @@ const VideoPlayerPage = ({
                   <div className="relative">
                     <IconButton onClick={() => setMenuOpen(!menuOpen)} className="bg-gray-800 hover:bg-gray-700"><MoreHorizontal className="h-5 w-5" /></IconButton>
                     <ActionsMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} demo={"bottom-left"} items={[
-                        { icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }},
-                        { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) },
-                        { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) },
-                        { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }},
-                        { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }},
+                      { icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }},
+                      { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) },
+                      { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) },
+                      { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }},
+                      { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }},
                     ]}/>
                   </div>
                 </div>
@@ -218,11 +212,11 @@ const VideoPlayerPage = ({
 
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
                 <div className="flex items-center justify-between mb-4">
-                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-400 text-sm">
-                     <div className="flex items-center"><span>{selectedDemo.views?.toLocaleString()} views</span></div>
-                     <div>{selectedDemo.year}</div>
-                     {selectedDemo.event && (<div className="text-yellow-400 font-medium">{selectedDemo.event}</div>)}
-                   </div>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-400 text-sm">
+                    <div className="flex items-center"><span>{selectedDemo.views?.toLocaleString()} views</span></div>
+                    <div>{selectedDemo.year}</div>
+                    {selectedDemo.event && (<div className="text-yellow-400 font-medium">{selectedDemo.event}</div>)}
+                  </div>
                   <button onClick={() => setHelpExpanded(!helpExpanded)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-yellow-400 transition-colors">
                     <span className="hidden sm:inline">Help us improve</span>
                     {helpExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
