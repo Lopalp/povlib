@@ -46,7 +46,6 @@ const VideoPlayerPage = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [showKeyOverlay, setShowKeyOverlay] = useState(false);
   const [showMatchTimeline, setShowMatchTimeline] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -122,11 +121,8 @@ const VideoPlayerPage = ({
   return (
     <div className="min-h-screen bg-gray-950 text-gray-200 pt-24">
       <main className="pb-0">
-        <div
-          className="relative w-full bg-black"
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-        >
+        {/* Die Hover-Events onMouseEnter/Leave wurden von diesem Container entfernt */}
+        <div className="relative w-full bg-black">
           <div className="aspect-video">
             <div className="absolute top-0 left-0 w-full h-full">
               <YouTubeEmbed
@@ -144,25 +140,24 @@ const VideoPlayerPage = ({
             ></div>
           </div>
           
-          {/* === GEÄNDERT: Verbreiterte Notch Toolbar === */}
+          {/* === GEÄNDERT: Verbreiterte Notch, Buttons sichtbar bei Pause === */}
           <div className="absolute top-0 right-0 z-20">
-            {/* Äußere div setzt die Breite und die Form */}
-            <div className="w-32 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-               {/* Innere div für Padding und Ausrichtung der Buttons */}
-              <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${isHovering ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="w-40 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
+              <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${!isPlaying ? 'opacity-100' : 'opacity-0'}`}>
                 <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
                 <IconButton onClick={() => setShowMatchTimeline(!showMatchTimeline)} className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
               </div>
             </div>
           </div>
 
-          {/* === GEÄNDERT: Custom Controls, angehoben und nur bei PAUSE sichtbar === */}
+          {/* === GEÄNDERT: Timeline etwas tiefer, sichtbar bei Pause === */}
           <div 
-            className={`absolute bottom-4 left-0 right-0 px-4 z-20 transition-opacity duration-300 ${!isPlaying ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute bottom-2 left-0 right-0 px-4 z-20 transition-opacity duration-300 ${!isPlaying ? 'opacity-100' : 'opacity-0'}`}
             style={{ pointerEvents: !isPlaying ? 'auto' : 'none' }} 
           >
             <div className="flex items-center gap-4 text-white">
               <IconButton onClick={togglePlayPause} className="hover:bg-white/20">
+                {/* Zeigt immer ein Play-Icon, da die Leiste nur bei Pause sichtbar ist */}
                 <Play className="h-6 w-6" />
               </IconButton>
               <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
@@ -178,7 +173,7 @@ const VideoPlayerPage = ({
             </div>
           </div>
 
-          {/* === GEÄNDERT: WASD-Overlay neu positioniert === */}
+          {/* WASD-Overlay (Position ist relativ zur neuen Timeline) */}
           {showKeyOverlay && (
             <div className="absolute bottom-24 left-8 pointer-events-none z-30">
               <div className="grid grid-cols-3 gap-3 w-40">
@@ -190,6 +185,7 @@ const VideoPlayerPage = ({
             </div>
           )}
 
+          {/* === GEÄNDERT: Inhalt der Match Timeline wiederhergestellt === */}
           {showMatchTimeline && (
             <div className="absolute bottom-20 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-auto z-30">
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-gray-800 animate-in slide-in-from-bottom-5 duration-300">
