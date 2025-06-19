@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+"use client"; // <--- DIES IST DIE LÖSUNG
+
+import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { createSupabaseBrowserClient } from '../lib/supabaseClient';
-import { getFilteredDemos } from '../lib/db/demos'; // Wir importieren die gleiche Funktion wie die Startseite
+import { getFilteredDemos } from '../lib/db/demos';
 import { Trash2 } from 'lucide-react';
 
 // Es ist am besten, diese Komponente in eine eigene Datei auszulagern: /components/VideoCard.js
 function VideoCard({ video, onSelectDemo }) {
   const handleClick = () => onSelectDemo(video);
 
-  // Fallback-Bilder, falls keine vorhanden sind
   const VIDEO_THUMBNAIL_POOL = ["/img/1.png", "/img/2.png", "/img/3.png", "/img/4.png", "/img/5.png", "/img/6.png"];
   const randomThumbnail = () => VIDEO_THUMBNAIL_POOL[Math.floor(Math.random() * VIDEO_THUMBNAIL_POOL.length)];
 
@@ -63,7 +64,6 @@ const HistoryPage = () => {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
 
-  // Schritt 1: Prüfen, ob ein Benutzer angemeldet ist. Eine Verlaufsseite ist benutzerspezifisch.
   useEffect(() => {
     const fetchUserAndData = async () => {
         setIsLoading(true);
@@ -71,11 +71,8 @@ const HistoryPage = () => {
         
         if (session) {
             setUser(session.user);
-            // Schritt 2: Da es keinen echten Verlauf gibt, laden wir zufällige Demos.
-            // Wir holen 12 Demos, um die Seite zu füllen.
             const randomDemos = await getFilteredDemos({}, 12);
 
-            // Schritt 3: Wir mappen die zufälligen Demos in das Video-Format.
             const mappedDemos = randomDemos.map(demo => ({
                 type: "video",
                 demoId: demo.id,
@@ -85,15 +82,11 @@ const HistoryPage = () => {
                 views: `${demo.views || 0} views`,
                 uploadDate: demo.year || "2024",
                 channel: demo.players?.[0] || "Unknown Player",
-                channelAvatar: null, // Wird durch Fallback in VideoCard behandelt
-                watched: true, // Alle werden als "angesehen" markiert
+                channelAvatar: null,
+                watched: true,
                 id: `video-${demo.id}`,
             }));
             setDemoHistory(mappedDemos);
-        } else {
-            // Optional: Wenn kein Benutzer da ist, kann man ihn zum Login leiten
-            // oder einfach einen leeren Verlauf anzeigen.
-            // router.push('/login'); 
         }
         setIsLoading(false);
     };
@@ -105,17 +98,13 @@ const HistoryPage = () => {
     router.push(`/demos/${demo.demoId}`);
   };
 
-  // Diese Funktion simuliert das Löschen des Verlaufs, indem sie den State leert.
   const handleClearHistory = () => {
     const isConfirmed = window.confirm("Are you sure you want to clear your watch history? (This is a demo)");
     
     if (isConfirmed) {
-      // In der echten Version würde hier der Datenbankaufruf erfolgen.
-      // Für die Demo leeren wir einfach das Array.
       setDemoHistory([]);
     }
   };
-
 
   if (isLoading) {
     return (
@@ -133,7 +122,6 @@ const HistoryPage = () => {
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="flex justify-between items-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">Watch History</h1>
-          {/* Zeige den "Löschen"-Button nur an, wenn Videos im Demo-Verlauf sind */}
           {demoHistory.length > 0 && (
              <button
               onClick={handleClearHistory}
@@ -145,7 +133,6 @@ const HistoryPage = () => {
           )}
         </div>
         
-        {/* Bedingtes Rendern: Entweder das Gitter mit Videos oder die Leerzustands-Nachricht */}
         {demoHistory.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 lg:gap-x-5 lg:gap-y-10">
             {demoHistory.map((video) => (
