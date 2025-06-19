@@ -12,7 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   Play,
-  Pause, // Wichtig: Pause-Icon importieren
+  Pause,
   X,
   Upload,
   Link2,
@@ -26,7 +26,6 @@ import Tag from "../typography/Tag";
 import { IconButton } from "../buttons";
 import ActionsMenu from "../menus/ActionsMenu";
 
-// Hilfsfunktion zur Formatierung von Sekunden in das Format MM:SS
 const formatTime = (timeInSeconds) => {
   if (isNaN(timeInSeconds) || timeInSeconds === 0) return "0:00";
   const minutes = Math.floor(timeInSeconds / 60);
@@ -42,31 +41,29 @@ const VideoPlayerPage = ({
   onOpenTagModal,
   onSelectRelatedDemo,
 }) => {
-  // States für die Overlays
+  // Alle State-Variablen sind hier oben korrekt definiert
+  const [menuOpen, setMenuOpen] = useState(false); // Die entscheidende Variable
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [helpExpanded, setHelpExpanded] = useState(false);
+  const [matchroomUrl, setMatchroomUrl] = useState("");
   const [showKeyOverlay, setShowKeyOverlay] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
   const [selectedRound, setSelectedRound] = useState(null);
-
-  // States für die neue, eigene Videosteuerung
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
-  // Refs für Player und Intervall
+  const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
+  
   const playerRef = useRef(null);
   const progressIntervalRef = useRef(null);
 
-  // Player-Events
   const handlePlayerReady = (event) => {
     playerRef.current = event.target;
     setDuration(event.target.getDuration());
-    if (event.target.getPlayerState() === 5) { // Video ist bereit (cued)
-        // Autoplay Logik
-        const videoData = event.target.getVideoData();
-        if (videoData && videoData.autoplay) {
-            event.target.playVideo();
-        }
+    const videoData = event.target.getVideoData();
+    if (videoData && videoData.autoplay) {
+        event.target.playVideo();
     }
   };
 
@@ -76,34 +73,25 @@ const VideoPlayerPage = ({
     setIsPlaying(isCurrentlyPlaying);
 
     if (isCurrentlyPlaying) {
-      // Wenn das Video spielt, starte den Intervall, um die Zeit zu aktualisieren
       progressIntervalRef.current = setInterval(() => {
         if (playerRef.current) {
           setCurrentTime(playerRef.current.getCurrentTime());
         }
       }, 500);
     } else {
-      // Wenn das Video pausiert oder endet, lösche den Intervall
       clearInterval(progressIntervalRef.current);
     }
   };
 
   useEffect(() => {
-    // Cleanup-Effekt: Stellt sicher, dass der Intervall gelöscht wird,
-    // wenn die Komponente verlassen wird, um Memory-Leaks zu vermeiden.
     return () => {
       clearInterval(progressIntervalRef.current);
     };
   }, []);
 
-  // Steuerungsfunktionen
   const togglePlayPause = () => {
     if (!playerRef.current) return;
-    if (isPlaying) {
-      playerRef.current.pauseVideo();
-    } else {
-      playerRef.current.playVideo();
-    }
+    isPlaying ? playerRef.current.pauseVideo() : playerRef.current.playVideo();
   };
 
   const handleSeek = (e) => {
@@ -113,8 +101,6 @@ const VideoPlayerPage = ({
     playerRef.current.seekTo(newTime, true);
   };
   
-  // (Restliche Logik wie Key-Overlay-Effekt etc. bleibt hier)
-  const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
   useEffect(() => {
     if (!showKeyOverlay) return;
     const interval = setInterval(() => {
@@ -150,10 +136,8 @@ const VideoPlayerPage = ({
             </div>
           </div>
 
-          {/* === Custom Controls Overlay === */}
           <div 
             className={`absolute bottom-0 left-0 right-0 p-4 z-10 transition-opacity duration-300 ${isToolbarVisible ? 'opacity-100' : 'opacity-0'}`}
-            // Verhindert, dass die Maus-Events vom Overlay "geschluckt" werden, wenn es unsichtbar ist
             style={{ pointerEvents: isToolbarVisible ? 'auto' : 'none' }} 
           >
             <div className="flex items-center gap-4 text-white">
@@ -173,7 +157,6 @@ const VideoPlayerPage = ({
             </div>
           </div>
 
-          {/* Alte Overlays (jetzt ohne Steuerungsfunktion, nur Anzeige) */}
           {showKeyOverlay && (
             <div className="absolute top-8 left-8 pointer-events-none z-20">
               <div className="grid grid-cols-3 gap-3 w-40">
@@ -212,14 +195,12 @@ const VideoPlayerPage = ({
             </div>
           )}
 
-          {/* Toolbar für die Overlays */}
           <div className={`absolute top-4 right-4 flex items-center gap-3 transition-opacity duration-300 pointer-events-auto z-20 ${isToolbarVisible ? 'opacity-100' : 'opacity-0'}`}>
             <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
             <IconButton onClick={() => setShowTimeline(!showTimeline)} className={`${showTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
           </div>
         </div>
         
-        {/* Seiteninhalt unter dem Video */}
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col gap-8 pt-12">
             <div className="w-full space-y-6">
@@ -237,7 +218,28 @@ const VideoPlayerPage = ({
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <button onClick={() => onLike(selectedDemo.id)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"><ThumbsUp className="w-5 h-5"/><span>{selectedDemo.likes}</span></button>
                   <IconButton className="bg-gray-800 hover:bg-gray-700"><Share2 className="h-5 w-5" /></IconButton>
-                  <div className="relative"><IconButton onClick={() => setMenuOpen(true)} className="bg-gray-800 hover:bg-gray-700"><MoreHorizontal className="h-5 w-5" /></IconButton><ActionsMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} demo={"bottom-left"} items={[{ icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }}, { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) }, { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) }, { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }}, { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}]}/></div>
+                  
+                  {/* KORRIGIERTER BEREICH FÜR DAS MENÜ */}
+                  <div className="relative">
+                    <IconButton 
+                      onClick={() => setMenuOpen(!menuOpen)} // Korrekt als Toggle implementiert
+                      className="bg-gray-800 hover:bg-gray-700"
+                    >
+                      <MoreHorizontal className="h-5 w-5" />
+                    </IconButton>
+                    <ActionsMenu 
+                      isOpen={menuOpen} 
+                      onClose={() => setMenuOpen(false)} 
+                      demo={"bottom-left"} 
+                      items={[
+                        { icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }},
+                        { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) }, 
+                        { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) }, 
+                        { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }},
+                        { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}
+                      ]}
+                    />
+                  </div>
                 </div>
               </div>
 
