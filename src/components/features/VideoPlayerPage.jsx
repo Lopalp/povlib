@@ -149,10 +149,9 @@ const VideoPlayerPage = ({
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col gap-8">
             
-            {/* === VIDEOSEKTION (JETZT WIEDER IM CONTAINER) === */}
             <div
               ref={playerContainerRef}
-              className="relative w-full bg-black rounded-2xl overflow-hidden shadow-2xl" // Abgerundete Ecken & Schatten für den neuen Look
+              className="relative w-full bg-black rounded-2xl overflow-hidden shadow-2xl"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
@@ -169,10 +168,10 @@ const VideoPlayerPage = ({
                 <div className="absolute top-0 left-0 w-full h-full z-10 cursor-pointer" onClick={togglePlayPause}></div>
               </div>
               
-              {/* Overlays (Notch, Timelines, etc.) funktionieren weiterhin relativ zu diesem Container */}
+              {/* === GEÄNDERT: Sichtbarkeitslogik auf den gesamten Notch-Container angewendet === */}
               <div className="absolute top-0 right-0 z-20">
-                <div className="w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-                  <div className={`flex items-center justify-end p-2 gap-2 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="flex items-center justify-end p-2 gap-2">
                     <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
                     <IconButton 
                         onClick={() => setShowMatchTimeline(!showMatchTimeline)} 
@@ -192,7 +191,7 @@ const VideoPlayerPage = ({
               >
                 {(!isPlaying || showMatchTimeline) ? (
                   <div className="bg-gradient-to-t from-black/90 via-black/80 to-transparent">
-                    <div className="bg-gray-900/60 backdrop-blur-sm p-4 md:p-6">
+                    <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-4 md:p-6">
                       <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
                       <style jsx>{`.custom-scrollbar::-webkit-scrollbar { height: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #374151; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #eab308; }`}</style>
                       <div className="relative overflow-x-auto custom-scrollbar">
@@ -242,7 +241,6 @@ const VideoPlayerPage = ({
               )}
             </div>
             
-            {/* INHALT UNTER DEM VIDEO */}
             <div className="w-full space-y-6">
               <ModalHeading className="text-2xl lg:text-3xl">{selectedDemo.title}</ModalHeading>
               
