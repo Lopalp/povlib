@@ -209,9 +209,6 @@ export default function UtilityBookPage() {
 
   return (
     <>
-      {/* Spacer for Navbar */}
-      <div className="h-24 bg-gray-900"></div>
-
       {/* Hero Header */}
       <div className="relative py-20 bg-gradient-to-b from-gray-800 to-gray-900">
         <div className="absolute inset-0 bg-yellow-400/5 mix-blend-overlay"></div>

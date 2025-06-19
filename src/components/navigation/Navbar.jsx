@@ -71,20 +71,13 @@ export default function Navbar({
   const isActive = (path) => pathname === path;
 
   return (
-    <header className={`fixed top-0 w-full z-50 ${glassBg}`}>
+    <header
+      className="fixed top-0 w-full z-50"
+      style={{ backgroundColor: "#030712" }}
+    >
       <div className="w-full px-4 md:px-6">
         <div className="flex items-center justify-between py-4 gap-4">
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setIsSidebarCollapsed((c) => !c)}
-              className="hidden md:flex p-2 text-gray-100 hover:text-brand-yellow"
-            >
-              {isSidebarCollapsed ? (
-                <PanelLeftOpen className="h-5 w-5" />
-              ) : (
-                <PanelLeftClose className="h-5 w-5" />
-              )}
-            </button>
+          <div className="flex items-center space-x-2 pl-2 pr-4">
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <LogoHeading size={1.5} />
@@ -93,7 +86,10 @@ export default function Navbar({
 
           {/* Desktop search */}
           <div className="hidden md:flex flex-1 justify-center">
-            <form onSubmit={handleSearchSubmit} className="relative w-full max-w-xl">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="relative w-full max-w-xl"
+            >
               <input
                 type="text"
                 value={searchQuery}
@@ -101,7 +97,10 @@ export default function Navbar({
                 placeholder="Search demos, players, teams, utilities..."
                 className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none"
               />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
                 <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
               </button>
             </form>
@@ -169,8 +168,15 @@ export default function Navbar({
             <IconButton onClick={toggleSearch}>
               <Search className="h-5 w-5 text-gray-100" />
             </IconButton>
-            <button onClick={() => setIsMenuOpen((o) => !o)} className="p-2 text-gray-100">
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button
+              onClick={() => setIsMenuOpen((o) => !o)}
+              className="p-2 text-gray-100"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -190,7 +196,10 @@ export default function Navbar({
               placeholder="Search demos, players, teams, utilities..."
               className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent placeholder-gray-400 text-white focus:outline-none"
             />
-            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+            >
               <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
             </button>
           </form>
@@ -210,7 +219,10 @@ export default function Navbar({
                   placeholder="Search demos, players, teams, utilities..."
                   className="w-full py-2 pl-4 pr-10 rounded-full border border-gray-600 bg-transparent text-gray-100 placeholder-gray-400 focus:outline-none"
                 />
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+                <button
+                  type="submit"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
                   <Search className="h-5 w-5 text-gray-100 hover:text-brand-yellow" />
                 </button>
               </form>

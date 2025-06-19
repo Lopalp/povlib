@@ -1,9 +1,10 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --brand-yellow: #FBBF24;
+  --brand-yellow: #fbbf24;
   --gray-900: #181a20;
   --gray-800: #23272f;
   --gray-700: #374151;
@@ -43,10 +44,11 @@
   }
 }
 
+html,
 body {
-  background: var(--background);
+  background: #030712 !important;
   color: var(--foreground);
-  font-family: var(--font-sans);
+  /* font-family removed to allow next/font/google to work */
 }
 
 /* Global cursor styles */

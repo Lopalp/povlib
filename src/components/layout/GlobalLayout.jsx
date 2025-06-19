@@ -39,14 +39,14 @@ function GlobalLayoutContent({ children }) {
         />
       )}
 
-      <div className="flex">
+      <div className="flex relative">
         {shouldShowNavigation && <Sidebar />}
         <main
           className={`flex-1 ${
             shouldShowNavigation
               ? isSidebarCollapsed
-                ? "md:ml-16"
-                : "md:ml-64"
+                ? "md:ml-16 pt-16"
+                : "md:ml-64 pt-16"
               : ""
           }`}
         >
