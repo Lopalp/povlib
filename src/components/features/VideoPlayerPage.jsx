@@ -12,6 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   Play,
+  Pause, // Wichtig: Pause-Icon importieren
   X,
   Upload,
   Link2,
@@ -25,6 +26,14 @@ import Tag from "../typography/Tag";
 import { IconButton } from "../buttons";
 import ActionsMenu from "../menus/ActionsMenu";
 
+// Hilfsfunktion zur Formatierung von Sekunden in das Format MM:SS
+const formatTime = (timeInSeconds) => {
+  if (isNaN(timeInSeconds) || timeInSeconds === 0) return "0:00";
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = Math.floor(timeInSeconds % 60);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
 const VideoPlayerPage = ({
   selectedDemo,
   relatedDemos = [],
@@ -33,42 +42,86 @@ const VideoPlayerPage = ({
   onOpenTagModal,
   onSelectRelatedDemo,
 }) => {
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [helpExpanded, setHelpExpanded] = useState(false);
-  const [matchroomUrl, setMatchroomUrl] = useState("");
+  // States für die Overlays
   const [showKeyOverlay, setShowKeyOverlay] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
   const [selectedRound, setSelectedRound] = useState(null);
-  const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
-  
-  const playerRef = useRef(null);
 
+  // States für die neue, eigene Videosteuerung
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // Refs für Player und Intervall
+  const playerRef = useRef(null);
+  const progressIntervalRef = useRef(null);
+
+  // Player-Events
   const handlePlayerReady = (event) => {
     playerRef.current = event.target;
-  };
-
-  const handleRoundClick = (round) => {
-    setSelectedRound(selectedRound === round ? null : round);
-    if (playerRef.current && typeof playerRef.current.getDuration === 'function') {
-      const duration = playerRef.current.getDuration();
-      if (duration > 0) {
-        const randomTime = Math.random() * duration;
-        playerRef.current.seekTo(randomTime, true);
-      }
+    setDuration(event.target.getDuration());
+    if (event.target.getPlayerState() === 5) { // Video ist bereit (cued)
+        // Autoplay Logik
+        const videoData = event.target.getVideoData();
+        if (videoData && videoData.autoplay) {
+            event.target.playVideo();
+        }
     }
   };
 
+  const handlePlayerStateChange = (event) => {
+    const playerState = event.data;
+    const isCurrentlyPlaying = playerState === 1;
+    setIsPlaying(isCurrentlyPlaying);
+
+    if (isCurrentlyPlaying) {
+      // Wenn das Video spielt, starte den Intervall, um die Zeit zu aktualisieren
+      progressIntervalRef.current = setInterval(() => {
+        if (playerRef.current) {
+          setCurrentTime(playerRef.current.getCurrentTime());
+        }
+      }, 500);
+    } else {
+      // Wenn das Video pausiert oder endet, lösche den Intervall
+      clearInterval(progressIntervalRef.current);
+    }
+  };
+
+  useEffect(() => {
+    // Cleanup-Effekt: Stellt sicher, dass der Intervall gelöscht wird,
+    // wenn die Komponente verlassen wird, um Memory-Leaks zu vermeiden.
+    return () => {
+      clearInterval(progressIntervalRef.current);
+    };
+  }, []);
+
+  // Steuerungsfunktionen
+  const togglePlayPause = () => {
+    if (!playerRef.current) return;
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.playVideo();
+    }
+  };
+
+  const handleSeek = (e) => {
+    if (!playerRef.current) return;
+    const newTime = (e.target.value / 100) * duration;
+    setCurrentTime(newTime);
+    playerRef.current.seekTo(newTime, true);
+  };
+  
+  // (Restliche Logik wie Key-Overlay-Effekt etc. bleibt hier)
+  const [activeKeys, setActiveKeys] = useState({ w: false, a: false, s: false, d: false });
   useEffect(() => {
     if (!showKeyOverlay) return;
     const interval = setInterval(() => {
       const keys = ["w", "a", "s", "d"];
       const randomKey = keys[Math.floor(Math.random() * keys.length)];
-      setActiveKeys((prev) => ({ ...{ w: false, a: false, s: false, d: false }, [randomKey]: true }));
-      setTimeout(() => {
-        setActiveKeys({ w: false, a: false, s: false, d: false });
-      }, 300);
+      setActiveKeys({ w: false, a: false, s: false, d: false, [randomKey]: true });
+      setTimeout(() => setActiveKeys({ w: false, a: false, s: false, d: false }), 300);
     }, 500);
     return () => clearInterval(interval);
   }, [showKeyOverlay]);
@@ -91,16 +144,38 @@ const VideoPlayerPage = ({
                 videoId={selectedDemo.video_id}
                 title={selectedDemo.title}
                 onReady={handlePlayerReady}
+                onStateChange={handlePlayerStateChange}
                 autoplay
-                controls={false}
-                showInfo={false}
               />
             </div>
           </div>
 
-          {/* Overlays */}
+          {/* === Custom Controls Overlay === */}
+          <div 
+            className={`absolute bottom-0 left-0 right-0 p-4 z-10 transition-opacity duration-300 ${isToolbarVisible ? 'opacity-100' : 'opacity-0'}`}
+            // Verhindert, dass die Maus-Events vom Overlay "geschluckt" werden, wenn es unsichtbar ist
+            style={{ pointerEvents: isToolbarVisible ? 'auto' : 'none' }} 
+          >
+            <div className="flex items-center gap-4 text-white">
+              <IconButton onClick={togglePlayPause} className="hover:bg-white/20">
+                {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+              </IconButton>
+              <span className="text-sm font-mono w-14 text-center">{formatTime(currentTime)}</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={duration > 0 ? (currentTime / duration) * 100 : 0}
+                onChange={handleSeek}
+                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+              />
+              <span className="text-sm font-mono w-14 text-center">{formatTime(duration)}</span>
+            </div>
+          </div>
+
+          {/* Alte Overlays (jetzt ohne Steuerungsfunktion, nur Anzeige) */}
           {showKeyOverlay && (
-            <div className="absolute top-8 left-8 pointer-events-none z-10">
+            <div className="absolute top-8 left-8 pointer-events-none z-20">
               <div className="grid grid-cols-3 gap-3 w-40">
                 <div className="col-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div></div>
                 <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
@@ -111,7 +186,7 @@ const VideoPlayerPage = ({
           )}
 
           {showTimeline && (
-            <div className="absolute bottom-20 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-auto z-10">
+            <div className="absolute bottom-20 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-black/80 via-black/50 to-transparent pointer-events-auto z-20">
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-gray-800 animate-in slide-in-from-bottom-5 duration-300">
                 <h2 className="text-xl font-semibold text-white flex items-center mb-6"><div className="w-1 h-6 bg-yellow-400 mr-3 rounded-full"></div>Match Timeline</h2>
                 <style jsx>{`.custom-scrollbar::-webkit-scrollbar { height: 8px; } .custom-scrollbar::-webkit-scrollbar-track { background: #374151; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #eab308; }`}</style>
@@ -120,7 +195,7 @@ const VideoPlayerPage = ({
                   <div className="relative flex justify-between min-w-max gap-4 pb-4">
                     {Array.from({ length: 25 }, (_, i) => i + 1).map((round) => (
                       <div key={round} className="flex flex-col items-center flex-shrink-0">
-                        <button onClick={() => handleRoundClick(round)} className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}>{round}</button>
+                        <button onClick={() => setSelectedRound(selectedRound === round ? null : round)} className={`w-8 h-8 ${selectedRound === round ? 'bg-yellow-400 border-yellow-400 text-gray-900 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'} rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 hover:bg-gray-700 transition-all cursor-pointer transform hover:scale-105`}>{round}</button>
                         <span className="text-xs text-gray-500 mt-2 whitespace-nowrap">Round {round}</span>
                       </div>
                     ))}
@@ -137,29 +212,14 @@ const VideoPlayerPage = ({
             </div>
           )}
 
-          {/* HIER IST DIE WIEDERHERGESTELLTE TOOLBAR */}
-          <div
-            className={`absolute bottom-4 right-4 flex items-center gap-3 bg-gray-900/70 backdrop-blur-sm border border-gray-700 rounded-lg p-2 transition-opacity duration-300 pointer-events-auto z-10 ${
-              isToolbarVisible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <IconButton
-              onClick={() => setShowKeyOverlay(!showKeyOverlay)}
-              className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`}
-              tooltip="Toggle WASD Overlay"
-            >
-              <Keyboard className="h-5 w-5" />
-            </IconButton>
-            <IconButton
-              onClick={() => setShowTimeline(!showTimeline)}
-              className={`${showTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`}
-              tooltip="Toggle Match Timeline"
-            >
-              <ListVideo className="h-5 w-5" />
-            </IconButton>
+          {/* Toolbar für die Overlays */}
+          <div className={`absolute top-4 right-4 flex items-center gap-3 transition-opacity duration-300 pointer-events-auto z-20 ${isToolbarVisible ? 'opacity-100' : 'opacity-0'}`}>
+            <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
+            <IconButton onClick={() => setShowTimeline(!showTimeline)} className={`${showTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-700'}`} tooltip="Toggle Match Timeline"><ListVideo className="h-5 w-5" /></IconButton>
           </div>
         </div>
         
+        {/* Seiteninhalt unter dem Video */}
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex flex-col gap-8 pt-12">
             <div className="w-full space-y-6">
@@ -177,7 +237,7 @@ const VideoPlayerPage = ({
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <button onClick={() => onLike(selectedDemo.id)} className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"><ThumbsUp className="w-5 h-5"/><span>{selectedDemo.likes}</span></button>
                   <IconButton className="bg-gray-800 hover:bg-gray-700"><Share2 className="h-5 w-5" /></IconButton>
-                  <div className="relative"><IconButton onClick={() => setMenuOpen(!menuOpen)} className="bg-gray-800 hover:bg-gray-700"><MoreHorizontal className="h-5 w-5" /></IconButton><ActionsMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} demo={"bottom-left"} items={[{ icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }}, { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) }, { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) }, { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }}, { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}]}/></div>
+                  <div className="relative"><IconButton onClick={() => setMenuOpen(true)} className="bg-gray-800 hover:bg-gray-700"><MoreHorizontal className="h-5 w-5" /></IconButton><ActionsMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} demo={"bottom-left"} items={[{ icon: <LucideTag className="h-4 w-4 text-yellow-400" />, label: "Add Tag", onClick: () => { onOpenTagModal(); setMenuOpen(false); }}, { icon: <Bookmark className="h-4 w-4 text-yellow-400" />, label: "Save", onClick: () => setMenuOpen(false) }, { icon: <Flag className="h-4 w-4 text-red-500" />, label: "Report", onClick: () => setMenuOpen(false) }, { icon: <Download className="h-4 w-4 text-yellow-400" />, label: "Download Video", onClick: () => { window.open(selectedDemo.video_url); setMenuOpen(false); }}, { icon: <ExternalLink className="h-4 w-4 text-yellow-400" />, label: "Open Matchroom", onClick: () => { window.open(selectedDemo.matchroom_url, "_blank"); setMenuOpen(false); }}]}/></div>
                 </div>
               </div>
 
