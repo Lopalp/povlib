@@ -21,13 +21,13 @@ const formatTime = (timeInSeconds) => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-// === GEÄNDERT: PlayerControls hat jetzt Standard-Props, um den Build-Fehler zu verhindern ===
+// PlayerControls mit ausfallsicheren Standardwerten für ALLE Props
 const PlayerControls = ({ 
   togglePlayPause = () => {},
   isPlaying = false,
   currentTime = 0,
   duration = 0,
-  handleSeek = () => {}, 
+  handleSeek = () => {}, // Sorgt dafür, dass handleSeek immer definiert ist
   volume = 1,
   isMuted = false,
   handleVolumeChange = () => {},
@@ -83,6 +83,7 @@ const PlayerControls = ({
     </div>
   );
 };
+
 
 // HAUPTKOMPONENTE
 const VideoPlayerPage = ({
@@ -165,19 +166,27 @@ const VideoPlayerPage = ({
     const newVolume = parseFloat(e.target.value) / 100;
     setVolume(newVolume);
     playerRef.current.setVolume(newVolume * 100);
-    if(newVolume > 0 && isMuted) {
+    if (newVolume > 0 && isMuted) {
       playerRef.current.unMute();
       setIsMuted(false);
     }
   };
   
   const toggleMute = () => {
+    if (!playerRef.current) return;
     if(isMuted) {
       playerRef.current.unMute();
     } else {
       playerRef.current.mute();
     }
     setIsMuted(!isMuted);
+  };
+  
+  const handleSeek = (e) => {
+    if (!playerRef.current) return;
+    const newTime = (e.target.value / 100) * duration;
+    setCurrentTime(newTime);
+    playerRef.current.seekTo(newTime, true);
   };
 
   useEffect(() => {
