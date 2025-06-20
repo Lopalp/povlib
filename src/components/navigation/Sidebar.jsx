@@ -43,7 +43,7 @@ export default function Sidebar({ items }) {
   const youItems = [
     {
       label: "Your Matches",
-      href: "/matches",
+      href: "/your-matches",
       icon: <Crosshair className="h-5 w-5" />,
     },
     {
