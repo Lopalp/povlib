@@ -1,5 +1,7 @@
 
 // src/app/your-matches/page.jsx
+"use client";
+
 import React from 'react';
 import SectionHeading from '../../components/headings/SectionHeading';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
