@@ -12,9 +12,8 @@ import Tag from "../typography/Tag";
 import { IconButton } from "../buttons";
 import ActionsMenu from "../menus/ActionsMenu";
 
-// HILFSKOMPONENTEN (innerhalb der Hauptdatei für Übersicht)
+// HILFSKOMPONENTEN
 
-// 1. Hilfsfunktion zur Formatierung von Sekunden in das Format MM:SS
 const formatTime = (timeInSeconds) => {
   if (isNaN(timeInSeconds) || timeInSeconds === 0) return "0:00";
   const minutes = Math.floor(timeInSeconds / 60);
@@ -22,7 +21,6 @@ const formatTime = (timeInSeconds) => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-// 2. Hilfskomponente für die untere Steuerungsleiste
 const PlayerControls = ({ 
   togglePlayPause = () => {},
   isPlaying = false,
@@ -248,9 +246,10 @@ const VideoPlayerPage = ({
                 ></div>
               </div>
               
+              {/* === KORREKTUR 1: Sichtbarkeitslogik auf den gesamten Notch-Container angewendet === */}
               <div className="absolute top-0 right-0 z-30">
-                <div className="w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-                  <div className={`flex items-center justify-end p-2 gap-1 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`w-48 bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="flex items-center justify-end p-2 gap-1">
                     <IconButton onClick={() => setShowMultiPov(!showMultiPov)} className={`${showMultiPov ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle Multi-POV"><Users className="h-5 w-5" /></IconButton>
                     <IconButton onClick={() => setShowKeyOverlay(!showKeyOverlay)} className={`${showKeyOverlay ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'}`} tooltip="Toggle WASD Overlay"><Keyboard className="h-5 w-5" /></IconButton>
                     <IconButton onClick={() => setShowMatchTimeline(!showMatchTimeline)} className={`${showMatchTimeline ? 'bg-yellow-400/20 text-yellow-400' : 'bg-transparent hover:bg-gray-800'} disabled:opacity-50 disabled:cursor-not-allowed`} tooltip="Toggle Match Timeline" disabled={!isPlaying}><ListVideo className="h-5 w-5" /></IconButton>
@@ -268,6 +267,18 @@ const VideoPlayerPage = ({
                             </div>
                         ))}
                     </div>
+                </div>
+              )}
+
+              {/* === KORREKTUR 2: WASD-Overlay wieder hinzugefügt === */}
+              {showKeyOverlay && (
+                <div className="absolute bottom-72 left-8 pointer-events-none z-30">
+                  <div className="grid grid-cols-3 gap-3 w-40">
+                    <div className="col-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.w ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>W</div></div>
+                    <div className="col-start-1 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.a ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>A</div></div>
+                    <div className="col-start-2 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.s ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>S</div></div>
+                    <div className="col-start-3 row-start-2"><div className={`w-12 h-12 rounded-lg border-2 ${activeKeys.d ? "border-yellow-400 text-yellow-400" : "border-gray-500 text-gray-300"} flex items-center justify-center font-bold text-lg transition-all duration-200`}>D</div></div>
+                  </div>
                 </div>
               )}
 
