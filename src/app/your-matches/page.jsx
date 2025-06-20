@@ -1,4 +1,4 @@
-jsx
+
 // src/app/your-matches/page.jsx
 import React from 'react';
 import SectionHeading from '../../components/headings/SectionHeading';
