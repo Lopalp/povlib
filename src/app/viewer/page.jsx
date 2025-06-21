@@ -214,8 +214,18 @@ const TacticalReplayViewer = () => {
     const handleRoundSelect = (roundNumber) => { if (isMultiRound) { setSelectedRounds(prev => prev.includes(roundNumber) ? (prev.length > 1 ? prev.filter(r => r !== roundNumber) : prev) : [...prev, roundNumber] ); } else { setSelectedRounds([roundNumber]); } };
     
     return (
-        <div ref={containerRef} className="w-full h-screen flex items-center justify-center font-sans relative text-gray-200 overflow-hidden p-4 md:p-8" style={{ backgroundColor: theme.colors.background, fontFamily: theme.font }} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} >
-            <style>{`.accent-color { accent-color: ${theme.colors.accent}; } .animate-fade-in-up { animation: fade-in-up 0.3s ease-out forwards; } @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } .animate-fade-in-right { animation: fade-in-right 0.3s ease-out forwards; } @keyframes fade-in-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }`}</style>
+        <div ref={containerRef} className="w-full h-screen flex items-center justify-center font-sans relative text-gray-200 overflow-hidden p-4 pt-12 md:p-8 md:pt-16" style={{ backgroundColor: theme.colors.background, fontFamily: theme.font }} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} >
+            <style>{`
+                .accent-color { accent-color: ${theme.colors.accent}; }
+                .animate-fade-in-up { animation: fade-in-up 0.3s ease-out forwards; }
+                @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-fade-in-right { animation: fade-in-right 0.3s ease-out forwards; }
+                @keyframes fade-in-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+                .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+            `}</style>
             
             {isScoreboardVisible && <Scoreboard replayData={replayData} onClose={() => setIsScoreboardVisible(false)} />}
             
@@ -253,7 +263,7 @@ const TacticalReplayViewer = () => {
                 
                 <aside className={`absolute top-1/2 -translate-y-1/2 right-4 w-80 z-20 transition-all duration-300 ease-in-out ${isPlayersExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
                      {singleRoundData && (
-                        <div className="p-2 space-y-1 rounded-xl bg-gray-950/80 backdrop-blur-sm border border-white/10 max-h-[70vh] overflow-y-auto">
+                        <div className="p-2 space-y-1 rounded-xl bg-gray-950/80 backdrop-blur-sm border border-white/10 max-h-[70vh] overflow-y-auto custom-scrollbar">
                             {['teamA', 'teamB'].map(teamId => (
                                 <div key={teamId} className="mb-2">
                                     <h3 className="font-semibold px-3 py-1" style={{color: replayData.teams[teamId].color}}>{replayData.teams[teamId].name}</h3>
@@ -276,7 +286,7 @@ const TacticalReplayViewer = () => {
                                     <span className="ml-3 text-sm font-medium text-gray-300">Multi-Runden-Analyse</span>
                                 </label>
                             </div>
-                             <div className="relative overflow-x-auto">
+                             <div className="relative overflow-x-auto custom-scrollbar">
                                  <div className="flex justify-start min-w-max gap-4 p-2 px-4">
                                     {replayData.rounds.map((r) => ( <button key={r.roundNumber} onClick={() => handleRoundSelect(r.roundNumber)} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 transition-all transform hover:scale-105 ${selectedRounds.includes(r.roundNumber) ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'}`} > {r.roundNumber} </button> ))}
                                  </div>
