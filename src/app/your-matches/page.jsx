@@ -119,38 +119,33 @@ const MatchCard = ({ match, onSelectMatch, onGenerateVideo }) => {
 
       {/* Match Details */}
       <div className="flex-1 pt-1 relative">
-        <h3 className="text-white text-base font-medium leading-snug mb-1">
+        <h3 className="text-white text-base font-medium leading-snug mb-1 line-clamp-2">
           {match.map} - {match.score}
         </h3>
-        
-        <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-          <span className={getResultColor(match.result)}>{match.result.toUpperCase()}</span>
-          <span>•</span>
-          <span>{match.date}</span>
-          <span>•</span>
-          <span>{match.platform}</span>
-        </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-4 text-sm mb-2">
-          <span className="text-gray-400">
-            K/D: <span className={getKDColor(match.kd)}>{match.kd}</span>
-          </span>
-          <span className="text-gray-400">
-            Rating: <span className={getRatingColor(match.hltvRating)}>{match.hltvRating}</span>
-          </span>
-          <span className="text-gray-400">
-            ADR: <span className="text-gray-300">{match.adr}</span>
-          </span>
-        </div>
+        <p className="text-gray-400 text-sm mb-2">
+          <span className={getResultColor(match.result)}>{match.result.toUpperCase()}</span>
+          {" • "}
+          {match.date}
+          {" • "}
+          {match.platform}
+        </p>
+
+        <p className="text-gray-400 text-sm line-clamp-1">
+          K/D: <span className={getKDColor(match.kd)}>{match.kd}</span>
+          {" • "}
+          Rating: <span className={getRatingColor(match.hltvRating)}>{match.hltvRating}</span>
+          {" • "}
+          ADR: {match.adr}
+        </p>
 
         {/* KDA */}
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-400 text-sm mt-1">
           {match.kills}/{match.deaths}/{match.assists} - {match.duration}
         </p>
 
         {/* Generate Video Button */}
-        <button 
+        <button
           onClick={(e) => {
             e.stopPropagation();
             onGenerateVideo(match.id);
