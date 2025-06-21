@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     Play, Pause, Users, Shield, Heart, Bomb, Crosshair, ShieldCheck, ListVideo,
     DollarSign, BarChart, Flame, Cloud, Zap, Map,
-    Thermometer, Footprints, X, ChevronDown
+    Thermometer, Footprints, X, ChevronDown, ChevronUp, Maximize, Minimize
 } from 'lucide-react';
 
 // --- THEME & CONFIGURATION ---
@@ -57,16 +57,25 @@ const generateRoundData = (roundNumber) => {
     }
     events.sort((a,b) => a.time - b.time);
     
-    // Update player stats based on events
-    replayData.rounds.slice(0, roundNumber - 1).forEach(prevRound => {
-        playersThisRound.forEach(p => {
-            const playerInPrevRound = prevRound.players.find(pp => pp.id === p.id);
-            if (playerInPrevRound) {
-                p.stats.k += playerInPrevRound.stats.k;
-                p.stats.a += playerInPrevRound.stats.a;
-                p.stats.d += playerInPrevRound.stats.d;
-            }
-        });
+    let roundStats = {};
+    if (replayData?.rounds?.length > 0) {
+        roundStats = replayData.rounds.slice(0, roundNumber - 1).reduce((acc, prevRound) => {
+             prevRound.players.forEach(p => {
+                if(!acc[p.id]) acc[p.id] = { k:0, a:0, d:0};
+                acc[p.id].k += p.stats.k;
+                acc[p.id].a += p.stats.a;
+                acc[p.id].d += p.stats.d;
+             });
+             return acc;
+        }, {});
+    }
+    
+    playersThisRound.forEach(p => {
+        if(roundStats[p.id]){
+            p.stats.k += roundStats[p.id].k;
+            p.stats.a += roundStats[p.id].a;
+            p.stats.d += roundStats[p.id].d;
+        }
     });
 
     return { roundNumber, winner: Math.random() > 0.5 ? 'teamA' : 'teamB', events, players: playersThisRound, utility: [ { type: 'smoke', team: 'teamA', count: Math.floor(Math.random() * 5) }, { type: 'flash', team: 'teamA', count: Math.floor(Math.random() * 8) }, { type: 'molotov', team: 'teamB', count: Math.floor(Math.random() * 3) } ], };
@@ -75,7 +84,7 @@ const generateRoundData = (roundNumber) => {
 const replayData = {
     mapName: 'de_inferno', totalRounds: 16,
     teams: { teamA: { name: 'Nexus', color: theme.colors.teamA, players: staticPlayers.filter(p => p.team === 'teamA') }, teamB: { name: 'GUNS', color: theme.colors.teamB, players: staticPlayers.filter(p => p.team === 'teamB') } },
-    rounds: [], // Will be populated dynamically
+    rounds: [],
 };
 replayData.rounds = Array.from({ length: 16 }, (_, i) => generateRoundData(i + 1));
 
@@ -85,7 +94,7 @@ const IconButton = ({ children, onClick, className = '', tooltip = '' }) => (<bu
 const formatTime = (time) => `${Math.floor(time/60)}:${(Math.floor(time%60)+'').padStart(2,'0')}`;
 
 const KillFeed = ({ events, currentTime }) => (
-    <div className="absolute top-24 right-4 w-72 z-20 space-y-1.5 pointer-events-none">
+    <div className="absolute top-4 right-16 w-72 z-20 space-y-1.5 pointer-events-none">
         {events .filter(e => e.type === 'kill' && e.time <= currentTime && e.time > currentTime - 5) .slice(-4) .map((event) => ( <div key={`${event.id}-${event.killer}`} className="bg-gray-950/70 backdrop-blur-sm rounded-md px-3 py-1.5 flex items-center justify-between text-sm shadow-lg animate-fade-in-right"> <span style={{ color: replayData.teams[event.killerTeam].color }} className="font-semibold">{event.killer}</span> <Crosshair className="w-4 h-4 text-gray-500"/> <span style={{ color: replayData.teams[event.victimTeam].color }} className="opacity-70">{event.victim}</span> </div> ))}
     </div>
 );
@@ -181,7 +190,6 @@ const MapCanvas = ({ players, geometry, showHeatmap, showPaths, events, currentT
 
         ctx.clearRect(0, 0, rect.width, rect.height);
         
-        const mapAspectRatio = 16 / 9;
         let scale = Math.min(rect.width / 1600, rect.height / 900);
         let offsetX = (rect.width - 1600 * scale) / 2;
         let offsetY = (rect.height - 900 * scale) / 2;
@@ -255,6 +263,8 @@ const TacticalReplayViewer = () => {
     const [arePathsVisible, setArePathsVisible] = useState(false);
     const [isPlayersExpanded, setIsPlayersExpanded] = useState(true);
     const [isUtilityExpanded, setIsUtilityExpanded] = useState(true);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isFooterExpanded, setIsFooterExpanded] = useState(true);
 
     const containerRef = useRef(null);
     const areControlsVisible = !isPlaying || isHovering || isMultiRound;
@@ -270,6 +280,21 @@ const TacticalReplayViewer = () => {
 
     const handleRoundSelect = (roundNumber) => { if (isMultiRound) { setSelectedRounds(prev => prev.includes(roundNumber) ? (prev.length > 1 ? prev.filter(r => r !== roundNumber) : prev) : [...prev, roundNumber] ); } else { setSelectedRounds([roundNumber]); } };
     
+    const handleFullscreen = () => {
+        if (!containerRef.current) return;
+        if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen().catch(err => console.error(err));
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
+    useEffect(() => {
+        const onFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+    }, []);
+
     return (
         <div ref={containerRef} className="w-full min-h-screen font-sans text-gray-200 bg-gray-950" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} >
             <style>{`
@@ -291,19 +316,24 @@ const TacticalReplayViewer = () => {
                     <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
                         <MapCanvas players={isMultiRound ? aggregatedPlayers : singleRoundData?.players || []} geometry={mapGeometry} showHeatmap={isHeatmapVisible} showPaths={arePathsVisible} events={aggregatedEvents} currentTime={currentTime} isMultiRound={isMultiRound} />
                         
-                        {!isMultiRound && singleRoundData && (
-                            <header className={`absolute top-0 left-1/2 -translate-x-1/2 p-4 z-30 transition-all duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0 -translate-y-4'}`}>
-                                <div className="p-3 px-6 rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 flex items-center gap-4 shadow-lg">
-                                    <span className="font-bold text-lg" style={{ color: theme.colors.teamA }}>{replayData.teams.teamA.name}</span>
-                                    <span className="text-2xl font-mono bg-black/30 px-3 py-1 rounded-md text-white">{scoreToCurrentRound.teamA} : {scoreToCurrentRound.teamB}</span>
-                                    <span className="font-bold text-lg" style={{ color: theme.colors.teamB }}>{replayData.teams.teamB.name}</span>
+                        <div className={`absolute top-4 left-4 z-30 transition-all duration-300 space-y-2 ${areControlsVisible && !isMultiRound ? 'opacity-100' : 'opacity-0'}`}>
+                             {singleRoundData && (
+                                <div className="p-3 px-4 rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 shadow-lg">
+                                    <div className="flex items-center gap-4">
+                                        <span className="font-bold text-lg" style={{ color: theme.colors.teamA }}>{replayData.teams.teamA.name}</span>
+                                        <span className="text-2xl font-mono bg-black/30 px-3 py-1 rounded-md text-white">{scoreToCurrentRound.teamA} : {scoreToCurrentRound.teamB}</span>
+                                        <span className="font-bold text-lg" style={{ color: theme.colors.teamB }}>{replayData.teams.teamB.name}</span>
+                                    </div>
+                                    <div className="text-center text-sm text-gray-400 mt-1"> Round <span className="text-white font-bold">{selectedRounds[0]}</span> </div>
                                 </div>
-                                <div className="text-center text-sm text-gray-400 mt-2"> Round <span className="text-white font-bold">{selectedRounds[0]}</span> </div>
-                            </header>
-                        )}
+                            )}
+                             <aside className={`transition-all duration-300 ease-in-out ${isUtilityExpanded && !isMultiRound ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                                {singleRoundData && <UtilityTracker utility={singleRoundData.utility} teams={replayData.teams} />}
+                            </aside>
+                        </div>
                         
-                        <div className={`absolute top-0 right-0 z-30 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
-                            <div className="bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
+                        <div className={`absolute top-4 right-4 z-30 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                            <div className="bg-gray-950/70 backdrop-blur-sm rounded-lg">
                                 <div className="flex items-center justify-end p-2 gap-1">
                                      <IconButton onClick={() => setIsScoreboardVisible(v => !v)} className={`${isScoreboardVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Scoreboard"><ListVideo className="h-5 w-5" /></IconButton>
                                      <IconButton onClick={() => setIsHeatmapVisible(v => !v)} className={`${isHeatmapVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Heatmap"><Thermometer className="h-5 w-5" /></IconButton>
@@ -312,47 +342,47 @@ const TacticalReplayViewer = () => {
                                      <IconButton onClick={() => setIsPlayersExpanded(v => !v)} className={`${isPlayersExpanded ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Spielerliste"><Users className="h-5 w-5" /></IconButton>
                                 </div>
                             </div>
+                             <aside className={`mt-2 transition-all duration-300 ease-in-out ${isPlayersExpanded && !isMultiRound ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                                 {singleRoundData && (
+                                    <div className={`p-2 space-y-1 rounded-xl bg-gray-950/80 backdrop-blur-sm border border-white/10 overflow-y-auto custom-scrollbar transition-all duration-300 ${isFooterExpanded ? 'max-h-[55vh]' : 'max-h-[75vh]'}`}>
+                                        {['teamA', 'teamB'].map(teamId => (
+                                            <div key={teamId} className="mb-2">
+                                                <h3 className="font-semibold px-3 py-1" style={{color: replayData.teams[teamId].color}}>{replayData.teams[teamId].name}</h3>
+                                                {singleRoundData.players.filter(p => p.team === teamId).map(p => (
+                                                    <PlayerRow key={p.id} player={p} team={replayData.teams[teamId]} isAlive={p.isAlive} />
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                 )}
+                            </aside>
                         </div>
 
                         {!isMultiRound && singleRoundData && <KillFeed events={singleRoundData.events} currentTime={currentTime} />}
                         
-                        <aside className={`absolute top-1/2 -translate-y-1/2 left-4 w-60 z-20 transition-all duration-300 ease-in-out ${isUtilityExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
-                            {singleRoundData && <UtilityTracker utility={singleRoundData.utility} teams={replayData.teams} />}
-                        </aside>
-                        
-                        <aside className={`absolute top-1/2 -translate-y-1/2 right-4 w-80 z-20 transition-all duration-300 ease-in-out ${isPlayersExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
-                             {singleRoundData && (
-                                <div className="p-2 space-y-1 rounded-xl bg-gray-950/80 backdrop-blur-sm border border-white/10 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                                    {['teamA', 'teamB'].map(teamId => (
-                                        <div key={teamId} className="mb-2">
-                                            <h3 className="font-semibold px-3 py-1" style={{color: replayData.teams[teamId].color}}>{replayData.teams[teamId].name}</h3>
-                                            {singleRoundData.players.filter(p => p.team === teamId).map(p => (
-                                                <PlayerRow key={p.id} player={p} team={replayData.teams[teamId]} isAlive={p.isAlive} />
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                             )}
-                        </aside>
-
                         <footer className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
                              <div className="bg-gradient-to-t from-black/80 via-black/60 to-transparent">
                                 <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-3 space-y-3">
-                                    <div className="flex items-center justify-center px-4 pt-2">
-                                        <label className="flex items-center cursor-pointer">
-                                            <span className="mr-3 text-sm font-medium text-gray-300">Einzelrunde</span>
-                                            <div className="relative"> <input type="checkbox" checked={isMultiRound} onChange={() => setIsMultiRound(v => !v)} className="sr-only peer" /> <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div> </div>
-                                            <span className="ml-3 text-sm font-medium text-gray-300">Multi-Runden-Analyse</span>
-                                        </label>
-                                    </div>
-                                     <div className="relative overflow-x-auto custom-scrollbar">
-                                         <div className="flex justify-start min-w-max gap-4 p-2 px-4">
-                                            {replayData.rounds.map((r) => ( <button key={r.roundNumber} onClick={() => handleRoundSelect(r.roundNumber)} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 transition-all transform hover:scale-105 ${selectedRounds.includes(r.roundNumber) ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'}`} > {r.roundNumber} </button> ))}
+                                    <div className={`transition-all duration-300 ease-in-out ${isFooterExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+                                        <div className="flex items-center justify-center px-4 pt-2">
+                                            <label className="flex items-center cursor-pointer">
+                                                <span className="mr-3 text-sm font-medium text-gray-300">Einzelrunde</span>
+                                                <div className="relative"> <input type="checkbox" checked={isMultiRound} onChange={() => setIsMultiRound(v => !v)} className="sr-only peer" /> <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div> </div>
+                                                <span className="ml-3 text-sm font-medium text-gray-300">Multi-Runden-Analyse</span>
+                                            </label>
+                                        </div>
+                                         <div className="relative overflow-x-auto custom-scrollbar pt-2">
+                                             <div className="flex justify-start min-w-max gap-4 p-2 px-4">
+                                                {replayData.rounds.map((r) => ( <button key={r.roundNumber} onClick={() => handleRoundSelect(r.roundNumber)} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 transition-all transform hover:scale-105 ${selectedRounds.includes(r.roundNumber) ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'}`} > {r.roundNumber} </button> ))}
+                                             </div>
                                          </div>
-                                     </div>
+                                    </div>
                                     <div className="flex items-center gap-3 text-white pt-2 border-t border-gray-700/50">
+                                        <IconButton onClick={() => setIsFooterExpanded(v => !v)} tooltip={isFooterExpanded ? 'Leiste ausblenden' : 'Leiste einblenden'} className="flex-shrink-0">
+                                            {isFooterExpanded ? <ChevronDown /> : <ChevronUp />}
+                                        </IconButton>
                                         {!isMultiRound ? (
-                                            <IconButton onClick={() => setIsPlaying(!isPlaying)}>
+                                            <IconButton onClick={() => setIsPlaying(!isPlaying)} className="flex-shrink-0">
                                                 {isPlaying ? <Pause /> : <Play />}
                                             </IconButton>
                                         ) : (
@@ -362,31 +392,16 @@ const TacticalReplayViewer = () => {
                                             {isMultiRound ? "N/A" : formatTime(currentTime)}
                                         </span>
                                         <div className="w-full h-2 bg-white/10 rounded-lg relative group">
-                                             <div 
-                                                className="absolute h-full bg-yellow-400 rounded-lg" 
-                                                style={{ width: isMultiRound ? '0%' : `${(currentTime / roundDuration) * 100}%`}}
-                                            ></div>
-                                             <input 
-                                                type="range" 
-                                                min="0" 
-                                                max={roundDuration} 
-                                                value={isMultiRound ? 0 : currentTime} 
-                                                disabled={isMultiRound}
-                                                onChange={(e) => setCurrentTime(parseFloat(e.target.value))} 
-                                                className={`w-full h-full bg-transparent appearance-none absolute inset-0 z-10 accent-color ${isMultiRound ? 'cursor-default' : 'cursor-pointer'}`}
-                                            />
+                                             <div className="absolute h-full bg-yellow-400 rounded-lg" style={{ width: isMultiRound ? '0%' : `${(currentTime / roundDuration) * 100}%`}}></div>
+                                             <input type="range" min="0" max={roundDuration} value={isMultiRound ? 0 : currentTime} disabled={isMultiRound} onChange={(e) => setCurrentTime(parseFloat(e.target.value))} className={`w-full h-full bg-transparent appearance-none absolute inset-0 z-10 accent-color ${isMultiRound ? 'cursor-default' : 'cursor-pointer'}`} />
                                              {(isMultiRound ? aggregatedEvents : singleRoundData?.events || []).map((event, index) => (
-                                                 <div
-                                                     key={`${event.id}-${index}`}
-                                                     className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none group-hover:scale-150 transition-transform"
-                                                     style={{
-                                                         left: `${(event.time / roundDuration) * 100}%`,
-                                                         backgroundColor: theme.colors.killEvent,
-                                                     }}
-                                                 />
+                                                 <div key={`${event.id}-${index}`} className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none group-hover:scale-150 transition-transform" style={{ left: `${(event.time / roundDuration) * 100}%`, backgroundColor: theme.colors.killEvent, }} />
                                              ))}
                                          </div>
                                         <span className="text-sm font-mono w-14 text-center">{formatTime(roundDuration)}</span>
+                                        <IconButton onClick={handleFullscreen} tooltip="Vollbild" className="flex-shrink-0">
+                                            {isFullscreen ? <Minimize /> : <Maximize />}
+                                        </IconButton>
                                     </div>
                                 </div>
                             </div>
