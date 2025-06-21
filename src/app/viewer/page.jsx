@@ -181,7 +181,6 @@ const MapCanvas = ({ players, geometry, showHeatmap, showPaths, events, currentT
 
         ctx.clearRect(0, 0, rect.width, rect.height);
         
-        // **FIX: Maintain aspect ratio**
         const mapAspectRatio = 16 / 9;
         let scale = Math.min(rect.width / 1600, rect.height / 900);
         let offsetX = (rect.width - 1600 * scale) / 2;
@@ -193,7 +192,6 @@ const MapCanvas = ({ players, geometry, showHeatmap, showPaths, events, currentT
         ctx.translate(offsetX, offsetY);
         ctx.scale(scale, scale);
 
-        // Now draw on a virtual 1600x900 canvas
         ctx.fillStyle = theme.colors.mapWall;
         geometry.walls.forEach(wall => ctx.fillRect(wall.x, wall.y, wall.w, wall.h));
         
@@ -238,7 +236,7 @@ const MapCanvas = ({ players, geometry, showHeatmap, showPaths, events, currentT
             }
         });
         
-        ctx.restore(); // Restore from translate/scale
+        ctx.restore(); 
     }, [players, geometry, showHeatmap, showPaths, events, currentTime, isMultiRound]);
     
     return <canvas ref={canvasRef} className="w-full h-full" />;
@@ -273,7 +271,7 @@ const TacticalReplayViewer = () => {
     const handleRoundSelect = (roundNumber) => { if (isMultiRound) { setSelectedRounds(prev => prev.includes(roundNumber) ? (prev.length > 1 ? prev.filter(r => r !== roundNumber) : prev) : [...prev, roundNumber] ); } else { setSelectedRounds([roundNumber]); } };
     
     return (
-        <div ref={containerRef} className="w-full h-screen flex flex-col justify-center font-sans relative text-gray-200 overflow-hidden bg-transparent" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} >
+        <div ref={containerRef} className="w-full min-h-screen font-sans text-gray-200 bg-gray-950" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)} >
             <style>{`
                 .accent-color { accent-color: ${theme.colors.accent}; }
                 .animate-fade-in-up { animation: fade-in-up 0.3s ease-out forwards; }
@@ -288,112 +286,145 @@ const TacticalReplayViewer = () => {
             
             {isScoreboardVisible && <Scoreboard replayData={replayData} onClose={() => setIsScoreboardVisible(false)} />}
             
-            <div className="w-full flex-grow p-4 pt-20 md:p-8 md:pt-24 flex items-center justify-center">
-                <div className="relative w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
-                    <MapCanvas players={isMultiRound ? aggregatedPlayers : singleRoundData?.players || []} geometry={mapGeometry} showHeatmap={isHeatmapVisible} showPaths={arePathsVisible} events={aggregatedEvents} currentTime={currentTime} isMultiRound={isMultiRound} />
-                    
-                    {!isMultiRound && singleRoundData && (
-                        <header className={`absolute top-0 left-1/2 -translate-x-1/2 p-4 z-30 transition-all duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0 -translate-y-4'}`}>
-                            <div className="p-3 px-6 rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 flex items-center gap-4 shadow-lg">
-                                <span className="font-bold text-lg" style={{ color: theme.colors.teamA }}>{replayData.teams.teamA.name}</span>
-                                <span className="text-2xl font-mono bg-black/30 px-3 py-1 rounded-md text-white">{scoreToCurrentRound.teamA} : {scoreToCurrentRound.teamB}</span>
-                                <span className="font-bold text-lg" style={{ color: theme.colors.teamB }}>{replayData.teams.teamB.name}</span>
+            <main className="container mx-auto max-w-7xl px-4 py-24">
+                <div className="flex flex-col gap-8">
+                    <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
+                        <MapCanvas players={isMultiRound ? aggregatedPlayers : singleRoundData?.players || []} geometry={mapGeometry} showHeatmap={isHeatmapVisible} showPaths={arePathsVisible} events={aggregatedEvents} currentTime={currentTime} isMultiRound={isMultiRound} />
+                        
+                        {!isMultiRound && singleRoundData && (
+                            <header className={`absolute top-0 left-1/2 -translate-x-1/2 p-4 z-30 transition-all duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0 -translate-y-4'}`}>
+                                <div className="p-3 px-6 rounded-xl bg-black/40 backdrop-blur-sm border border-white/10 flex items-center gap-4 shadow-lg">
+                                    <span className="font-bold text-lg" style={{ color: theme.colors.teamA }}>{replayData.teams.teamA.name}</span>
+                                    <span className="text-2xl font-mono bg-black/30 px-3 py-1 rounded-md text-white">{scoreToCurrentRound.teamA} : {scoreToCurrentRound.teamB}</span>
+                                    <span className="font-bold text-lg" style={{ color: theme.colors.teamB }}>{replayData.teams.teamB.name}</span>
+                                </div>
+                                <div className="text-center text-sm text-gray-400 mt-2"> Round <span className="text-white font-bold">{selectedRounds[0]}</span> </div>
+                            </header>
+                        )}
+                        
+                        <div className={`absolute top-0 right-0 z-30 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
+                            <div className="bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
+                                <div className="flex items-center justify-end p-2 gap-1">
+                                     <IconButton onClick={() => setIsScoreboardVisible(v => !v)} className={`${isScoreboardVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Scoreboard"><ListVideo className="h-5 w-5" /></IconButton>
+                                     <IconButton onClick={() => setIsHeatmapVisible(v => !v)} className={`${isHeatmapVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Heatmap"><Thermometer className="h-5 w-5" /></IconButton>
+                                     <IconButton onClick={() => setArePathsVisible(v => !v)} className={`${arePathsVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Pfade anzeigen"><Footprints className="h-5 w-5" /></IconButton>
+                                     <IconButton onClick={() => setIsUtilityExpanded(v => !v)} className={`${isUtilityExpanded ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Utility-Verlauf"><BarChart className="h-5 w-5" /></IconButton>
+                                     <IconButton onClick={() => setIsPlayersExpanded(v => !v)} className={`${isPlayersExpanded ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Spielerliste"><Users className="h-5 w-5" /></IconButton>
+                                </div>
                             </div>
-                            <div className="text-center text-sm text-gray-400 mt-2"> Round <span className="text-white font-bold">{selectedRounds[0]}</span> </div>
-                        </header>
-                    )}
-                    
-                    <div className={`absolute top-0 right-0 z-30 transition-opacity duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0'}`}>
-                        <div className="bg-gray-950/70 backdrop-blur-sm rounded-bl-2xl">
-                            <div className="flex items-center justify-end p-2 gap-1">
-                                 <IconButton onClick={() => setIsScoreboardVisible(v => !v)} className={`${isScoreboardVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Scoreboard"><ListVideo className="h-5 w-5" /></IconButton>
-                                 <IconButton onClick={() => setIsHeatmapVisible(v => !v)} className={`${isHeatmapVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Heatmap"><Thermometer className="h-5 w-5" /></IconButton>
-                                 <IconButton onClick={() => setArePathsVisible(v => !v)} className={`${arePathsVisible ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Pfade anzeigen"><Footprints className="h-5 w-5" /></IconButton>
-                                 <IconButton onClick={() => setIsUtilityExpanded(v => !v)} className={`${isUtilityExpanded ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Utility-Verlauf"><BarChart className="h-5 w-5" /></IconButton>
-                                 <IconButton onClick={() => setIsPlayersExpanded(v => !v)} className={`${isPlayersExpanded ? 'bg-yellow-400/20 text-yellow-400' : ''}`} tooltip="Spielerliste"><Users className="h-5 w-5" /></IconButton>
+                        </div>
+
+                        {!isMultiRound && singleRoundData && <KillFeed events={singleRoundData.events} currentTime={currentTime} />}
+                        
+                        <aside className={`absolute top-1/2 -translate-y-1/2 left-4 w-60 z-20 transition-all duration-300 ease-in-out ${isUtilityExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
+                            {singleRoundData && <UtilityTracker utility={singleRoundData.utility} teams={replayData.teams} />}
+                        </aside>
+                        
+                        <aside className={`absolute top-1/2 -translate-y-1/2 right-4 w-80 z-20 transition-all duration-300 ease-in-out ${isPlayersExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
+                             {singleRoundData && (
+                                <div className="p-2 space-y-1 rounded-xl bg-gray-950/80 backdrop-blur-sm border border-white/10 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                                    {['teamA', 'teamB'].map(teamId => (
+                                        <div key={teamId} className="mb-2">
+                                            <h3 className="font-semibold px-3 py-1" style={{color: replayData.teams[teamId].color}}>{replayData.teams[teamId].name}</h3>
+                                            {singleRoundData.players.filter(p => p.team === teamId).map(p => (
+                                                <PlayerRow key={p.id} player={p} team={replayData.teams[teamId]} isAlive={p.isAlive} />
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                             )}
+                        </aside>
+
+                        <footer className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
+                             <div className="bg-gradient-to-t from-black/80 via-black/60 to-transparent">
+                                <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-3 space-y-3">
+                                    <div className="flex items-center justify-center px-4 pt-2">
+                                        <label className="flex items-center cursor-pointer">
+                                            <span className="mr-3 text-sm font-medium text-gray-300">Einzelrunde</span>
+                                            <div className="relative"> <input type="checkbox" checked={isMultiRound} onChange={() => setIsMultiRound(v => !v)} className="sr-only peer" /> <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div> </div>
+                                            <span className="ml-3 text-sm font-medium text-gray-300">Multi-Runden-Analyse</span>
+                                        </label>
+                                    </div>
+                                     <div className="relative overflow-x-auto custom-scrollbar">
+                                         <div className="flex justify-start min-w-max gap-4 p-2 px-4">
+                                            {replayData.rounds.map((r) => ( <button key={r.roundNumber} onClick={() => handleRoundSelect(r.roundNumber)} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 transition-all transform hover:scale-105 ${selectedRounds.includes(r.roundNumber) ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'}`} > {r.roundNumber} </button> ))}
+                                         </div>
+                                     </div>
+                                    <div className="flex items-center gap-3 text-white pt-2 border-t border-gray-700/50">
+                                        {!isMultiRound ? (
+                                            <IconButton onClick={() => setIsPlaying(!isPlaying)}>
+                                                {isPlaying ? <Pause /> : <Play />}
+                                            </IconButton>
+                                        ) : (
+                                            <div className="w-10 h-10 flex-shrink-0" />
+                                        )}
+                                        <span className="text-sm font-mono w-14 text-center">
+                                            {isMultiRound ? "N/A" : formatTime(currentTime)}
+                                        </span>
+                                        <div className="w-full h-2 bg-white/10 rounded-lg relative group">
+                                             <div 
+                                                className="absolute h-full bg-yellow-400 rounded-lg" 
+                                                style={{ width: isMultiRound ? '0%' : `${(currentTime / roundDuration) * 100}%`}}
+                                            ></div>
+                                             <input 
+                                                type="range" 
+                                                min="0" 
+                                                max={roundDuration} 
+                                                value={isMultiRound ? 0 : currentTime} 
+                                                disabled={isMultiRound}
+                                                onChange={(e) => setCurrentTime(parseFloat(e.target.value))} 
+                                                className={`w-full h-full bg-transparent appearance-none absolute inset-0 z-10 accent-color ${isMultiRound ? 'cursor-default' : 'cursor-pointer'}`}
+                                            />
+                                             {(isMultiRound ? aggregatedEvents : singleRoundData?.events || []).map((event, index) => (
+                                                 <div
+                                                     key={`${event.id}-${index}`}
+                                                     className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none group-hover:scale-150 transition-transform"
+                                                     style={{
+                                                         left: `${(event.time / roundDuration) * 100}%`,
+                                                         backgroundColor: theme.colors.killEvent,
+                                                     }}
+                                                 />
+                                             ))}
+                                         </div>
+                                        <span className="text-sm font-mono w-14 text-center">{formatTime(roundDuration)}</span>
+                                    </div>
+                                </div>
                             </div>
+                        </footer>
+                    </div>
+                    
+                    <div className="w-full space-y-6">
+                        <h1 className="text-3xl lg:text-4xl font-bold text-white">
+                            Analyse: {replayData.teams.teamA.name} vs. {replayData.teams.teamB.name} auf <span className="capitalize">{replayData.mapName.replace('de_', '')}</span>
+                        </h1>
+                    
+                        <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+                            {staticPlayers.map((player) => (
+                                <div key={player.id} className="flex-shrink-0 flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700 cursor-pointer">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-gray-900 font-bold text-base shadow-lg" style={{backgroundColor: player.team === 'teamA' ? theme.colors.teamA : theme.colors.teamB}}>
+                                        {player.name.charAt(0)}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-white font-semibold text-base">{player.name}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+                             <div className="flex items-center justify-between mb-4">
+                                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-400 text-sm">
+                                    <div>{replayData.totalRounds} Runden</div>
+                                    <div>Match-Analyse</div>
+                                </div>
+                            </div>
+                            <p className="text-gray-300 leading-relaxed">
+                                Detaillierte Analyse des Matches. Nutzen Sie die Werkzeuge oben und unten, um einzelne oder mehrere Runden zu untersuchen, Spielerpfade zu verfolgen und Kill-Hotspots auf der Karte zu visualisieren.
+                            </p>
                         </div>
                     </div>
-
-                    {!isMultiRound && singleRoundData && <KillFeed events={singleRoundData.events} currentTime={currentTime} />}
-                    
-                    <aside className={`absolute top-1/2 -translate-y-1/2 left-4 w-60 z-20 transition-all duration-300 ease-in-out ${isUtilityExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
-                        {singleRoundData && <UtilityTracker utility={singleRoundData.utility} teams={replayData.teams} />}
-                    </aside>
-                    
-                    <aside className={`absolute top-1/2 -translate-y-1/2 right-4 w-80 z-20 transition-all duration-300 ease-in-out ${isPlayersExpanded && !isMultiRound ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
-                         {singleRoundData && (
-                            <div className="p-2 space-y-1 rounded-xl bg-gray-950/80 backdrop-blur-sm border border-white/10 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                                {['teamA', 'teamB'].map(teamId => (
-                                    <div key={teamId} className="mb-2">
-                                        <h3 className="font-semibold px-3 py-1" style={{color: replayData.teams[teamId].color}}>{replayData.teams[teamId].name}</h3>
-                                        {singleRoundData.players.filter(p => p.team === teamId).map(p => (
-                                            <PlayerRow key={p.id} player={p} team={replayData.teams[teamId]} isAlive={p.isAlive} />
-                                        ))}
-                                    </div>
-                                ))}
-                            </div>
-                         )}
-                    </aside>
-
-                    <footer className={`absolute bottom-0 left-0 right-0 z-30 transition-all duration-300 ${areControlsVisible ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
-                         <div className="bg-gradient-to-t from-black/80 via-black/60 to-transparent">
-                            <div className="bg-gray-900/60 backdrop-blur-sm border-t border-gray-700/50 p-3 space-y-3">
-                                <div className="flex items-center justify-center px-4 pt-2">
-                                    <label className="flex items-center cursor-pointer">
-                                        <span className="mr-3 text-sm font-medium text-gray-300">Einzelrunde</span>
-                                        <div className="relative"> <input type="checkbox" checked={isMultiRound} onChange={() => setIsMultiRound(v => !v)} className="sr-only peer" /> <div className="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div> </div>
-                                        <span className="ml-3 text-sm font-medium text-gray-300">Multi-Runden-Analyse</span>
-                                    </label>
-                                </div>
-                                 <div className="relative overflow-x-auto custom-scrollbar">
-                                     <div className="flex justify-start min-w-max gap-4 p-2 px-4">
-                                        {replayData.rounds.map((r) => ( <button key={r.roundNumber} onClick={() => handleRoundSelect(r.roundNumber)} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 hover:border-yellow-400 transition-all transform hover:scale-105 ${selectedRounds.includes(r.roundNumber) ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400 scale-110' : 'bg-gray-800 border-gray-700 text-gray-300'}`} > {r.roundNumber} </button> ))}
-                                     </div>
-                                 </div>
-                                <div className="flex items-center gap-3 text-white pt-2 border-t border-gray-700/50">
-                                    {!isMultiRound ? (
-                                        <IconButton onClick={() => setIsPlaying(!isPlaying)}>
-                                            {isPlaying ? <Pause /> : <Play />}
-                                        </IconButton>
-                                    ) : (
-                                        <div className="w-10 h-10 flex-shrink-0" /> // Placeholder for alignment
-                                    )}
-                                    <span className="text-sm font-mono w-14 text-center">
-                                        {isMultiRound ? "N/A" : formatTime(currentTime)}
-                                    </span>
-                                    <div className="w-full h-2 bg-white/10 rounded-lg relative group">
-                                         <div 
-                                            className="absolute h-full bg-yellow-400 rounded-lg" 
-                                            style={{ width: isMultiRound ? '0%' : `${(currentTime / roundDuration) * 100}%`}}
-                                        ></div>
-                                         <input 
-                                            type="range" 
-                                            min="0" 
-                                            max={roundDuration} 
-                                            value={isMultiRound ? 0 : currentTime} 
-                                            disabled={isMultiRound}
-                                            onChange={(e) => setCurrentTime(parseFloat(e.target.value))} 
-                                            className={`w-full h-full bg-transparent appearance-none absolute inset-0 z-10 accent-color ${isMultiRound ? 'cursor-default' : 'cursor-pointer'}`}
-                                        />
-                                         {(isMultiRound ? aggregatedEvents : singleRoundData?.events || []).map((event, index) => (
-                                             <div
-                                                 key={`${event.id}-${index}`}
-                                                 className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full pointer-events-none group-hover:scale-150 transition-transform"
-                                                 style={{
-                                                     left: `${(event.time / roundDuration) * 100}%`,
-                                                     backgroundColor: theme.colors.killEvent,
-                                                 }}
-                                             />
-                                         ))}
-                                     </div>
-                                    <span className="text-sm font-mono w-14 text-center">{formatTime(roundDuration)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </footer>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
