@@ -320,7 +320,7 @@ const getEventIcon = (type) => {
   }
 };
 
-export default function DemoViewer2D() {
+export default function Analytics2DViewer() {
   const [players] = useState(generateDetailedPlayers());
   const [matchHistory] = useState(generateMatchHistory());
   const [isPlaying, setIsPlaying] = useState(false);

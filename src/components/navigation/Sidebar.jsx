@@ -71,7 +71,7 @@ export default function Sidebar({ items }) {
   const analyticsItems = [
     {
       label: "2D Viewer",
-      href: "/analytics/2d-viewer",
+      href: "/viewer",
       icon: <MonitorPlay className="h-5 w-5" />,
     },
     {

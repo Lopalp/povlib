@@ -56,7 +56,7 @@ function GlobalLayoutContent({ children }) {
         </main>
       </div>
 
-      {shouldShowNavigation && <Footer />}
+      {shouldShowNavigation}
     </>
   );
 }
